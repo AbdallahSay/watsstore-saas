@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState, useRef } from 'react';
+import Link from 'next/link';
 import { api } from '@/lib/api';
 import { DashboardSummary } from '@/types';
 import Swal from 'sweetalert2';
@@ -24,7 +25,13 @@ import {
   MessageCircle,
   X,
   ShieldCheck,
-  CheckCircle2
+  CheckCircle2,
+  FileSpreadsheet,
+  Share2,
+  ChevronDown,
+  ChevronUp,
+  Circle,
+  ArrowLeft
 } from 'lucide-react';
 import { platformConfig } from '@/config/platformConfig';
 
@@ -36,6 +43,9 @@ export default function DashboardOverviewPage() {
   const [copiedWallet, setCopiedWallet] = useState(false);
   const [isUpgradeModalOpen, setIsUpgradeModalOpen] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState<'pro' | 'vip'>('pro');
+  const [isExporting, setIsExporting] = useState(false);
+  const [isOnboardingDismissed, setIsOnboardingDismissed] = useState(false);
+  const [isLinkShared, setIsLinkShared] = useState(false);
 
   useEffect(() => {
     const fetchSummary = async () => {
@@ -45,6 +55,14 @@ export default function DashboardOverviewPage() {
       try {
         const data = await api.getDashboardSummary(token);
         setSummary(data);
+
+        // Check onboarding flags in localStorage
+        if (data?.storeInfo?.id) {
+          const isDismissed = localStorage.getItem(`watsstore_onboarding_dismissed_${data.storeInfo.id}`) === 'true';
+          const isShared = localStorage.getItem(`watsstore_shared_${data.storeInfo.id}`) === 'true';
+          setIsOnboardingDismissed(isDismissed);
+          setIsLinkShared(isShared);
+        }
       } catch (err: any) {
         Swal.fire({
           icon: 'error',
@@ -58,6 +76,57 @@ export default function DashboardOverviewPage() {
 
     fetchSummary();
   }, []);
+
+  const handleExportCsv = async () => {
+    const token = localStorage.getItem('watsstore_token');
+    if (!token) return;
+
+    setIsExporting(true);
+    try {
+      await api.exportOrdersCsv(token);
+      const toast = Swal.mixin({
+        toast: true,
+        position: 'top-end',
+        showConfirmButton: false,
+        timer: 2000,
+      });
+      toast.fire({
+        icon: 'success',
+        title: 'تم تصدير ملف الإكسل (CSV) بنجاح!',
+      });
+    } catch (err: any) {
+      Swal.fire({
+        icon: 'error',
+        title: 'خطأ في التصدير',
+        text: err.message || 'حدث خطأ أثناء تحميل ملف الإكسل',
+      });
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
+  const handleShareOnWhatsApp = (storeUrl: string, storeName: string) => {
+    if (summary?.storeInfo?.id) {
+      localStorage.setItem(`watsstore_shared_${summary.storeInfo.id}`, 'true');
+      setIsLinkShared(true);
+    }
+
+    const text = encodeURIComponent(
+      `مرحباً بكم! يسعدنا زيارتكم لمتجرنا الإلكتروني الرسمي على الواتساب [${storeName}]:\n${storeUrl}\nتصفحوا المنتجات واطلبوا مباشرة بأسرع خدمة وتوصيل! 🛍️✨`
+    );
+    window.open(`https://wa.me/?text=${text}`, '_blank');
+  };
+
+  const handleToggleOnboardingDismiss = () => {
+    if (!summary?.storeInfo?.id) return;
+    const newState = !isOnboardingDismissed;
+    setIsOnboardingDismissed(newState);
+    if (newState) {
+      localStorage.setItem(`watsstore_onboarding_dismissed_${summary.storeInfo.id}`, 'true');
+    } else {
+      localStorage.removeItem(`watsstore_onboarding_dismissed_${summary.storeInfo.id}`);
+    }
+  };
 
   const copyToClipboard = (text: string, type: 'link' | 'qr' | 'wallet') => {
     navigator.clipboard.writeText(text);
@@ -178,6 +247,224 @@ export default function DashboardOverviewPage() {
           </div>
         </div>
       </div>
+
+      {/* Merchant Onboarding Wizard (First-Time Experience) */}
+      {(() => {
+        const step1Done = true;
+        const step2Done = Boolean(summary.storeInfo.logoUrl || summary.storeInfo.vodafoneCashNumber || summary.storeInfo.instaPayAddress);
+        const step3Done = summary.totalProducts >= 3;
+        const step4Done = isLinkShared;
+
+        const completedStepsCount = 1 + (step2Done ? 1 : 0) + (step3Done ? 1 : 0) + (step4Done ? 1 : 0);
+        const progressPercent = Math.round((completedStepsCount / 4) * 100);
+
+        if (isOnboardingDismissed) {
+          return (
+            <div className="bg-white/90 border border-slate-200 rounded-2xl p-3 px-5 flex items-center justify-between shadow-sm">
+              <div className="flex items-center gap-3">
+                <Sparkles className="w-4 h-4 text-emerald-600" />
+                <span className="text-xs font-bold text-slate-700">
+                  دليل تجهيز المتجر ({completedStepsCount} من 4 خطوات مكتملة)
+                </span>
+                <div className="w-24 bg-slate-100 rounded-full h-1.5 overflow-hidden">
+                  <div 
+                    className="bg-emerald-500 h-1.5 rounded-full transition-all duration-500" 
+                    style={{ width: `${progressPercent}%` }} 
+                  />
+                </div>
+              </div>
+              <button
+                onClick={handleToggleOnboardingDismiss}
+                className="text-xs font-bold text-emerald-600 hover:text-emerald-700 flex items-center gap-1 transition-colors"
+              >
+                <span>إظهار خطوات الدليل</span>
+                <ChevronDown className="w-4 h-4" />
+              </button>
+            </div>
+          );
+        }
+
+        return (
+          <div className="bg-gradient-to-br from-emerald-50/80 via-white to-slate-50 border border-emerald-200 rounded-3xl p-6 sm:p-7 shadow-sm space-y-6 relative overflow-hidden">
+            {/* Header */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-emerald-100 pb-4">
+              <div className="space-y-1">
+                <div className="flex items-center gap-2">
+                  <div className="w-7 h-7 rounded-xl bg-emerald-600 text-white flex items-center justify-center font-bold text-xs shadow-sm">
+                    🚀
+                  </div>
+                  <h3 className="text-base font-black text-slate-900">
+                    دليل إطلاق متجرك السريع (خطوات التجهيز الأولى)
+                  </h3>
+                  <span className="text-xs font-black px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-200">
+                    {progressPercent}% مكتمل
+                  </span>
+                </div>
+                <p className="text-xs text-slate-500">
+                  أكمل هذه الخطوات البسيطة لتبدأ باستقبال الزبائن والطلبات الفورية عبر الواتساب بأعلى فاعلية
+                </p>
+              </div>
+
+              <button
+                onClick={handleToggleOnboardingDismiss}
+                className="text-xs font-bold text-slate-400 hover:text-slate-600 self-end sm:self-center flex items-center gap-1 transition-colors px-2.5 py-1 rounded-lg hover:bg-slate-100"
+                title="إخفاء مؤقت"
+              >
+                <span>تخطّي المؤقت</span>
+                <ChevronUp className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Progress Bar */}
+            <div className="space-y-1.5">
+              <div className="w-full bg-slate-200/80 rounded-full h-2.5 overflow-hidden">
+                <div
+                  className="bg-gradient-to-r from-emerald-500 to-teal-500 h-2.5 rounded-full transition-all duration-500"
+                  style={{ width: `${progressPercent}%` }}
+                />
+              </div>
+              <div className="flex justify-between text-[11px] font-bold text-slate-400">
+                <span>تأسيس المتجر</span>
+                <span>{completedStepsCount} من 4 مهام مكتملة</span>
+                <span>جاهز للبيع 100%</span>
+              </div>
+            </div>
+
+            {/* Steps Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              {/* Step 1 */}
+              <div className="p-4 rounded-2xl bg-white border border-emerald-200 shadow-sm flex flex-col justify-between space-y-3">
+                <div className="space-y-1.5">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md">الخطوة 1</span>
+                    <CheckCircle2 className="w-5 h-5 text-emerald-500" />
+                  </div>
+                  <h4 className="text-xs font-black text-slate-900">تسجيل وتأسيس المتجر</h4>
+                  <p className="text-[11px] text-slate-400">تم إنشاء رابط متجرك وكود الـ QR الدائم بنجاح.</p>
+                </div>
+                <div className="pt-2 border-t border-slate-100">
+                  <span className="text-[11px] font-bold text-emerald-600 flex items-center gap-1">
+                    <Check className="w-3.5 h-3.5" />
+                    <span>مكتمل بنجاح</span>
+                  </span>
+                </div>
+              </div>
+
+              {/* Step 2 */}
+              <div className={`p-4 rounded-2xl bg-white border shadow-sm flex flex-col justify-between space-y-3 ${step2Done ? 'border-emerald-200' : 'border-slate-200'}`}>
+                <div className="space-y-1.5">
+                  <div className="flex items-center justify-between">
+                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-md ${step2Done ? 'text-emerald-700 bg-emerald-50' : 'text-amber-700 bg-amber-50'}`}>
+                      الخطوة 2
+                    </span>
+                    {step2Done ? (
+                      <CheckCircle2 className="w-5 h-5 text-emerald-500" />
+                    ) : (
+                      <Circle className="w-5 h-5 text-slate-300" />
+                    )}
+                  </div>
+                  <h4 className="text-xs font-black text-slate-900">الشعار ووسائل الدفع</h4>
+                  <p className="text-[11px] text-slate-400">
+                    {step2Done ? 'تم تجهيز الشعار وتفعيل وسائل الدفع.' : 'ارفع لوجو متجرك وأضف رقم فودافون كاش أو إنستاباي.'}
+                  </p>
+                </div>
+                <div className="pt-2 border-t border-slate-100">
+                  {step2Done ? (
+                    <span className="text-[11px] font-bold text-emerald-600 flex items-center gap-1">
+                      <Check className="w-3.5 h-3.5" />
+                      <span>مكتمل بنجاح</span>
+                    </span>
+                  ) : (
+                    <Link
+                      href="/dashboard/settings"
+                      className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-600 hover:text-emerald-700"
+                    >
+                      <span>ضبط الإعدادات الآن</span>
+                      <ArrowLeft className="w-3 h-3" />
+                    </Link>
+                  )}
+                </div>
+              </div>
+
+              {/* Step 3 */}
+              <div className={`p-4 rounded-2xl bg-white border shadow-sm flex flex-col justify-between space-y-3 ${step3Done ? 'border-emerald-200' : 'border-slate-200'}`}>
+                <div className="space-y-1.5">
+                  <div className="flex items-center justify-between">
+                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-md ${step3Done ? 'text-emerald-700 bg-emerald-50' : 'text-amber-700 bg-amber-50'}`}>
+                      الخطوة 3
+                    </span>
+                    {step3Done ? (
+                      <CheckCircle2 className="w-5 h-5 text-emerald-500" />
+                    ) : (
+                      <Circle className="w-5 h-5 text-slate-300" />
+                    )}
+                  </div>
+                  <h4 className="text-xs font-black text-slate-900">إضافة أول 3 منتجات</h4>
+                  <p className="text-[11px] text-slate-400">
+                    {step3Done
+                      ? `رائع! أضفت ${summary.totalProducts} منتجات في الكتالوج.`
+                      : `أضف صور وأسعار منتجاتك (مضاف حالياً ${summary.totalProducts}/3).`}
+                  </p>
+                </div>
+                <div className="pt-2 border-t border-slate-100">
+                  {step3Done ? (
+                    <span className="text-[11px] font-bold text-emerald-600 flex items-center gap-1">
+                      <Check className="w-3.5 h-3.5" />
+                      <span>مكتمل بنجاح</span>
+                    </span>
+                  ) : (
+                    <Link
+                      href="/dashboard/products"
+                      className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-600 hover:text-emerald-700"
+                    >
+                      <span>إضافة منتجات</span>
+                      <ArrowLeft className="w-3 h-3" />
+                    </Link>
+                  )}
+                </div>
+              </div>
+
+              {/* Step 4 */}
+              <div className={`p-4 rounded-2xl bg-white border shadow-sm flex flex-col justify-between space-y-3 ${step4Done ? 'border-emerald-200' : 'border-slate-200'}`}>
+                <div className="space-y-1.5">
+                  <div className="flex items-center justify-between">
+                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-md ${step4Done ? 'text-emerald-700 bg-emerald-50' : 'text-blue-700 bg-blue-50'}`}>
+                      الخطوة 4
+                    </span>
+                    {step4Done ? (
+                      <CheckCircle2 className="w-5 h-5 text-emerald-500" />
+                    ) : (
+                      <Circle className="w-5 h-5 text-slate-300" />
+                    )}
+                  </div>
+                  <h4 className="text-xs font-black text-slate-900">مشاركة الرابط على الواتساب</h4>
+                  <p className="text-[11px] text-slate-400">
+                    {step4Done
+                      ? 'تمت مشاركة المتجر مع الزبائن بنجاح.'
+                      : 'شارك رابط متجرك في الحالات والجروبات لتصل لأول زبون.'}
+                  </p>
+                </div>
+                <div className="pt-2 border-t border-slate-100">
+                  {step4Done ? (
+                    <span className="text-[11px] font-bold text-emerald-600 flex items-center gap-1">
+                      <Check className="w-3.5 h-3.5" />
+                      <span>تمت المشاركة</span>
+                    </span>
+                  ) : (
+                    <button
+                      onClick={() => handleShareOnWhatsApp(storeUrl, summary.storeInfo.storeName)}
+                      className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-600 hover:text-emerald-700"
+                    >
+                      <span>مشاركة عبر WhatsApp</span>
+                      <Share2 className="w-3 h-3" />
+                    </button>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
 
       {/* Metrics Row */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
@@ -321,16 +608,40 @@ export default function DashboardOverviewPage() {
 
       {/* Recent Orders List */}
       <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-sm space-y-4">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold">
               <Receipt className="w-4 h-4" />
             </div>
-            <h2 className="text-lg font-bold text-slate-900">سجل أحدث الطلبات (آخر 20 طلب)</h2>
+            <div>
+              <h2 className="text-lg font-bold text-slate-900">سجل أحدث الطلبات (آخر 20 طلب)</h2>
+              <p className="text-xs text-slate-400">إجمالي الطلبات المسجلة: {summary.recentOrders.length} طلب</p>
+            </div>
           </div>
-          <span className="text-xs font-bold text-slate-500">
-            {summary.recentOrders.length} طلب
-          </span>
+
+          <div className="flex items-center gap-2">
+            <button
+              onClick={handleExportCsv}
+              disabled={isExporting || summary.recentOrders.length === 0}
+              className="px-3.5 py-2 bg-emerald-50 hover:bg-emerald-100 disabled:opacity-50 text-emerald-700 text-xs font-bold rounded-xl flex items-center gap-1.5 border border-emerald-200 transition-colors shadow-sm"
+              title="تصدير الطلبات لملف Excel CSV"
+            >
+              {isExporting ? (
+                <div className="w-3.5 h-3.5 border-2 border-emerald-600 border-t-transparent rounded-full animate-spin" />
+              ) : (
+                <FileSpreadsheet className="w-4 h-4" />
+              )}
+              <span>{isExporting ? 'جاري التحميل...' : '📥 تصدير الطلبات لإكسل (CSV)'}</span>
+            </button>
+
+            <Link
+              href="/dashboard/orders"
+              className="px-3.5 py-2 bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold rounded-xl flex items-center gap-1.5 transition-colors"
+            >
+              <span>عرض كل الطلبات</span>
+              <ExternalLink className="w-3.5 h-3.5" />
+            </Link>
+          </div>
         </div>
 
         {summary.recentOrders.length === 0 ? (

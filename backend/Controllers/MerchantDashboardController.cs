@@ -10,6 +10,7 @@ using WatsStore.Api.Domain.Entities;
 using WatsStore.Api.DTOs;
 using WatsStore.Api.Infrastructure.Data;
 using WatsStore.Api.Infrastructure.Utils;
+using System.Text;
 
 namespace WatsStore.Api.Controllers
 {
@@ -403,6 +404,90 @@ namespace WatsStore.Api.Controllers
             await _db.SaveChangesAsync();
 
             return Ok(new { message = "تم حذف المنتج بنجاح" });
+        }
+
+        [HttpGet("orders")]
+        public async Task<IActionResult> GetOrders([FromQuery] int page = 1, [FromQuery] int pageSize = 50)
+        {
+            var storeId = GetAuthenticatedStoreId();
+
+            var query = _db.WhatsAppOrders
+                .AsNoTracking()
+                .Where(o => o.StoreId == storeId)
+                .OrderByDescending(o => o.CreatedAt);
+
+            var total = await query.CountAsync();
+            var orders = await query
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .Select(o => new OrderDto
+                {
+                    Id = o.Id,
+                    OrderNumber = o.OrderNumber,
+                    CustomerName = o.CustomerName,
+                    CustomerPhone = o.CustomerPhone,
+                    CustomerAddress = o.CustomerAddress,
+                    CustomerNotes = o.CustomerNotes,
+                    PaymentMethod = o.PaymentMethod,
+                    ItemsJson = o.ItemsJson,
+                    TotalAmount = o.TotalAmount,
+                    CreatedAt = o.CreatedAt
+                })
+                .ToListAsync();
+
+            return Ok(new
+            {
+                total,
+                page,
+                pageSize,
+                orders
+            });
+        }
+
+        [HttpGet("orders/export")]
+        public async Task<IActionResult> ExportOrdersCsv()
+        {
+            var storeId = GetAuthenticatedStoreId();
+
+            var orders = await _db.WhatsAppOrders
+                .AsNoTracking()
+                .Where(o => o.StoreId == storeId)
+                .OrderByDescending(o => o.CreatedAt)
+                .ToListAsync();
+
+            var sb = new StringBuilder();
+
+            // UTF-8 BOM so Microsoft Excel opens Arabic text correctly without encoding artifacts
+            sb.Append('\uFEFF');
+
+            // Arabic CSV Headers
+            sb.AppendLine("رقم الطلب,اسم العميل,رقم الهاتف,العنوان,طريقة الدفع,المبلغ الإجمالي (ج.م),تاريخ الطلب,ملاحظات");
+
+            foreach (var o in orders)
+            {
+                var orderNum = o.OrderNumber;
+                var name = EscapeCsv(o.CustomerName);
+                var phone = EscapeCsv(o.CustomerPhone);
+                var address = EscapeCsv(o.CustomerAddress);
+                var paymentMethod = EscapeCsv(string.IsNullOrEmpty(o.PaymentMethod) ? "الدفع عند الاستلام" : o.PaymentMethod);
+                var total = o.TotalAmount.ToString("F2", System.Globalization.CultureInfo.InvariantCulture);
+                var date = o.CreatedAt.ToString("yyyy-MM-dd HH:mm", System.Globalization.CultureInfo.InvariantCulture);
+                var notes = EscapeCsv(o.CustomerNotes ?? "");
+
+                sb.AppendLine($"{orderNum},{name},{phone},{address},{paymentMethod},{total},{date},{notes}");
+            }
+
+            var bytes = Encoding.UTF8.GetBytes(sb.ToString());
+            var fileName = $"watsstore-orders-{DateTime.UtcNow:yyyyMMdd-HHmm}.csv";
+
+            return File(bytes, "text/csv; charset=utf-8", fileName);
+        }
+
+        private static string EscapeCsv(string value)
+        {
+            if (string.IsNullOrEmpty(value)) return "\"\"";
+            var clean = value.Replace("\r", " ").Replace("\n", " ").Replace("\"", "\"\"");
+            return $"\"{clean}\"";
         }
     }
 }

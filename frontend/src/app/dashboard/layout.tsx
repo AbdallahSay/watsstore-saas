@@ -13,6 +13,7 @@ import {
   LogOut, 
   User, 
   ShieldCheck,
+  Receipt,
   Menu,
   X
 } from 'lucide-react';
@@ -62,10 +63,11 @@ export default function DashboardLayout({
   }
 
   const navLinks = [
-    { name: 'نظرة عامة والطلبات', href: '/dashboard', icon: LayoutDashboard },
+    { name: 'نظرة عامة للمتجر', href: '/dashboard', icon: LayoutDashboard },
+    { name: 'الطلبات والمبيعات', href: '/dashboard/orders', icon: Receipt },
     { name: 'المنتجات والكتالوج', href: '/dashboard/products', icon: ShoppingBag },
     { name: 'الأقسام والتصنيفات', href: '/dashboard/categories', icon: FolderTree },
-    { name: 'إعدادات المتجر والبيكسل', href: '/dashboard/settings', icon: Settings },
+    { name: 'إعدادات المتجر والدفع', href: '/dashboard/settings', icon: Settings },
   ];
 
   return (

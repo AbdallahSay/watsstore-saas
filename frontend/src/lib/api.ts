@@ -199,4 +199,35 @@ export const api = {
 
     return res.json();
   },
+
+  async getOrders(token: string, page = 1, pageSize = 50): Promise<{ total: number; page: number; pageSize: number; orders: any[] }> {
+    return fetchJson<{ total: number; page: number; pageSize: number; orders: any[] }>(
+      `${API_BASE_URL}/merchant/orders?page=${page}&pageSize=${pageSize}`,
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+  },
+
+  async exportOrdersCsv(token: string): Promise<void> {
+    const res = await fetch(`${API_BASE_URL}/merchant/orders/export`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!res.ok) {
+      throw new Error('فشل تصدير الطلبات. يرجى المحاولة لاحقاً');
+    }
+
+    const blob = await res.blob();
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `watsstore-orders-${new Date().toISOString().slice(0, 10)}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(url);
+  },
 };
