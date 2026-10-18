@@ -205,6 +205,14 @@ export default function StoreCatalogClient({ store }: StoreCatalogClientProps) {
         onOpenCart={() => setIsCartOpen(true)}
       />
 
+      {/* Trial Expired Alert Banner */}
+      {store.isTrialExpired && (
+        <div className="bg-rose-600 text-white px-4 py-3 text-center text-xs sm:text-sm font-bold flex items-center justify-center gap-2 shadow-inner">
+          <AlertTriangle className="w-4 h-4 shrink-0 text-white animate-pulse" />
+          <span>⚠️ هذا المتجر في وضع المعاينة فقط نظراً لانتهاء الفترة التجريبية المجانية. استقبال الطلبات متوقف مؤقتاً.</span>
+        </div>
+      )}
+
       {/* Store Banner / Cover */}
       {store.coverUrl && (
         <div className="relative w-full h-44 sm:h-64 bg-slate-900 overflow-hidden">

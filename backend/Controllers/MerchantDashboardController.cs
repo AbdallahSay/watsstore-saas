@@ -79,11 +79,18 @@ namespace WatsStore.Api.Controllers
                 })
                 .ToListAsync();
 
+            var isTrialExpired = store.IsTrialExpired();
+            var remainingDays = store.GetRemainingTrialDays();
+            var trialEndsAt = store.GetEffectiveTrialOrSubscriptionEndsAt();
+
             var response = new DashboardSummaryResponse
             {
                 TotalProducts = totalProducts,
                 TotalOrders = totalOrders,
                 TotalRevenue = totalRevenue,
+                IsTrialExpired = isTrialExpired,
+                RemainingTrialDays = remainingDays,
+                TrialEndsAt = trialEndsAt,
                 StoreInfo = new StoreProfileDto
                 {
                     Id = store.Id,
@@ -108,6 +115,9 @@ namespace WatsStore.Api.Controllers
                     InstaPayAddress = store.InstaPayAddress,
                     PlanType = store.PlanType,
                     IsActive = store.IsActive,
+                    IsTrialExpired = isTrialExpired,
+                    RemainingTrialDays = remainingDays,
+                    TrialEndsAt = trialEndsAt,
                     CreatedAt = store.CreatedAt
                 },
                 RecentOrders = recentOrders
@@ -288,6 +298,11 @@ namespace WatsStore.Api.Controllers
             if (store == null)
                 return NotFound(new { message = "المتجر غير موجود" });
 
+            if (store.IsTrialExpired())
+            {
+                return StatusCode(StatusCodes.Status403Forbidden, new { isTrialExpired = true, message = "انتهت فترتك التجريبية المجانية (14 يوماً). يرجى ترقية باقتك إلى Pro أو VIP للاستمرار في إضافة المنتجات وإدارة متجرك." });
+            }
+
             // Enforce 15-product limit on Free Plan
             if (string.Equals(store.PlanType, "Free", StringComparison.OrdinalIgnoreCase))
             {
@@ -361,6 +376,15 @@ namespace WatsStore.Api.Controllers
                 return BadRequest(ModelState);
 
             var storeId = GetAuthenticatedStoreId();
+            var store = await _db.Stores.FirstOrDefaultAsync(s => s.Id == storeId);
+            if (store == null)
+                return NotFound(new { message = "المتجر غير موجود" });
+
+            if (store.IsTrialExpired())
+            {
+                return StatusCode(StatusCodes.Status403Forbidden, new { isTrialExpired = true, message = "انتهت فترتك التجريبية المجانية (14 يوماً). يرجى ترقية باقتك إلى Pro أو VIP للاستمرار في تعديل المنتجات وإدارة متجرك." });
+            }
+
             var product = await _db.Products
                 .FirstOrDefaultAsync(p => p.Id == id && p.StoreId == storeId);
 
@@ -610,6 +634,15 @@ namespace WatsStore.Api.Controllers
                 return BadRequest(ModelState);
 
             var storeId = GetAuthenticatedStoreId();
+            var store = await _db.Stores.FirstOrDefaultAsync(s => s.Id == storeId);
+            if (store == null)
+                return NotFound(new { message = "المتجر غير موجود" });
+
+            if (store.IsTrialExpired())
+            {
+                return StatusCode(StatusCodes.Status403Forbidden, new { isTrialExpired = true, message = "انتهت فترتك التجريبية المجانية (14 يوماً). يرجى ترقية باقتك إلى Pro أو VIP للاستمرار في إنشاء كوبونات الخصم وإدارة متجرك." });
+            }
+
             var code = request.Code.Trim().ToUpperInvariant();
 
             // Validate code uniqueness within merchant's store

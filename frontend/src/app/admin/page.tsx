@@ -33,7 +33,9 @@ import {
   Settings,
   ArrowRight,
   Shield,
-  Check
+  Check,
+  Crown,
+  Clock
 } from 'lucide-react';
 import { api } from '@/lib/api';
 import { AdminPlatformStats, AdminStoreSummary } from '@/types';
@@ -436,6 +438,128 @@ export default function SuperAdminPage() {
         icon: 'error',
         title: 'فشل حذف المتجر',
         text: err.message || 'حدث خطأ أثناء محاولة حذف المتجر',
+        background: '#0f172a',
+        color: '#f8fafc',
+      });
+    } finally {
+      setActionLoadingId(null);
+    }
+  };
+
+  // Update Store Plan
+  const handleUpdateStorePlan = async (store: AdminStoreSummary) => {
+    if (!token) return;
+
+    const { value: selectedPlan } = await Swal.fire({
+      title: `تعديل باقة متجر "${store.storeName}"`,
+      text: `الباقة الحالية: ${store.planType}`,
+      icon: 'question',
+      input: 'radio',
+      inputOptions: {
+        'Pro': 'باقة المحترفين Pro (149 ج.م) ⭐',
+        'VIP': 'باقة النخبة VIP (299 ج.م) 👑',
+        'Free': 'تجربة مجانية Free (14 يوماً)',
+      },
+      inputValue: store.planType || 'Free',
+      showCancelButton: true,
+      confirmButtonText: 'تحديث الباقة 🚀',
+      cancelButtonText: 'إلغاء',
+      confirmButtonColor: '#10B981',
+      cancelButtonColor: '#64748b',
+      background: '#0f172a',
+      color: '#f8fafc',
+    });
+
+    if (!selectedPlan) return;
+
+    const storeId = store.id;
+    setActionLoadingId(storeId);
+    try {
+      const res = await api.adminUpdateStorePlan(token, storeId, selectedPlan);
+      setStores(prev => prev.map(s => {
+        if (s.id === storeId) {
+          return {
+            ...s,
+            planType: res.planType,
+            isTrialExpired: res.isTrialExpired,
+            remainingTrialDays: res.remainingTrialDays,
+            trialEndsAt: res.trialEndsAt,
+          };
+        }
+        return s;
+      }));
+
+      Swal.fire({
+        icon: 'success',
+        title: 'تم تحديث الباقة بنجاح 🎉',
+        text: res.message,
+        timer: 2000,
+        showConfirmButton: false,
+        background: '#0f172a',
+        color: '#f8fafc',
+      });
+    } catch (err: any) {
+      Swal.fire({
+        icon: 'error',
+        title: 'خطأ أثناء تحديث الباقة',
+        text: err.message || 'فشل تحديث باقة المتجر',
+        background: '#0f172a',
+        color: '#f8fafc',
+      });
+    } finally {
+      setActionLoadingId(null);
+    }
+  };
+
+  // Extend Store Trial
+  const handleExtendTrial = async (store: AdminStoreSummary) => {
+    if (!token) return;
+
+    const confirmResult = await Swal.fire({
+      title: `تمديد الفترة التجريبية لمتجر "${store.storeName}"؟`,
+      text: 'سيتم إضافة 14 يوماً إضافية للتجربة المجانية وفتح كافة صلاحيات استقبال الطلبات للمتجر فوراً.',
+      icon: 'info',
+      showCancelButton: true,
+      confirmButtonText: 'نعم، تمديد 14 يوماً ⏳',
+      cancelButtonText: 'إلغاء',
+      confirmButtonColor: '#10B981',
+      cancelButtonColor: '#64748b',
+      background: '#0f172a',
+      color: '#f8fafc',
+    });
+
+    if (!confirmResult.isConfirmed) return;
+
+    const storeId = store.id;
+    setActionLoadingId(storeId);
+    try {
+      const res = await api.adminExtendTrial(token, storeId, 14);
+      setStores(prev => prev.map(s => {
+        if (s.id === storeId) {
+          return {
+            ...s,
+            isTrialExpired: res.isTrialExpired,
+            remainingTrialDays: res.remainingTrialDays,
+            trialEndsAt: res.trialEndsAt,
+          };
+        }
+        return s;
+      }));
+
+      Swal.fire({
+        icon: 'success',
+        title: 'تم تمديد التجربة بنجاح ⏳',
+        text: res.message,
+        timer: 2000,
+        showConfirmButton: false,
+        background: '#0f172a',
+        color: '#f8fafc',
+      });
+    } catch (err: any) {
+      Swal.fire({
+        icon: 'error',
+        title: 'خطأ أثناء تمديد التجربة',
+        text: err.message || 'فشل تمديد التجربة',
         background: '#0f172a',
         color: '#f8fafc',
       });
@@ -1209,7 +1333,7 @@ export default function SuperAdminPage() {
                           <th className="py-3.5 px-4">المتجر والرابط</th>
                           <th className="py-3.5 px-4">المالك والتواصل</th>
                           <th className="py-3.5 px-4">المدينة والتصنيف</th>
-                          <th className="py-3.5 px-4">الباقة</th>
+                          <th className="py-3.5 px-4">الباقة والتجربة</th>
                           <th className="py-3.5 px-4">المبيعات والطلبات</th>
                           <th className="py-3.5 px-4">الحالة</th>
                           <th className="py-3.5 px-4 text-center">الإجراءات والتحكم</th>
@@ -1286,17 +1410,35 @@ export default function SuperAdminPage() {
                                 </div>
                               </td>
 
-                              {/* Plan */}
+                              {/* Plan & Trial Status */}
                               <td className="py-3.5 px-4">
-                                <span className={`inline-block px-2.5 py-1 rounded-md text-[11px] font-black uppercase ${
-                                  plan === 'VIP'
-                                    ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
-                                    : plan === 'Pro'
-                                    ? 'bg-purple-500/20 text-purple-300 border border-purple-500/30'
-                                    : 'bg-slate-800 text-slate-400 border border-slate-700'
-                                }`}>
-                                  {plan}
-                                </span>
+                                <div className="space-y-1">
+                                  <span className={`inline-block px-2.5 py-0.5 rounded-md text-[11px] font-black uppercase ${
+                                    plan === 'VIP'
+                                      ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
+                                      : plan === 'Pro'
+                                      ? 'bg-purple-500/20 text-purple-300 border border-purple-500/30'
+                                      : 'bg-slate-800 text-slate-400 border border-slate-700'
+                                  }`}>
+                                    {plan}
+                                  </span>
+
+                                  {plan === 'Free' ? (
+                                    store.isTrialExpired ? (
+                                      <span className="text-[10px] text-rose-400 font-bold block">
+                                        منتهية (0 يوم) ⛔
+                                      </span>
+                                    ) : (
+                                      <span className="text-[10px] text-amber-400 font-bold block">
+                                        متبقي {store.remainingTrialDays ?? 14} يوم ⏳
+                                      </span>
+                                    )
+                                  ) : (
+                                    <span className="text-[10px] text-emerald-400 font-bold block">
+                                      مشترك مدفوع 👑
+                                    </span>
+                                  )}
+                                </div>
                               </td>
 
                               {/* Orders & Revenue */}
@@ -1340,6 +1482,28 @@ export default function SuperAdminPage() {
                                   >
                                     <ExternalLink className="w-3.5 h-3.5" />
                                   </Link>
+
+                                  {/* Upgrade / Change Plan Button */}
+                                  <button
+                                    onClick={() => handleUpdateStorePlan(store)}
+                                    disabled={isActionPending}
+                                    className="p-2 bg-purple-500/10 hover:bg-purple-500/20 text-purple-400 hover:text-purple-300 border border-purple-500/30 rounded-lg transition-colors disabled:opacity-50"
+                                    title="ترقية أو تعديل باقة المتجر (Pro / VIP / Free)"
+                                  >
+                                    <Crown className="w-3.5 h-3.5" />
+                                  </button>
+
+                                  {/* Extend Trial Button */}
+                                  {plan === 'Free' && (
+                                    <button
+                                      onClick={() => handleExtendTrial(store)}
+                                      disabled={isActionPending}
+                                      className="p-2 bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 hover:text-blue-300 border border-blue-500/30 rounded-lg transition-colors disabled:opacity-50"
+                                      title="تمديد الفترة التجريبية 14 يوماً إضافياً"
+                                    >
+                                      <Clock className="w-3.5 h-3.5" />
+                                    </button>
+                                  )}
 
                                   {/* Toggle Active Status Button */}
                                   <button

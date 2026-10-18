@@ -38,5 +38,44 @@ namespace WatsStore.Api.Domain.Entities
         public ICollection<WhatsAppOrder> Orders { get; set; } = new List<WhatsAppOrder>();
         public ICollection<StoreReview> Reviews { get; set; } = new List<StoreReview>();
         public ICollection<StoreCoupon> Coupons { get; set; } = new List<StoreCoupon>();
+
+        public DateTime GetEffectiveTrialOrSubscriptionEndsAt()
+        {
+            if (SubscriptionEndsAt.HasValue)
+                return SubscriptionEndsAt.Value;
+
+            // Default 14-day trial from CreatedAt
+            return CreatedAt.AddDays(14);
+        }
+
+        public bool IsTrialExpired()
+        {
+            if (string.Equals(PlanType, "Pro", StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(PlanType, "VIP", StringComparison.OrdinalIgnoreCase))
+            {
+                if (SubscriptionEndsAt.HasValue)
+                {
+                    return DateTime.UtcNow > SubscriptionEndsAt.Value;
+                }
+                return false;
+            }
+
+            // Free plan is strictly a 14-Day Free Trial
+            var expiry = GetEffectiveTrialOrSubscriptionEndsAt();
+            return DateTime.UtcNow > expiry;
+        }
+
+        public int GetRemainingTrialDays()
+        {
+            if (string.Equals(PlanType, "Pro", StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(PlanType, "VIP", StringComparison.OrdinalIgnoreCase))
+            {
+                return 999;
+            }
+
+            var expiry = GetEffectiveTrialOrSubscriptionEndsAt();
+            var diff = expiry - DateTime.UtcNow;
+            return Math.Max(0, (int)Math.Ceiling(diff.TotalDays));
+        }
     }
 }

@@ -46,6 +46,9 @@ export interface Store {
   vodafoneCashNumber?: string | null;
   instaPayAddress?: string | null;
   planType: string;
+  isTrialExpired?: boolean;
+  remainingTrialDays?: number;
+  trialEndsAt?: string | null;
   averageRating?: number;
   totalReviews?: number;
   reviews?: StoreReview[];
@@ -157,6 +160,9 @@ export interface DashboardSummary {
   totalProducts: number;
   totalOrders: number;
   totalRevenue: number;
+  isTrialExpired?: boolean;
+  remainingTrialDays?: number;
+  trialEndsAt?: string | null;
   storeInfo: {
     id: string;
     storeName: string;
@@ -180,6 +186,9 @@ export interface DashboardSummary {
     instaPayAddress?: string | null;
     planType: string;
     isActive: boolean;
+    isTrialExpired?: boolean;
+    remainingTrialDays?: number;
+    trialEndsAt?: string | null;
     createdAt: string;
   };
   recentOrders: {
@@ -268,6 +277,9 @@ export interface AdminStoreSummary {
   city: string;
   planType: string;
   isActive: boolean;
+  isTrialExpired?: boolean;
+  remainingTrialDays?: number;
+  trialEndsAt?: string | null;
   createdAt: string;
   ordersCount: number;
   productsCount: number;
@@ -299,4 +311,14 @@ export interface AdminForgotPasswordResponse {
   resetToken: string;
   expiresInMinutes: number;
 }
+
+export interface StorePlanUpdateResponse {
+  storeId: string;
+  planType: string;
+  isTrialExpired: boolean;
+  remainingTrialDays: number;
+  trialEndsAt?: string | null;
+  message: string;
+}
+
 

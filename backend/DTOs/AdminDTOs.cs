@@ -33,6 +33,9 @@ namespace WatsStore.Api.DTOs
         public string City { get; set; } = string.Empty;
         public string PlanType { get; set; } = "Free";
         public bool IsActive { get; set; }
+        public bool IsTrialExpired { get; set; }
+        public int RemainingTrialDays { get; set; } = 14;
+        public DateTime? TrialEndsAt { get; set; }
         public DateTime CreatedAt { get; set; }
         public int OrdersCount { get; set; }
         public int ProductsCount { get; set; }
@@ -96,5 +99,26 @@ namespace WatsStore.Api.DTOs
         [Required(ErrorMessage = "كلمة المرور الجديدة مطلوبة")]
         [StringLength(100, MinimumLength = 6, ErrorMessage = "كلمة المرور الجديدة يجب أن تكون بين 6 و 100 حرف")]
         public string NewPassword { get; set; } = string.Empty;
+    }
+
+    public class UpdateStorePlanRequest
+    {
+        [Required(ErrorMessage = "نوع الباقة مطلوب")]
+        public string Plan { get; set; } = "Free"; // Free, Pro, VIP
+    }
+
+    public class ExtendStoreTrialRequest
+    {
+        public int Days { get; set; } = 14;
+    }
+
+    public class StorePlanUpdateResponse
+    {
+        public Guid StoreId { get; set; }
+        public string PlanType { get; set; } = string.Empty;
+        public bool IsTrialExpired { get; set; }
+        public int RemainingTrialDays { get; set; }
+        public DateTime? TrialEndsAt { get; set; }
+        public string Message { get; set; } = string.Empty;
     }
 }

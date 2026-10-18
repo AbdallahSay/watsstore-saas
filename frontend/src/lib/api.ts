@@ -16,7 +16,8 @@ import {
   AdminStoreSummary,
   AdminPlatformStats,
   ToggleStoreStatusResponse,
-  AdminForgotPasswordResponse
+  AdminForgotPasswordResponse,
+  StorePlanUpdateResponse
 } from '../types';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://watsstore.runasp.net/api';
@@ -411,6 +412,28 @@ export const api = {
         Authorization: `Bearer ${token}`,
         'X-Admin-Key': token.startsWith('WatsStore_') ? token : '',
       },
+    });
+  },
+
+  async adminUpdateStorePlan(token: string, storeId: string, plan: string): Promise<StorePlanUpdateResponse> {
+    return fetchJson<StorePlanUpdateResponse>(`${API_BASE_URL}/admin/stores/${storeId}/plan`, {
+      method: 'PATCH',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'X-Admin-Key': token.startsWith('WatsStore_') ? token : '',
+      },
+      body: JSON.stringify({ plan }),
+    });
+  },
+
+  async adminExtendTrial(token: string, storeId: string, days: number = 14): Promise<StorePlanUpdateResponse> {
+    return fetchJson<StorePlanUpdateResponse>(`${API_BASE_URL}/admin/stores/${storeId}/extend-trial`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'X-Admin-Key': token.startsWith('WatsStore_') ? token : '',
+      },
+      body: JSON.stringify({ days }),
     });
   },
 

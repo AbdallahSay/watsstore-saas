@@ -9,6 +9,9 @@ namespace WatsStore.Api.DTOs
         public int TotalProducts { get; set; }
         public int TotalOrders { get; set; }
         public decimal TotalRevenue { get; set; }
+        public bool IsTrialExpired { get; set; }
+        public int RemainingTrialDays { get; set; } = 14;
+        public DateTime? TrialEndsAt { get; set; }
         public StoreProfileDto StoreInfo { get; set; } = new();
         public List<OrderDto> RecentOrders { get; set; } = new();
     }
@@ -37,6 +40,9 @@ namespace WatsStore.Api.DTOs
         public string? InstaPayAddress { get; set; }
         public string PlanType { get; set; } = "Free";
         public bool IsActive { get; set; }
+        public bool IsTrialExpired { get; set; }
+        public int RemainingTrialDays { get; set; } = 14;
+        public DateTime? TrialEndsAt { get; set; }
         public DateTime CreatedAt { get; set; }
     }
 

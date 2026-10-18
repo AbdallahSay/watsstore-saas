@@ -25,6 +25,9 @@ namespace WatsStore.Api.DTOs
         public string? VodafoneCashNumber { get; set; }
         public string? InstaPayAddress { get; set; }
         public string PlanType { get; set; } = "Free";
+        public bool IsTrialExpired { get; set; }
+        public int RemainingTrialDays { get; set; } = 14;
+        public DateTime? TrialEndsAt { get; set; }
         public double AverageRating { get; set; } = 5.0;
         public int TotalReviews { get; set; } = 0;
         public List<PublicReviewDto> Reviews { get; set; } = new();

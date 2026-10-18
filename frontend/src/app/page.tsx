@@ -52,7 +52,7 @@ export default function HomePage() {
                 href="/register"
                 className="w-full sm:w-auto px-8 py-4 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-base rounded-2xl shadow-xl shadow-emerald-600/25 flex items-center justify-center gap-3 transition-all hover:scale-105 active:scale-95"
               >
-                <span>ابدأ متجرك مجاناً الآن</span>
+                <span>ابدأ تجربة مجانية لمدة 14 يوماً</span>
                 <ArrowLeft className="w-5 h-5" />
               </Link>
 
@@ -179,20 +179,20 @@ export default function HomePage() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-stretch">
-              {/* FREE PLAN */}
+              {/* FREE TRIAL */}
               <div className="bg-white rounded-3xl p-8 border border-slate-200/80 shadow-sm flex flex-col justify-between">
                 <div>
-                  <h3 className="text-xl font-bold text-slate-900">الباقة المجانية</h3>
-                  <p className="text-xs text-slate-500 mt-1">للتجار المبتدئين والمشاريع المنزلية</p>
+                  <h3 className="text-xl font-bold text-slate-900">تجربة مجانية (14 يوماً)</h3>
+                  <p className="text-xs text-slate-500 mt-1">جرب المنصة بكامل خصائصها قبل الاشتراك</p>
                   <div className="mt-6 mb-8 flex items-baseline gap-1">
                     <span className="text-4xl font-black text-slate-900">0</span>
-                    <span className="text-sm font-bold text-slate-600">ج.م / مجاناً دائماً</span>
+                    <span className="text-sm font-bold text-slate-600">ج.م / لمدة 14 يوماً</span>
                   </div>
 
                   <ul className="space-y-3.5 text-sm text-slate-600 border-t border-slate-100 pt-6">
                     <li className="flex items-center gap-2.5">
                       <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                      <span>حتى 15 منتج كحد أقصى</span>
+                      <span>حتى 15 منتج خلال فترة التجربة</span>
                     </li>
                     <li className="flex items-center gap-2.5">
                       <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
@@ -208,7 +208,7 @@ export default function HomePage() {
                     </li>
                     <li className="flex items-center gap-2.5">
                       <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                      <span>رابط ورمز QR دائم لمتجرك ومطبوعاتك</span>
+                      <span>رابط ورمز QR لمتجرك ومطبوعاتك</span>
                     </li>
                   </ul>
                 </div>
@@ -217,7 +217,7 @@ export default function HomePage() {
                   href="/register"
                   className="mt-8 w-full py-3.5 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-sm text-center transition-colors block"
                 >
-                  ابدأ مجاناً الآن
+                  ابدأ تجربتك المجانية (14 يوماً)
                 </Link>
               </div>
 
@@ -315,14 +315,14 @@ export default function HomePage() {
               جاهز لتجربة أسرع متجر واتساب في مصر؟
             </h2>
             <p className="text-base sm:text-lg text-emerald-100 max-w-xl mx-auto">
-              سجل متجرك الآن في دقيقتين مجاناً، وابدأ في استقبال طلبات زبائنك بطريقة احترافية.
+              سجل متجرك الآن في دقيقتين وابدأ تجربة مجانية كاملة لمدة 14 يوماً بدون بطاقة بنكية.
             </p>
             <div>
               <Link
                 href="/register"
                 className="inline-flex items-center gap-3 px-8 py-4 bg-white text-emerald-700 hover:bg-emerald-50 font-black text-base rounded-2xl shadow-xl transition-all hover:scale-105"
               >
-                <span>أنشئ متجرك مجاناً</span>
+                <span>ابدأ تجربتك المجانية (14 يوماً)</span>
                 <ArrowLeft className="w-5 h-5" />
               </Link>
             </div>

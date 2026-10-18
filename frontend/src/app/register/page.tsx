@@ -122,8 +122,11 @@ export default function RegisterPage() {
           </span>
         </Link>
         <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900">
-          أنشئ متجرك المجاني في دقيقتين
+          ابدأ فترتك التجريبية المجانية (14 يوماً)
         </h2>
+        <p className="mt-1 text-xs text-emerald-600 font-bold">
+          بدون بطاقة بنكية — تجربة كاملة لكافة المميزات لمدة أسبوعين
+        </p>
         <p className="mt-2 text-xs sm:text-sm text-slate-600">
           لديك حساب بالفعل؟{' '}
           <Link href="/login" className="font-bold text-emerald-600 hover:text-emerald-700">
@@ -280,7 +283,7 @@ export default function RegisterPage() {
                 disabled={isLoading}
                 className="w-full py-4 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white font-extrabold text-sm rounded-2xl shadow-lg shadow-emerald-600/25 flex items-center justify-center gap-2 transition-all hover:scale-[1.01] active:scale-[0.99]"
               >
-                <span>{isLoading ? 'جاري إنشاء المتجر...' : 'إنشاء المتجر الآن مجاناً 🚀'}</span>
+                <span>{isLoading ? 'جاري إنشاء المتجر...' : 'بدء التجربة المجانية (14 يوماً) 🚀'}</span>
                 <ArrowLeft className="w-4 h-4" />
               </button>
             </div>

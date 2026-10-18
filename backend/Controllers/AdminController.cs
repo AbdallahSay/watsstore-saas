@@ -282,11 +282,36 @@ namespace WatsStore.Api.Controllers
             var totalReviews = await _db.StoreReviews.CountAsync();
             var totalViews = await _db.Stores.SumAsync(s => (long?)s.ViewCount) ?? 0L;
 
-            var recentStores = await _db.Stores
+            var rawRecent = await _db.Stores
                 .AsNoTracking()
                 .OrderByDescending(s => s.CreatedAt)
                 .Take(5)
-                .Select(s => new AdminStoreSummaryDto
+                .Select(s => new
+                {
+                    s.Id,
+                    s.StoreName,
+                    s.OwnerName,
+                    s.Email,
+                    s.WhatsAppNumber,
+                    s.Slug,
+                    s.PublicCode,
+                    s.BusinessCategory,
+                    s.City,
+                    s.PlanType,
+                    s.IsActive,
+                    s.CreatedAt,
+                    s.SubscriptionEndsAt,
+                    OrdersCount = s.Orders.Count,
+                    ProductsCount = s.Products.Count,
+                    TotalRevenue = s.Orders.Sum(o => o.TotalAmount),
+                    s.ViewCount
+                })
+                .ToListAsync();
+
+            var recentStores = rawRecent.Select(s =>
+            {
+                var trial = CalculateTrial(s.PlanType, s.CreatedAt, s.SubscriptionEndsAt);
+                return new AdminStoreSummaryDto
                 {
                     Id = s.Id,
                     StoreName = s.StoreName,
@@ -300,20 +325,48 @@ namespace WatsStore.Api.Controllers
                     City = s.City,
                     PlanType = s.PlanType,
                     IsActive = s.IsActive,
+                    IsTrialExpired = trial.IsTrialExpired,
+                    RemainingTrialDays = trial.RemainingTrialDays,
+                    TrialEndsAt = trial.TrialEndsAt,
                     CreatedAt = s.CreatedAt,
-                    OrdersCount = s.Orders.Count,
-                    ProductsCount = s.Products.Count,
-                    TotalRevenue = s.Orders.Sum(o => o.TotalAmount),
+                    OrdersCount = s.OrdersCount,
+                    ProductsCount = s.ProductsCount,
+                    TotalRevenue = s.TotalRevenue,
                     ViewCount = s.ViewCount
-                })
-                .ToListAsync();
+                };
+            }).ToList();
 
-            var topStores = await _db.Stores
+            var rawTop = await _db.Stores
                 .AsNoTracking()
                 .OrderByDescending(s => s.Orders.Count)
                 .ThenByDescending(s => s.ViewCount)
                 .Take(5)
-                .Select(s => new AdminStoreSummaryDto
+                .Select(s => new
+                {
+                    s.Id,
+                    s.StoreName,
+                    s.OwnerName,
+                    s.Email,
+                    s.WhatsAppNumber,
+                    s.Slug,
+                    s.PublicCode,
+                    s.BusinessCategory,
+                    s.City,
+                    s.PlanType,
+                    s.IsActive,
+                    s.CreatedAt,
+                    s.SubscriptionEndsAt,
+                    OrdersCount = s.Orders.Count,
+                    ProductsCount = s.Products.Count,
+                    TotalRevenue = s.Orders.Sum(o => o.TotalAmount),
+                    s.ViewCount
+                })
+                .ToListAsync();
+
+            var topStores = rawTop.Select(s =>
+            {
+                var trial = CalculateTrial(s.PlanType, s.CreatedAt, s.SubscriptionEndsAt);
+                return new AdminStoreSummaryDto
                 {
                     Id = s.Id,
                     StoreName = s.StoreName,
@@ -327,13 +380,16 @@ namespace WatsStore.Api.Controllers
                     City = s.City,
                     PlanType = s.PlanType,
                     IsActive = s.IsActive,
+                    IsTrialExpired = trial.IsTrialExpired,
+                    RemainingTrialDays = trial.RemainingTrialDays,
+                    TrialEndsAt = trial.TrialEndsAt,
                     CreatedAt = s.CreatedAt,
-                    OrdersCount = s.Orders.Count,
-                    ProductsCount = s.Products.Count,
-                    TotalRevenue = s.Orders.Sum(o => o.TotalAmount),
+                    OrdersCount = s.OrdersCount,
+                    ProductsCount = s.ProductsCount,
+                    TotalRevenue = s.TotalRevenue,
                     ViewCount = s.ViewCount
-                })
-                .ToListAsync();
+                };
+            }).ToList();
 
             return Ok(new AdminPlatformStatsDto
             {
@@ -379,9 +435,34 @@ namespace WatsStore.Api.Controllers
                     query = query.Where(s => !s.IsActive);
             }
 
-            var stores = await query
+            var rawStores = await query
                 .OrderByDescending(s => s.CreatedAt)
-                .Select(s => new AdminStoreSummaryDto
+                .Select(s => new
+                {
+                    s.Id,
+                    s.StoreName,
+                    s.OwnerName,
+                    s.Email,
+                    s.WhatsAppNumber,
+                    s.Slug,
+                    s.PublicCode,
+                    s.BusinessCategory,
+                    s.City,
+                    s.PlanType,
+                    s.IsActive,
+                    s.CreatedAt,
+                    s.SubscriptionEndsAt,
+                    OrdersCount = s.Orders.Count,
+                    ProductsCount = s.Products.Count,
+                    TotalRevenue = s.Orders.Sum(o => o.TotalAmount),
+                    s.ViewCount
+                })
+                .ToListAsync();
+
+            var stores = rawStores.Select(s =>
+            {
+                var trial = CalculateTrial(s.PlanType, s.CreatedAt, s.SubscriptionEndsAt);
+                return new AdminStoreSummaryDto
                 {
                     Id = s.Id,
                     StoreName = s.StoreName,
@@ -395,13 +476,16 @@ namespace WatsStore.Api.Controllers
                     City = s.City,
                     PlanType = s.PlanType,
                     IsActive = s.IsActive,
+                    IsTrialExpired = trial.IsTrialExpired,
+                    RemainingTrialDays = trial.RemainingTrialDays,
+                    TrialEndsAt = trial.TrialEndsAt,
                     CreatedAt = s.CreatedAt,
-                    OrdersCount = s.Orders.Count,
-                    ProductsCount = s.Products.Count,
-                    TotalRevenue = s.Orders.Sum(o => o.TotalAmount),
+                    OrdersCount = s.OrdersCount,
+                    ProductsCount = s.ProductsCount,
+                    TotalRevenue = s.TotalRevenue,
                     ViewCount = s.ViewCount
-                })
-                .ToListAsync();
+                };
+            }).ToList();
 
             return Ok(stores);
         }
@@ -467,6 +551,100 @@ namespace WatsStore.Api.Controllers
                 id,
                 message = $"تم حذف متجر '{storeName}' وجميع بياناته المرتبطة بنجاح من المنصة."
             });
+        }
+
+        [HttpPatch("stores/{id}/plan")]
+        public async Task<IActionResult> UpdateStorePlan(Guid id, [FromBody] UpdateStorePlanRequest request)
+        {
+            if (!IsAdminAuthorized())
+                return Unauthorized(new { message = "غير مصرح لك بالوصول إلى لوحة الإدارة العليا" });
+
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var store = await _db.Stores.FirstOrDefaultAsync(s => s.Id == id);
+            if (store == null)
+            {
+                return NotFound(new { message = "المتجر المطلوب غير موجود في المنصة" });
+            }
+
+            var validPlans = new[] { "Free", "Pro", "VIP" };
+            var matchedPlan = validPlans.FirstOrDefault(p => string.Equals(p, request.Plan?.Trim(), StringComparison.OrdinalIgnoreCase)) ?? "Free";
+
+            store.PlanType = matchedPlan;
+            if (matchedPlan == "Pro" || matchedPlan == "VIP")
+            {
+                // When upgraded to Pro or VIP, ensure active subscription for 1 year if empty or expired
+                if (!store.SubscriptionEndsAt.HasValue || store.SubscriptionEndsAt.Value < DateTime.UtcNow)
+                {
+                    store.SubscriptionEndsAt = DateTime.UtcNow.AddYears(1);
+                }
+            }
+
+            await _db.SaveChangesAsync();
+
+            return Ok(new StorePlanUpdateResponse
+            {
+                StoreId = store.Id,
+                PlanType = store.PlanType,
+                IsTrialExpired = store.IsTrialExpired(),
+                RemainingTrialDays = store.GetRemainingTrialDays(),
+                TrialEndsAt = store.GetEffectiveTrialOrSubscriptionEndsAt(),
+                Message = $"تم تحديث باقة متجر '{store.StoreName}' إلى {store.PlanType} بنجاح"
+            });
+        }
+
+        [HttpPost("stores/{id}/extend-trial")]
+        public async Task<IActionResult> ExtendStoreTrial(Guid id, [FromBody] ExtendStoreTrialRequest request)
+        {
+            if (!IsAdminAuthorized())
+                return Unauthorized(new { message = "غير مصرح لك بالوصول إلى لوحة الإدارة العليا" });
+
+            var store = await _db.Stores.FirstOrDefaultAsync(s => s.Id == id);
+            if (store == null)
+            {
+                return NotFound(new { message = "المتجر المطلوب غير موجود في المنصة" });
+            }
+
+            int daysToAdd = request.Days != 0 ? request.Days : 14;
+            var baseDate = request.Days < 0 
+                ? DateTime.UtcNow 
+                : (store.SubscriptionEndsAt.HasValue && store.SubscriptionEndsAt.Value > DateTime.UtcNow
+                    ? store.SubscriptionEndsAt.Value
+                    : DateTime.UtcNow);
+
+            store.SubscriptionEndsAt = baseDate.AddDays(daysToAdd);
+            await _db.SaveChangesAsync();
+
+            return Ok(new StorePlanUpdateResponse
+            {
+                StoreId = store.Id,
+                PlanType = store.PlanType,
+                IsTrialExpired = store.IsTrialExpired(),
+                RemainingTrialDays = store.GetRemainingTrialDays(),
+                TrialEndsAt = store.GetEffectiveTrialOrSubscriptionEndsAt(),
+                Message = $"تم تمديد الفترة التجريبية لمتجر '{store.StoreName}' لمدة {daysToAdd} يوماً إضافياً بنجاح"
+            });
+        }
+
+        private static (bool IsTrialExpired, int RemainingTrialDays, DateTime? TrialEndsAt) CalculateTrial(string planType, DateTime createdAt, DateTime? subscriptionEndsAt)
+        {
+            DateTime expiry = subscriptionEndsAt ?? createdAt.AddDays(14);
+            bool isExpired;
+            int remainingDays;
+            if (string.Equals(planType, "Pro", StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(planType, "VIP", StringComparison.OrdinalIgnoreCase))
+            {
+                isExpired = subscriptionEndsAt.HasValue && DateTime.UtcNow > subscriptionEndsAt.Value;
+                remainingDays = 999;
+            }
+            else
+            {
+                isExpired = DateTime.UtcNow > expiry;
+                var diff = expiry - DateTime.UtcNow;
+                remainingDays = Math.Max(0, (int)Math.Ceiling(diff.TotalDays));
+            }
+            return (isExpired, remainingDays, expiry);
         }
     }
 }

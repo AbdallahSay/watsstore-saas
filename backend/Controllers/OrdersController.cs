@@ -43,6 +43,14 @@ namespace WatsStore.Api.Controllers
             if (store == null)
                 return NotFound(new { message = "المتجر غير موجود أو غير نشط حالياً." });
 
+            if (store.IsTrialExpired())
+            {
+                return StatusCode(StatusCodes.Status403Forbidden, new { 
+                    isTrialExpired = true, 
+                    message = "هذا المتجر غير متاح لاستقبال الطلبات حالياً نظراً لانتهاء الفترة التجريبية المجانية الخاصة به. يرجى التواصل مع صاحب المتجر لتفعيل باقة الاشتراك." 
+                });
+            }
+
             var productIds = request.Items.Select(i => i.ProductId).Distinct().ToList();
 
             // Fetch actual database prices to guarantee security and prevent tampering
