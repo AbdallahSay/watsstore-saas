@@ -1,0 +1,298 @@
+{
+  "timestamp": "2026-10-18T21:38:56.041Z",
+  "frontendUrl": "https://frontend-bay-ten-58.vercel.app",
+  "backendUrl": "https://watsstore.runasp.net",
+  "totalTests": 32,
+  "passed": 32,
+  "failed": 0,
+  "results": [
+    {
+      "name": "Landing Page (/) Hero, Pricing & Navigation",
+      "category": "Public / Marketing",
+      "expected": 200,
+      "actual": 200,
+      "timeMs": 896,
+      "verdict": "PASS ✅",
+      "details": "Hero: true, Pricing: true, Trial Badge: true, Nav: true"
+    },
+    {
+      "name": "Programmatic SEO Directory Root (/directory)",
+      "category": "SEO / Directory",
+      "expected": 200,
+      "actual": 200,
+      "timeMs": 597,
+      "verdict": "PASS ✅",
+      "details": "Contains Egyptian Cities: true"
+    },
+    {
+      "name": "Directory City & Category Navigation with JSON-LD Schema",
+      "category": "SEO / Directory",
+      "expected": 200,
+      "actual": 200,
+      "timeMs": 428,
+      "verdict": "PASS ✅",
+      "details": "JSON-LD: true, Breadcrumbs: true"
+    },
+    {
+      "name": "Dynamic Sitemap Verification (/sitemap.xml)",
+      "category": "SEO / Indexing",
+      "expected": 200,
+      "actual": 200,
+      "timeMs": 366,
+      "verdict": "PASS ✅",
+      "details": "Length: 60715 chars, Valid Urlset: true"
+    },
+    {
+      "name": "Robots.txt Directive Verification (/robots.txt)",
+      "category": "SEO / Indexing",
+      "expected": 200,
+      "actual": 200,
+      "timeMs": 488,
+      "verdict": "PASS ✅",
+      "details": "Contains sitemap directive: true"
+    },
+    {
+      "name": "Public Pricing API Matrix (/api/public/pricing)",
+      "category": "Public / Pricing",
+      "expected": 200,
+      "actual": 200,
+      "timeMs": 478,
+      "verdict": "PASS ✅",
+      "details": "Pro: 299 EGP, VIP: 599 EGP"
+    },
+    {
+      "name": "Frontend Super Admin Page Loading (/admin)",
+      "category": "Admin / UI",
+      "expected": 200,
+      "actual": 200,
+      "timeMs": 468,
+      "verdict": "PASS ✅",
+      "details": ""
+    },
+    {
+      "name": "Super Admin Authentication (/api/admin/login)",
+      "category": "Admin / Auth",
+      "expected": 200,
+      "actual": 200,
+      "timeMs": 333,
+      "verdict": "PASS ✅",
+      "details": "Admin Email: undefined"
+    },
+    {
+      "name": "Platform Live Metrics (/api/admin/stats)",
+      "category": "Admin / Analytics",
+      "expected": 200,
+      "actual": 200,
+      "timeMs": 410,
+      "verdict": "PASS ✅",
+      "details": "Total Stores: 24, Total Orders: 10, GMV: 9205 EGP"
+    },
+    {
+      "name": "Stores Management Table & Search Query Filter",
+      "category": "Admin / Stores",
+      "expected": 200,
+      "actual": 200,
+      "timeMs": 111,
+      "verdict": "PASS ✅",
+      "details": "Found al-amal-fashion: true"
+    },
+    {
+      "name": "Security Check: Rejection of Invalid Current Password",
+      "category": "Admin / Security",
+      "expected": 400,
+      "actual": 400,
+      "timeMs": 324,
+      "verdict": "PASS ✅",
+      "details": "Message: كلمة المرور الحالية غير صحيحة. يرجى إعادة المحاولة."
+    },
+    {
+      "name": "Merchant Registration (/api/auth/register)",
+      "category": "Merchant / Auth",
+      "expected": 200,
+      "actual": 200,
+      "timeMs": 382,
+      "verdict": "PASS ✅",
+      "details": "Store ID: e021c3cc-79c6-4727-9276-8a6db6b75c3f, Slug: متجر-إي-تو-إي-0350"
+    },
+    {
+      "name": "Merchant Authentication Login (/api/auth/login)",
+      "category": "Merchant / Auth",
+      "expected": 200,
+      "actual": 200,
+      "timeMs": 380,
+      "verdict": "PASS ✅",
+      "details": "Login Token Granted"
+    },
+    {
+      "name": "All 9 Merchant Dashboard Pages Load (200 OK)",
+      "category": "Frontend / Dashboard",
+      "expected": 200,
+      "actual": 200,
+      "timeMs": 450,
+      "verdict": "PASS ✅",
+      "details": "Verified: /, /products, /categories, /orders, /coupons, /reviews, /analytics, /billing, /settings"
+    },
+    {
+      "name": "Merchant Onboarding Summary & 14-Day Free Trial Tracking",
+      "category": "Merchant / Dashboard",
+      "expected": 200,
+      "actual": 200,
+      "timeMs": 424,
+      "verdict": "PASS ✅",
+      "details": "Plan: Free, Remaining Days: 14"
+    },
+    {
+      "name": "Catalog: Create Category (/api/merchant/categories)",
+      "category": "Merchant / Catalog",
+      "expected": 200,
+      "actual": 200,
+      "timeMs": 391,
+      "verdict": "PASS ✅",
+      "details": "Category ID: 41"
+    },
+    {
+      "name": "Catalog: Create Product with Variants (/api/merchant/products)",
+      "category": "Merchant / Catalog",
+      "expected": 200,
+      "actual": 200,
+      "timeMs": 468,
+      "verdict": "PASS ✅",
+      "details": "Product ID: 773d1236-3079-4f17-a10f-e14dca226a36, Price: 450 EGP"
+    },
+    {
+      "name": "Super Admin Upgrades Merchant to Pro Plan",
+      "category": "Admin / Plan Control",
+      "expected": 200,
+      "actual": 200,
+      "timeMs": 4729,
+      "verdict": "PASS ✅",
+      "details": "New Plan: Pro"
+    },
+    {
+      "name": "AI Product Description Generator (Rich Arabic Copy & Quota Tracking)",
+      "category": "Merchant / AI Tool",
+      "expected": 200,
+      "actual": 200,
+      "timeMs": 380,
+      "verdict": "PASS ✅",
+      "details": "AI Used: 1/15, Status: success"
+    },
+    {
+      "name": "Coupons Engine: Create Percentage & Fixed Discount Coupons",
+      "category": "Merchant / Coupons",
+      "expected": 200,
+      "actual": 200,
+      "timeMs": 808,
+      "verdict": "PASS ✅",
+      "details": "Percentage: SUMMER350 (15%), Fixed: SAVE50350 (50 EGP)"
+    },
+    {
+      "name": "Storefront Page Rendering (/s/[slug])",
+      "category": "Public / Storefront",
+      "expected": 200,
+      "actual": 200,
+      "timeMs": 1143,
+      "verdict": "PASS ✅",
+      "details": "Store Slug: متجر-إي-تو-إي-0350"
+    },
+    {
+      "name": "Dynamic OpenGraph Social Share Image (/s/[slug]/opengraph-image)",
+      "category": "Public / Storefront",
+      "expected": 200,
+      "actual": 200,
+      "timeMs": 683,
+      "verdict": "PASS ✅",
+      "details": "Content-Type: image/png"
+    },
+    {
+      "name": "Public Cart: Apply Valid Coupon & Calculate Discount",
+      "category": "Buyer / Checkout",
+      "expected": 200,
+      "actual": 200,
+      "timeMs": 372,
+      "verdict": "PASS ✅",
+      "details": "Subtotal: 450, Discount: 67.5 EGP, Final: undefined EGP"
+    },
+    {
+      "name": "Public Cart: Reject Non-Existent or Invalid Coupon",
+      "category": "Buyer / Checkout",
+      "expected": 400,
+      "actual": 400,
+      "timeMs": 386,
+      "verdict": "PASS ✅",
+      "details": "Message: كود الخصم غير موجود أو تم إيقافه"
+    },
+    {
+      "name": "Order Placement & WhatsApp Redirection Generator",
+      "category": "Buyer / Checkout",
+      "expected": 200,
+      "actual": 200,
+      "timeMs": 131,
+      "verdict": "PASS ✅",
+      "details": "Order #1015, WhatsApp Link Generated"
+    },
+    {
+      "name": "Customer Review Submission (5-Star Rating)",
+      "category": "Buyer / Reviews",
+      "expected": 201,
+      "actual": 201,
+      "timeMs": 140,
+      "verdict": "PASS ✅",
+      "details": "Review ID: 537dfad0-51a2-4401-bef1-9ac01cba6ef4"
+    },
+    {
+      "name": "Merchant Orders Inbox: Incoming WhatsApp Order Verified",
+      "category": "Merchant / Orders",
+      "expected": 200,
+      "actual": 200,
+      "timeMs": 143,
+      "verdict": "PASS ✅",
+      "details": "Found Order #1015 in Merchant Inbox"
+    },
+    {
+      "name": "Excel Orders Export (text/csv with UTF-8 BOM \\uFEFF)",
+      "category": "Merchant / Excel Export",
+      "expected": 200,
+      "actual": 200,
+      "timeMs": 124,
+      "verdict": "PASS ✅",
+      "details": "UTF-8 BOM: true, Content-Type: text/csv; charset=utf-8, Headers: Arabic CSV"
+    },
+    {
+      "name": "Reviews Moderation: Review Moderation & Approval",
+      "category": "Merchant / Reviews",
+      "expected": 200,
+      "actual": 200,
+      "timeMs": 128,
+      "verdict": "PASS ✅",
+      "details": "Review Approved Successfully"
+    },
+    {
+      "name": "Analytics Dashboard Charts & Revenue Metrics",
+      "category": "Merchant / Analytics",
+      "expected": 200,
+      "actual": 200,
+      "timeMs": 129,
+      "verdict": "PASS ✅",
+      "details": "Revenue: 765 EGP, Total Orders: 0"
+    },
+    {
+      "name": "Billing Management & Dynamic Tier Limits Display",
+      "category": "Merchant / Billing",
+      "expected": 200,
+      "actual": 200,
+      "timeMs": 137,
+      "verdict": "PASS ✅",
+      "details": "Active Plan: Pro, AI Quota Limit: 15"
+    },
+    {
+      "name": "Submit Subscription Upgrade Request (Vodafone Cash / InstaPay)",
+      "category": "Merchant / Billing",
+      "expected": 200,
+      "actual": 200,
+      "timeMs": 149,
+      "verdict": "PASS ✅",
+      "details": "Status: Pending, Request ID: 1449a649-3d0c-40fd-9646-14c0e7a83c80"
+    }
+  ]
+}

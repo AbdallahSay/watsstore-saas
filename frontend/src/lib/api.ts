@@ -88,10 +88,19 @@ async function fetchJson<T>(url: string, options?: RequestInit): Promise<T> {
   return res.json() as Promise<T>;
 }
 
+function safeSlug(slug: string): string {
+  if (!slug) return '';
+  try {
+    return encodeURIComponent(decodeURIComponent(slug));
+  } catch {
+    return encodeURIComponent(slug);
+  }
+}
+
 export const api = {
   // Public Store endpoints
   async getPublicStore(slug: string): Promise<Store> {
-    return fetchJson<Store>(`${API_BASE_URL}/public/stores/${encodeURIComponent(slug)}`, {
+    return fetchJson<Store>(`${API_BASE_URL}/public/stores/${safeSlug(slug)}`, {
       cache: 'no-store', // Always get fresh store data for SSR
     });
   },
@@ -120,7 +129,7 @@ export const api = {
 
   // Orders
   async createWhatsAppOrder(storeSlug: string, orderData: CreateOrderRequest): Promise<CreateOrderResponse> {
-    return fetchJson<CreateOrderResponse>(`${API_BASE_URL}/public/stores/${encodeURIComponent(storeSlug)}/orders`, {
+    return fetchJson<CreateOrderResponse>(`${API_BASE_URL}/public/stores/${safeSlug(storeSlug)}/orders`, {
       method: 'POST',
       body: JSON.stringify(orderData),
     });
@@ -287,7 +296,7 @@ export const api = {
   // Customer Reviews
   async submitReview(storeSlug: string, data: { customerName: string; rating: number; comment: string }): Promise<{ message: string; reviewId: string }> {
     return fetchJson<{ message: string; reviewId: string }>(
-      `${API_BASE_URL}/public/stores/${encodeURIComponent(storeSlug)}/reviews`,
+      `${API_BASE_URL}/public/stores/${safeSlug(storeSlug)}/reviews`,
       {
         method: 'POST',
         body: JSON.stringify(data),
@@ -322,7 +331,7 @@ export const api = {
   // Promo Codes & Coupons
   async applyCoupon(storeSlug: string, data: { code: string; cartSubtotal: number }): Promise<ApplyCouponResponse> {
     return fetchJson<ApplyCouponResponse>(
-      `${API_BASE_URL}/public/stores/${encodeURIComponent(storeSlug)}/apply-coupon`,
+      `${API_BASE_URL}/public/stores/${safeSlug(storeSlug)}/apply-coupon`,
       {
         method: 'POST',
         body: JSON.stringify(data),
