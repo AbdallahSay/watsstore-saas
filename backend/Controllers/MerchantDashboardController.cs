@@ -573,5 +573,133 @@ namespace WatsStore.Api.Controllers
 
             return Ok(new { message = "تم حذف التقييم بنجاح" });
         }
+
+        // --- COUPONS MANAGEMENT ---
+
+        [HttpGet("coupons")]
+        public async Task<IActionResult> GetCoupons()
+        {
+            var storeId = GetAuthenticatedStoreId();
+
+            var coupons = await _db.StoreCoupons
+                .AsNoTracking()
+                .Where(c => c.StoreId == storeId)
+                .OrderByDescending(c => c.CreatedAt)
+                .Select(c => new CouponDto
+                {
+                    Id = c.Id,
+                    StoreId = c.StoreId,
+                    Code = c.Code,
+                    DiscountType = c.DiscountType,
+                    DiscountValue = c.DiscountValue,
+                    ExpiryDate = c.ExpiryDate,
+                    UsageLimit = c.UsageLimit,
+                    TimesUsed = c.TimesUsed,
+                    IsActive = c.IsActive,
+                    CreatedAt = c.CreatedAt
+                })
+                .ToListAsync();
+
+            return Ok(coupons);
+        }
+
+        [HttpPost("coupons")]
+        public async Task<IActionResult> CreateCoupon([FromBody] CreateCouponRequest request)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var storeId = GetAuthenticatedStoreId();
+            var code = request.Code.Trim().ToUpperInvariant();
+
+            // Validate code uniqueness within merchant's store
+            var exists = await _db.StoreCoupons
+                .AnyAsync(c => c.StoreId == storeId && c.Code == code);
+
+            if (exists)
+            {
+                return BadRequest(new { message = $"كود الخصم '{code}' موجود بالفعل في متجرك. يرجى اختيار كود آخر." });
+            }
+
+            var discountType = string.Equals(request.DiscountType, "FixedAmount", StringComparison.OrdinalIgnoreCase) 
+                ? "FixedAmount" 
+                : "Percentage";
+
+            if (discountType == "Percentage" && request.DiscountValue > 100)
+            {
+                return BadRequest(new { message = "نسبة الخصم المئوية لا يمكن أن تتجاوز 100%" });
+            }
+
+            var coupon = new StoreCoupon
+            {
+                Id = Guid.NewGuid(),
+                StoreId = storeId,
+                Code = code,
+                DiscountType = discountType,
+                DiscountValue = request.DiscountValue,
+                ExpiryDate = request.ExpiryDate?.ToUniversalTime(),
+                UsageLimit = request.UsageLimit,
+                TimesUsed = 0,
+                IsActive = request.IsActive,
+                CreatedAt = DateTime.UtcNow
+            };
+
+            _db.StoreCoupons.Add(coupon);
+            await _db.SaveChangesAsync();
+
+            var resultDto = new CouponDto
+            {
+                Id = coupon.Id,
+                StoreId = coupon.StoreId,
+                Code = coupon.Code,
+                DiscountType = coupon.DiscountType,
+                DiscountValue = coupon.DiscountValue,
+                ExpiryDate = coupon.ExpiryDate,
+                UsageLimit = coupon.UsageLimit,
+                TimesUsed = coupon.TimesUsed,
+                IsActive = coupon.IsActive,
+                CreatedAt = coupon.CreatedAt
+            };
+
+            return CreatedAtAction(nameof(GetCoupons), resultDto);
+        }
+
+        [HttpPatch("coupons/{id}/toggle")]
+        public async Task<IActionResult> ToggleCouponStatus(Guid id)
+        {
+            var storeId = GetAuthenticatedStoreId();
+
+            var coupon = await _db.StoreCoupons
+                .FirstOrDefaultAsync(c => c.Id == id && c.StoreId == storeId);
+
+            if (coupon == null)
+                return NotFound(new { message = "كود الخصم غير موجود" });
+
+            coupon.IsActive = !coupon.IsActive;
+            await _db.SaveChangesAsync();
+
+            return Ok(new 
+            { 
+                message = coupon.IsActive ? "تم تفعيل كود الخصم بنجاح" : "تم تعطيل كود الخصم بنجاح",
+                isActive = coupon.IsActive 
+            });
+        }
+
+        [HttpDelete("coupons/{id}")]
+        public async Task<IActionResult> DeleteCoupon(Guid id)
+        {
+            var storeId = GetAuthenticatedStoreId();
+
+            var coupon = await _db.StoreCoupons
+                .FirstOrDefaultAsync(c => c.Id == id && c.StoreId == storeId);
+
+            if (coupon == null)
+                return NotFound(new { message = "كود الخصم غير موجود" });
+
+            _db.StoreCoupons.Remove(coupon);
+            await _db.SaveChangesAsync();
+
+            return Ok(new { message = "تم حذف كود الخصم بنجاح" });
+        }
     }
 }

@@ -179,8 +179,22 @@ using (var scope = app.Services.CreateScope())
                     );
                     CREATE INDEX IF NOT EXISTS ""IX_StoreReviews_StoreId_IsApproved"" ON ""StoreReviews"" (""StoreId"", ""IsApproved"");
                     CREATE INDEX IF NOT EXISTS ""IX_StoreReviews_StoreId_CreatedAt"" ON ""StoreReviews"" (""StoreId"", ""CreatedAt"");
+                    CREATE TABLE IF NOT EXISTS ""StoreCoupons"" (
+                        ""Id"" UUID NOT NULL PRIMARY KEY,
+                        ""StoreId"" UUID NOT NULL REFERENCES ""Stores""(""Id"") ON DELETE CASCADE,
+                        ""Code"" VARCHAR(50) NOT NULL,
+                        ""DiscountType"" VARCHAR(20) NOT NULL DEFAULT 'Percentage',
+                        ""DiscountValue"" NUMERIC(10, 2) NOT NULL,
+                        ""ExpiryDate"" TIMESTAMP WITH TIME ZONE NULL,
+                        ""UsageLimit"" INT NULL,
+                        ""TimesUsed"" INT NOT NULL DEFAULT 0,
+                        ""IsActive"" BOOLEAN NOT NULL DEFAULT TRUE,
+                        ""CreatedAt"" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
+                    );
+                    CREATE UNIQUE INDEX IF NOT EXISTS ""IX_StoreCoupons_StoreId_Code"" ON ""StoreCoupons"" (""StoreId"", ""Code"");
+                    CREATE INDEX IF NOT EXISTS ""IX_StoreCoupons_StoreId_IsActive"" ON ""StoreCoupons"" (""StoreId"", ""IsActive"");
                 ");
-                logger.LogInformation("PostgreSQL database columns & StoreReviews table verified/applied successfully.");
+                logger.LogInformation("PostgreSQL database columns & StoreReviews/StoreCoupons tables verified/applied successfully.");
             }
             else
             {
@@ -207,8 +221,27 @@ using (var scope = app.Services.CreateScope())
                         CREATE INDEX IX_StoreReviews_StoreId_IsApproved ON StoreReviews (StoreId, IsApproved);
                         CREATE INDEX IX_StoreReviews_StoreId_CreatedAt ON StoreReviews (StoreId, CreatedAt);
                     END
+
+                    IF NOT EXISTS (SELECT * FROM sys.tables WHERE name = 'StoreCoupons')
+                    BEGIN
+                        CREATE TABLE StoreCoupons (
+                            Id UNIQUEIDENTIFIER NOT NULL PRIMARY KEY,
+                            StoreId UNIQUEIDENTIFIER NOT NULL,
+                            Code NVARCHAR(50) NOT NULL,
+                            DiscountType NVARCHAR(20) NOT NULL DEFAULT 'Percentage',
+                            DiscountValue DECIMAL(10, 2) NOT NULL,
+                            ExpiryDate DATETIME2 NULL,
+                            UsageLimit INT NULL,
+                            TimesUsed INT NOT NULL DEFAULT 0,
+                            IsActive BIT NOT NULL DEFAULT 1,
+                            CreatedAt DATETIME2 NOT NULL DEFAULT GETUTCDATE(),
+                            CONSTRAINT FK_StoreCoupons_Stores_StoreId FOREIGN KEY (StoreId) REFERENCES Stores(Id) ON DELETE CASCADE
+                        );
+                        CREATE UNIQUE INDEX IX_StoreCoupons_StoreId_Code ON StoreCoupons (StoreId, Code);
+                        CREATE INDEX IX_StoreCoupons_StoreId_IsActive ON StoreCoupons (StoreId, IsActive);
+                    END
                 ");
-                logger.LogInformation("SQL Server database column migrations & StoreReviews table checked and applied successfully.");
+                logger.LogInformation("SQL Server database column migrations & StoreReviews/StoreCoupons tables checked and applied successfully.");
             }
         }
         catch (Exception colEx)
@@ -371,6 +404,28 @@ using (var scope = app.Services.CreateScope())
             db.StoreReviews.AddRange(review1, review2, review3);
             await db.SaveChangesAsync();
             logger.LogInformation("Customer reviews seeded successfully.");
+        }
+
+        // Seed default promo code 'MASAR10' for al-amal-fashion if none exist
+        if (amalStore != null && !await db.StoreCoupons.AnyAsync(c => c.StoreId == amalStore.Id))
+        {
+            logger.LogInformation("Seeding default promo code 'MASAR10' for 'al-amal-fashion'...");
+            var coupon1 = new StoreCoupon
+            {
+                Id = Guid.NewGuid(),
+                StoreId = amalStore.Id,
+                Code = "MASAR10",
+                DiscountType = "Percentage",
+                DiscountValue = 10.00m,
+                ExpiryDate = DateTime.UtcNow.AddMonths(3),
+                UsageLimit = 100,
+                TimesUsed = 0,
+                IsActive = true,
+                CreatedAt = DateTime.UtcNow
+            };
+            db.StoreCoupons.Add(coupon1);
+            await db.SaveChangesAsync();
+            logger.LogInformation("Promo code 'MASAR10' seeded successfully.");
         }
     }
     catch (Exception ex)

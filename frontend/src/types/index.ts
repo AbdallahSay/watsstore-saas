@@ -98,6 +98,7 @@ export interface CreateOrderRequest {
   customerAddress: string;
   customerNotes?: string;
   paymentMethod?: string;
+  couponCode?: string;
   items: OrderItemRequest[];
 }
 
@@ -105,10 +106,35 @@ export interface CreateOrderResponse {
   orderId: string;
   orderNumber: number;
   subtotal: number;
+  discountAmount?: number;
+  couponCode?: string;
   deliveryFee: number;
   totalAmount: number;
   whatsAppRedirectUrl: string;
   formattedMessage: string;
+}
+
+export interface StoreCoupon {
+  id: string;
+  storeId: string;
+  code: string;
+  discountType: 'Percentage' | 'FixedAmount' | string;
+  discountValue: number;
+  expiryDate?: string | null;
+  usageLimit?: number | null;
+  timesUsed: number;
+  isActive: boolean;
+  createdAt: string;
+}
+
+export interface ApplyCouponResponse {
+  isValid: boolean;
+  code: string;
+  discountType: string;
+  discountValue: number;
+  discountAmount: number;
+  newSubtotal: number;
+  message: string;
 }
 
 export interface AuthResponse {

@@ -14,6 +14,7 @@ namespace WatsStore.Api.Infrastructure.Data
         public DbSet<Product> Products => Set<Product>();
         public DbSet<WhatsAppOrder> WhatsAppOrders => Set<WhatsAppOrder>();
         public DbSet<StoreReview> StoreReviews => Set<StoreReview>();
+        public DbSet<StoreCoupon> StoreCoupons => Set<StoreCoupon>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -66,6 +67,11 @@ namespace WatsStore.Api.Infrastructure.Data
                 entity.HasMany(s => s.Reviews)
                       .WithOne(r => r.Store)
                       .HasForeignKey(r => r.StoreId)
+                      .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasMany(s => s.Coupons)
+                      .WithOne(c => c.Store)
+                      .HasForeignKey(c => c.StoreId)
                       .OnDelete(DeleteBehavior.Cascade);
             });
 
@@ -132,6 +138,19 @@ namespace WatsStore.Api.Infrastructure.Data
 
                 entity.HasIndex(r => new { r.StoreId, r.IsApproved });
                 entity.HasIndex(r => new { r.StoreId, r.CreatedAt });
+            });
+
+            // StoreCoupon Configuration
+            modelBuilder.Entity<StoreCoupon>(entity =>
+            {
+                entity.HasKey(c => c.Id);
+                entity.Property(c => c.Code).HasMaxLength(50).IsRequired();
+                entity.Property(c => c.DiscountType).HasMaxLength(20).HasDefaultValue("Percentage");
+                entity.Property(c => c.DiscountValue).HasPrecision(10, 2);
+                entity.Property(c => c.IsActive).HasDefaultValue(true);
+
+                entity.HasIndex(c => new { c.StoreId, c.Code }).IsUnique();
+                entity.HasIndex(c => new { c.StoreId, c.IsActive });
             });
         }
     }

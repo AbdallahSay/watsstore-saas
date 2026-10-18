@@ -8,7 +8,9 @@ import {
   Category,
   Product,
   StoreReview,
-  MerchantReviewsResponse
+  MerchantReviewsResponse,
+  StoreCoupon,
+  ApplyCouponResponse
 } from '../types';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://watsstore.runasp.net/api';
@@ -263,6 +265,48 @@ export const api = {
 
   async deleteReview(token: string, reviewId: string): Promise<{ message: string }> {
     return fetchJson<{ message: string }>(`${API_BASE_URL}/merchant/reviews/${reviewId}`, {
+      method: 'DELETE',
+      headers: { Authorization: `Bearer ${token}` },
+    });
+  },
+
+  // Promo Codes & Coupons
+  async applyCoupon(storeSlug: string, data: { code: string; cartSubtotal: number }): Promise<ApplyCouponResponse> {
+    return fetchJson<ApplyCouponResponse>(
+      `${API_BASE_URL}/public/stores/${encodeURIComponent(storeSlug)}/apply-coupon`,
+      {
+        method: 'POST',
+        body: JSON.stringify(data),
+      }
+    );
+  },
+
+  async getMerchantCoupons(token: string): Promise<StoreCoupon[]> {
+    return fetchJson<StoreCoupon[]>(`${API_BASE_URL}/merchant/coupons`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+  },
+
+  async createMerchantCoupon(token: string, data: any): Promise<StoreCoupon> {
+    return fetchJson<StoreCoupon>(`${API_BASE_URL}/merchant/coupons`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+      body: JSON.stringify(data),
+    });
+  },
+
+  async toggleCouponStatus(token: string, couponId: string): Promise<{ message: string; isActive: boolean }> {
+    return fetchJson<{ message: string; isActive: boolean }>(
+      `${API_BASE_URL}/merchant/coupons/${couponId}/toggle`,
+      {
+        method: 'PATCH',
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+  },
+
+  async deleteMerchantCoupon(token: string, couponId: string): Promise<{ message: string }> {
+    return fetchJson<{ message: string }>(`${API_BASE_URL}/merchant/coupons/${couponId}`, {
       method: 'DELETE',
       headers: { Authorization: `Bearer ${token}` },
     });

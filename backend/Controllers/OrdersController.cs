@@ -73,8 +73,41 @@ namespace WatsStore.Api.Controllers
                 });
             }
 
+            // Coupon Code Validation & Discount Engine
+            decimal discountAmount = 0m;
+            StoreCoupon? appliedCoupon = null;
+
+            if (!string.IsNullOrWhiteSpace(request.CouponCode))
+            {
+                var couponCode = request.CouponCode.Trim().ToUpperInvariant();
+                appliedCoupon = await _db.StoreCoupons
+                    .FirstOrDefaultAsync(c => c.StoreId == store.Id && c.Code == couponCode && c.IsActive);
+
+                if (appliedCoupon != null)
+                {
+                    bool isExpired = appliedCoupon.ExpiryDate.HasValue && appliedCoupon.ExpiryDate.Value < DateTime.UtcNow;
+                    bool limitExceeded = appliedCoupon.UsageLimit.HasValue && appliedCoupon.TimesUsed >= appliedCoupon.UsageLimit.Value;
+
+                    if (!isExpired && !limitExceeded)
+                    {
+                        if (string.Equals(appliedCoupon.DiscountType, "Percentage", StringComparison.OrdinalIgnoreCase))
+                        {
+                            discountAmount = Math.Round(subtotal * (appliedCoupon.DiscountValue / 100m), 2);
+                        }
+                        else
+                        {
+                            discountAmount = appliedCoupon.DiscountValue;
+                        }
+
+                        discountAmount = Math.Clamp(discountAmount, 0, subtotal);
+                        appliedCoupon.TimesUsed++; // Increment usage count
+                    }
+                }
+            }
+
             var deliveryFee = store.DeliveryFee;
-            var totalAmount = subtotal + deliveryFee;
+            var discountedSubtotal = subtotal - discountAmount;
+            var totalAmount = discountedSubtotal + deliveryFee;
 
             var normalizedCustomerPhone = SlugGenerator.NormalizeEgyptianPhone(request.CustomerPhone);
             var itemsJson = JsonSerializer.Serialize(savedItems);
@@ -129,6 +162,10 @@ namespace WatsStore.Api.Controllers
 
             sb.AppendLine("──────────────────────");
             sb.AppendLine($"💵 *المجموع الفرعي:* {subtotal:N2} {store.Currency}");
+            if (discountAmount > 0 && appliedCoupon != null)
+            {
+                sb.AppendLine($"🏷️ *كود الخصم ({appliedCoupon.Code}):* -{discountAmount:N2} {store.Currency}");
+            }
             if (deliveryFee > 0)
             {
                 sb.AppendLine($"🚚 *رسوم التوصيل:* {deliveryFee:N2} {store.Currency}");
@@ -170,6 +207,8 @@ namespace WatsStore.Api.Controllers
                 OrderId = order.Id,
                 OrderNumber = order.OrderNumber,
                 Subtotal = subtotal,
+                DiscountAmount = discountAmount,
+                CouponCode = appliedCoupon?.Code,
                 DeliveryFee = deliveryFee,
                 TotalAmount = totalAmount,
                 WhatsAppRedirectUrl = whatsAppRedirectUrl,

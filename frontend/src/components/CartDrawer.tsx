@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Store, CartItem } from '../types';
+import { Store, CartItem, ApplyCouponResponse } from '../types';
 import { api } from '../lib/api';
 import { pixel } from '../lib/pixel';
 import Swal from 'sweetalert2';
@@ -21,7 +21,8 @@ import {
   Building2,
   Copy,
   Check,
-  CreditCard
+  CreditCard,
+  Tag
 } from 'lucide-react';
 
 interface CartDrawerProps {
@@ -53,6 +54,13 @@ export default function CartDrawer({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
 
+  // Coupon state
+  const [couponCodeInput, setCouponCodeInput] = useState('');
+  const [appliedCoupon, setAppliedCoupon] = useState<ApplyCouponResponse | null>(null);
+  const [isApplyingCoupon, setIsApplyingCoupon] = useState(false);
+  const [couponError, setCouponError] = useState<string | null>(null);
+  const [showCouponInput, setShowCouponInput] = useState(false);
+
   if (!isOpen) return null;
 
   const subtotal = cartItems.reduce(
@@ -60,7 +68,42 @@ export default function CartDrawer({
     0
   );
   const deliveryFee = store.deliveryFee || 0;
-  const totalAmount = subtotal + deliveryFee;
+  const discountAmount = appliedCoupon ? appliedCoupon.discountAmount : 0;
+  const totalAmount = Math.max(0, subtotal - discountAmount) + deliveryFee;
+
+  const handleApplyCoupon = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    if (!couponCodeInput.trim()) return;
+    setIsApplyingCoupon(true);
+    setCouponError(null);
+    try {
+      const res = await api.applyCoupon(store.slug, {
+        code: couponCodeInput.trim(),
+        cartSubtotal: subtotal
+      });
+      setAppliedCoupon(res);
+      setCouponCodeInput(res.code);
+      Swal.fire({
+        toast: true,
+        position: 'top-end',
+        icon: 'success',
+        title: res.message || 'تم تفعيل كود الخصم بنجاح!',
+        showConfirmButton: false,
+        timer: 2500,
+      });
+    } catch (err: any) {
+      setCouponError(err.message || 'كود الخصم غير صالح أو منتهي الصلاحية');
+      setAppliedCoupon(null);
+    } finally {
+      setIsApplyingCoupon(false);
+    }
+  };
+
+  const handleRemoveCoupon = () => {
+    setAppliedCoupon(null);
+    setCouponCodeInput('');
+    setCouponError(null);
+  };
 
   const copyNumber = (text: string, type: 'wallet' | 'instapay') => {
     navigator.clipboard.writeText(text);
@@ -106,6 +149,7 @@ export default function CartDrawer({
         customerAddress: customerAddress.trim(),
         customerNotes: customerNotes.trim() ? customerNotes.trim() : undefined,
         paymentMethod: paymentMethod,
+        couponCode: appliedCoupon ? appliedCoupon.code : undefined,
         items: cartItems.map((item) => ({
           productId: item.product.id,
           quantity: item.quantity,
@@ -498,11 +542,109 @@ export default function CartDrawer({
         {/* Drawer Footer / Summary */}
         {cartItems.length > 0 && (
           <div className="p-4 bg-slate-50 border-t border-slate-200 space-y-3">
+            {/* Promo Code Box */}
+            <div className="bg-white p-2.5 rounded-xl border border-slate-200 shadow-sm">
+              {!appliedCoupon ? (
+                showCouponInput ? (
+                  <form onSubmit={handleApplyCoupon} className="space-y-2">
+                    <div className="flex items-center gap-1.5">
+                      <div className="relative flex-1">
+                        <Tag className="w-3.5 h-3.5 text-slate-400 absolute right-2.5 top-1/2 -translate-y-1/2" />
+                        <input
+                          type="text"
+                          value={couponCodeInput}
+                          onChange={(e) => {
+                            setCouponCodeInput(e.target.value.toUpperCase());
+                            if (couponError) setCouponError(null);
+                          }}
+                          placeholder="كود الخصم (مثل MASAR10)"
+                          className="w-full text-xs font-mono font-bold pr-7 pl-2 py-1.5 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 uppercase tracking-wider"
+                          disabled={isApplyingCoupon}
+                          autoFocus
+                        />
+                      </div>
+                      <button
+                        type="submit"
+                        disabled={isApplyingCoupon || !couponCodeInput.trim()}
+                        className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white text-xs font-bold rounded-lg transition-all"
+                      >
+                        {isApplyingCoupon ? 'تحقق...' : 'تطبيق'}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => { setShowCouponInput(false); setCouponError(null); }}
+                        className="p-1.5 text-slate-400 hover:text-slate-600 rounded-lg text-xs"
+                      >
+                        <X className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                    {couponError && (
+                      <p className="text-[11px] text-rose-600 font-medium flex items-center gap-1">
+                        <AlertCircle className="w-3 h-3 flex-shrink-0" />
+                        <span>{couponError}</span>
+                      </p>
+                    )}
+                  </form>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => setShowCouponInput(true)}
+                    className="w-full flex items-center justify-between text-xs text-emerald-700 hover:text-emerald-800 font-bold group"
+                  >
+                    <span className="flex items-center gap-1.5">
+                      <Tag className="w-3.5 h-3.5 text-emerald-600 group-hover:rotate-12 transition-transform" />
+                      <span>لديك كود خصم أو كوبون تخفيض؟</span>
+                    </span>
+                    <span className="text-[11px] bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded-full border border-emerald-200">
+                      أدخل الكود
+                    </span>
+                  </button>
+                )
+              ) : (
+                <div className="flex items-center justify-between bg-emerald-50 border border-emerald-200 p-2 rounded-lg">
+                  <div className="flex items-center gap-2">
+                    <div className="w-5 h-5 rounded-full bg-emerald-600 text-white flex items-center justify-center font-bold text-[10px]">
+                      ✓
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-1.5">
+                        <span className="font-mono font-black text-emerald-900 text-xs tracking-wider">
+                          {appliedCoupon.code}
+                        </span>
+                        <span className="text-[10px] bg-emerald-200/80 text-emerald-800 font-bold px-1.5 py-0.5 rounded">
+                          {appliedCoupon.discountType === 'Percentage' ? `خصم ${appliedCoupon.discountValue}%` : `خصم ${appliedCoupon.discountValue} ${store.currency}`}
+                        </span>
+                      </div>
+                      <span className="text-[10px] text-emerald-700 block">
+                        وفّرت {appliedCoupon.discountAmount.toFixed(2)} {store.currency}
+                      </span>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handleRemoveCoupon}
+                    className="text-[11px] text-rose-600 hover:text-rose-700 font-bold px-2 py-1 hover:bg-rose-50 rounded transition-colors"
+                  >
+                    إلغاء
+                  </button>
+                </div>
+              )}
+            </div>
+
             <div className="space-y-1.5 text-xs text-slate-600">
               <div className="flex justify-between">
                 <span>المجموع الفرعي:</span>
                 <span className="font-bold text-slate-800">{subtotal.toFixed(2)} {store.currency}</span>
               </div>
+              {appliedCoupon && appliedCoupon.discountAmount > 0 && (
+                <div className="flex justify-between text-emerald-600 font-bold bg-emerald-50/70 px-2 py-1 rounded">
+                  <span className="flex items-center gap-1">
+                    <Tag className="w-3 h-3" />
+                    <span>الخصم ({appliedCoupon.code}):</span>
+                  </span>
+                  <span>-{appliedCoupon.discountAmount.toFixed(2)} {store.currency}</span>
+                </div>
+              )}
               <div className="flex justify-between">
                 <span>رسوم التوصيل:</span>
                 <span className="font-bold text-slate-800">

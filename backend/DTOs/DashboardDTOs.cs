@@ -152,4 +152,38 @@ namespace WatsStore.Api.DTOs
         public double AverageRating { get; set; }
         public List<MerchantReviewDto> Reviews { get; set; } = new();
     }
+
+    public class CouponDto
+    {
+        public Guid Id { get; set; }
+        public Guid StoreId { get; set; }
+        public string Code { get; set; } = string.Empty;
+        public string DiscountType { get; set; } = "Percentage";
+        public decimal DiscountValue { get; set; }
+        public DateTime? ExpiryDate { get; set; }
+        public int? UsageLimit { get; set; }
+        public int TimesUsed { get; set; }
+        public bool IsActive { get; set; }
+        public DateTime CreatedAt { get; set; }
+    }
+
+    public class CreateCouponRequest
+    {
+        [Required(ErrorMessage = "كود الخصم مطلوب")]
+        [StringLength(50, MinimumLength = 2, ErrorMessage = "كود الخصم يجب أن يتكون من حرفين إلى 50 حرفاً")]
+        public string Code { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "نوع الخصم مطلوب")]
+        public string DiscountType { get; set; } = "Percentage"; // "Percentage" or "FixedAmount"
+
+        [Range(0.01, 1000000, ErrorMessage = "قيمة الخصم يجب أن تكون أكبر من صفر")]
+        public decimal DiscountValue { get; set; }
+
+        public DateTime? ExpiryDate { get; set; }
+
+        [Range(1, 1000000, ErrorMessage = "الحد الأقصى للاستخدام يجب أن يكون 1 على الأقل")]
+        public int? UsageLimit { get; set; }
+
+        public bool IsActive { get; set; } = true;
+    }
 }

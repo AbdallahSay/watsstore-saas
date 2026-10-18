@@ -97,4 +97,25 @@ namespace WatsStore.Api.DTOs
         [StringLength(1000, MinimumLength = 3, ErrorMessage = "نص التقييم يجب أن يكون بين 3 و 1000 حرف")]
         public string Comment { get; set; } = string.Empty;
     }
+
+    public class ApplyCouponRequest
+    {
+        [Required(ErrorMessage = "كود الخصم مطلوب")]
+        [StringLength(50, MinimumLength = 1, ErrorMessage = "كود الخصم غير صالح")]
+        public string Code { get; set; } = string.Empty;
+
+        [Range(0.01, 10000000, ErrorMessage = "مجموع سلة المشتريات يجب أن يكون أكبر من صفر")]
+        public decimal CartSubtotal { get; set; }
+    }
+
+    public class ApplyCouponResponse
+    {
+        public bool IsValid { get; set; }
+        public string Code { get; set; } = string.Empty;
+        public string DiscountType { get; set; } = "Percentage";
+        public decimal DiscountValue { get; set; }
+        public decimal DiscountAmount { get; set; }
+        public decimal NewSubtotal { get; set; }
+        public string Message { get; set; } = string.Empty;
+    }
 }

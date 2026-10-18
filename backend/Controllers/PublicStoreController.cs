@@ -166,6 +166,71 @@ namespace WatsStore.Api.Controllers
             });
         }
 
+        [HttpPost("{slug}/apply-coupon")]
+        public async Task<IActionResult> ApplyCoupon(string slug, [FromBody] ApplyCouponRequest request)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            if (string.IsNullOrWhiteSpace(slug))
+                return BadRequest(new { isValid = false, message = "معرف المتجر مطلوب" });
+
+            var normalizedSlug = slug.Trim().ToLowerInvariant();
+            var store = await _db.Stores
+                .AsNoTracking()
+                .FirstOrDefaultAsync(s => s.Slug == normalizedSlug && s.IsActive);
+
+            if (store == null)
+                return NotFound(new { isValid = false, message = "المتجر غير موجود أو تم إيقافه" });
+
+            if (request.CartSubtotal <= 0)
+                return BadRequest(new { isValid = false, message = "سلة المشتريات فارغة أو غير صالحة" });
+
+            var couponCode = request.Code.Trim().ToUpperInvariant();
+            var coupon = await _db.StoreCoupons
+                .AsNoTracking()
+                .FirstOrDefaultAsync(c => c.StoreId == store.Id && c.Code == couponCode);
+
+            if (coupon == null || !coupon.IsActive)
+            {
+                return BadRequest(new { isValid = false, message = "كود الخصم غير موجود أو تم إيقافه" });
+            }
+
+            if (coupon.ExpiryDate.HasValue && coupon.ExpiryDate.Value < DateTime.UtcNow)
+            {
+                return BadRequest(new { isValid = false, message = "كود الخصم منتهي الصلاحية" });
+            }
+
+            if (coupon.UsageLimit.HasValue && coupon.TimesUsed >= coupon.UsageLimit.Value)
+            {
+                return BadRequest(new { isValid = false, message = "وصل كود الخصم للحد الأقصى لعدد مرات الاستخدام" });
+            }
+
+            decimal discountAmount = 0m;
+            if (string.Equals(coupon.DiscountType, "Percentage", StringComparison.OrdinalIgnoreCase))
+            {
+                discountAmount = Math.Round(request.CartSubtotal * (coupon.DiscountValue / 100m), 2);
+            }
+            else
+            {
+                discountAmount = coupon.DiscountValue;
+            }
+
+            discountAmount = Math.Clamp(discountAmount, 0, request.CartSubtotal);
+            var newSubtotal = request.CartSubtotal - discountAmount;
+
+            return Ok(new ApplyCouponResponse
+            {
+                IsValid = true,
+                Code = coupon.Code,
+                DiscountType = coupon.DiscountType,
+                DiscountValue = coupon.DiscountValue,
+                DiscountAmount = discountAmount,
+                NewSubtotal = newSubtotal,
+                Message = $"تم تطبيق كود الخصم بنجاح! وفرت {discountAmount:N2} {store.Currency}"
+            });
+        }
+
         [HttpGet("qr/{publicCode}")]
         public async Task<IActionResult> ResolveQrCode(string publicCode)
         {

@@ -17,6 +17,7 @@ namespace WatsStore.Api.DTOs
 
         public string? CustomerNotes { get; set; }
         public string? PaymentMethod { get; set; } = "الدفع عند الاستلام";
+        public string? CouponCode { get; set; }
 
         [Required]
         [MinLength(1, ErrorMessage = "يجب اختيار منتج واحد على الأقل")]
@@ -39,6 +40,8 @@ namespace WatsStore.Api.DTOs
         public Guid OrderId { get; set; }
         public int OrderNumber { get; set; }
         public decimal Subtotal { get; set; }
+        public decimal DiscountAmount { get; set; } = 0.00m;
+        public string? CouponCode { get; set; }
         public decimal DeliveryFee { get; set; }
         public decimal TotalAmount { get; set; }
         public string WhatsAppRedirectUrl { get; set; } = string.Empty;
