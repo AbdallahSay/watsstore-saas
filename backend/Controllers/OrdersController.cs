@@ -78,6 +78,7 @@ namespace WatsStore.Api.Controllers
 
             var normalizedCustomerPhone = SlugGenerator.NormalizeEgyptianPhone(request.CustomerPhone);
             var itemsJson = JsonSerializer.Serialize(savedItems);
+            var paymentMethod = string.IsNullOrWhiteSpace(request.PaymentMethod) ? "الدفع عند الاستلام" : request.PaymentMethod.Trim();
 
             var order = new WhatsAppOrder
             {
@@ -87,6 +88,7 @@ namespace WatsStore.Api.Controllers
                 CustomerPhone = normalizedCustomerPhone,
                 CustomerAddress = request.CustomerAddress.Trim(),
                 CustomerNotes = string.IsNullOrWhiteSpace(request.CustomerNotes) ? null : request.CustomerNotes.Trim(),
+                PaymentMethod = paymentMethod,
                 ItemsJson = itemsJson,
                 TotalAmount = totalAmount,
                 CreatedAt = DateTime.UtcNow
@@ -137,7 +139,25 @@ namespace WatsStore.Api.Controllers
             }
             sb.AppendLine($"💰 *الإجمالي المستحق:* *{totalAmount:N2} {store.Currency}*");
             sb.AppendLine("──────────────────────");
-            sb.AppendLine("⚡ *تم الإرسال عبر منصة WatsStore*");
+            sb.AppendLine($"💳 *طريقة الدفع:* {order.PaymentMethod}");
+            if (order.PaymentMethod.Contains("محفظة") || order.PaymentMethod.Contains("كاش") || order.PaymentMethod.Contains("Cash"))
+            {
+                if (!string.IsNullOrWhiteSpace(store.VodafoneCashNumber))
+                {
+                    sb.AppendLine($"📱 *رقم التحويل (كاش):* {store.VodafoneCashNumber}");
+                }
+                sb.AppendLine($"⚠️ _يرجى إرسال لقطة شاشة لإشعار التحويل هنا في المحادثة_");
+            }
+            else if (order.PaymentMethod.Contains("إنستاباي") || order.PaymentMethod.Contains("InstaPay"))
+            {
+                if (!string.IsNullOrWhiteSpace(store.InstaPayAddress))
+                {
+                    sb.AppendLine($"🏦 *عنوان إنستاباي:* {store.InstaPayAddress}");
+                }
+                sb.AppendLine($"⚠️ _يرجى إرسال لقطة شاشة لإشعار التحويل هنا في المحادثة_");
+            }
+            sb.AppendLine("──────────────────────");
+            sb.AppendLine("⚡ *تم الإرسال عبر منصة WatsStore by Masar Tech*");
 
             var formattedMessage = sb.ToString();
             var encodedMsg = Uri.EscapeDataString(formattedMessage);

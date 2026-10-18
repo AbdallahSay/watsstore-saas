@@ -15,7 +15,7 @@ export default function Navbar() {
             <span className="text-xl font-bold bg-gradient-to-r from-emerald-600 to-teal-700 bg-clip-text text-transparent">
               WatsStore
             </span>
-            <span className="text-xs text-slate-500 block -mt-1 font-medium">متاجر الواتساب الذكية</span>
+            <span className="text-[10px] text-slate-500 block -mt-1 font-bold">بواسطة Masar Tech</span>
           </div>
         </Link>
 

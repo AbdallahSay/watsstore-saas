@@ -21,6 +21,8 @@ namespace WatsStore.Api.DTOs
         public string SeoTitle { get; set; } = string.Empty;
         public string SeoDescription { get; set; } = string.Empty;
         public string? MetaPixelId { get; set; } // Null if PlanType == "Free"
+        public string? VodafoneCashNumber { get; set; }
+        public string? InstaPayAddress { get; set; }
         public string PlanType { get; set; } = "Free";
         public List<PublicCategoryDto> Categories { get; set; } = new();
         public List<PublicProductDto> Products { get; set; } = new();

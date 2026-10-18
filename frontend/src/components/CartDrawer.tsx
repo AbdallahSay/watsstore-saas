@@ -16,7 +16,12 @@ import {
   User, 
   Phone, 
   FileText,
-  AlertCircle
+  AlertCircle,
+  Wallet,
+  Building2,
+  Copy,
+  Check,
+  CreditCard
 } from 'lucide-react';
 
 interface CartDrawerProps {
@@ -42,6 +47,9 @@ export default function CartDrawer({
   const [customerPhone, setCustomerPhone] = useState('');
   const [customerAddress, setCustomerAddress] = useState('');
   const [customerNotes, setCustomerNotes] = useState('');
+  const [paymentMethod, setPaymentMethod] = useState('الدفع عند الاستلام');
+  const [copiedWallet, setCopiedWallet] = useState(false);
+  const [copiedInstaPay, setCopiedInstaPay] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
 
@@ -53,6 +61,17 @@ export default function CartDrawer({
   );
   const deliveryFee = store.deliveryFee || 0;
   const totalAmount = subtotal + deliveryFee;
+
+  const copyNumber = (text: string, type: 'wallet' | 'instapay') => {
+    navigator.clipboard.writeText(text);
+    if (type === 'wallet') {
+      setCopiedWallet(true);
+      setTimeout(() => setCopiedWallet(false), 2000);
+    } else {
+      setCopiedInstaPay(true);
+      setTimeout(() => setCopiedInstaPay(false), 2000);
+    }
+  };
 
   const handleSubmitOrder = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -86,6 +105,7 @@ export default function CartDrawer({
         customerPhone: customerPhone.trim(),
         customerAddress: customerAddress.trim(),
         customerNotes: customerNotes.trim() ? customerNotes.trim() : undefined,
+        paymentMethod: paymentMethod,
         items: cartItems.map((item) => ({
           productId: item.product.id,
           quantity: item.quantity,
@@ -122,9 +142,10 @@ export default function CartDrawer({
         title: 'تم تسجيل طلبك بنجاح! 🎉',
         html: `
           <div style="direction: rtl; text-align: right; font-family: inherit;">
-            <p style="margin-bottom: 8px;"><strong>رقم الطلب:</strong> #${result.orderNumber}</p>
-            <p style="margin-bottom: 8px;"><strong>الإجمالي:</strong> ${result.totalAmount.toFixed(2)} ${store.currency}</p>
-            <p style="color: #059669; font-size: 14px; margin-top: 12px;">سيتم توجيهك الآن إلى الواتساب لإرسال الفاتورة وتأكيد الطلب مع المتجر مباشرة.</p>
+            <p style="margin-bottom: 6px;"><strong>رقم الطلب:</strong> #${result.orderNumber}</p>
+            <p style="margin-bottom: 6px;"><strong>طريقة الدفع:</strong> ${paymentMethod}</p>
+            <p style="margin-bottom: 6px;"><strong>الإجمالي:</strong> ${result.totalAmount.toFixed(2)} ${store.currency}</p>
+            <p style="color: #059669; font-size: 13px; margin-top: 10px;">سيتم توجيهك الآن إلى الواتساب لإرسال الفاتورة وتأكيد الطلب مع المتجر مباشرة.</p>
           </div>
         `,
         icon: 'success',
@@ -269,7 +290,7 @@ export default function CartDrawer({
                 })}
               </div>
 
-              {/* Customer Info Form */}
+              {/* Customer Info & Payment Method Form */}
               <form onSubmit={handleSubmitOrder} className="space-y-4 pt-4 border-t border-slate-200">
                 <h3 className="font-bold text-slate-800 text-xs flex items-center gap-1">
                   <User className="w-3.5 h-3.5 text-emerald-600" />
@@ -287,32 +308,28 @@ export default function CartDrawer({
                   <label className="block text-xs font-bold text-slate-700 mb-1">
                     الاسم بالكامل *
                   </label>
-                  <div className="relative">
-                    <input
-                      type="text"
-                      required
-                      value={customerName}
-                      onChange={(e) => setCustomerName(e.target.value)}
-                      placeholder="مثال: محمد أحمد"
-                      className="w-full text-xs font-medium px-3 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500"
-                    />
-                  </div>
+                  <input
+                    type="text"
+                    required
+                    value={customerName}
+                    onChange={(e) => setCustomerName(e.target.value)}
+                    placeholder="مثال: محمد أحمد"
+                    className="w-full text-xs font-medium px-3 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500"
+                  />
                 </div>
 
                 <div>
                   <label className="block text-xs font-bold text-slate-700 mb-1">
                     رقم هاتف الواتساب *
                   </label>
-                  <div className="relative">
-                    <input
-                      type="tel"
-                      required
-                      value={customerPhone}
-                      onChange={(e) => setCustomerPhone(e.target.value)}
-                      placeholder="مثال: 01012345678"
-                      className="w-full text-xs font-medium px-3 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500"
-                    />
-                  </div>
+                  <input
+                    type="tel"
+                    required
+                    value={customerPhone}
+                    onChange={(e) => setCustomerPhone(e.target.value)}
+                    placeholder="مثال: 01012345678"
+                    className="w-full text-xs font-medium px-3 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500"
+                  />
                 </div>
 
                 <div>
@@ -327,6 +344,138 @@ export default function CartDrawer({
                     placeholder="المحافظة، المنطقة، اسم الشارع، رقم العمارة أو علامة مميزة"
                     className="w-full text-xs font-medium px-3 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500"
                   />
+                </div>
+
+                {/* Payment Method Selector */}
+                <div className="space-y-2 pt-2">
+                  <label className="block text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                    <CreditCard className="w-3.5 h-3.5 text-emerald-600" />
+                    <span>طريقة الدفع المفضلة *</span>
+                  </label>
+
+                  <div className="space-y-2">
+                    {/* 1. Cash on Delivery */}
+                    <label className={`flex items-start gap-2.5 p-3 rounded-xl border cursor-pointer transition-all ${
+                      paymentMethod === 'الدفع عند الاستلام'
+                        ? 'border-emerald-500 bg-emerald-50/50'
+                        : 'border-slate-200 hover:bg-slate-50'
+                    }`}>
+                      <input
+                        type="radio"
+                        name="paymentMethod"
+                        value="الدفع عند الاستلام"
+                        checked={paymentMethod === 'الدفع عند الاستلام'}
+                        onChange={(e) => setPaymentMethod(e.target.value)}
+                        className="mt-0.5 text-emerald-600 focus:ring-emerald-500"
+                      />
+                      <div className="text-xs">
+                        <span className="font-bold text-slate-900 block">💵 الدفع عند الاستلام (Cash on Delivery)</span>
+                        <span className="text-[11px] text-slate-500">الدفع نقداً للمندوب عند استلام ومعاينة الطلب.</span>
+                      </div>
+                    </label>
+
+                    {/* 2. Vodafone Cash / E-Wallets */}
+                    {store.vodafoneCashNumber && (
+                      <label className={`flex flex-col gap-2 p-3 rounded-xl border cursor-pointer transition-all ${
+                        paymentMethod === 'محفظة إلكترونية (فودافون كاش / محافظ الجوال)'
+                          ? 'border-emerald-500 bg-emerald-50/50'
+                          : 'border-slate-200 hover:bg-slate-50'
+                      }`}>
+                        <div className="flex items-start gap-2.5">
+                          <input
+                            type="radio"
+                            name="paymentMethod"
+                            value="محفظة إلكترونية (فودافون كاش / محافظ الجوال)"
+                            checked={paymentMethod === 'محفظة إلكترونية (فودافون كاش / محافظ الجوال)'}
+                            onChange={(e) => setPaymentMethod(e.target.value)}
+                            className="mt-0.5 text-emerald-600 focus:ring-emerald-500"
+                          />
+                          <div className="text-xs flex-1">
+                            <span className="font-bold text-slate-900 block flex items-center gap-1">
+                              <span>📱 محفظة إلكترونية (فودافون كاش / محافظ الجوال)</span>
+                            </span>
+                            <span className="text-[11px] text-slate-500">تحويل سريع عبر محافظ الجوال قبل أو بعد تأكيد الطلب.</span>
+                          </div>
+                        </div>
+
+                        {paymentMethod === 'محفظة إلكترونية (فودافون كاش / محافظ الجوال)' && (
+                          <div className="mr-6 p-2.5 bg-white rounded-lg border border-emerald-200 space-y-1.5 text-xs">
+                            <div className="flex items-center justify-between">
+                              <span className="text-[11px] text-slate-500">رقم المحفظة للتحويل:</span>
+                              <div className="flex items-center gap-1.5 font-mono font-bold text-slate-900">
+                                <span>{store.vodafoneCashNumber}</span>
+                                <button
+                                  type="button"
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    copyNumber(store.vodafoneCashNumber!, 'wallet');
+                                  }}
+                                  className="p-1 rounded bg-slate-100 hover:bg-slate-200 text-slate-700"
+                                  title="نسخ الرقم"
+                                >
+                                  {copiedWallet ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
+                                </button>
+                              </div>
+                            </div>
+                            <p className="text-[10px] text-amber-800 bg-amber-50 p-1.5 rounded leading-relaxed">
+                              ⚠️ يرجى تحويل المبلغ وإرسال صورة التحويل في محادثة الواتساب بعد إتمام الطلب لتأكيد الحجز فوراً.
+                            </p>
+                          </div>
+                        )}
+                      </label>
+                    )}
+
+                    {/* 3. InstaPay */}
+                    {store.instaPayAddress && (
+                      <label className={`flex flex-col gap-2 p-3 rounded-xl border cursor-pointer transition-all ${
+                        paymentMethod === 'إنستاباي (InstaPay)'
+                          ? 'border-emerald-500 bg-emerald-50/50'
+                          : 'border-slate-200 hover:bg-slate-50'
+                      }`}>
+                        <div className="flex items-start gap-2.5">
+                          <input
+                            type="radio"
+                            name="paymentMethod"
+                            value="إنستاباي (InstaPay)"
+                            checked={paymentMethod === 'إنستاباي (InstaPay)'}
+                            onChange={(e) => setPaymentMethod(e.target.value)}
+                            className="mt-0.5 text-emerald-600 focus:ring-emerald-500"
+                          />
+                          <div className="text-xs flex-1">
+                            <span className="font-bold text-slate-900 block flex items-center gap-1">
+                              <span>🏦 إنستاباي (InstaPay)</span>
+                            </span>
+                            <span className="text-[11px] text-slate-500">تحويل فوري ومجاني عبر تطبيق InstaPay.</span>
+                          </div>
+                        </div>
+
+                        {paymentMethod === 'إنستاباي (InstaPay)' && (
+                          <div className="mr-6 p-2.5 bg-white rounded-lg border border-emerald-200 space-y-1.5 text-xs">
+                            <div className="flex items-center justify-between">
+                              <span className="text-[11px] text-slate-500">معرف / رقم إنستاباي:</span>
+                              <div className="flex items-center gap-1.5 font-mono font-bold text-slate-900">
+                                <span>{store.instaPayAddress}</span>
+                                <button
+                                  type="button"
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    copyNumber(store.instaPayAddress!, 'instapay');
+                                  }}
+                                  className="p-1 rounded bg-slate-100 hover:bg-slate-200 text-slate-700"
+                                  title="نسخ المعرف"
+                                >
+                                  {copiedInstaPay ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
+                                </button>
+                              </div>
+                            </div>
+                            <p className="text-[10px] text-purple-800 bg-purple-50 p-1.5 rounded leading-relaxed">
+                              ⚠️ يرجى تحويل المبلغ وإرسال صورة التحويل في محادثة الواتساب بعد إتمام الطلب لتأكيد الحجز فوراً.
+                            </p>
+                          </div>
+                        )}
+                      </label>
+                    )}
+                  </div>
                 </div>
 
                 <div>

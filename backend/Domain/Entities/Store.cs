@@ -24,6 +24,8 @@ namespace WatsStore.Api.Domain.Entities
         public string? SeoTitle { get; set; }
         public string? SeoDescription { get; set; }
         public string? MetaPixelId { get; set; }
+        public string? VodafoneCashNumber { get; set; }
+        public string? InstaPayAddress { get; set; }
         public string PlanType { get; set; } = "Free"; // Free, Pro, VIP
         public bool IsActive { get; set; } = true;
         public DateTime? SubscriptionEndsAt { get; set; }

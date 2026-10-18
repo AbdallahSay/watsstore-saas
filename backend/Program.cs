@@ -111,6 +111,8 @@ var app = builder.Build();
 // Configure the HTTP request pipeline
 app.UseCors("AllowAll");
 
+app.UseStaticFiles();
+
 app.UseSwagger();
 app.UseSwaggerUI(c =>
 {
@@ -123,7 +125,7 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-// Auto-Seeding Database on Startup
+// Auto-Seeding Database & Column Migrations on Startup
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
@@ -132,6 +134,24 @@ using (var scope = app.Services.CreateScope())
     try
     {
         await db.Database.EnsureCreatedAsync();
+
+        // Safe production column inspection and migration
+        try
+        {
+            await db.Database.ExecuteSqlRawAsync(@"
+                IF COL_LENGTH('Stores', 'VodafoneCashNumber') IS NULL 
+                    ALTER TABLE Stores ADD VodafoneCashNumber NVARCHAR(20) NULL;
+                IF COL_LENGTH('Stores', 'InstaPayAddress') IS NULL 
+                    ALTER TABLE Stores ADD InstaPayAddress NVARCHAR(100) NULL;
+                IF COL_LENGTH('WhatsAppOrders', 'PaymentMethod') IS NULL 
+                    ALTER TABLE WhatsAppOrders ADD PaymentMethod NVARCHAR(50) NOT NULL CONSTRAINT DF_WhatsAppOrders_PaymentMethod DEFAULT N'الدفع عند الاستلام';
+            ");
+            logger.LogInformation("Database column migrations checked and applied successfully.");
+        }
+        catch (Exception colEx)
+        {
+            logger.LogWarning(colEx, "Column migration check skipped or failed.");
+        }
 
         if (!await db.Stores.AnyAsync(s => s.Slug == "al-amal-fashion"))
         {

@@ -42,6 +42,8 @@ namespace WatsStore.Api.Infrastructure.Data
                 entity.Property(s => s.ThemeColor).HasMaxLength(20).HasDefaultValue("#10B981");
                 entity.Property(s => s.Currency).HasMaxLength(20).HasDefaultValue("ج.م");
                 entity.Property(s => s.PlanType).HasMaxLength(20).HasDefaultValue("Free");
+                entity.Property(s => s.VodafoneCashNumber).HasMaxLength(20);
+                entity.Property(s => s.InstaPayAddress).HasMaxLength(100);
 
                 entity.Property(s => s.DeliveryFee).HasPrecision(10, 2);
 
@@ -94,6 +96,7 @@ namespace WatsStore.Api.Infrastructure.Data
                 entity.HasKey(o => o.Id);
                 entity.Property(o => o.OrderNumber).UseIdentityColumn(1001, 1);
                 entity.Property(o => o.TotalAmount).HasPrecision(10, 2);
+                entity.Property(o => o.PaymentMethod).HasMaxLength(50).HasDefaultValue("الدفع عند الاستلام");
                 entity.Property(o => o.CustomerName).HasMaxLength(150).IsRequired();
                 entity.Property(o => o.CustomerPhone).HasMaxLength(30).IsRequired();
                 entity.Property(o => o.CustomerAddress).HasMaxLength(500).IsRequired();

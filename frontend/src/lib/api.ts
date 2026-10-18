@@ -163,4 +163,40 @@ export const api = {
       headers: { Authorization: `Bearer ${token}` },
     });
   },
+
+  async toggleProductAvailability(token: string, productId: string): Promise<{ id: string; isAvailable: boolean; message: string }> {
+    return fetchJson<{ id: string; isAvailable: boolean; message: string }>(
+      `${API_BASE_URL}/merchant/products/${encodeURIComponent(productId)}/availability`,
+      {
+        method: 'PATCH',
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+  },
+
+  async uploadImage(token: string, file: File): Promise<{ imageUrl: string; relativeUrl: string; message: string }> {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    const res = await fetch(`${API_BASE_URL}/merchant/upload`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      body: formData,
+    });
+
+    if (!res.ok) {
+      let errorMsg = `HTTP Error ${res.status}`;
+      try {
+        const errorData = await res.json();
+        errorMsg = errorData.message || JSON.stringify(errorData);
+      } catch {
+        errorMsg = res.statusText || errorMsg;
+      }
+      throw new Error(errorMsg);
+    }
+
+    return res.json();
+  },
 };

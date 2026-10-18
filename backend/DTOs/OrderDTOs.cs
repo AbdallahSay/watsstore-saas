@@ -16,6 +16,7 @@ namespace WatsStore.Api.DTOs
         public string CustomerAddress { get; set; } = string.Empty;
 
         public string? CustomerNotes { get; set; }
+        public string? PaymentMethod { get; set; } = "الدفع عند الاستلام";
 
         [Required]
         [MinLength(1, ErrorMessage = "يجب اختيار منتج واحد على الأقل")]

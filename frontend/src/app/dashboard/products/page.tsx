@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { api } from '@/lib/api';
 import { Product, Category, ProductVariantGroup } from '@/types';
 import Swal from 'sweetalert2';
@@ -13,8 +13,15 @@ import {
   SlidersHorizontal, 
   Check, 
   X,
-  AlertCircle
+  AlertCircle,
+  Upload,
+  Loader2,
+  Crown,
+  Sparkles,
+  ToggleLeft,
+  ToggleRight
 } from 'lucide-react';
+import { platformConfig } from '@/config/platformConfig';
 
 export default function DashboardProductsPage() {
   const [products, setProducts] = useState<Product[]>([]);
@@ -22,6 +29,8 @@ export default function DashboardProductsPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+  const [planType, setPlanType] = useState('Free');
+  const [storeName, setStoreName] = useState('');
 
   // Form State
   const [formName, setFormName] = useState('');
@@ -32,21 +41,31 @@ export default function DashboardProductsPage() {
   const [formDescription, setFormDescription] = useState('');
   const [formIsAvailable, setFormIsAvailable] = useState(true);
   
+  // File upload state
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
   // Interactive Variant Builder State
   const [variantGroups, setVariantGroups] = useState<{ name: string; optionsText: string }[]>([]);
   const [isSaving, setIsSaving] = useState(false);
+
+  // Toggling state
+  const [togglingId, setTogglingId] = useState<string | null>(null);
 
   const fetchInitialData = async () => {
     const token = localStorage.getItem('watsstore_token');
     if (!token) return;
 
     try {
-      const [prods, cats] = await Promise.all([
+      const [prods, cats, summary] = await Promise.all([
         api.getProducts(token),
         api.getCategories(token),
+        api.getDashboardSummary(token)
       ]);
       setProducts(prods);
       setCategories(cats);
+      setPlanType(summary.storeInfo?.planType || 'Free');
+      setStoreName(summary.storeInfo?.storeName || '');
     } catch (err: any) {
       Swal.fire({
         icon: 'error',
@@ -62,7 +81,36 @@ export default function DashboardProductsPage() {
     fetchInitialData();
   }, []);
 
+  const openUpgradeWhatsApp = () => {
+    const text = encodeURIComponent(
+      `مرحباً Masar Tech، أرغب في ترقية باقة متجري (${storeName}) إلى باقة Pro لإضافة منتجات غير محدودة وتفعيل مميزات المتجر المتقدمة.`
+    );
+    window.open(`https://wa.me/${platformConfig.supportWhatsApp}?text=${text}`, '_blank');
+  };
+
   const openCreateModal = () => {
+    if (planType === 'Free' && products.length >= 15) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'وصلت للحد الأقصى (15 منتج) 🔒',
+        html: `
+          <div class="text-right text-xs space-y-2 text-slate-600 leading-relaxed">
+            <p>أنت حالياً على <b>الباقة المجانية</b> والتي تتيح إضافة حتى 15 منتج كحد أقصى.</p>
+            <p>لإضافة عدد غير محدود من المنتجات وتفعيل Meta Pixel، قم بترقية متجرك لباقة <b>Pro</b> بسعر 149 ج.م فقط شهرياً!</p>
+          </div>
+        `,
+        showCancelButton: true,
+        confirmButtonText: 'ترقية الباقة الآن عبر واتساب',
+        cancelButtonText: 'لاحقاً',
+        confirmButtonColor: '#059669',
+      }).then((res) => {
+        if (res.isConfirmed) {
+          openUpgradeWhatsApp();
+        }
+      });
+      return;
+    }
+
     setEditingProduct(null);
     setFormName('');
     setFormCategoryId(categories.length > 0 ? categories[0].id : '');
@@ -105,12 +153,78 @@ export default function DashboardProductsPage() {
     setIsModalOpen(true);
   };
 
+  const handleImageFileUpload = async (file: File) => {
+    const token = localStorage.getItem('watsstore_token');
+    if (!token) return;
+
+    setIsUploadingImage(true);
+    try {
+      const res = await api.uploadImage(token, file);
+      setFormImageUrl(res.imageUrl);
+      Swal.fire({
+        icon: 'success',
+        title: 'تم رفع صورة المنتج بنجاح! 📸',
+        timer: 1500,
+        showConfirmButton: false,
+      });
+    } catch (err: any) {
+      Swal.fire({
+        icon: 'error',
+        title: 'فشل في رفع الصورة',
+        text: err.message || 'يرجى اختيار صورة بحجم أقل من 5 ميجابايت',
+      });
+    } finally {
+      setIsUploadingImage(false);
+    }
+  };
+
   const handleAddVariantGroup = () => {
     setVariantGroups((prev) => [...prev, { name: '', optionsText: '' }]);
   };
 
   const handleRemoveVariantGroup = (index: number) => {
     setVariantGroups((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  // 1-Click Availability Toggle
+  const handleToggleAvailability = async (product: Product) => {
+    const token = localStorage.getItem('watsstore_token');
+    if (!token) return;
+
+    setTogglingId(product.id);
+    const prevStatus = product.isAvailable;
+    const newStatus = !prevStatus;
+
+    // Optimistic UI update
+    setProducts((prev) =>
+      prev.map((p) => (p.id === product.id ? { ...p, isAvailable: newStatus } : p))
+    );
+
+    try {
+      const res = await api.toggleProductAvailability(token, product.id);
+      const toast = Swal.mixin({
+        toast: true,
+        position: 'top-end',
+        showConfirmButton: false,
+        timer: 1600,
+      });
+      toast.fire({
+        icon: 'success',
+        title: res.message,
+      });
+    } catch (err: any) {
+      // Revert if error
+      setProducts((prev) =>
+        prev.map((p) => (p.id === product.id ? { ...p, isAvailable: prevStatus } : p))
+      );
+      Swal.fire({
+        icon: 'error',
+        title: 'خطأ',
+        text: err.message || 'فشل في تحديث حالة التوفر',
+      });
+    } finally {
+      setTogglingId(null);
+    }
   };
 
   const handleSaveProduct = async (e: React.FormEvent) => {
@@ -197,20 +311,62 @@ export default function DashboardProductsPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-black text-slate-900">إدارة المنتجات والكتالوج</h1>
+          <div className="flex items-center gap-2.5">
+            <h1 className="text-2xl font-black text-slate-900">إدارة المنتجات والكتالوج</h1>
+            {planType === 'Free' ? (
+              <span className="text-[11px] font-bold px-2.5 py-1 rounded-full bg-slate-100 text-slate-700 border border-slate-200">
+                منتجاتك: {products.length} / 15 (الباقة المجانية)
+              </span>
+            ) : (
+              <span className="text-[11px] font-bold px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center gap-1">
+                <Crown className="w-3 h-3 text-amber-500" />
+                <span>منتجات غير محدودة ({planType})</span>
+              </span>
+            )}
+          </div>
           <p className="text-xs text-slate-500 mt-1">
-            أضف منتجاتك وحدد الأسعار والمتغيرات (المقاسات والألوان) لتظهر لزبائنك فوراً في المتجر.
+            أضف منتجاتك وارفع صورها مباشرة، وحدد المقاسات والألوان، وتحكم في توفرها بضغطة زر واحدة.
           </p>
         </div>
 
-        <button
-          onClick={openCreateModal}
-          className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-bold rounded-2xl shadow-lg shadow-emerald-600/20 flex items-center gap-2 transition-all hover:scale-105"
-        >
-          <Plus className="w-4 h-4 stroke-[2.5]" />
-          <span>إضافة منتج جديد</span>
-        </button>
+        <div className="flex items-center gap-3">
+          {planType === 'Free' && products.length >= 12 && (
+            <button
+              onClick={openUpgradeWhatsApp}
+              className="px-3.5 py-2 bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200 text-xs font-bold rounded-2xl flex items-center gap-1.5 transition-all"
+            >
+              <Crown className="w-3.5 h-3.5 text-amber-600" />
+              <span>ترقية لمنتجات غير محدودة</span>
+            </button>
+          )}
+
+          <button
+            onClick={openCreateModal}
+            className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-bold rounded-2xl shadow-lg shadow-emerald-600/20 flex items-center gap-2 transition-all hover:scale-105"
+          >
+            <Plus className="w-4 h-4 stroke-[2.5]" />
+            <span>إضافة منتج جديد</span>
+          </button>
+        </div>
       </div>
+
+      {/* Free Plan Limit Notice if Near Limit */}
+      {planType === 'Free' && products.length >= 14 && (
+        <div className="p-4 rounded-2xl bg-amber-50 border border-amber-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs text-amber-900">
+          <div className="flex items-center gap-2">
+            <AlertCircle className="w-5 h-5 text-amber-600 shrink-0" />
+            <span>
+              لقد استخدمت <b>{products.length} من أصل 15 منتجاً</b> متاحاً في باقتك المجانية. ترقية متجرك تمنحك منتجات غير محدودة فوراً!
+            </span>
+          </div>
+          <button
+            onClick={openUpgradeWhatsApp}
+            className="px-3 py-1.5 bg-amber-600 hover:bg-amber-700 text-white font-bold rounded-xl whitespace-nowrap self-start sm:self-auto"
+          >
+            ترقية متجري الآن
+          </button>
+        </div>
+      )}
 
       {/* Products Grid / Table */}
       {isLoading ? (
@@ -224,7 +380,7 @@ export default function DashboardProductsPage() {
           </div>
           <h3 className="text-base font-bold text-slate-800">لا توجد منتجات حتى الآن</h3>
           <p className="text-xs text-slate-500">
-            ابدأ بإضافة أول منتج لمتجرك لتتمكن من إرسال رابط الكتالوج لزبائنك على الواتساب.
+            ابدأ برفع أول منتج لمتجرك لتتمكن من إرسال رابط الكتالوج لزبائنك على الواتساب.
           </p>
           <button
             onClick={openCreateModal}
@@ -243,7 +399,7 @@ export default function DashboardProductsPage() {
                   <th className="py-4 px-4">القسم</th>
                   <th className="py-4 px-4">السعر</th>
                   <th className="py-4 px-4">المتغيرات (المقاسات/الألوان)</th>
-                  <th className="py-4 px-4">الحالة</th>
+                  <th className="py-4 px-4 text-center">حالة التوفر (تبديل فوري)</th>
                   <th className="py-4 px-4 text-center">الإجراءات</th>
                 </tr>
               </thead>
@@ -256,6 +412,8 @@ export default function DashboardProductsPage() {
                       variantCount = Array.isArray(v) ? v.length : 0;
                     } catch {}
                   }
+
+                  const isToggling = togglingId === product.id;
 
                   return (
                     <tr key={product.id} className="hover:bg-slate-50/80 transition-colors">
@@ -309,16 +467,28 @@ export default function DashboardProductsPage() {
                         )}
                       </td>
 
-                      <td className="py-3 px-4">
-                        {product.isAvailable ? (
-                          <span className="bg-emerald-100/80 text-emerald-800 font-bold px-2 py-0.5 rounded-full text-[11px]">
-                            متوفر للطلب
-                          </span>
-                        ) : (
-                          <span className="bg-slate-100 text-slate-500 font-bold px-2 py-0.5 rounded-full text-[11px]">
-                            نفذت الكمية
-                          </span>
-                        )}
+                      {/* 1-Click Interactive Availability Toggle */}
+                      <td className="py-3 px-4 text-center">
+                        <button
+                          type="button"
+                          disabled={isToggling}
+                          onClick={() => handleToggleAvailability(product)}
+                          className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full font-bold text-xs transition-all ${
+                            product.isAvailable
+                              ? 'bg-emerald-100/90 text-emerald-800 hover:bg-emerald-200 border border-emerald-300'
+                              : 'bg-rose-100/90 text-rose-800 hover:bg-rose-200 border border-rose-300'
+                          } ${isToggling ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer active:scale-95'}`}
+                          title="اضغط للتبديل الفوري بين متوفر وغير متوفر"
+                        >
+                          {isToggling ? (
+                            <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                          ) : product.isAvailable ? (
+                            <Check className="w-3.5 h-3.5 stroke-[2.5]" />
+                          ) : (
+                            <X className="w-3.5 h-3.5 stroke-[2.5]" />
+                          )}
+                          <span>{product.isAvailable ? 'متوفر للطلب ✅' : 'غير متوفر ❌'}</span>
+                        </button>
                       </td>
 
                       <td className="py-3 px-4">
@@ -375,7 +545,7 @@ export default function DashboardProductsPage() {
                   required
                   value={formName}
                   onChange={(e) => setFormName(e.target.value)}
-                  placeholder="مثال: فستان سواريه مطرز"
+                  placeholder="مثال: سنيكرز رياضي مريح"
                   className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 font-medium text-sm focus:outline-none focus:border-emerald-500"
                 />
               </div>
@@ -397,15 +567,52 @@ export default function DashboardProductsPage() {
                   </select>
                 </div>
 
+                {/* Direct Image Upload & URL */}
                 <div>
-                  <label className="block font-bold text-slate-700 mb-1">رابط صورة المنتج (URL)</label>
-                  <input
-                    type="url"
-                    value={formImageUrl}
-                    onChange={(e) => setFormImageUrl(e.target.value)}
-                    placeholder="https://images.unsplash.com/..."
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 font-medium text-sm focus:outline-none focus:border-emerald-500"
-                  />
+                  <label className="block font-bold text-slate-700 mb-1">صورة المنتج</label>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="text"
+                      value={formImageUrl}
+                      onChange={(e) => setFormImageUrl(e.target.value)}
+                      placeholder="رابط الصورة أو ارفعها..."
+                      className="flex-1 px-3 py-2 rounded-xl border border-slate-200 font-medium text-xs focus:outline-none focus:border-emerald-500"
+                    />
+                    <input
+                      type="file"
+                      ref={fileInputRef}
+                      accept="image/png,image/jpeg,image/webp"
+                      className="hidden"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) handleImageFileUpload(file);
+                      }}
+                    />
+                    <button
+                      type="button"
+                      disabled={isUploadingImage}
+                      onClick={() => fileInputRef.current?.click()}
+                      className="px-2.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-[11px] rounded-xl flex items-center gap-1 border border-slate-200 whitespace-nowrap"
+                      title="رفع صورة من جهازك"
+                    >
+                      {isUploadingImage ? (
+                        <Loader2 className="w-3.5 h-3.5 animate-spin text-emerald-600" />
+                      ) : (
+                        <Upload className="w-3.5 h-3.5 text-emerald-600" />
+                      )}
+                      <span>رفع</span>
+                    </button>
+                  </div>
+                  {formImageUrl && (
+                    <div className="flex items-center gap-2 mt-1.5">
+                      <img
+                        src={formImageUrl}
+                        alt="Product Preview"
+                        className="w-8 h-8 rounded-lg object-cover border border-slate-200"
+                      />
+                      <span className="text-[10px] text-slate-400">معاينة الصورة الحالية</span>
+                    </div>
+                  )}
                 </div>
               </div>
 

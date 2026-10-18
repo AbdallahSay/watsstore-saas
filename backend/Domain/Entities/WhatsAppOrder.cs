@@ -11,6 +11,7 @@ namespace WatsStore.Api.Domain.Entities
         public string CustomerPhone { get; set; } = string.Empty;
         public string CustomerAddress { get; set; } = string.Empty;
         public string? CustomerNotes { get; set; }
+        public string PaymentMethod { get; set; } = "الدفع عند الاستلام";
         public string ItemsJson { get; set; } = "[]";
         public decimal TotalAmount { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;

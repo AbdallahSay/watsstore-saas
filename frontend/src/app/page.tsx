@@ -183,20 +183,20 @@ export default function HomePage() {
               <div className="bg-white rounded-3xl p-8 border border-slate-200/80 shadow-sm flex flex-col justify-between">
                 <div>
                   <h3 className="text-xl font-bold text-slate-900">الباقة المجانية</h3>
-                  <p className="text-xs text-slate-500 mt-1">للمشاريع الناشئة وتجربة المنصة</p>
+                  <p className="text-xs text-slate-500 mt-1">للتجار المبتدئين والمشاريع المنزلية</p>
                   <div className="mt-6 mb-8 flex items-baseline gap-1">
                     <span className="text-4xl font-black text-slate-900">0</span>
-                    <span className="text-sm font-bold text-slate-600">ج.م / شهرياً</span>
+                    <span className="text-sm font-bold text-slate-600">ج.م / مجاناً دائماً</span>
                   </div>
 
                   <ul className="space-y-3.5 text-sm text-slate-600 border-t border-slate-100 pt-6">
                     <li className="flex items-center gap-2.5">
                       <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                      <span>حتى 25 منتج في الكتالوج</span>
+                      <span>حتى 15 منتج كحد أقصى</span>
                     </li>
                     <li className="flex items-center gap-2.5">
                       <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                      <span>طلبات واتساب غير محدودة</span>
+                      <span>طلبات واستفسارات غير محدودة عبر الواتساب</span>
                     </li>
                     <li className="flex items-center gap-2.5">
                       <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
@@ -204,10 +204,11 @@ export default function HomePage() {
                     </li>
                     <li className="flex items-center gap-2.5">
                       <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                      <span>رابط QR دائم لمتجرك</span>
+                      <span>دعم المحافظ الإلكترونية وإنستاباي 📱</span>
                     </li>
-                    <li className="flex items-center gap-2.5 text-slate-400">
-                      <span>• ربط Meta Pixel (غير متاح)</span>
+                    <li className="flex items-center gap-2.5">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                      <span>رابط ورمز QR دائم لمتجرك ومطبوعاتك</span>
                     </li>
                   </ul>
                 </div>
@@ -216,7 +217,7 @@ export default function HomePage() {
                   href="/register"
                   className="mt-8 w-full py-3.5 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-sm text-center transition-colors block"
                 >
-                  ابدأ مجاناً
+                  ابدأ مجاناً الآن
                 </Link>
               </div>
 
@@ -230,7 +231,7 @@ export default function HomePage() {
                   <h3 className="text-xl font-bold text-slate-900">باقة المحترفين Pro</h3>
                   <p className="text-xs text-slate-500 mt-1">للمتاجر الراغبة في التوسع وإطلاق الإعلانات الممولة</p>
                   <div className="mt-6 mb-8 flex items-baseline gap-1">
-                    <span className="text-4xl font-black text-emerald-600">299</span>
+                    <span className="text-4xl font-black text-emerald-600">149</span>
                     <span className="text-sm font-bold text-slate-600">ج.م / شهرياً</span>
                   </div>
 
@@ -241,19 +242,19 @@ export default function HomePage() {
                     </li>
                     <li className="flex items-center gap-2.5">
                       <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                      <span className="font-bold text-emerald-700">ربط Meta Pixel تتبع إعلانات فيسبوك وإنستغرام</span>
+                      <span className="font-bold text-emerald-700">تفعيل Meta Pixel لتتبع إعلانات فيسبوك وإنستغرام</span>
                     </li>
                     <li className="flex items-center gap-2.5">
                       <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                      <span>إزالة شارة المنصة الإعلانية من المتجر</span>
+                      <span>إزالة شارة المنصة بالكامل لعلامة تجارية خاصة</span>
                     </li>
                     <li className="flex items-center gap-2.5">
                       <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                      <span>تهيئة سيو كاملة وتخصيص الكلمات المفتاحية</span>
+                      <span>لوحة تحكم إحصائيات المبيعات والطلبات</span>
                     </li>
                     <li className="flex items-center gap-2.5">
                       <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                      <span>لوحة تحكم إحصائيات المبيعات وتقارير الأرباح</span>
+                      <span>دعم فني وتدريب سريع ومباشر على الواتساب</span>
                     </li>
                   </ul>
                 </div>
@@ -262,36 +263,36 @@ export default function HomePage() {
                   href="/register"
                   className="mt-8 w-full py-3.5 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-sm text-center shadow-lg shadow-emerald-600/25 transition-all hover:scale-[1.02] block"
                 >
-                  اشترك في باقة Pro
+                  اشترك في باقة Pro (149 ج.م)
                 </Link>
               </div>
 
               {/* VIP PLAN */}
               <div className="bg-white rounded-3xl p-8 border border-slate-200/80 shadow-sm flex flex-col justify-between">
                 <div>
-                  <h3 className="text-xl font-bold text-slate-900">باقة كبار التجار VIP</h3>
-                  <p className="text-xs text-slate-500 mt-1">للعلامات التجارية وسلاسل الفروع</p>
+                  <h3 className="text-xl font-bold text-slate-900">باقة النخبة VIP</h3>
+                  <p className="text-xs text-slate-500 mt-1">للعلامات التجارية الكبرى والمتاجر الرائدة</p>
                   <div className="mt-6 mb-8 flex items-baseline gap-1">
-                    <span className="text-4xl font-black text-slate-900">599</span>
+                    <span className="text-4xl font-black text-slate-900">299</span>
                     <span className="text-sm font-bold text-slate-600">ج.م / شهرياً</span>
                   </div>
 
                   <ul className="space-y-3.5 text-sm text-slate-600 border-t border-slate-100 pt-6">
                     <li className="flex items-center gap-2.5">
                       <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                      <span>جميع مميزات باقة Pro</span>
+                      <span>جميع مميزات باقة Pro بالكامل</span>
                     </li>
                     <li className="flex items-center gap-2.5">
                       <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                      <span className="font-bold">ظهور في صدارة دليل المتاجر والمحافظات</span>
+                      <span className="font-bold">دعم النطاق الخاص (Custom Domain)</span>
                     </li>
                     <li className="flex items-center gap-2.5">
                       <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                      <span>دعم فني خاص على الواتساب 24/7</span>
+                      <span>مدير حساب مخصص لمساعدتك في إدخال المنتجات</span>
                     </li>
                     <li className="flex items-center gap-2.5">
                       <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                      <span>مساعدة في رفع المنتجات وتجهيز الكتالوج مجاناً</span>
+                      <span>استشارات تسويقية وحملات لزيادة مبيعاتك</span>
                     </li>
                   </ul>
                 </div>
@@ -300,7 +301,7 @@ export default function HomePage() {
                   href="/register"
                   className="mt-8 w-full py-3.5 rounded-2xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-sm text-center transition-colors block"
                 >
-                  انضم إلى باقة VIP
+                  انضم إلى باقة VIP (299 ج.م)
                 </Link>
               </div>
             </div>

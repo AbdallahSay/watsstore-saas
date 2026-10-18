@@ -33,6 +33,8 @@ namespace WatsStore.Api.DTOs
         public string? SeoTitle { get; set; }
         public string? SeoDescription { get; set; }
         public string? MetaPixelId { get; set; }
+        public string? VodafoneCashNumber { get; set; }
+        public string? InstaPayAddress { get; set; }
         public string PlanType { get; set; } = "Free";
         public bool IsActive { get; set; }
         public DateTime CreatedAt { get; set; }
@@ -57,6 +59,8 @@ namespace WatsStore.Api.DTOs
         public string? SeoTitle { get; set; }
         public string? SeoDescription { get; set; }
         public string? MetaPixelId { get; set; }
+        public string? VodafoneCashNumber { get; set; }
+        public string? InstaPayAddress { get; set; }
     }
 
     public class CategoryCreateUpdateRequest
@@ -118,6 +122,7 @@ namespace WatsStore.Api.DTOs
         public string CustomerPhone { get; set; } = string.Empty;
         public string CustomerAddress { get; set; } = string.Empty;
         public string? CustomerNotes { get; set; }
+        public string PaymentMethod { get; set; } = "الدفع عند الاستلام";
         public string ItemsJson { get; set; } = string.Empty;
         public decimal TotalAmount { get; set; }
         public DateTime CreatedAt { get; set; }

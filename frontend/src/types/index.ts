@@ -43,6 +43,8 @@ export interface Store {
   seoTitle?: string | null;
   seoDescription?: string | null;
   metaPixelId?: string | null;
+  vodafoneCashNumber?: string | null;
+  instaPayAddress?: string | null;
   planType: string;
   categories: Category[];
   products: Product[];
@@ -65,6 +67,7 @@ export interface CreateOrderRequest {
   customerPhone: string;
   customerAddress: string;
   customerNotes?: string;
+  paymentMethod?: string;
   items: OrderItemRequest[];
 }
 
@@ -117,6 +120,8 @@ export interface DashboardSummary {
     seoTitle?: string | null;
     seoDescription?: string | null;
     metaPixelId?: string | null;
+    vodafoneCashNumber?: string | null;
+    instaPayAddress?: string | null;
     planType: string;
     isActive: boolean;
     createdAt: string;
@@ -128,6 +133,7 @@ export interface DashboardSummary {
     customerPhone: string;
     customerAddress: string;
     customerNotes?: string | null;
+    paymentMethod?: string;
     itemsJson: string;
     totalAmount: number;
     createdAt: string;

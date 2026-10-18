@@ -73,6 +73,8 @@ namespace WatsStore.Api.Controllers
                 SeoTitle = seoTitle,
                 SeoDescription = seoDescription,
                 MetaPixelId = merchantMetaPixelId,
+                VodafoneCashNumber = store.VodafoneCashNumber,
+                InstaPayAddress = store.InstaPayAddress,
                 PlanType = store.PlanType,
                 Categories = store.Categories.Select(c => new PublicCategoryDto
                 {

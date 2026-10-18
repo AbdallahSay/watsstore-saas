@@ -56,24 +56,34 @@ export default function Footer() {
           </div>
 
           <div>
-            <h4 className="text-white font-bold text-sm mb-4">تواصل ودعم فني</h4>
+            <h4 className="text-white font-bold text-sm mb-4">تواصل ودعم فني Masar Tech</h4>
             <p className="text-sm text-slate-400 leading-relaxed mb-4">
-              فريق الدعم الفني متواجد لمساعدتك في إعداد وتجهيز متجرك وربط بيكسل الإعلانات.
+              فريق الدعم الفني وإدارة المنصة في خدمتكم لتفعيل باقات Pro/VIP والمساعدة في إعداد المتاجر.
             </p>
-            <a
-              href="https://wa.me/201012345678"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-sm font-bold transition-colors"
-            >
-              <MessageCircle className="w-4 h-4" />
-              <span>تواصل مع الدعم عبر واتساب</span>
-            </a>
+            <div className="space-y-2">
+              <a
+                href="https://wa.me/201011653619"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-sm font-bold transition-colors w-full justify-center"
+              >
+                <MessageCircle className="w-4 h-4" />
+                <span>واتساب الدعم: 01011653619</span>
+              </a>
+              <a
+                href="https://www.facebook.com/search/top?q=Masar%20Tech"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-block text-xs text-slate-400 hover:text-white transition-colors text-center w-full"
+              >
+                صفحة Masar Tech الرسمية على فيسبوك ↗
+              </a>
+            </div>
           </div>
         </div>
 
         <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
-          <p>© {new Date().getFullYear()} WatsStore. جميع الحقوق محفوظة لتجار مصر 🇪🇬</p>
+          <p>© {new Date().getFullYear()} WatsStore — تطوير وإدارة Masar Tech - 01011653619 🇪🇬</p>
           <div className="flex items-center gap-1">
             <span>صُنع بشغف لخدمة التجارة الإلكترونية المصرية</span>
             <Heart className="w-3.5 h-3.5 text-rose-500 inline fill-rose-500" />

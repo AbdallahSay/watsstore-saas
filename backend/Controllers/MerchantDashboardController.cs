@@ -71,6 +71,7 @@ namespace WatsStore.Api.Controllers
                     CustomerPhone = o.CustomerPhone,
                     CustomerAddress = o.CustomerAddress,
                     CustomerNotes = o.CustomerNotes,
+                    PaymentMethod = o.PaymentMethod,
                     ItemsJson = o.ItemsJson,
                     TotalAmount = o.TotalAmount,
                     CreatedAt = o.CreatedAt
@@ -102,6 +103,8 @@ namespace WatsStore.Api.Controllers
                     SeoTitle = store.SeoTitle,
                     SeoDescription = store.SeoDescription,
                     MetaPixelId = store.MetaPixelId,
+                    VodafoneCashNumber = store.VodafoneCashNumber,
+                    InstaPayAddress = store.InstaPayAddress,
                     PlanType = store.PlanType,
                     IsActive = store.IsActive,
                     CreatedAt = store.CreatedAt
@@ -138,6 +141,10 @@ namespace WatsStore.Api.Controllers
 
             // Only allow MetaPixelId to be saved (and active) for merchants
             store.MetaPixelId = string.IsNullOrWhiteSpace(request.MetaPixelId) ? null : request.MetaPixelId.Trim();
+
+            // Electronic Wallet & InstaPay
+            store.VodafoneCashNumber = string.IsNullOrWhiteSpace(request.VodafoneCashNumber) ? null : request.VodafoneCashNumber.Trim();
+            store.InstaPayAddress = string.IsNullOrWhiteSpace(request.InstaPayAddress) ? null : request.InstaPayAddress.Trim();
 
             await _db.SaveChangesAsync();
 
@@ -276,6 +283,20 @@ namespace WatsStore.Api.Controllers
 
             var storeId = GetAuthenticatedStoreId();
 
+            var store = await _db.Stores.FirstOrDefaultAsync(s => s.Id == storeId);
+            if (store == null)
+                return NotFound(new { message = "المتجر غير موجود" });
+
+            // Enforce 15-product limit on Free Plan
+            if (string.Equals(store.PlanType, "Free", StringComparison.OrdinalIgnoreCase))
+            {
+                var productCount = await _db.Products.CountAsync(p => p.StoreId == storeId);
+                if (productCount >= 15)
+                {
+                    return BadRequest(new { message = "لقد وصلت للحد الأقصى للمنتجات في الخطة المجانية (15 منتج). يرجى ترقية باقتك إلى Pro أو VIP عبر التواصل معنا على 01011653619 لإضافة منتجات غير محدودة!" });
+                }
+            }
+
             if (request.CategoryId.HasValue)
             {
                 var categoryExists = await _db.Categories
@@ -308,6 +329,28 @@ namespace WatsStore.Api.Controllers
             await _db.SaveChangesAsync();
 
             return Ok(product);
+        }
+
+        [HttpPatch("products/{id:guid}/availability")]
+        [HttpPut("products/{id:guid}/toggle-availability")]
+        public async Task<IActionResult> ToggleProductAvailability(Guid id)
+        {
+            var storeId = GetAuthenticatedStoreId();
+            var product = await _db.Products
+                .FirstOrDefaultAsync(p => p.Id == id && p.StoreId == storeId);
+
+            if (product == null)
+                return NotFound(new { message = "المنتج غير موجود" });
+
+            product.IsAvailable = !product.IsAvailable;
+            await _db.SaveChangesAsync();
+
+            return Ok(new
+            {
+                id = product.Id,
+                isAvailable = product.IsAvailable,
+                message = product.IsAvailable ? "تم تفعيل المنتج وتوفيره في المتجر بنجاح" : "تم إيقاف توفير المنتج مؤقتاً"
+            });
         }
 
         [HttpPut("products/{id:guid}")]

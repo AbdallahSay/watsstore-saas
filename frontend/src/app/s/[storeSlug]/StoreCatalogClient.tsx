@@ -315,7 +315,7 @@ export default function StoreCatalogClient({ store }: StoreCatalogClientProps) {
             className="inline-flex items-center gap-2 hover:underline"
           >
             <Sparkles className="w-4 h-4" />
-            <span>⚡ تم إنشاء هذا المتجر مجاناً عبر منصة WatsStore — أنشئ متجرك في دقيقتين</span>
+            <span>⚡ تم إنشاء هذا المتجر مجاناً عبر منصة WatsStore by Masar Tech — أنشئ متجرك في دقيقتين</span>
           </Link>
         </div>
       )}
