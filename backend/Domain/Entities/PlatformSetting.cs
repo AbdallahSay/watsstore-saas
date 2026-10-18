@@ -24,6 +24,10 @@ namespace WatsStore.Api.Domain.Entities
         public bool IsLaunchDiscountBannerActive { get; set; } = true;
         public string LaunchDiscountText { get; set; } = "🔥 عروض الإطلاق التجاري: احصل على خصم إضافي عند الاشتراك السنوي اليوم!";
 
+        // Platform Local Payment Wallets
+        public string VodafoneCashWallet { get; set; } = "01027150123";
+        public string InstaPayHandle { get; set; } = "watsstore@instapay";
+
         public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
     }
 }

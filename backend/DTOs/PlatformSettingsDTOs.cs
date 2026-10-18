@@ -23,6 +23,10 @@ namespace WatsStore.Api.DTOs
         public bool IsLaunchDiscountBannerActive { get; set; } = true;
         public string LaunchDiscountText { get; set; } = "🔥 عروض الإطلاق التجاري: احصل على خصم إضافي عند الاشتراك السنوي اليوم!";
 
+        // Platform Local Payment Wallets
+        public string VodafoneCashWallet { get; set; } = "01027150123";
+        public string InstaPayHandle { get; set; } = "watsstore@instapay";
+
         public DateTime? UpdatedAt { get; set; }
     }
 
@@ -62,5 +66,11 @@ namespace WatsStore.Api.DTOs
 
         [StringLength(500, ErrorMessage = "نص البنر التسويقي طويل جداً")]
         public string? LaunchDiscountText { get; set; }
+
+        [StringLength(50, ErrorMessage = "رقم محفظة فودافون كاش غير صالح")]
+        public string? VodafoneCashWallet { get; set; }
+
+        [StringLength(100, ErrorMessage = "عنوان إنستاباي غير صالح")]
+        public string? InstaPayHandle { get; set; }
     }
 }

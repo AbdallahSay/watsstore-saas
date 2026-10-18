@@ -40,6 +40,8 @@ namespace WatsStore.Api.Controllers
                     VipAiLimit = 150,
                     IsLaunchDiscountBannerActive = true,
                     LaunchDiscountText = "🔥 عروض الإطلاق التجاري: احصل على خصم إضافي عند الاشتراك السنوي اليوم!",
+                    VodafoneCashWallet = "01027150123",
+                    InstaPayHandle = "watsstore@instapay",
                     UpdatedAt = DateTime.UtcNow
                 });
             }
@@ -58,6 +60,8 @@ namespace WatsStore.Api.Controllers
                 VipAiLimit = settings.VipAiLimit,
                 IsLaunchDiscountBannerActive = settings.IsLaunchDiscountBannerActive,
                 LaunchDiscountText = settings.LaunchDiscountText,
+                VodafoneCashWallet = string.IsNullOrWhiteSpace(settings.VodafoneCashWallet) ? "01027150123" : settings.VodafoneCashWallet,
+                InstaPayHandle = string.IsNullOrWhiteSpace(settings.InstaPayHandle) ? "watsstore@instapay" : settings.InstaPayHandle,
                 UpdatedAt = settings.UpdatedAt
             });
         }

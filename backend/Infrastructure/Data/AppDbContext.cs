@@ -17,6 +17,7 @@ namespace WatsStore.Api.Infrastructure.Data
         public DbSet<StoreCoupon> StoreCoupons => Set<StoreCoupon>();
         public DbSet<SuperAdmin> SuperAdmins => Set<SuperAdmin>();
         public DbSet<PlatformSetting> PlatformSettings => Set<PlatformSetting>();
+        public DbSet<SubscriptionRequest> SubscriptionRequests => Set<SubscriptionRequest>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -163,6 +164,29 @@ namespace WatsStore.Api.Infrastructure.Data
                 entity.Property(a => a.PasswordHash).HasMaxLength(255).IsRequired();
                 entity.Property(a => a.ResetToken).HasMaxLength(100);
                 entity.HasIndex(a => a.Email).IsUnique();
+            });
+
+            // SubscriptionRequest Configuration
+            modelBuilder.Entity<SubscriptionRequest>(entity =>
+            {
+                entity.HasKey(r => r.Id);
+                entity.Property(r => r.StoreName).HasMaxLength(150);
+                entity.Property(r => r.MerchantEmail).HasMaxLength(200);
+                entity.Property(r => r.MerchantPhone).HasMaxLength(50);
+                entity.Property(r => r.PlanType).HasMaxLength(20).IsRequired();
+                entity.Property(r => r.BillingCycle).HasMaxLength(20).IsRequired();
+                entity.Property(r => r.PaymentMethod).HasMaxLength(50).IsRequired();
+                entity.Property(r => r.TransactionId).HasMaxLength(100).IsRequired();
+                entity.Property(r => r.Status).HasMaxLength(20).HasDefaultValue("Pending");
+                entity.Property(r => r.Amount).HasPrecision(10, 2);
+
+                entity.HasOne(r => r.Store)
+                      .WithMany()
+                      .HasForeignKey(r => r.StoreId)
+                      .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasIndex(r => new { r.StoreId, r.Status });
+                entity.HasIndex(r => r.CreatedAt);
             });
         }
     }

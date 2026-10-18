@@ -40,10 +40,12 @@ import {
   Megaphone,
   Zap,
   Tag,
-  Sliders
+  Sliders,
+  CreditCard,
+  UserCheck
 } from 'lucide-react';
 import { api } from '@/lib/api';
-import { AdminPlatformStats, AdminStoreSummary, PlatformPricingSettings } from '@/types';
+import { AdminPlatformStats, AdminStoreSummary, PlatformPricingSettings, SubscriptionRequestItem } from '@/types';
 
 export default function SuperAdminPage() {
   const [token, setToken] = useState<string | null>(null);
@@ -51,7 +53,11 @@ export default function SuperAdminPage() {
   const [isInitializing, setIsInitializing] = useState(true);
 
   // Active View Tab in Dashboard
-  const [activeTab, setActiveTab] = useState<'stores' | 'pricing' | 'settings'>('stores');
+  const [activeTab, setActiveTab] = useState<'stores' | 'subscriptions' | 'pricing' | 'settings'>('stores');
+
+  // Subscriptions Management States
+  const [pendingSubscriptions, setPendingSubscriptions] = useState<SubscriptionRequestItem[]>([]);
+  const [isProcessingSubId, setIsProcessingSubId] = useState<string | null>(null);
 
   // Pricing & Plans Settings States
   const [pricingSettings, setPricingSettings] = useState<PlatformPricingSettings>({
@@ -67,6 +73,8 @@ export default function SuperAdminPage() {
     vipAiLimit: 150,
     isLaunchDiscountBannerActive: true,
     launchDiscountText: '🔥 عرض الإطلاق التجاري: احصل على خصم إضافي عند الاشتراك السنوي اليوم!',
+    vodafoneCashWallet: '01027150123',
+    instaPayHandle: 'watsstore@instapay',
   });
   const [isSavingPricing, setIsSavingPricing] = useState(false);
   const [pricingSuccessMsg, setPricingSuccessMsg] = useState<string | null>(null);
@@ -126,12 +134,16 @@ export default function SuperAdminPage() {
   const loadDashboardData = useCallback(async (activeToken: string) => {
     setIsLoadingData(true);
     try {
-      const [statsRes, storesRes, pricingRes] = await Promise.all([
+      const [statsRes, storesRes, pricingRes, pendingSubsRes] = await Promise.all([
         api.getAdminPlatformStats(activeToken),
         api.getAdminStores(activeToken),
         api.getAdminPricing(activeToken).catch((err) => {
           console.warn('Could not load admin pricing:', err);
           return null;
+        }),
+        api.getAdminPendingSubscriptions(activeToken).catch((err) => {
+          console.warn('Could not load pending subscriptions:', err);
+          return [];
         })
       ]);
       setStats(statsRes);
@@ -139,6 +151,7 @@ export default function SuperAdminPage() {
       if (pricingRes) {
         setPricingSettings(pricingRes);
       }
+      setPendingSubscriptions(pendingSubsRes || []);
     } catch (err: any) {
       console.error('Failed to load admin data:', err);
       if (err.message && err.message.includes('401')) {
@@ -300,6 +313,99 @@ export default function SuperAdminPage() {
       });
     } finally {
       setIsSavingPricing(false);
+    }
+  };
+
+  // Handle Approve Subscription
+  const handleApproveSubscription = async (sub: SubscriptionRequestItem) => {
+    if (!token) return;
+
+    const confirm = await Swal.fire({
+      title: 'تأكيد اعتماد الترقية والتفعيل؟',
+      html: `هل قمت بمراجعة ومطابقة الحوالة لمتجر <b>${sub.storeName}</b>؟<br/>سيتم تفعيل باقة <b>${sub.planType}</b> (${sub.billingCycle === 'Annual' ? 'اشتراك سنوي 365 يوم' : 'اشتراك شهري 30 يوم'}) وتصفير كوتة الذكاء الاصطناعي فوراً.`,
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'نعم، اعتماد وتفعيل فوري ✅',
+      cancelButtonText: 'إلغاء',
+      confirmButtonColor: '#10B981',
+      cancelButtonColor: '#64748b',
+      background: '#0f172a',
+      color: '#f8fafc',
+    });
+
+    if (!confirm.isConfirmed) return;
+
+    setIsProcessingSubId(sub.id);
+    try {
+      const res = await api.approveAdminSubscription(token, sub.id);
+      Swal.fire({
+        icon: 'success',
+        title: 'تم اعتماد الترقية بنجاح! 🎉',
+        text: res.message || 'تمت ترقية المتجر وتفعيل الباقة فوراً.',
+        timer: 2000,
+        showConfirmButton: false,
+        background: '#0f172a',
+        color: '#f8fafc',
+      });
+      loadDashboardData(token);
+    } catch (err: any) {
+      Swal.fire({
+        icon: 'error',
+        title: 'فشل اعتماد الترقية',
+        text: err.message || 'حدث خطأ أثناء اعتماد الطلب',
+        confirmButtonColor: '#10B981',
+        background: '#0f172a',
+        color: '#f8fafc',
+      });
+    } finally {
+      setIsProcessingSubId(null);
+    }
+  };
+
+  // Handle Reject Subscription
+  const handleRejectSubscription = async (sub: SubscriptionRequestItem) => {
+    if (!token) return;
+
+    const { value: reason } = await Swal.fire({
+      title: 'رفض طلب الاشتراك',
+      input: 'text',
+      inputLabel: 'سبب الرفض (سيظهر في صفحة التاجر):',
+      inputPlaceholder: 'مثال: رقم العملية غير مسجل بمحفظتنا، أو المبلغ المحول غير مطابق...',
+      showCancelButton: true,
+      confirmButtonText: 'تأكيد الرفض ❌',
+      cancelButtonText: 'إلغاء',
+      confirmButtonColor: '#ef4444',
+      cancelButtonColor: '#64748b',
+      background: '#0f172a',
+      color: '#f8fafc',
+    });
+
+    if (reason === undefined) return;
+
+    setIsProcessingSubId(sub.id);
+    try {
+      const res = await api.rejectAdminSubscription(token, sub.id, reason);
+      Swal.fire({
+        icon: 'info',
+        title: 'تم رفض الطلب',
+        text: res.message || 'تم رفض طلب الاشتراك وتسجيل الملاحظة للتاجر.',
+        timer: 2000,
+        showConfirmButton: false,
+        background: '#0f172a',
+        color: '#f8fafc',
+      });
+      loadDashboardData(token);
+    } catch (err: any) {
+      Swal.fire({
+        icon: 'error',
+        title: 'فشل الرفض',
+        text: err.message || 'حدث خطأ أثناء رفض الطلب',
+        confirmButtonColor: '#10B981',
+        background: '#0f172a',
+        color: '#f8fafc',
+      });
+    } finally {
+      setIsProcessingSubId(null);
     }
   };
 
@@ -1024,6 +1130,22 @@ export default function SuperAdminPage() {
             <span>المتاجر والإحصائيات</span>
           </button>
           <button
+            onClick={() => setActiveTab('subscriptions')}
+            className={`px-3.5 py-1.5 text-xs font-bold rounded-lg transition-all flex items-center gap-1.5 relative ${
+              activeTab === 'subscriptions'
+                ? 'bg-emerald-500 text-slate-950 font-black shadow-sm'
+                : 'text-slate-400 hover:text-white'
+            }`}
+          >
+            <CreditCard className="w-3.5 h-3.5" />
+            <span>طلبات الاشتراك</span>
+            {pendingSubscriptions.length > 0 && (
+              <span className="w-4 h-4 rounded-full bg-amber-500 text-slate-950 text-[10px] font-black flex items-center justify-center animate-pulse">
+                {pendingSubscriptions.length}
+              </span>
+            )}
+          </button>
+          <button
             onClick={() => setActiveTab('pricing')}
             className={`px-3.5 py-1.5 text-xs font-bold rounded-lg transition-all flex items-center gap-1.5 ${
               activeTab === 'pricing'
@@ -1043,7 +1165,7 @@ export default function SuperAdminPage() {
             }`}
           >
             <Key className="w-3.5 h-3.5" />
-            <span>إعدادات الحساب وكلمة المرور</span>
+            <span>إعدادات الحساب</span>
           </button>
         </div>
 
@@ -1077,10 +1199,10 @@ export default function SuperAdminPage() {
 
       {/* Mobile Tab Switcher */}
       <div className="md:hidden px-4 pt-4">
-        <div className="grid grid-cols-3 gap-1 bg-slate-900 border border-slate-800 p-1 rounded-xl">
+        <div className="grid grid-cols-4 gap-1 bg-slate-900 border border-slate-800 p-1 rounded-xl">
           <button
             onClick={() => setActiveTab('stores')}
-            className={`py-2 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-1.5 ${
+            className={`py-2 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-1 ${
               activeTab === 'stores'
                 ? 'bg-emerald-500 text-slate-950 font-black'
                 : 'text-slate-400 hover:text-white'
@@ -1090,8 +1212,24 @@ export default function SuperAdminPage() {
             <span>المتاجر</span>
           </button>
           <button
+            onClick={() => setActiveTab('subscriptions')}
+            className={`py-2 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-1 relative ${
+              activeTab === 'subscriptions'
+                ? 'bg-emerald-500 text-slate-950 font-black'
+                : 'text-slate-400 hover:text-white'
+            }`}
+          >
+            <CreditCard className="w-3.5 h-3.5" />
+            <span>الاشتراكات</span>
+            {pendingSubscriptions.length > 0 && (
+              <span className="w-3.5 h-3.5 rounded-full bg-amber-500 text-slate-950 text-[9px] font-black flex items-center justify-center">
+                {pendingSubscriptions.length}
+              </span>
+            )}
+          </button>
+          <button
             onClick={() => setActiveTab('pricing')}
-            className={`py-2 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-1.5 ${
+            className={`py-2 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-1 ${
               activeTab === 'pricing'
                 ? 'bg-emerald-500 text-slate-950 font-black'
                 : 'text-slate-400 hover:text-white'
@@ -1102,7 +1240,7 @@ export default function SuperAdminPage() {
           </button>
           <button
             onClick={() => setActiveTab('settings')}
-            className={`py-2 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-1.5 ${
+            className={`py-2 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-1 ${
               activeTab === 'settings'
                 ? 'bg-emerald-500 text-slate-950 font-black'
                 : 'text-slate-400 hover:text-white'
@@ -1235,6 +1373,159 @@ export default function SuperAdminPage() {
               </form>
             </div>
           </div>
+        ) : activeTab === 'subscriptions' ? (
+          /* Subscription Requests Tab */
+          <div className="max-w-6xl mx-auto space-y-6">
+            <div className="bg-slate-900/70 border border-slate-800 rounded-3xl p-6 sm:p-8 space-y-6 shadow-xl">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-5">
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-amber-500 to-orange-400 text-slate-950 flex items-center justify-center shadow-lg shadow-amber-500/20">
+                    <CreditCard className="w-6 h-6" />
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <h2 className="text-xl font-black text-white">إدارة طلبات الاشتراك والترقية</h2>
+                      {pendingSubscriptions.length > 0 && (
+                        <span className="px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-400 border border-amber-500/30 text-xs font-black">
+                          {pendingSubscriptions.length} طلبات معلقة
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-xs text-slate-400">
+                      مراجعة إيصالات التحويل عبر فودافون كاش وإنستاباي وتفعيل باقات التجار فورياً.
+                    </p>
+                  </div>
+                </div>
+
+                <button
+                  onClick={() => token && loadDashboardData(token)}
+                  disabled={isLoadingData}
+                  className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-bold border border-slate-700 flex items-center gap-2 self-start sm:self-auto"
+                >
+                  <RefreshCw className={`w-3.5 h-3.5 ${isLoadingData ? 'animate-spin' : ''}`} />
+                  <span>تحديث الطلبات</span>
+                </button>
+              </div>
+
+              {pendingSubscriptions.length === 0 ? (
+                <div className="p-12 text-center bg-slate-950/60 border border-slate-800 rounded-2xl space-y-3">
+                  <div className="w-12 h-12 rounded-full bg-emerald-500/10 text-emerald-400 flex items-center justify-center mx-auto">
+                    <CheckCircle2 className="w-6 h-6" />
+                  </div>
+                  <h3 className="text-base font-bold text-white">لا توجد أي طلبات اشتراك معلقة حالياً</h3>
+                  <p className="text-xs text-slate-400 max-w-md mx-auto">
+                    جميع طلبات الترقية والتحويلات تمت مراجعتها وتفعيلها بنجاح. ستظهر هنا الطلبات الجديدة فور إرسالها من التجار.
+                  </p>
+                </div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="w-full text-right text-xs">
+                    <thead className="bg-slate-950/80 text-slate-400 border-b border-slate-800">
+                      <tr>
+                        <th className="py-3.5 px-4 font-bold">المتجر والتاجر</th>
+                        <th className="py-3.5 px-4 font-bold">الباقة المطلوبة</th>
+                        <th className="py-3.5 px-4 font-bold">المبلغ</th>
+                        <th className="py-3.5 px-4 font-bold">طريقة الدفع</th>
+                        <th className="py-3.5 px-4 font-bold">رقم العملية / الحوالة</th>
+                        <th className="py-3.5 px-4 font-bold">تاريخ الإرسال</th>
+                        <th className="py-3.5 px-4 font-bold text-center">إجراءات المراجعة</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-800/60">
+                      {pendingSubscriptions.map((sub) => (
+                        <tr key={sub.id} className="hover:bg-slate-800/40 transition-colors">
+                          <td className="py-3.5 px-4">
+                            <div className="space-y-0.5">
+                              <span className="font-bold text-white block text-sm">{sub.storeName}</span>
+                              <span className="text-[11px] text-slate-400 block font-mono">{sub.merchantEmail}</span>
+                              <a
+                                href={`https://wa.me/${sub.merchantPhone.replace(/[^0-9]/g, '')}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-[11px] text-emerald-400 hover:underline inline-flex items-center gap-1 font-mono"
+                              >
+                                <span>واتساب: {sub.merchantPhone}</span>
+                                <ExternalLink className="w-3 h-3" />
+                              </a>
+                            </div>
+                          </td>
+
+                          <td className="py-3.5 px-4">
+                            <div className="space-y-0.5">
+                              <span className={`inline-block px-2.5 py-0.5 rounded-full text-xs font-black ${
+                                sub.planType === 'VIP' 
+                                  ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30' 
+                                  : 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
+                              }`}>
+                                {sub.planType === 'VIP' ? 'VIP 👑' : 'Pro ⭐'}
+                              </span>
+                              <span className="text-[11px] text-slate-400 block">
+                                {sub.billingCycle === 'Annual' ? 'دفع سنوي (365 يوم)' : 'دفع شهري (30 يوم)'}
+                              </span>
+                            </div>
+                          </td>
+
+                          <td className="py-3.5 px-4">
+                            <span className="text-sm font-black text-white font-mono">{sub.amount} ج.م</span>
+                          </td>
+
+                          <td className="py-3.5 px-4">
+                            <span className="px-2 py-1 rounded-lg bg-slate-800 text-slate-300 font-bold text-[11px]">
+                              {sub.paymentMethod === 'VodafoneCash' ? 'فودافون كاش' : sub.paymentMethod === 'InstaPay' ? 'إنستاباي' : sub.paymentMethod}
+                            </span>
+                          </td>
+
+                          <td className="py-3.5 px-4">
+                            <div className="space-y-1">
+                              <code className="text-amber-400 font-mono font-bold bg-slate-950 px-2 py-1 rounded border border-slate-800 block text-center">
+                                {sub.transactionId}
+                              </code>
+                              {sub.notes && (
+                                <span className="text-[10px] text-slate-400 block italic">
+                                  ملاحظة: {sub.notes}
+                                </span>
+                              )}
+                            </div>
+                          </td>
+
+                          <td className="py-3.5 px-4 font-mono text-slate-400">
+                            {new Date(sub.createdAt).toLocaleDateString('ar-EG', { dateStyle: 'short', timeStyle: 'short' })}
+                          </td>
+
+                          <td className="py-3.5 px-4 text-center">
+                            <div className="flex items-center justify-center gap-1.5">
+                              <button
+                                onClick={() => handleApproveSubscription(sub)}
+                                disabled={isProcessingSubId === sub.id}
+                                className="px-3 py-1.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black rounded-xl text-xs transition-all shadow-sm flex items-center gap-1 disabled:opacity-50"
+                                title="قبول الحوالة وترقية المتجر فوراً"
+                              >
+                                {isProcessingSubId === sub.id ? (
+                                  <div className="w-3.5 h-3.5 border-2 border-slate-950 border-t-transparent rounded-full animate-spin" />
+                                ) : (
+                                  <Check className="w-3.5 h-3.5" />
+                                )}
+                                <span>قبول وترقية</span>
+                              </button>
+
+                              <button
+                                onClick={() => handleRejectSubscription(sub)}
+                                disabled={isProcessingSubId === sub.id}
+                                className="px-2.5 py-1.5 bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 font-bold rounded-xl text-xs transition-all disabled:opacity-50"
+                                title="رفض الطلب"
+                              >
+                                <XCircle className="w-3.5 h-3.5" />
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+          </div>
         ) : activeTab === 'pricing' ? (
           /* Pricing & Plans Control Panel Tab */
           <div className="max-w-5xl mx-auto space-y-8">
@@ -1246,9 +1537,9 @@ export default function SuperAdminPage() {
                     <DollarSign className="w-6 h-6" />
                   </div>
                   <div>
-                    <h2 className="text-xl font-black text-white">إدارة باقات وأسعار المنصة والعروض</h2>
+                    <h2 className="text-xl font-black text-white">إدارة باقات وأسعار المنصة والعروض ومحافظ الدفع</h2>
                     <p className="text-xs text-slate-400">
-                      تعديل أسعار الاشتراكات الشهرية والسنوية، حدود المنتجات والكوبونات، كوتة الذكاء الاصطناعي، والبانر الترويجي.
+                      تعديل أسعار الاشتراكات الشهرية والسنوية، حدود المنتجات والكوبونات، كوتة الذكاء الاصطناعي، أرقام المحافظ، والبانر الترويجي.
                     </p>
                   </div>
                 </div>
@@ -1275,7 +1566,7 @@ export default function SuperAdminPage() {
               )}
 
               <form onSubmit={handleSavePricing} className="space-y-8">
-                {/* 1. Marketing Launch Banner Settings */}
+                {/* 1. Marketing Launch Banner & Payment Wallets Settings */}
                 <div className="bg-slate-950/60 border border-slate-800/80 rounded-2xl p-5 sm:p-6 space-y-4">
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                     <div className="flex items-center gap-2.5">
@@ -1317,6 +1608,35 @@ export default function SuperAdminPage() {
                       placeholder="مثال: 🔥 عرض الإطلاق التجاري: احصل على خصم إضافي عند الاشتراك السنوي اليوم!"
                       className="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 text-xs text-slate-100 focus:outline-none focus:border-emerald-500"
                     />
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-3 border-t border-slate-800/80">
+                    <div>
+                      <label className="text-xs font-bold text-slate-300 block mb-1.5">رقم محفظة فودافون كاش المعتمد للمنصة</label>
+                      <input
+                        type="text"
+                        value={pricingSettings.vodafoneCashWallet || ''}
+                        onChange={(e) => setPricingSettings({
+                          ...pricingSettings,
+                          vodafoneCashWallet: e.target.value
+                        })}
+                        placeholder="01027150123"
+                        className="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 text-xs text-slate-100 font-mono focus:outline-none focus:border-emerald-500"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-xs font-bold text-slate-300 block mb-1.5">معرف عنوان الدفع اللحظي إنستاباي (InstaPay IPN)</label>
+                      <input
+                        type="text"
+                        value={pricingSettings.instaPayHandle || ''}
+                        onChange={(e) => setPricingSettings({
+                          ...pricingSettings,
+                          instaPayHandle: e.target.value
+                        })}
+                        placeholder="watsstore@instapay"
+                        className="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 text-xs text-slate-100 font-mono focus:outline-none focus:border-emerald-500"
+                      />
+                    </div>
                   </div>
                 </div>
 

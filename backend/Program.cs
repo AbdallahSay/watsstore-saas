@@ -355,10 +355,34 @@ using (var scope = app.Services.CreateScope())
                         ""VipAiLimit"" INT NOT NULL DEFAULT 150,
                         ""IsLaunchDiscountBannerActive"" BOOLEAN NOT NULL DEFAULT TRUE,
                         ""LaunchDiscountText"" VARCHAR(500) NOT NULL DEFAULT '🔥 عروض الإطلاق التجاري: احصل على خصم إضافي عند الاشتراك السنوي اليوم!',
+                        ""VodafoneCashWallet"" VARCHAR(50) NOT NULL DEFAULT '01027150123',
+                        ""InstaPayHandle"" VARCHAR(100) NOT NULL DEFAULT 'watsstore@instapay',
                         ""UpdatedAt"" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
                     );
+                    ALTER TABLE ""PlatformSettings"" ADD COLUMN IF NOT EXISTS ""VodafoneCashWallet"" VARCHAR(50) NOT NULL DEFAULT '01027150123';
+                    ALTER TABLE ""PlatformSettings"" ADD COLUMN IF NOT EXISTS ""InstaPayHandle"" VARCHAR(100) NOT NULL DEFAULT 'watsstore@instapay';
+
+                    CREATE TABLE IF NOT EXISTS ""SubscriptionRequests"" (
+                        ""Id"" UUID NOT NULL PRIMARY KEY,
+                        ""StoreId"" UUID NOT NULL REFERENCES ""Stores""(""Id"") ON DELETE CASCADE,
+                        ""StoreName"" VARCHAR(150) NOT NULL,
+                        ""MerchantEmail"" VARCHAR(200) NOT NULL,
+                        ""MerchantPhone"" VARCHAR(50) NOT NULL,
+                        ""PlanType"" VARCHAR(20) NOT NULL,
+                        ""BillingCycle"" VARCHAR(20) NOT NULL,
+                        ""Amount"" NUMERIC(10, 2) NOT NULL,
+                        ""PaymentMethod"" VARCHAR(50) NOT NULL,
+                        ""TransactionId"" VARCHAR(100) NOT NULL,
+                        ""Notes"" TEXT NULL,
+                        ""Status"" VARCHAR(20) NOT NULL DEFAULT 'Pending',
+                        ""AdminNotes"" TEXT NULL,
+                        ""CreatedAt"" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+                        ""ReviewedAt"" TIMESTAMP WITH TIME ZONE NULL
+                    );
+                    CREATE INDEX IF NOT EXISTS ""IX_SubscriptionRequests_StoreId_Status"" ON ""SubscriptionRequests"" (""StoreId"", ""Status"");
+                    CREATE INDEX IF NOT EXISTS ""IX_SubscriptionRequests_CreatedAt"" ON ""SubscriptionRequests"" (""CreatedAt"");
                 ");
-                logger.LogInformation("PostgreSQL database columns & StoreReviews/StoreCoupons/SuperAdmins/PlatformSettings tables verified/applied successfully.");
+                logger.LogInformation("PostgreSQL database columns & StoreReviews/StoreCoupons/SuperAdmins/PlatformSettings/SubscriptionRequests tables verified/applied successfully.");
             }
             else
             {
@@ -441,11 +465,42 @@ using (var scope = app.Services.CreateScope())
                             VipAiLimit INT NOT NULL DEFAULT 150,
                             IsLaunchDiscountBannerActive BIT NOT NULL DEFAULT 1,
                             LaunchDiscountText NVARCHAR(500) NOT NULL DEFAULT N'🔥 عروض الإطلاق التجاري: احصل على خصم إضافي عند الاشتراك السنوي اليوم!',
+                            VodafoneCashWallet NVARCHAR(50) NOT NULL DEFAULT N'01027150123',
+                            InstaPayHandle NVARCHAR(100) NOT NULL DEFAULT N'watsstore@instapay',
                             UpdatedAt DATETIME2 NOT NULL DEFAULT GETUTCDATE()
                         );
                     END
+
+                    IF COL_LENGTH('PlatformSettings', 'VodafoneCashWallet') IS NULL 
+                        ALTER TABLE PlatformSettings ADD VodafoneCashWallet NVARCHAR(50) NOT NULL CONSTRAINT DF_PlatformSettings_VodafoneCashWallet DEFAULT N'01027150123';
+                    IF COL_LENGTH('PlatformSettings', 'InstaPayHandle') IS NULL 
+                        ALTER TABLE PlatformSettings ADD InstaPayHandle NVARCHAR(100) NOT NULL CONSTRAINT DF_PlatformSettings_InstaPayHandle DEFAULT N'watsstore@instapay';
+
+                    IF NOT EXISTS (SELECT * FROM sys.tables WHERE name = 'SubscriptionRequests')
+                    BEGIN
+                        CREATE TABLE SubscriptionRequests (
+                            Id UNIQUEIDENTIFIER NOT NULL PRIMARY KEY,
+                            StoreId UNIQUEIDENTIFIER NOT NULL,
+                            StoreName NVARCHAR(150) NOT NULL,
+                            MerchantEmail NVARCHAR(200) NOT NULL,
+                            MerchantPhone NVARCHAR(50) NOT NULL,
+                            PlanType NVARCHAR(20) NOT NULL,
+                            BillingCycle NVARCHAR(20) NOT NULL,
+                            Amount DECIMAL(10, 2) NOT NULL,
+                            PaymentMethod NVARCHAR(50) NOT NULL,
+                            TransactionId NVARCHAR(100) NOT NULL,
+                            Notes NVARCHAR(MAX) NULL,
+                            Status NVARCHAR(20) NOT NULL DEFAULT 'Pending',
+                            AdminNotes NVARCHAR(MAX) NULL,
+                            CreatedAt DATETIME2 NOT NULL DEFAULT GETUTCDATE(),
+                            ReviewedAt DATETIME2 NULL,
+                            CONSTRAINT FK_SubscriptionRequests_Stores_StoreId FOREIGN KEY (StoreId) REFERENCES Stores(Id) ON DELETE CASCADE
+                        );
+                        CREATE INDEX IX_SubscriptionRequests_StoreId_Status ON SubscriptionRequests (StoreId, Status);
+                        CREATE INDEX IX_SubscriptionRequests_CreatedAt ON SubscriptionRequests (CreatedAt);
+                    END
                 ");
-                logger.LogInformation("SQL Server database column migrations & StoreReviews/StoreCoupons/SuperAdmins/PlatformSettings tables checked and applied successfully.");
+                logger.LogInformation("SQL Server database column migrations & StoreReviews/StoreCoupons/SuperAdmins/PlatformSettings/SubscriptionRequests tables checked and applied successfully.");
             }
         }
         catch (Exception colEx)

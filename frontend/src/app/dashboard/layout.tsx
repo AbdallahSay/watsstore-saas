@@ -22,7 +22,8 @@ import {
   AlertTriangle,
   Clock,
   Crown,
-  Sparkles
+  Sparkles,
+  CreditCard
 } from 'lucide-react';
 import { api } from '@/lib/api';
 import { platformConfig } from '@/config/platformConfig';
@@ -103,6 +104,7 @@ export default function DashboardLayout({
     { name: 'الأقسام والتصنيفات', href: '/dashboard/categories', icon: FolderTree },
     { name: 'آراء العملاء والتقييمات', href: '/dashboard/reviews', icon: Star },
     { name: 'الخصومات وكوبونات التخفيض', href: '/dashboard/coupons', icon: Tag },
+    { name: 'الفواتير والاشتراك', href: '/dashboard/billing', icon: CreditCard },
     { name: 'إعدادات المتجر والدفع', href: '/dashboard/settings', icon: Settings },
   ];
 

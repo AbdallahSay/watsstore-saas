@@ -678,6 +678,8 @@ namespace WatsStore.Api.Controllers
                 VipAiLimit = settings.VipAiLimit,
                 IsLaunchDiscountBannerActive = settings.IsLaunchDiscountBannerActive,
                 LaunchDiscountText = settings.LaunchDiscountText,
+                VodafoneCashWallet = string.IsNullOrWhiteSpace(settings.VodafoneCashWallet) ? "01027150123" : settings.VodafoneCashWallet,
+                InstaPayHandle = string.IsNullOrWhiteSpace(settings.InstaPayHandle) ? "watsstore@instapay" : settings.InstaPayHandle,
                 UpdatedAt = settings.UpdatedAt
             });
         }
@@ -719,6 +721,16 @@ namespace WatsStore.Api.Controllers
                 settings.LaunchDiscountText = request.LaunchDiscountText.Trim();
             }
 
+            if (!string.IsNullOrWhiteSpace(request.VodafoneCashWallet))
+            {
+                settings.VodafoneCashWallet = request.VodafoneCashWallet.Trim();
+            }
+
+            if (!string.IsNullOrWhiteSpace(request.InstaPayHandle))
+            {
+                settings.InstaPayHandle = request.InstaPayHandle.Trim();
+            }
+
             settings.UpdatedAt = DateTime.UtcNow;
 
             await _db.SaveChangesAsync();
@@ -740,9 +752,201 @@ namespace WatsStore.Api.Controllers
                     VipAiLimit = settings.VipAiLimit,
                     IsLaunchDiscountBannerActive = settings.IsLaunchDiscountBannerActive,
                     LaunchDiscountText = settings.LaunchDiscountText,
+                    VodafoneCashWallet = settings.VodafoneCashWallet,
+                    InstaPayHandle = settings.InstaPayHandle,
                     UpdatedAt = settings.UpdatedAt
                 }
             });
+        }
+
+        [HttpGet("plans")]
+        public async Task<IActionResult> GetPlans()
+        {
+            if (!IsAdminAuthorized())
+                return Unauthorized(new { message = "غير مصرح لك بالوصول إلى لوحة الإدارة العليا" });
+
+            var settings = await _db.PlatformSettings.FirstOrDefaultAsync(p => p.Id == 1)
+                           ?? new PlatformSetting();
+
+            var plans = new List<PlanTierConfigDto>
+            {
+                new PlanTierConfigDto
+                {
+                    PlanType = "Free",
+                    Name = "تجربة مجانية (14 يوماً)",
+                    PriceMonthly = 0m,
+                    PriceAnnual = 0m,
+                    MaxProducts = 10,
+                    MaxCoupons = 1,
+                    AiGenerationsLimit = 0,
+                    ExcelExportAllowed = false,
+                    IsPopular = false
+                },
+                new PlanTierConfigDto
+                {
+                    PlanType = "Pro",
+                    Name = "باقة المحترفين (الأكثر طلباً ⭐)",
+                    PriceMonthly = settings.ProMonthlyPrice,
+                    PriceAnnual = settings.ProAnnualPrice,
+                    MaxProducts = settings.ProProductLimit,
+                    MaxCoupons = settings.ProCouponLimit,
+                    AiGenerationsLimit = settings.ProAiLimit,
+                    ExcelExportAllowed = true,
+                    IsPopular = true
+                },
+                new PlanTierConfigDto
+                {
+                    PlanType = "VIP",
+                    Name = "كبار التجار والبراندات (VIP 👑)",
+                    PriceMonthly = settings.VipMonthlyPrice,
+                    PriceAnnual = settings.VipAnnualPrice,
+                    MaxProducts = settings.VipProductLimit,
+                    MaxCoupons = settings.VipCouponLimit,
+                    AiGenerationsLimit = settings.VipAiLimit,
+                    ExcelExportAllowed = true,
+                    IsPopular = false
+                }
+            };
+
+            return Ok(new AllPlansResponseDto
+            {
+                Plans = plans,
+                VodafoneCashWallet = string.IsNullOrWhiteSpace(settings.VodafoneCashWallet) ? "01027150123" : settings.VodafoneCashWallet,
+                InstaPayHandle = string.IsNullOrWhiteSpace(settings.InstaPayHandle) ? "watsstore@instapay" : settings.InstaPayHandle,
+                UpdatedAt = settings.UpdatedAt
+            });
+        }
+
+        [HttpPut("plans")]
+        public async Task<IActionResult> UpdatePlans([FromBody] UpdatePlatformSettingsRequest request)
+        {
+            return await UpdatePricing(request);
+        }
+
+        [HttpGet("subscriptions/pending")]
+        public async Task<IActionResult> GetPendingSubscriptions()
+        {
+            if (!IsAdminAuthorized())
+                return Unauthorized(new { message = "غير مصرح لك بالوصول إلى لوحة الإدارة العليا" });
+
+            var requests = await _db.SubscriptionRequests
+                .Where(r => r.Status == "Pending")
+                .OrderByDescending(r => r.CreatedAt)
+                .ToListAsync();
+
+            var dtos = requests.Select(MapSubToDto).ToList();
+            return Ok(dtos);
+        }
+
+        [HttpGet("subscriptions")]
+        public async Task<IActionResult> GetAllSubscriptions([FromQuery] string? status)
+        {
+            if (!IsAdminAuthorized())
+                return Unauthorized(new { message = "غير مصرح لك بالوصول إلى لوحة الإدارة العليا" });
+
+            var query = _db.SubscriptionRequests.AsQueryable();
+            if (!string.IsNullOrWhiteSpace(status))
+            {
+                query = query.Where(r => r.Status == status.Trim());
+            }
+
+            var requests = await query
+                .OrderByDescending(r => r.CreatedAt)
+                .ToListAsync();
+
+            var dtos = requests.Select(MapSubToDto).ToList();
+            return Ok(dtos);
+        }
+
+        [HttpPatch("subscriptions/{id}/approve")]
+        public async Task<IActionResult> ApproveSubscription(Guid id)
+        {
+            if (!IsAdminAuthorized())
+                return Unauthorized(new { message = "غير مصرح لك بالوصول إلى لوحة الإدارة العليا" });
+
+            var sub = await _db.SubscriptionRequests
+                .Include(r => r.Store)
+                .FirstOrDefaultAsync(r => r.Id == id);
+
+            if (sub == null)
+            {
+                return NotFound(new { message = "طلب الاشتراك غير موجود" });
+            }
+
+            sub.Status = "Approved";
+            sub.ReviewedAt = DateTime.UtcNow;
+            sub.AdminNotes = "تمت مراجعة الحوالة واعتماد الترقية بنجاح من قبل المسؤول العام";
+
+            if (sub.Store != null)
+            {
+                sub.Store.PlanType = sub.PlanType;
+                sub.Store.AiGenerationsCount = 0;
+                sub.Store.AiQuotaResetDate = DateTime.UtcNow;
+
+                int daysToAdd = sub.BillingCycle == "Annual" ? 365 : 30;
+                var baseDate = (sub.Store.SubscriptionEndsAt.HasValue && sub.Store.SubscriptionEndsAt.Value > DateTime.UtcNow)
+                    ? sub.Store.SubscriptionEndsAt.Value
+                    : DateTime.UtcNow;
+
+                sub.Store.SubscriptionEndsAt = baseDate.AddDays(daysToAdd);
+            }
+
+            await _db.SaveChangesAsync();
+
+            return Ok(new
+            {
+                message = $"تم قبول الحوالة واعتماد ترقية متجر '{sub.Store?.StoreName ?? sub.StoreName}' إلى باقة {sub.PlanType} بنجاح!",
+                request = MapSubToDto(sub)
+            });
+        }
+
+        [HttpPatch("subscriptions/{id}/reject")]
+        public async Task<IActionResult> RejectSubscription(Guid id, [FromBody] RejectSubscriptionRequest req)
+        {
+            if (!IsAdminAuthorized())
+                return Unauthorized(new { message = "غير مصرح لك بالوصول إلى لوحة الإدارة العليا" });
+
+            var sub = await _db.SubscriptionRequests.FirstOrDefaultAsync(r => r.Id == id);
+            if (sub == null)
+            {
+                return NotFound(new { message = "طلب الاشتراك غير موجود" });
+            }
+
+            sub.Status = "Rejected";
+            sub.ReviewedAt = DateTime.UtcNow;
+            sub.AdminNotes = string.IsNullOrWhiteSpace(req?.AdminNotes) 
+                ? "تعذر التأكد من صحة رقم العملية أو إيصال التحويل" 
+                : req.AdminNotes.Trim();
+
+            await _db.SaveChangesAsync();
+
+            return Ok(new
+            {
+                message = "تم رفض طلب الاشتراك وتسجيل الملاحظة",
+                request = MapSubToDto(sub)
+            });
+        }
+
+        private static SubscriptionRequestDto MapSubToDto(SubscriptionRequest r)
+        {
+            return new SubscriptionRequestDto
+            {
+                Id = r.Id,
+                StoreId = r.StoreId,
+                StoreName = r.StoreName,
+                MerchantEmail = r.MerchantEmail,
+                MerchantPhone = r.MerchantPhone,
+                PlanType = r.PlanType,
+                BillingCycle = r.BillingCycle,
+                Amount = r.Amount,
+                PaymentMethod = r.PaymentMethod,
+                TransactionId = r.TransactionId,
+                Notes = r.Notes,
+                Status = r.Status,
+                AdminNotes = r.AdminNotes,
+                CreatedAt = r.CreatedAt,
+                ReviewedAt = r.ReviewedAt
+            };
         }
 
         private static (bool IsTrialExpired, int RemainingTrialDays, DateTime? TrialEndsAt) CalculateTrial(string planType, DateTime createdAt, DateTime? subscriptionEndsAt)

@@ -18,7 +18,10 @@ import {
   ToggleStoreStatusResponse,
   AdminForgotPasswordResponse,
   StorePlanUpdateResponse,
-  PlatformPricingSettings
+  PlatformPricingSettings,
+  AllPlansResponse,
+  SubscriptionRequestItem,
+  MerchantBillingStatus
 } from '../types';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://watsstore.runasp.net/api';
@@ -492,6 +495,87 @@ export const api = {
         'X-Admin-Key': token.startsWith('WatsStore_') ? token : '',
       },
       body: JSON.stringify(data),
+    });
+  },
+
+  // Merchant Billing Endpoints
+  async getMerchantBillingStatus(token: string): Promise<MerchantBillingStatus> {
+    return fetchJson<MerchantBillingStatus>(`${API_BASE_URL}/merchant/billing/status`, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
+  },
+
+  async submitMerchantUpgradeRequest(token: string, data: { planType: string; billingCycle: string; paymentMethod: string; transactionId: string; notes?: string }): Promise<any> {
+    return fetchJson<any>(`${API_BASE_URL}/merchant/billing/upgrade-request`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`
+      },
+      body: JSON.stringify(data)
+    });
+  },
+
+  // Admin Plans & Dynamic Quotas
+  async getAdminPlans(token: string): Promise<AllPlansResponse> {
+    return fetchJson<AllPlansResponse>(`${API_BASE_URL}/admin/plans`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'X-Admin-Key': token.startsWith('WatsStore_') ? token : '',
+      }
+    });
+  },
+
+  async updateAdminPlans(token: string, data: Partial<PlatformPricingSettings>): Promise<{ message: string; settings: PlatformPricingSettings }> {
+    return fetchJson<{ message: string; settings: PlatformPricingSettings }>(`${API_BASE_URL}/admin/plans`, {
+      method: 'PUT',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'X-Admin-Key': token.startsWith('WatsStore_') ? token : '',
+      },
+      body: JSON.stringify(data),
+    });
+  },
+
+  // Admin Subscription Requests
+  async getAdminPendingSubscriptions(token: string): Promise<SubscriptionRequestItem[]> {
+    return fetchJson<SubscriptionRequestItem[]>(`${API_BASE_URL}/admin/subscriptions/pending`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'X-Admin-Key': token.startsWith('WatsStore_') ? token : '',
+      }
+    });
+  },
+
+  async getAdminAllSubscriptions(token: string, status?: string): Promise<SubscriptionRequestItem[]> {
+    const url = status ? `${API_BASE_URL}/admin/subscriptions?status=${encodeURIComponent(status)}` : `${API_BASE_URL}/admin/subscriptions`;
+    return fetchJson<SubscriptionRequestItem[]>(url, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'X-Admin-Key': token.startsWith('WatsStore_') ? token : '',
+      }
+    });
+  },
+
+  async approveAdminSubscription(token: string, id: string): Promise<{ message: string; request: SubscriptionRequestItem }> {
+    return fetchJson<{ message: string; request: SubscriptionRequestItem }>(`${API_BASE_URL}/admin/subscriptions/${id}/approve`, {
+      method: 'PATCH',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'X-Admin-Key': token.startsWith('WatsStore_') ? token : '',
+      }
+    });
+  },
+
+  async rejectAdminSubscription(token: string, id: string, adminNotes?: string): Promise<{ message: string; request: SubscriptionRequestItem }> {
+    return fetchJson<{ message: string; request: SubscriptionRequestItem }>(`${API_BASE_URL}/admin/subscriptions/${id}/reject`, {
+      method: 'PATCH',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'X-Admin-Key': token.startsWith('WatsStore_') ? token : '',
+      },
+      body: JSON.stringify({ adminNotes })
     });
   },
 };

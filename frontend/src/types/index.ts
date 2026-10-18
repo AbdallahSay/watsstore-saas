@@ -340,7 +340,65 @@ export interface PlatformPricingSettings {
   vipAiLimit: number;
   isLaunchDiscountBannerActive: boolean;
   launchDiscountText: string;
+  vodafoneCashWallet?: string;
+  instaPayHandle?: string;
   updatedAt?: string;
 }
+
+export interface PlanTierConfig {
+  planType: string;
+  name: string;
+  priceMonthly: number;
+  priceAnnual: number;
+  maxProducts: number;
+  maxCoupons: number;
+  aiGenerationsLimit: number;
+  excelExportAllowed: boolean;
+  isPopular: boolean;
+}
+
+export interface AllPlansResponse {
+  plans: PlanTierConfig[];
+  vodafoneCashWallet: string;
+  instaPayHandle: string;
+  updatedAt: string;
+}
+
+export interface SubscriptionRequestItem {
+  id: string;
+  storeId: string;
+  storeName: string;
+  merchantEmail: string;
+  merchantPhone: string;
+  planType: string;
+  billingCycle: string;
+  amount: number;
+  paymentMethod: string;
+  transactionId: string;
+  notes?: string | null;
+  status: string; // 'Pending' | 'Approved' | 'Rejected'
+  adminNotes?: string | null;
+  createdAt: string;
+  reviewedAt?: string | null;
+}
+
+export interface MerchantBillingStatus {
+  storeId: string;
+  storeName: string;
+  planType: string;
+  isActive: boolean;
+  isTrialExpired: boolean;
+  remainingTrialDays: number;
+  trialEndsAt?: string | null;
+  subscriptionEndsAt?: string | null;
+  aiGenerationsUsed: number;
+  aiGenerationsLimit: number;
+  remainingAiQuota: number;
+  activePendingRequest?: SubscriptionRequestItem | null;
+  invoiceHistory: SubscriptionRequestItem[];
+  vodafoneCashWallet: string;
+  instaPayHandle: string;
+}
+
 
 
