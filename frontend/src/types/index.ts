@@ -46,8 +46,38 @@ export interface Store {
   vodafoneCashNumber?: string | null;
   instaPayAddress?: string | null;
   planType: string;
+  averageRating?: number;
+  totalReviews?: number;
+  reviews?: StoreReview[];
   categories: Category[];
   products: Product[];
+}
+
+export interface StoreReview {
+  id: string;
+  customerName: string;
+  rating: number;
+  comment: string;
+  isApproved?: boolean;
+  createdAt: string;
+}
+
+export interface MerchantReview {
+  id: string;
+  storeId: string;
+  customerName: string;
+  rating: number;
+  comment: string;
+  isApproved: boolean;
+  createdAt: string;
+}
+
+export interface MerchantReviewsResponse {
+  totalCount: number;
+  approvedCount: number;
+  pendingCount: number;
+  averageRating: number;
+  reviews: MerchantReview[];
 }
 
 export interface CartItem {

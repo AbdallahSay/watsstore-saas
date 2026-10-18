@@ -489,5 +489,89 @@ namespace WatsStore.Api.Controllers
             var clean = value.Replace("\r", " ").Replace("\n", " ").Replace("\"", "\"\"");
             return $"\"{clean}\"";
         }
+
+        [HttpGet("reviews")]
+        public async Task<IActionResult> GetReviews()
+        {
+            var storeId = GetAuthenticatedStoreId();
+
+            var reviews = await _db.StoreReviews
+                .AsNoTracking()
+                .Where(r => r.StoreId == storeId)
+                .OrderByDescending(r => r.CreatedAt)
+                .Select(r => new MerchantReviewDto
+                {
+                    Id = r.Id,
+                    StoreId = r.StoreId,
+                    CustomerName = r.CustomerName,
+                    Rating = r.Rating,
+                    Comment = r.Comment,
+                    IsApproved = r.IsApproved,
+                    CreatedAt = r.CreatedAt
+                })
+                .ToListAsync();
+
+            var totalCount = reviews.Count;
+            var approvedCount = reviews.Count(r => r.IsApproved);
+            var pendingCount = totalCount - approvedCount;
+            var averageRating = approvedCount > 0 
+                ? Math.Round(reviews.Where(r => r.IsApproved).Average(r => (double)r.Rating), 1)
+                : (totalCount > 0 ? Math.Round(reviews.Average(r => (double)r.Rating), 1) : 5.0);
+
+            return Ok(new MerchantReviewsResponse
+            {
+                TotalCount = totalCount,
+                ApprovedCount = approvedCount,
+                PendingCount = pendingCount,
+                AverageRating = averageRating,
+                Reviews = reviews
+            });
+        }
+
+        [HttpPatch("reviews/{id}/approve")]
+        public async Task<IActionResult> ToggleReviewApproval(Guid id, [FromBody] ReviewApprovalRequest? request)
+        {
+            var storeId = GetAuthenticatedStoreId();
+
+            var review = await _db.StoreReviews
+                .FirstOrDefaultAsync(r => r.Id == id && r.StoreId == storeId);
+
+            if (review == null)
+                return NotFound(new { message = "التقييم غير موجود أو لا ينتمي لهذا المتجر" });
+
+            if (request != null)
+            {
+                review.IsApproved = request.IsApproved;
+            }
+            else
+            {
+                review.IsApproved = !review.IsApproved;
+            }
+
+            await _db.SaveChangesAsync();
+
+            return Ok(new 
+            { 
+                message = review.IsApproved ? "تم اعتماد ونشر التقييم بنجاح" : "تم إخفاء التقييم ونقله للمراجعة",
+                isApproved = review.IsApproved 
+            });
+        }
+
+        [HttpDelete("reviews/{id}")]
+        public async Task<IActionResult> DeleteReview(Guid id)
+        {
+            var storeId = GetAuthenticatedStoreId();
+
+            var review = await _db.StoreReviews
+                .FirstOrDefaultAsync(r => r.Id == id && r.StoreId == storeId);
+
+            if (review == null)
+                return NotFound(new { message = "التقييم غير موجود أو لا ينتمي لهذا المتجر" });
+
+            _db.StoreReviews.Remove(review);
+            await _db.SaveChangesAsync();
+
+            return Ok(new { message = "تم حذف التقييم بنجاح" });
+        }
     }
 }

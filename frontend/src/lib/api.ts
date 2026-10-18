@@ -6,7 +6,9 @@ import {
   AuthResponse, 
   DashboardSummary,
   Category,
-  Product
+  Product,
+  StoreReview,
+  MerchantReviewsResponse
 } from '../types';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://watsstore.runasp.net/api';
@@ -229,5 +231,40 @@ export const api = {
     a.click();
     document.body.removeChild(a);
     window.URL.revokeObjectURL(url);
+  },
+
+  // Customer Reviews
+  async submitReview(storeSlug: string, data: { customerName: string; rating: number; comment: string }): Promise<{ message: string; reviewId: string }> {
+    return fetchJson<{ message: string; reviewId: string }>(
+      `${API_BASE_URL}/public/stores/${encodeURIComponent(storeSlug)}/reviews`,
+      {
+        method: 'POST',
+        body: JSON.stringify(data),
+      }
+    );
+  },
+
+  async getMerchantReviews(token: string): Promise<MerchantReviewsResponse> {
+    return fetchJson<MerchantReviewsResponse>(`${API_BASE_URL}/merchant/reviews`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+  },
+
+  async toggleReviewApproval(token: string, reviewId: string, isApproved?: boolean): Promise<{ message: string; isApproved: boolean }> {
+    return fetchJson<{ message: string; isApproved: boolean }>(
+      `${API_BASE_URL}/merchant/reviews/${reviewId}/approve`,
+      {
+        method: 'PATCH',
+        headers: { Authorization: `Bearer ${token}` },
+        body: isApproved !== undefined ? JSON.stringify({ isApproved }) : undefined,
+      }
+    );
+  },
+
+  async deleteReview(token: string, reviewId: string): Promise<{ message: string }> {
+    return fetchJson<{ message: string }>(`${API_BASE_URL}/merchant/reviews/${reviewId}`, {
+      method: 'DELETE',
+      headers: { Authorization: `Bearer ${token}` },
+    });
   },
 };

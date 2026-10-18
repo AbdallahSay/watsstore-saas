@@ -167,8 +167,20 @@ using (var scope = app.Services.CreateScope())
                     ALTER TABLE ""Stores"" ADD COLUMN IF NOT EXISTS ""VodafoneCashNumber"" VARCHAR(20) NULL;
                     ALTER TABLE ""Stores"" ADD COLUMN IF NOT EXISTS ""InstaPayAddress"" VARCHAR(100) NULL;
                     ALTER TABLE ""WhatsAppOrders"" ADD COLUMN IF NOT EXISTS ""PaymentMethod"" VARCHAR(50) NOT NULL DEFAULT 'الدفع عند الاستلام';
+
+                    CREATE TABLE IF NOT EXISTS ""StoreReviews"" (
+                        ""Id"" UUID NOT NULL PRIMARY KEY,
+                        ""StoreId"" UUID NOT NULL REFERENCES ""Stores""(""Id"") ON DELETE CASCADE,
+                        ""CustomerName"" VARCHAR(150) NOT NULL,
+                        ""Rating"" INT NOT NULL,
+                        ""Comment"" VARCHAR(1000) NOT NULL,
+                        ""IsApproved"" BOOLEAN NOT NULL DEFAULT FALSE,
+                        ""CreatedAt"" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
+                    );
+                    CREATE INDEX IF NOT EXISTS ""IX_StoreReviews_StoreId_IsApproved"" ON ""StoreReviews"" (""StoreId"", ""IsApproved"");
+                    CREATE INDEX IF NOT EXISTS ""IX_StoreReviews_StoreId_CreatedAt"" ON ""StoreReviews"" (""StoreId"", ""CreatedAt"");
                 ");
-                logger.LogInformation("PostgreSQL database columns verified/applied successfully.");
+                logger.LogInformation("PostgreSQL database columns & StoreReviews table verified/applied successfully.");
             }
             else
             {
@@ -179,13 +191,29 @@ using (var scope = app.Services.CreateScope())
                         ALTER TABLE Stores ADD InstaPayAddress NVARCHAR(100) NULL;
                     IF COL_LENGTH('WhatsAppOrders', 'PaymentMethod') IS NULL 
                         ALTER TABLE WhatsAppOrders ADD PaymentMethod NVARCHAR(50) NOT NULL CONSTRAINT DF_WhatsAppOrders_PaymentMethod DEFAULT N'الدفع عند الاستلام';
+
+                    IF NOT EXISTS (SELECT * FROM sys.tables WHERE name = 'StoreReviews')
+                    BEGIN
+                        CREATE TABLE StoreReviews (
+                            Id UNIQUEIDENTIFIER NOT NULL PRIMARY KEY,
+                            StoreId UNIQUEIDENTIFIER NOT NULL,
+                            CustomerName NVARCHAR(150) NOT NULL,
+                            Rating INT NOT NULL,
+                            Comment NVARCHAR(1000) NOT NULL,
+                            IsApproved BIT NOT NULL DEFAULT 0,
+                            CreatedAt DATETIME2 NOT NULL DEFAULT GETUTCDATE(),
+                            CONSTRAINT FK_StoreReviews_Stores_StoreId FOREIGN KEY (StoreId) REFERENCES Stores(Id) ON DELETE CASCADE
+                        );
+                        CREATE INDEX IX_StoreReviews_StoreId_IsApproved ON StoreReviews (StoreId, IsApproved);
+                        CREATE INDEX IX_StoreReviews_StoreId_CreatedAt ON StoreReviews (StoreId, CreatedAt);
+                    END
                 ");
-                logger.LogInformation("SQL Server database column migrations checked and applied successfully.");
+                logger.LogInformation("SQL Server database column migrations & StoreReviews table checked and applied successfully.");
             }
         }
         catch (Exception colEx)
         {
-            logger.LogWarning(colEx, "Column migration check skipped or failed.");
+            logger.LogWarning(colEx, "Column/Table migration check skipped or failed.");
         }
 
         if (!await db.Stores.AnyAsync(s => s.Slug == "al-amal-fashion"))
@@ -303,6 +331,46 @@ using (var scope = app.Services.CreateScope())
             await db.SaveChangesAsync();
 
             logger.LogInformation("Demo store 'al-amal-fashion' seeded successfully.");
+        }
+
+        // Seed default approved reviews for al-amal-fashion if none exist
+        var amalStore = await db.Stores.FirstOrDefaultAsync(s => s.Slug == "al-amal-fashion");
+        if (amalStore != null && !await db.StoreReviews.AnyAsync(r => r.StoreId == amalStore.Id))
+        {
+            logger.LogInformation("Seeding default customer reviews for 'al-amal-fashion'...");
+            var review1 = new StoreReview
+            {
+                Id = Guid.NewGuid(),
+                StoreId = amalStore.Id,
+                CustomerName = "منى محمود - الفيوم",
+                Rating = 5,
+                Comment = "خامات ممتازة جداً وتوصيل سريع في نفس اليوم في الفيوم، التغليف شيك وتعامل محترم على الواتساب.",
+                IsApproved = true,
+                CreatedAt = DateTime.UtcNow.AddDays(-3)
+            };
+            var review2 = new StoreReview
+            {
+                Id = Guid.NewGuid(),
+                StoreId = amalStore.Id,
+                CustomerName = "سارة خليل",
+                Rating = 5,
+                Comment = "الفستان السواريه تحفة وطلع أحلى من الصور بكتير، والمقاس مظبوط بالظبط، تجربة شراء ممتازة.",
+                IsApproved = true,
+                CreatedAt = DateTime.UtcNow.AddDays(-1)
+            };
+            var review3 = new StoreReview
+            {
+                Id = Guid.NewGuid(),
+                StoreId = amalStore.Id,
+                CustomerName = "دعاء عبد الرحمن",
+                Rating = 5,
+                Comment = "سرعة في الرد وسهولة في الطلب بدون تعقيد، شكراً لذوقكم العالي.",
+                IsApproved = true,
+                CreatedAt = DateTime.UtcNow.AddHours(-12)
+            };
+            db.StoreReviews.AddRange(review1, review2, review3);
+            await db.SaveChangesAsync();
+            logger.LogInformation("Customer reviews seeded successfully.");
         }
     }
     catch (Exception ex)

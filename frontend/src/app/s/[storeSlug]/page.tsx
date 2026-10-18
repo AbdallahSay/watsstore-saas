@@ -72,6 +72,27 @@ export default async function StorePage({ params }: PageProps) {
     currenciesAccepted: 'EGP',
     paymentAccepted: 'Cash on Delivery, WhatsApp Order',
     priceRange: '$$',
+    aggregateRating: (store.totalReviews && store.totalReviews > 0) ? {
+      '@type': 'AggregateRating',
+      ratingValue: store.averageRating ? store.averageRating.toFixed(1) : '5.0',
+      reviewCount: store.totalReviews,
+      bestRating: '5',
+      worstRating: '1',
+    } : undefined,
+    review: (store.reviews && store.reviews.length > 0) ? store.reviews.map(r => ({
+      '@type': 'Review',
+      author: {
+        '@type': 'Person',
+        name: r.customerName,
+      },
+      reviewRating: {
+        '@type': 'Rating',
+        ratingValue: r.rating,
+        bestRating: '5',
+        worstRating: '1',
+      },
+      reviewBody: r.comment,
+    })) : undefined,
     hasOfferCatalog: {
       '@type': 'OfferCatalog',
       name: `قائمة منتجات ${store.storeName}`,

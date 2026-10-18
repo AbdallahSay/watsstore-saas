@@ -14,6 +14,7 @@ import {
   User, 
   ShieldCheck,
   Receipt,
+  Star,
   Menu,
   X
 } from 'lucide-react';
@@ -67,6 +68,7 @@ export default function DashboardLayout({
     { name: 'الطلبات والمبيعات', href: '/dashboard/orders', icon: Receipt },
     { name: 'المنتجات والكتالوج', href: '/dashboard/products', icon: ShoppingBag },
     { name: 'الأقسام والتصنيفات', href: '/dashboard/categories', icon: FolderTree },
+    { name: 'آراء العملاء والتقييمات', href: '/dashboard/reviews', icon: Star },
     { name: 'إعدادات المتجر والدفع', href: '/dashboard/settings', icon: Settings },
   ];
 

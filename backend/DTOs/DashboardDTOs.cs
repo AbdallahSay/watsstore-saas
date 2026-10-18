@@ -127,4 +127,29 @@ namespace WatsStore.Api.DTOs
         public decimal TotalAmount { get; set; }
         public DateTime CreatedAt { get; set; }
     }
+
+    public class MerchantReviewDto
+    {
+        public Guid Id { get; set; }
+        public Guid StoreId { get; set; }
+        public string CustomerName { get; set; } = string.Empty;
+        public int Rating { get; set; }
+        public string Comment { get; set; } = string.Empty;
+        public bool IsApproved { get; set; }
+        public DateTime CreatedAt { get; set; }
+    }
+
+    public class ReviewApprovalRequest
+    {
+        public bool IsApproved { get; set; }
+    }
+
+    public class MerchantReviewsResponse
+    {
+        public int TotalCount { get; set; }
+        public int ApprovedCount { get; set; }
+        public int PendingCount { get; set; }
+        public double AverageRating { get; set; }
+        public List<MerchantReviewDto> Reviews { get; set; } = new();
+    }
 }

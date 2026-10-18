@@ -55,6 +55,30 @@ namespace WatsStore.Api.Controllers
                 ? store.SeoDescription
                 : $"تصفح تشكيلة ومنتجات {store.StoreName} في {store.City}. اختر منتجاتك المفضلة واطلب مباشرة عبر الواتساب بضغطة زر مع أسرع خدمة توصيل.";
 
+            var approvedReviews = await _db.StoreReviews
+                .AsNoTracking()
+                .Where(r => r.StoreId == store.Id && r.IsApproved)
+                .OrderByDescending(r => r.CreatedAt)
+                .Take(30)
+                .Select(r => new PublicReviewDto
+                {
+                    Id = r.Id,
+                    CustomerName = r.CustomerName,
+                    Rating = r.Rating,
+                    Comment = r.Comment,
+                    CreatedAt = r.CreatedAt
+                })
+                .ToListAsync();
+
+            var totalReviews = await _db.StoreReviews
+                .CountAsync(r => r.StoreId == store.Id && r.IsApproved);
+
+            var averageRating = totalReviews > 0
+                ? Math.Round(await _db.StoreReviews
+                    .Where(r => r.StoreId == store.Id && r.IsApproved)
+                    .AverageAsync(r => (double)r.Rating), 1)
+                : 5.0;
+
             var response = new PublicStoreResponse
             {
                 Id = store.Id,
@@ -76,6 +100,9 @@ namespace WatsStore.Api.Controllers
                 VodafoneCashNumber = store.VodafoneCashNumber,
                 InstaPayAddress = store.InstaPayAddress,
                 PlanType = store.PlanType,
+                AverageRating = averageRating,
+                TotalReviews = totalReviews,
+                Reviews = approvedReviews,
                 Categories = store.Categories.Select(c => new PublicCategoryDto
                 {
                     Id = c.Id,
@@ -99,6 +126,44 @@ namespace WatsStore.Api.Controllers
             };
 
             return Ok(response);
+        }
+
+        [HttpPost("{slug}/reviews")]
+        public async Task<IActionResult> SubmitReview(string slug, [FromBody] SubmitReviewRequest request)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            if (string.IsNullOrWhiteSpace(slug))
+                return BadRequest(new { message = "معرف المتجر مطلوب" });
+
+            var normalizedSlug = slug.Trim().ToLowerInvariant();
+            var store = await _db.Stores
+                .AsNoTracking()
+                .FirstOrDefaultAsync(s => s.Slug == normalizedSlug && s.IsActive);
+
+            if (store == null)
+                return NotFound(new { message = "المتجر غير موجود أو تم إيقافه" });
+
+            var review = new StoreReview
+            {
+                Id = Guid.NewGuid(),
+                StoreId = store.Id,
+                CustomerName = request.CustomerName.Trim(),
+                Rating = Math.Clamp(request.Rating, 1, 5),
+                Comment = request.Comment.Trim(),
+                IsApproved = false,
+                CreatedAt = DateTime.UtcNow
+            };
+
+            _db.StoreReviews.Add(review);
+            await _db.SaveChangesAsync();
+
+            return StatusCode(201, new 
+            { 
+                message = "شكراً لتقييمك! تم إرسال تقييمك بنجاح وسيظهر في صفحة المتجر بعد مراجعة المتجر.",
+                reviewId = review.Id
+            });
         }
 
         [HttpGet("qr/{publicCode}")]

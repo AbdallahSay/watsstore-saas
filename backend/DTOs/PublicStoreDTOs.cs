@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace WatsStore.Api.DTOs
 {
@@ -24,6 +25,9 @@ namespace WatsStore.Api.DTOs
         public string? VodafoneCashNumber { get; set; }
         public string? InstaPayAddress { get; set; }
         public string PlanType { get; set; } = "Free";
+        public double AverageRating { get; set; } = 5.0;
+        public int TotalReviews { get; set; } = 0;
+        public List<PublicReviewDto> Reviews { get; set; } = new();
         public List<PublicCategoryDto> Categories { get; set; } = new();
         public List<PublicProductDto> Products { get; set; } = new();
     }
@@ -69,5 +73,28 @@ namespace WatsStore.Api.DTOs
         public List<string> Slugs { get; set; } = new();
         public List<string> Cities { get; set; } = new();
         public List<string> Categories { get; set; } = new();
+    }
+
+    public class PublicReviewDto
+    {
+        public Guid Id { get; set; }
+        public string CustomerName { get; set; } = string.Empty;
+        public int Rating { get; set; }
+        public string Comment { get; set; } = string.Empty;
+        public DateTime CreatedAt { get; set; }
+    }
+
+    public class SubmitReviewRequest
+    {
+        [Required(ErrorMessage = "اسم العميل مطلوب")]
+        [StringLength(100, MinimumLength = 2, ErrorMessage = "اسم العميل يجب أن يكون بين حرفين و 100 حرف")]
+        public string CustomerName { get; set; } = string.Empty;
+
+        [Range(1, 5, ErrorMessage = "التقييم يجب أن يكون بين 1 و 5 نجوم")]
+        public int Rating { get; set; } = 5;
+
+        [Required(ErrorMessage = "نص التقييم مطلوب")]
+        [StringLength(1000, MinimumLength = 3, ErrorMessage = "نص التقييم يجب أن يكون بين 3 و 1000 حرف")]
+        public string Comment { get; set; } = string.Empty;
     }
 }

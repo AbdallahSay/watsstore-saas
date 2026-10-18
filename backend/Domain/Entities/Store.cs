@@ -35,5 +35,6 @@ namespace WatsStore.Api.Domain.Entities
         public ICollection<Category> Categories { get; set; } = new List<Category>();
         public ICollection<Product> Products { get; set; } = new List<Product>();
         public ICollection<WhatsAppOrder> Orders { get; set; } = new List<WhatsAppOrder>();
+        public ICollection<StoreReview> Reviews { get; set; } = new List<StoreReview>();
     }
 }

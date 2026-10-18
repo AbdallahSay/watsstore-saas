@@ -13,6 +13,7 @@ namespace WatsStore.Api.Infrastructure.Data
         public DbSet<Category> Categories => Set<Category>();
         public DbSet<Product> Products => Set<Product>();
         public DbSet<WhatsAppOrder> WhatsAppOrders => Set<WhatsAppOrder>();
+        public DbSet<StoreReview> StoreReviews => Set<StoreReview>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -60,6 +61,11 @@ namespace WatsStore.Api.Infrastructure.Data
                 entity.HasMany(s => s.Orders)
                       .WithOne(o => o.Store)
                       .HasForeignKey(o => o.StoreId)
+                      .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasMany(s => s.Reviews)
+                      .WithOne(r => r.Store)
+                      .HasForeignKey(r => r.StoreId)
                       .OnDelete(DeleteBehavior.Cascade);
             });
 
@@ -113,6 +119,19 @@ namespace WatsStore.Api.Infrastructure.Data
                 entity.Property(o => o.CustomerAddress).HasMaxLength(500).IsRequired();
 
                 entity.HasIndex(o => new { o.StoreId, o.CreatedAt });
+            });
+
+            // StoreReview Configuration
+            modelBuilder.Entity<StoreReview>(entity =>
+            {
+                entity.HasKey(r => r.Id);
+                entity.Property(r => r.CustomerName).HasMaxLength(150).IsRequired();
+                entity.Property(r => r.Comment).HasMaxLength(1000).IsRequired();
+                entity.Property(r => r.Rating).IsRequired();
+                entity.Property(r => r.IsApproved).HasDefaultValue(false);
+
+                entity.HasIndex(r => new { r.StoreId, r.IsApproved });
+                entity.HasIndex(r => new { r.StoreId, r.CreatedAt });
             });
         }
     }
