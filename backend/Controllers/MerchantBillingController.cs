@@ -15,7 +15,7 @@ namespace WatsStore.Api.Controllers
     [ApiController]
     [Route("api/merchant/billing")]
     [Authorize]
-    [EnableRateLimiting("auth-policy")]
+    [EnableRateLimiting("sensitive-policy")]
     public class MerchantBillingController : ControllerBase
     {
         private readonly AppDbContext _db;
@@ -102,9 +102,44 @@ namespace WatsStore.Api.Controllers
             var settings = await _db.PlatformSettings.FirstOrDefaultAsync(p => p.Id == 1)
                            ?? new PlatformSetting();
 
-            // Validate Plan and calculate amount
+            // Strict Plan validation
+            if (!string.Equals(request.PlanType, "Pro", StringComparison.OrdinalIgnoreCase) &&
+                !string.Equals(request.PlanType, "VIP", StringComparison.OrdinalIgnoreCase))
+            {
+                return BadRequest(new { message = "نوع الباقة غير صالح. يرجى اختيار Pro أو VIP." });
+            }
             string targetPlan = string.Equals(request.PlanType, "VIP", StringComparison.OrdinalIgnoreCase) ? "VIP" : "Pro";
+
+            // Strict Billing Cycle validation
+            if (!string.Equals(request.BillingCycle, "Monthly", StringComparison.OrdinalIgnoreCase) &&
+                !string.Equals(request.BillingCycle, "Annual", StringComparison.OrdinalIgnoreCase))
+            {
+                return BadRequest(new { message = "دورة الفوترة غير صالحة. يرجى اختيار Monthly أو Annual." });
+            }
             string cycle = string.Equals(request.BillingCycle, "Annual", StringComparison.OrdinalIgnoreCase) ? "Annual" : "Monthly";
+
+            // Strict Payment Method validation
+            string[] validMethods = { "VodafoneCash", "InstaPay", "OnlineCard" };
+            if (!validMethods.Any(m => string.Equals(m, request.PaymentMethod, StringComparison.OrdinalIgnoreCase)))
+            {
+                return BadRequest(new { message = "وسيلة الدفع غير صالحة. الوسائل المعتمدة هي VodafoneCash و InstaPay و OnlineCard." });
+            }
+            string paymentMethod = validMethods.First(m => string.Equals(m, request.PaymentMethod, StringComparison.OrdinalIgnoreCase));
+
+            // Strict Transaction ID validation
+            string transactionId = request.TransactionId?.Trim() ?? string.Empty;
+            if (string.IsNullOrWhiteSpace(transactionId) || transactionId.Length < 3)
+            {
+                return BadRequest(new { message = "يرجى كتابة رقم العملية أو كود الحوالة التأكيدي (3 أحرف أو أرقام على الأقل)." });
+            }
+
+            // Check if transaction ID was already used in a pending or approved request
+            bool duplicateTx = await _db.SubscriptionRequests.AnyAsync(r => 
+                r.TransactionId == transactionId && (r.Status == "Pending" || r.Status == "Approved"));
+            if (duplicateTx)
+            {
+                return BadRequest(new { message = "رقم العملية هذا مسجل بالفعل ومستخدم في طلب سابق" });
+            }
 
             decimal amount = 0m;
             if (targetPlan == "VIP")
@@ -114,21 +149,6 @@ namespace WatsStore.Api.Controllers
             else
             {
                 amount = cycle == "Annual" ? settings.ProAnnualPrice : settings.ProMonthlyPrice;
-            }
-
-            string paymentMethod = request.PaymentMethod?.Trim() ?? "VodafoneCash";
-            string transactionId = request.TransactionId?.Trim() ?? string.Empty;
-
-            if (string.IsNullOrWhiteSpace(transactionId))
-            {
-                return BadRequest(new { message = "يرجى كتابة رقم العملية أو كود الحوالة التأكيدي" });
-            }
-
-            // Check if there is already an existing pending request with same transactionId
-            bool duplicateTx = await _db.SubscriptionRequests.AnyAsync(r => r.TransactionId == transactionId && r.Status == "Pending");
-            if (duplicateTx)
-            {
-                return BadRequest(new { message = "رقم العملية هذا مسجل بالفعل وتحت المراجعة من الإدارة" });
             }
 
             var subRequest = new SubscriptionRequest
@@ -237,6 +257,25 @@ namespace WatsStore.Api.Controllers
                 storeName = subRequest.Store?.StoreName,
                 plan = subRequest.PlanType
             });
+        }
+
+        [HttpGet("requests/{id}")]
+        public async Task<IActionResult> GetBillingRequestById(Guid id)
+        {
+            var storeId = GetCurrentStoreId();
+            if (storeId == null)
+                return Unauthorized(new { message = "غير مصرح لك بالوصول، يرجى تسجيل الدخول مجدداً" });
+
+            var sub = await _db.SubscriptionRequests.FirstOrDefaultAsync(r => r.Id == id);
+            if (sub == null)
+                return NotFound(new { message = "طلب الاشتراك غير موجود" });
+
+            if (sub.StoreId != storeId.Value)
+            {
+                return StatusCode(403, new { message = "غير مصرح لك بالوصول إلى بيانات متجر آخر (Cross-Tenant Access Forbidden)" });
+            }
+
+            return Ok(MapToDto(sub));
         }
 
         private static SubscriptionRequestDto MapToDto(SubscriptionRequest r)

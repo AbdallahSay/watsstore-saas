@@ -28,15 +28,19 @@ namespace WatsStore.Api.DTOs
     public class MerchantUpgradeRequest
     {
         [Required(ErrorMessage = "يرجى تحديد نوع الباقة (Pro أو VIP)")]
+        [RegularExpression("^(Pro|VIP)$", ErrorMessage = "نوع الباقة غير صالح. يرجى اختيار Pro أو VIP.")]
         public string PlanType { get; set; } = "Pro";
 
         [Required(ErrorMessage = "يرجى تحديد دورة الفوترة (Monthly أو Annual)")]
+        [RegularExpression("^(Monthly|Annual)$", ErrorMessage = "دورة الفوترة غير صالحة. يرجى اختيار Monthly أو Annual.")]
         public string BillingCycle { get; set; } = "Monthly";
 
         [Required(ErrorMessage = "يرجى تحديد وسيلة الدفع (VodafoneCash أو InstaPay أو OnlineCard)")]
+        [RegularExpression("^(VodafoneCash|InstaPay|OnlineCard)$", ErrorMessage = "وسيلة الدفع غير صالحة. الوسائل المعتمدة هي VodafoneCash و InstaPay و OnlineCard.")]
         public string PaymentMethod { get; set; } = "VodafoneCash";
 
-        [Required(ErrorMessage = "يرجى إدخال رقم العملية أو الحوالة التأكيدية")]
+        [Required(AllowEmptyStrings = false, ErrorMessage = "يرجى إدخال رقم العملية أو الحوالة التأكيدية")]
+        [MinLength(3, ErrorMessage = "رقم العملية التأكيدي قصير جداً")]
         public string TransactionId { get; set; } = string.Empty;
 
         public string? Notes { get; set; }
