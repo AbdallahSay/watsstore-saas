@@ -13,7 +13,7 @@ interface PageProps {
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   try {
     const store = await api.getPublicStore(params.storeSlug);
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://frontend-bay-ten-58.vercel.app';
     const canonicalUrl = `${appUrl}/s/${store.slug}`;
     const images = store.coverUrl ? [store.coverUrl] : store.logoUrl ? [store.logoUrl] : [];
 
@@ -54,7 +54,7 @@ export default async function StorePage({ params }: PageProps) {
   }
 
   // Schema.org Structured Data for Google Rich Snippets (LocalBusiness + Products)
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://frontend-bay-ten-58.vercel.app';
   const structuredData = {
     '@context': 'https://schema.org',
     '@type': 'Store',

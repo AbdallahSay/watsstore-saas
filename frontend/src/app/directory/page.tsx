@@ -127,14 +127,19 @@ export default async function DirectoryPage({ searchParams }: DirectoryPageProps
                 {EGYPT_CITIES.map((city) => {
                   const isActive = (!selectedCity && city === 'الكل') || selectedCity === city;
                   const queryCity = city === 'الكل' ? undefined : city;
-                  const params = new URLSearchParams();
-                  if (queryCity) params.set('city', queryCity);
-                  if (selectedCategory) params.set('category', selectedCategory);
+                  let href = '/directory';
+                  if (queryCity && selectedCategory) {
+                    href = `/directory/${encodeURIComponent(queryCity)}/${encodeURIComponent(selectedCategory)}`;
+                  } else if (queryCity) {
+                    href = `/directory?city=${encodeURIComponent(queryCity)}`;
+                  } else if (selectedCategory) {
+                    href = `/directory?category=${encodeURIComponent(selectedCategory)}`;
+                  }
 
                   return (
                     <Link
                       key={city}
-                      href={`/directory?${params.toString()}`}
+                      href={href}
                       className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all border ${
                         isActive
                           ? 'bg-emerald-600 text-white border-emerald-600 shadow-sm'
@@ -155,14 +160,20 @@ export default async function DirectoryPage({ searchParams }: DirectoryPageProps
                 {BUSINESS_CATEGORIES.map((cat) => {
                   const isActive = (!selectedCategory && cat === 'الكل') || selectedCategory === cat;
                   const queryCat = cat === 'الكل' ? undefined : cat;
-                  const params = new URLSearchParams();
-                  if (selectedCity) params.set('city', selectedCity);
-                  if (queryCat) params.set('category', queryCat);
+
+                  let href = '/directory';
+                  if (selectedCity && queryCat) {
+                    href = `/directory/${encodeURIComponent(selectedCity)}/${encodeURIComponent(queryCat)}`;
+                  } else if (queryCat) {
+                    href = `/directory?category=${encodeURIComponent(queryCat)}`;
+                  } else if (selectedCity) {
+                    href = `/directory?city=${encodeURIComponent(selectedCity)}`;
+                  }
 
                   return (
                     <Link
                       key={cat}
-                      href={`/directory?${params.toString()}`}
+                      href={href}
                       className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all border ${
                         isActive
                           ? 'bg-slate-900 text-white border-slate-900 shadow-sm'

@@ -1,8 +1,34 @@
 import { MetadataRoute } from 'next';
 import { api } from '@/lib/api';
 
+const EGYPT_CITIES = [
+  'الفيوم',
+  'القاهرة',
+  'الجيزة',
+  'الإسكندرية',
+  'المنصورة',
+  'طنطا',
+  'أسيوط',
+  'سوهاج',
+  'المنيا',
+  'بني سويف',
+  'الشرقية',
+  'القليوبية',
+  'بورسعيد',
+];
+
+const POPULAR_CATEGORIES = [
+  'ملابس وأزياء',
+  'مطاعم وأكلات',
+  'حلويات ومخبوزات',
+  'عطور ومستحضرات تجميل',
+  'إكسسوارات وهدايا',
+  'أحذية وحقائب',
+  'إلكترونيات وموبايل',
+];
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://frontend-bay-ten-58.vercel.app';
   const routes: MetadataRoute.Sitemap = [
     {
       url: `${baseUrl}`,
@@ -21,7 +47,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   try {
     const data = await api.getSitemapData();
 
-    // Store storefronts
+    // 1. Store storefronts (/s/[slug])
     if (data.slugs && data.slugs.length > 0) {
       data.slugs.forEach((slug) => {
         routes.push({
@@ -33,31 +59,52 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       });
     }
 
-    // Programmatic Local SEO city pages
-    if (data.cities && data.cities.length > 0) {
-      data.cities.forEach((city) => {
+    const citiesToInclude = Array.from(new Set([...(data.cities || []), ...EGYPT_CITIES]));
+    const categoriesToInclude = Array.from(new Set([...(data.categories || []), ...POPULAR_CATEGORIES]));
+
+    // 2. City Directory Pages
+    citiesToInclude.forEach((city) => {
+      routes.push({
+        url: `${baseUrl}/directory?city=${encodeURIComponent(city)}`,
+        lastModified: new Date(),
+        changeFrequency: 'weekly',
+        priority: 0.8,
+      });
+    });
+
+    // 3. Category Directory Pages
+    categoriesToInclude.forEach((category) => {
+      routes.push({
+        url: `${baseUrl}/directory?category=${encodeURIComponent(category)}`,
+        lastModified: new Date(),
+        changeFrequency: 'weekly',
+        priority: 0.75,
+      });
+    });
+
+    // 4. Programmatic City + Category Pages (/directory/[city]/[category])
+    citiesToInclude.forEach((city) => {
+      categoriesToInclude.forEach((cat) => {
         routes.push({
-          url: `${baseUrl}/directory?city=${encodeURIComponent(city)}`,
+          url: `${baseUrl}/directory/${encodeURIComponent(city)}/${encodeURIComponent(cat)}`,
           lastModified: new Date(),
           changeFrequency: 'weekly',
           priority: 0.8,
         });
       });
-    }
-
-    // Programmatic Category pages
-    if (data.categories && data.categories.length > 0) {
-      data.categories.forEach((category) => {
+    });
+  } catch (error) {
+    // If backend is not reached during static build, provide baseline programmatic routes
+    EGYPT_CITIES.slice(0, 5).forEach((city) => {
+      POPULAR_CATEGORIES.forEach((cat) => {
         routes.push({
-          url: `${baseUrl}/directory?category=${encodeURIComponent(category)}`,
+          url: `${baseUrl}/directory/${encodeURIComponent(city)}/${encodeURIComponent(cat)}`,
           lastModified: new Date(),
           changeFrequency: 'weekly',
           priority: 0.75,
         });
       });
-    }
-  } catch (error) {
-    // If backend is not reached during static generation, return baseline routes
+    });
   }
 
   return routes;
