@@ -186,4 +186,47 @@ namespace WatsStore.Api.DTOs
 
         public bool IsActive { get; set; } = true;
     }
+
+    public class MerchantAnalyticsResponse
+    {
+        public decimal TotalRevenue { get; set; }
+        public int TotalOrdersCount { get; set; }
+        public decimal AverageOrderValue { get; set; }
+        public int TotalProductsCount { get; set; }
+        public int TotalViews { get; set; }
+        public decimal ThisMonthRevenue { get; set; }
+        public int ThisMonthOrdersCount { get; set; }
+        public decimal LastMonthRevenue { get; set; }
+        public decimal GrowthPercentage { get; set; }
+        public string Currency { get; set; } = "ج.م";
+        public List<DailySalesDataPoint> DailySales { get; set; } = new();
+        public List<TopProductAnalyticsDto> TopProducts { get; set; } = new();
+        public List<PaymentMethodStatDto> PaymentMethodsBreakdown { get; set; } = new();
+    }
+
+    public class DailySalesDataPoint
+    {
+        public string Date { get; set; } = string.Empty;
+        public string FormattedDate { get; set; } = string.Empty;
+        public decimal Revenue { get; set; }
+        public int OrdersCount { get; set; }
+    }
+
+    public class TopProductAnalyticsDto
+    {
+        public Guid ProductId { get; set; }
+        public string Name { get; set; } = string.Empty;
+        public string? ImageUrl { get; set; }
+        public decimal Price { get; set; }
+        public int UnitsSold { get; set; }
+        public decimal TotalRevenue { get; set; }
+    }
+
+    public class PaymentMethodStatDto
+    {
+        public string Method { get; set; } = string.Empty;
+        public int Count { get; set; }
+        public decimal TotalAmount { get; set; }
+        public double Percentage { get; set; }
+    }
 }

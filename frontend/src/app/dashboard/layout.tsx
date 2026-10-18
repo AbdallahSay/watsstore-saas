@@ -16,6 +16,7 @@ import {
   Receipt,
   Star,
   Tag,
+  BarChart3,
   Menu,
   X
 } from 'lucide-react';
@@ -67,6 +68,7 @@ export default function DashboardLayout({
   const navLinks = [
     { name: 'نظرة عامة للمتجر', href: '/dashboard', icon: LayoutDashboard },
     { name: 'الطلبات والمبيعات', href: '/dashboard/orders', icon: Receipt },
+    { name: 'الإحصائيات والتقارير', href: '/dashboard/analytics', icon: BarChart3 },
     { name: 'المنتجات والكتالوج', href: '/dashboard/products', icon: ShoppingBag },
     { name: 'الأقسام والتصنيفات', href: '/dashboard/categories', icon: FolderTree },
     { name: 'آراء العملاء والتقييمات', href: '/dashboard/reviews', icon: Star },

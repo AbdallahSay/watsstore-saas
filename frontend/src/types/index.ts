@@ -208,3 +208,43 @@ export interface StoreDirectoryCard {
   deliveryFee: number;
   productCount: number;
 }
+
+export interface DailySalesDataPoint {
+  date: string;
+  formattedDate: string;
+  revenue: number;
+  ordersCount: number;
+}
+
+export interface TopProductAnalytics {
+  productId: string;
+  name: string;
+  imageUrl?: string | null;
+  price: number;
+  unitsSold: number;
+  totalRevenue: number;
+}
+
+export interface PaymentMethodStat {
+  method: string;
+  count: number;
+  totalAmount: number;
+  percentage: number;
+}
+
+export interface MerchantAnalyticsResponse {
+  totalRevenue: number;
+  totalOrdersCount: number;
+  averageOrderValue: number;
+  totalProductsCount: number;
+  totalViews: number;
+  thisMonthRevenue: number;
+  thisMonthOrdersCount: number;
+  lastMonthRevenue: number;
+  growthPercentage: number;
+  currency: string;
+  dailySales: DailySalesDataPoint[];
+  topProducts: TopProductAnalytics[];
+  paymentMethodsBreakdown: PaymentMethodStat[];
+}
+

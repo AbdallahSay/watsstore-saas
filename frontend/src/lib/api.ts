@@ -10,7 +10,8 @@ import {
   StoreReview,
   MerchantReviewsResponse,
   StoreCoupon,
-  ApplyCouponResponse
+  ApplyCouponResponse,
+  MerchantAnalyticsResponse
 } from '../types';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://watsstore.runasp.net/api';
@@ -308,6 +309,13 @@ export const api = {
   async deleteMerchantCoupon(token: string, couponId: string): Promise<{ message: string }> {
     return fetchJson<{ message: string }>(`${API_BASE_URL}/merchant/coupons/${couponId}`, {
       method: 'DELETE',
+      headers: { Authorization: `Bearer ${token}` },
+    });
+  },
+
+  // Analytics & Revenue
+  async getMerchantAnalytics(token: string): Promise<MerchantAnalyticsResponse> {
+    return fetchJson<MerchantAnalyticsResponse>(`${API_BASE_URL}/merchant/analytics`, {
       headers: { Authorization: `Bearer ${token}` },
     });
   },

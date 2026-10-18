@@ -39,6 +39,14 @@ namespace WatsStore.Api.Controllers
             if (store == null)
                 return NotFound(new { message = "المتجر غير موجود أو تم إيقافه" });
 
+            // Increment Store Profile Visits
+            try
+            {
+                await _db.Database.ExecuteSqlRawAsync(
+                    "UPDATE Stores SET ViewCount = ViewCount + 1 WHERE Id = {0}", store.Id);
+            }
+            catch { }
+
             // Dual Meta Pixel Rule: Only expose Merchant Pixel if PlanType is NOT Free
             string? merchantMetaPixelId = null;
             if (!string.Equals(store.PlanType, "Free", StringComparison.OrdinalIgnoreCase))

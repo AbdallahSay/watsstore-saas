@@ -28,6 +28,7 @@ namespace WatsStore.Api.Domain.Entities
         public string? InstaPayAddress { get; set; }
         public string PlanType { get; set; } = "Free"; // Free, Pro, VIP
         public bool IsActive { get; set; } = true;
+        public int ViewCount { get; set; } = 0;
         public DateTime? SubscriptionEndsAt { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 

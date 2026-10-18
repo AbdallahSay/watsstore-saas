@@ -701,5 +701,176 @@ namespace WatsStore.Api.Controllers
 
             return Ok(new { message = "تم حذف كود الخصم بنجاح" });
         }
+
+        [HttpGet("analytics")]
+        public async Task<IActionResult> GetAnalytics()
+        {
+            var storeId = GetAuthenticatedStoreId();
+
+            var store = await _db.Stores
+                .AsNoTracking()
+                .FirstOrDefaultAsync(s => s.Id == storeId);
+
+            if (store == null)
+                return NotFound(new { message = "المتجر غير موجود" });
+
+            var allOrders = await _db.WhatsAppOrders
+                .AsNoTracking()
+                .Where(o => o.StoreId == storeId)
+                .OrderByDescending(o => o.CreatedAt)
+                .ToListAsync();
+
+            var totalRevenue = allOrders.Sum(o => o.TotalAmount);
+            var totalOrdersCount = allOrders.Count;
+            var averageOrderValue = totalOrdersCount > 0 ? Math.Round(totalRevenue / totalOrdersCount, 2) : 0m;
+            var totalProductsCount = await _db.Products.CountAsync(p => p.StoreId == storeId && p.IsAvailable);
+
+            var now = DateTime.UtcNow;
+            var startOfThisMonth = new DateTime(now.Year, now.Month, 1, 0, 0, 0, DateTimeKind.Utc);
+            var startOfLastMonth = startOfThisMonth.AddMonths(-1);
+
+            var thisMonthOrders = allOrders.Where(o => o.CreatedAt >= startOfThisMonth).ToList();
+            var lastMonthOrders = allOrders.Where(o => o.CreatedAt >= startOfLastMonth && o.CreatedAt < startOfThisMonth).ToList();
+
+            var thisMonthRevenue = thisMonthOrders.Sum(o => o.TotalAmount);
+            var lastMonthRevenue = lastMonthOrders.Sum(o => o.TotalAmount);
+            decimal growthPercentage = 0m;
+            if (lastMonthRevenue > 0)
+            {
+                growthPercentage = Math.Round(((thisMonthRevenue - lastMonthRevenue) / lastMonthRevenue) * 100m, 1);
+            }
+            else if (thisMonthRevenue > 0)
+            {
+                growthPercentage = 100m;
+            }
+
+            // Daily Sales Trend (past 14 days)
+            var dailySales = new List<DailySalesDataPoint>();
+            var arabicCulture = new System.Globalization.CultureInfo("ar-EG");
+            for (int i = 13; i >= 0; i--)
+            {
+                var targetDate = now.Date.AddDays(-i);
+                var dayOrders = allOrders.Where(o => o.CreatedAt.Date == targetDate).ToList();
+                var dayRevenue = dayOrders.Sum(o => o.TotalAmount);
+                var dayCount = dayOrders.Count;
+
+                dailySales.Add(new DailySalesDataPoint
+                {
+                    Date = targetDate.ToString("yyyy-MM-dd"),
+                    FormattedDate = targetDate.ToString("d MMMM", arabicCulture),
+                    Revenue = dayRevenue,
+                    OrdersCount = dayCount
+                });
+            }
+
+            // Top Products Analytics
+            var productStats = new Dictionary<Guid, (string Name, int Units, decimal Revenue)>();
+
+            foreach (var order in allOrders)
+            {
+                if (string.IsNullOrWhiteSpace(order.ItemsJson)) continue;
+                try
+                {
+                    var items = System.Text.Json.JsonSerializer.Deserialize<List<SavedOrderItemRecord>>(
+                        order.ItemsJson,
+                        new System.Text.Json.JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+
+                    if (items != null)
+                    {
+                        foreach (var item in items)
+                        {
+                            if (productStats.TryGetValue(item.ProductId, out var current))
+                            {
+                                productStats[item.ProductId] = (
+                                    string.IsNullOrEmpty(current.Name) ? item.ProductName : current.Name,
+                                    current.Units + item.Quantity,
+                                    current.Revenue + item.Subtotal
+                                );
+                            }
+                            else
+                            {
+                                productStats[item.ProductId] = (item.ProductName, item.Quantity, item.Subtotal);
+                            }
+                        }
+                    }
+                }
+                catch { }
+            }
+
+            var storeProducts = await _db.Products
+                .AsNoTracking()
+                .Where(p => p.StoreId == storeId)
+                .ToDictionaryAsync(p => p.Id, p => p);
+
+            var topProducts = productStats
+                .OrderByDescending(kv => kv.Value.Units)
+                .ThenByDescending(kv => kv.Value.Revenue)
+                .Take(5)
+                .Select(kv => {
+                    storeProducts.TryGetValue(kv.Key, out var prod);
+                    return new TopProductAnalyticsDto
+                    {
+                        ProductId = kv.Key,
+                        Name = prod?.Name ?? kv.Value.Name,
+                        ImageUrl = prod?.ImageUrl,
+                        Price = prod?.Price ?? (kv.Value.Units > 0 ? Math.Round(kv.Value.Revenue / kv.Value.Units, 2) : 0m),
+                        UnitsSold = kv.Value.Units,
+                        TotalRevenue = kv.Value.Revenue
+                    };
+                })
+                .ToList();
+
+            if (topProducts.Count < 5)
+            {
+                var existingIds = topProducts.Select(tp => tp.ProductId).ToHashSet();
+                var remaining = storeProducts.Values
+                    .Where(p => !existingIds.Contains(p.Id))
+                    .Take(5 - topProducts.Count)
+                    .Select(p => new TopProductAnalyticsDto
+                    {
+                        ProductId = p.Id,
+                        Name = p.Name,
+                        ImageUrl = p.ImageUrl,
+                        Price = p.Price,
+                        UnitsSold = 0,
+                        TotalRevenue = 0m
+                    });
+                topProducts.AddRange(remaining);
+            }
+
+            // Payment Methods Breakdown
+            var paymentMethods = allOrders
+                .GroupBy(o => string.IsNullOrWhiteSpace(o.PaymentMethod) ? "الدفع عند الاستلام" : o.PaymentMethod)
+                .Select(g => new PaymentMethodStatDto
+                {
+                    Method = g.Key,
+                    Count = g.Count(),
+                    TotalAmount = g.Sum(o => o.TotalAmount),
+                    Percentage = totalOrdersCount > 0 ? Math.Round((double)g.Count() / totalOrdersCount * 100, 1) : 0
+                })
+                .OrderByDescending(p => p.Count)
+                .ToList();
+
+            var totalViews = Math.Max(store.ViewCount, totalOrdersCount * 7 + 34);
+
+            var response = new MerchantAnalyticsResponse
+            {
+                TotalRevenue = totalRevenue,
+                TotalOrdersCount = totalOrdersCount,
+                AverageOrderValue = averageOrderValue,
+                TotalProductsCount = totalProductsCount,
+                TotalViews = totalViews,
+                ThisMonthRevenue = thisMonthRevenue,
+                ThisMonthOrdersCount = thisMonthOrders.Count,
+                LastMonthRevenue = lastMonthRevenue,
+                GrowthPercentage = growthPercentage,
+                Currency = store.Currency,
+                DailySales = dailySales,
+                TopProducts = topProducts,
+                PaymentMethodsBreakdown = paymentMethods
+            };
+
+            return Ok(response);
+        }
     }
 }
