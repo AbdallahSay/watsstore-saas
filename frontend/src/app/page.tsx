@@ -1,3 +1,6 @@
+'use client';
+
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
@@ -13,12 +16,55 @@ import {
   Smartphone, 
   Search, 
   BarChart3,
-  ExternalLink
+  ExternalLink,
+  X
 } from 'lucide-react';
+import { api } from '@/lib/api';
 
 export default function HomePage() {
+  const [billingCycle, setBillingCycle] = useState<'monthly' | 'annual'>('annual');
+  const [pricing, setPricing] = useState({
+    proMonthlyPrice: 299,
+    proAnnualPrice: 2499,
+    vipMonthlyPrice: 599,
+    vipAnnualPrice: 4999,
+    isLaunchDiscountBannerActive: true,
+    launchDiscountText: "🔥 عرض الإطلاق التجاري: احصل على خصم إضافي عند الاشتراك السنوي اليوم!",
+  });
+  const [showBanner, setShowBanner] = useState(true);
+
+  useEffect(() => {
+    api.getPublicPricing()
+      .then((data) => {
+        if (data) {
+          setPricing((prev) => ({ ...prev, ...data }));
+        }
+      })
+      .catch((err) => console.warn('Using default pricing matrix fallback:', err));
+  }, []);
+
   return (
     <>
+      {/* Top Urgency & Scarcity Marketing Banner */}
+      {showBanner && pricing.isLaunchDiscountBannerActive && (
+        <div className="bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 text-white px-4 py-2.5 text-xs sm:text-sm font-black shadow-md flex items-center justify-between relative z-50 animate-fadeIn">
+          <div className="flex-1 flex items-center justify-center gap-2 flex-wrap">
+            <Sparkles className="w-4 h-4 text-amber-300 animate-spin" />
+            <span>{pricing.launchDiscountText || "🔥 عرض الإطلاق التجاري: احصل على خصم إضافي عند الاشتراك السنوي اليوم!"}</span>
+            <a href="#pricing" className="underline mr-2 text-amber-200 hover:text-white font-black transition-colors">
+              اختر باقتك وسجل الآن ←
+            </a>
+          </div>
+          <button
+            onClick={() => setShowBanner(false)}
+            className="text-white/80 hover:text-white p-1 rounded-lg hover:bg-white/10 transition-colors"
+            aria-label="إغلاق الإشعار"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+      )}
+
       <Navbar />
 
       <main className="flex-1">
@@ -167,26 +213,64 @@ export default function HomePage() {
         </section>
 
         {/* PRICING PLANS */}
-        <section id="pricing" className="py-24 bg-slate-50">
+        <section id="pricing" className="py-24 bg-slate-50 relative">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center max-w-3xl mx-auto mb-16">
+            <div className="text-center max-w-3xl mx-auto mb-12">
               <h2 className="text-xs sm:text-sm font-bold text-emerald-600 tracking-wider uppercase mb-2">
                 باقات تناسب جميع أحجام الأنشطة
               </h2>
               <p className="text-3xl sm:text-4xl font-extrabold text-slate-900 leading-tight">
                 اختر الباقة المناسبة لمشروعك وابدأ بدون أي التزامات
               </p>
+              <p className="text-xs sm:text-sm text-slate-500 mt-2">
+                جميع الباقات تشمل تجربة مجانية كاملة 14 يوماً بدون الحاجة لبطاقة بنكية
+              </p>
+
+              {/* Billing Cycle Switcher with Psychological Savings */}
+              <div className="mt-8 inline-flex items-center gap-2 p-1.5 bg-slate-200/80 rounded-2xl border border-slate-300 shadow-inner">
+                <button
+                  type="button"
+                  onClick={() => setBillingCycle('monthly')}
+                  className={`px-5 py-2.5 rounded-xl font-black text-xs sm:text-sm transition-all ${
+                    billingCycle === 'monthly'
+                      ? 'bg-white text-slate-900 shadow-md scale-100'
+                      : 'text-slate-600 hover:text-slate-900'
+                  }`}
+                >
+                  الاشتراك الشهري
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setBillingCycle('annual')}
+                  className={`px-5 py-2.5 rounded-xl font-black text-xs sm:text-sm transition-all flex items-center gap-2 ${
+                    billingCycle === 'annual'
+                      ? 'bg-emerald-600 text-white shadow-md scale-100'
+                      : 'text-slate-600 hover:text-slate-900'
+                  }`}
+                >
+                  <span>الاشتراك السنوي</span>
+                  <span className={`px-2 py-0.5 rounded-full text-[10px] font-black tracking-tight ${
+                    billingCycle === 'annual' ? 'bg-amber-400 text-slate-950' : 'bg-emerald-100 text-emerald-800'
+                  }`}>
+                    وفر حتى 30% 🎁
+                  </span>
+                </button>
+              </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-stretch">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-stretch pt-4">
               {/* FREE TRIAL */}
-              <div className="bg-white rounded-3xl p-8 border border-slate-200/80 shadow-sm flex flex-col justify-between">
+              <div className="bg-white rounded-3xl p-8 border border-slate-200/80 shadow-sm flex flex-col justify-between hover:shadow-md transition-shadow">
                 <div>
                   <h3 className="text-xl font-bold text-slate-900">تجربة مجانية (14 يوماً)</h3>
                   <p className="text-xs text-slate-500 mt-1">جرب المنصة بكامل خصائصها قبل الاشتراك</p>
-                  <div className="mt-6 mb-8 flex items-baseline gap-1">
-                    <span className="text-4xl font-black text-slate-900">0</span>
-                    <span className="text-sm font-bold text-slate-600">ج.م / لمدة 14 يوماً</span>
+                  
+                  <div className="mt-6 mb-8">
+                    <div className="flex items-baseline gap-1">
+                      <span className="text-4xl font-black text-slate-900">0</span>
+                      <span className="text-sm font-bold text-slate-600">ج.م / لمدة 14 يوماً</span>
+                    </div>
+                    <p className="text-[11px] text-slate-400 mt-1">بدون بطاقة ائتمان أو عمولات مخفية</p>
                   </div>
 
                   <ul className="space-y-3.5 text-sm text-slate-600 border-t border-slate-100 pt-6">
@@ -229,24 +313,48 @@ export default function HomePage() {
                 </Link>
               </div>
 
-              {/* PRO PLAN (POPULAR) */}
-              <div className="bg-white rounded-3xl p-8 border-2 border-emerald-500 shadow-xl relative flex flex-col justify-between">
-                <span className="absolute -top-3.5 right-8 bg-emerald-600 text-white text-xs font-black px-3.5 py-1 rounded-full shadow-md">
-                  الأكثر طلباً للتجار ⭐
-                </span>
+              {/* PRO PLAN (DECOY & HERO POPULAR) */}
+              <div className="bg-white rounded-3xl p-8 border-2 border-emerald-500 shadow-2xl relative ring-4 ring-emerald-500/10 flex flex-col justify-between transform md:-translate-y-2 transition-all">
+                <div className="absolute -top-4 inset-x-0 flex justify-center">
+                  <span className="bg-gradient-to-r from-emerald-600 to-teal-600 text-white text-xs font-black px-4 py-1.5 rounded-full shadow-lg flex items-center gap-1.5 border border-emerald-300/40 tracking-wide">
+                    <Sparkles className="w-3.5 h-3.5 text-amber-300" />
+                    <span>الأكثر طلباً للتجار ⭐ (أفضل قيمة واستثمار)</span>
+                  </span>
+                </div>
 
                 <div>
-                  <h3 className="text-xl font-bold text-slate-900">باقة المحترفين Pro</h3>
+                  <h3 className="text-xl font-bold text-slate-900 mt-2">باقة المحترفين Pro</h3>
                   <p className="text-xs text-slate-500 mt-1">للمتاجر الراغبة في التوسع ومضاعفة المبيعات</p>
-                  <div className="mt-6 mb-8 flex items-baseline gap-1">
-                    <span className="text-4xl font-black text-emerald-600">149</span>
-                    <span className="text-sm font-bold text-slate-600">ج.م / شهرياً</span>
-                  </div>
+                  
+                  {billingCycle === 'annual' ? (
+                    <div className="mt-6 mb-8">
+                      <div className="flex items-baseline gap-1.5">
+                        <span className="text-4xl font-black text-emerald-600">{pricing.proAnnualPrice.toLocaleString()}</span>
+                        <span className="text-sm font-bold text-slate-600">ج.م / سنوياً</span>
+                      </div>
+                      <div className="mt-1 flex items-center gap-2 flex-wrap">
+                        <span className="text-xs font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200">
+                          وفر 1,089 ج.م (شهران مجاناً) 🎁
+                        </span>
+                        <span className="text-[11px] text-slate-400">
+                          (~{Math.round(pricing.proAnnualPrice / 12)} ج.م/شهرياً)
+                        </span>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="mt-6 mb-8">
+                      <div className="flex items-baseline gap-1.5">
+                        <span className="text-4xl font-black text-emerald-600">{pricing.proMonthlyPrice}</span>
+                        <span className="text-sm font-bold text-slate-600">ج.م / شهرياً</span>
+                      </div>
+                      <p className="text-[11px] text-slate-400 mt-1">تجديد شهري مرن، يمكنك الإلغاء بأي وقت</p>
+                    </div>
+                  )}
 
                   <ul className="space-y-3.5 text-sm text-slate-700 border-t border-slate-100 pt-6">
                     <li className="flex items-center gap-2.5">
                       <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                      <span className="font-bold text-emerald-800">حتى 100 منتج و 15 كوبون خصم</span>
+                      <span className="font-bold text-emerald-800">حتى 100 منتج و 15 كوبون خصم نشط</span>
                     </li>
                     <li className="flex items-center gap-2.5">
                       <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
@@ -279,19 +387,40 @@ export default function HomePage() {
                   href="/register"
                   className="mt-8 w-full py-3.5 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-sm text-center shadow-lg shadow-emerald-600/25 transition-all hover:scale-[1.02] block"
                 >
-                  اشترك في باقة Pro (149 ج.م)
+                  اشترك في باقة Pro {billingCycle === 'annual' ? `(${pricing.proAnnualPrice.toLocaleString()} ج.م/سنوياً)` : `(${pricing.proMonthlyPrice} ج.م/شهرياً)`}
                 </Link>
               </div>
 
               {/* VIP PLAN */}
-              <div className="bg-white rounded-3xl p-8 border border-slate-200/80 shadow-sm flex flex-col justify-between">
+              <div className="bg-white rounded-3xl p-8 border border-slate-200/80 shadow-sm flex flex-col justify-between hover:shadow-md transition-shadow">
                 <div>
                   <h3 className="text-xl font-bold text-slate-900">باقة كبار التجار VIP 👑</h3>
                   <p className="text-xs text-slate-500 mt-1">للعلامات التجارية الكبرى والمتاجر الرائدة</p>
-                  <div className="mt-6 mb-8 flex items-baseline gap-1">
-                    <span className="text-4xl font-black text-slate-900">299</span>
-                    <span className="text-sm font-bold text-slate-600">ج.م / شهرياً</span>
-                  </div>
+                  
+                  {billingCycle === 'annual' ? (
+                    <div className="mt-6 mb-8">
+                      <div className="flex items-baseline gap-1.5">
+                        <span className="text-4xl font-black text-slate-900">{pricing.vipAnnualPrice.toLocaleString()}</span>
+                        <span className="text-sm font-bold text-slate-600">ج.م / سنوياً</span>
+                      </div>
+                      <div className="mt-1 flex items-center gap-2 flex-wrap">
+                        <span className="text-xs font-bold text-amber-800 bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200">
+                          وفر 2,189 ج.م سنوياً 👑
+                        </span>
+                        <span className="text-[11px] text-slate-400">
+                          (~{Math.round(pricing.vipAnnualPrice / 12)} ج.م/شهرياً)
+                        </span>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="mt-6 mb-8">
+                      <div className="flex items-baseline gap-1.5">
+                        <span className="text-4xl font-black text-slate-900">{pricing.vipMonthlyPrice}</span>
+                        <span className="text-sm font-bold text-slate-600">ج.م / شهرياً</span>
+                      </div>
+                      <p className="text-[11px] text-slate-400 mt-1">شامل كافة مميزات المنصة والدعم المخصص</p>
+                    </div>
+                  )}
 
                   <ul className="space-y-3.5 text-sm text-slate-600 border-t border-slate-100 pt-6">
                     <li className="flex items-center gap-2.5">
@@ -325,7 +454,7 @@ export default function HomePage() {
                   href="/register"
                   className="mt-8 w-full py-3.5 rounded-2xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-sm text-center transition-colors block"
                 >
-                  انضم إلى باقة VIP (299 ج.م)
+                  انضم إلى باقة VIP {billingCycle === 'annual' ? `(${pricing.vipAnnualPrice.toLocaleString()} ج.م/سنوياً)` : `(${pricing.vipMonthlyPrice} ج.م/شهرياً)`}
                 </Link>
               </div>
             </div>

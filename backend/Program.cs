@@ -341,8 +341,24 @@ using (var scope = app.Services.CreateScope())
                         ""ResetTokenExpiresAt"" TIMESTAMP WITH TIME ZONE NULL,
                         ""UpdatedAt"" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
                     );
+                    CREATE TABLE IF NOT EXISTS ""PlatformSettings"" (
+                        ""Id"" INT NOT NULL PRIMARY KEY,
+                        ""ProMonthlyPrice"" NUMERIC(10, 2) NOT NULL DEFAULT 299,
+                        ""ProAnnualPrice"" NUMERIC(10, 2) NOT NULL DEFAULT 2499,
+                        ""ProProductLimit"" INT NOT NULL DEFAULT 100,
+                        ""ProCouponLimit"" INT NOT NULL DEFAULT 15,
+                        ""ProAiLimit"" INT NOT NULL DEFAULT 15,
+                        ""VipMonthlyPrice"" NUMERIC(10, 2) NOT NULL DEFAULT 599,
+                        ""VipAnnualPrice"" NUMERIC(10, 2) NOT NULL DEFAULT 4999,
+                        ""VipProductLimit"" INT NOT NULL DEFAULT 999999,
+                        ""VipCouponLimit"" INT NOT NULL DEFAULT 999999,
+                        ""VipAiLimit"" INT NOT NULL DEFAULT 150,
+                        ""IsLaunchDiscountBannerActive"" BOOLEAN NOT NULL DEFAULT TRUE,
+                        ""LaunchDiscountText"" VARCHAR(500) NOT NULL DEFAULT '🔥 عروض الإطلاق التجاري: احصل على خصم إضافي عند الاشتراك السنوي اليوم!',
+                        ""UpdatedAt"" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
+                    );
                 ");
-                logger.LogInformation("PostgreSQL database columns & StoreReviews/StoreCoupons/SuperAdmins tables verified/applied successfully.");
+                logger.LogInformation("PostgreSQL database columns & StoreReviews/StoreCoupons/SuperAdmins/PlatformSettings tables verified/applied successfully.");
             }
             else
             {
@@ -408,8 +424,28 @@ using (var scope = app.Services.CreateScope())
                             UpdatedAt DATETIME2 NOT NULL DEFAULT GETUTCDATE()
                         );
                     END
+
+                    IF NOT EXISTS (SELECT * FROM sys.tables WHERE name = 'PlatformSettings')
+                    BEGIN
+                        CREATE TABLE PlatformSettings (
+                            Id INT NOT NULL PRIMARY KEY DEFAULT 1,
+                            ProMonthlyPrice DECIMAL(10, 2) NOT NULL DEFAULT 299,
+                            ProAnnualPrice DECIMAL(10, 2) NOT NULL DEFAULT 2499,
+                            ProProductLimit INT NOT NULL DEFAULT 100,
+                            ProCouponLimit INT NOT NULL DEFAULT 15,
+                            ProAiLimit INT NOT NULL DEFAULT 15,
+                            VipMonthlyPrice DECIMAL(10, 2) NOT NULL DEFAULT 599,
+                            VipAnnualPrice DECIMAL(10, 2) NOT NULL DEFAULT 4999,
+                            VipProductLimit INT NOT NULL DEFAULT 999999,
+                            VipCouponLimit INT NOT NULL DEFAULT 999999,
+                            VipAiLimit INT NOT NULL DEFAULT 150,
+                            IsLaunchDiscountBannerActive BIT NOT NULL DEFAULT 1,
+                            LaunchDiscountText NVARCHAR(500) NOT NULL DEFAULT N'🔥 عروض الإطلاق التجاري: احصل على خصم إضافي عند الاشتراك السنوي اليوم!',
+                            UpdatedAt DATETIME2 NOT NULL DEFAULT GETUTCDATE()
+                        );
+                    END
                 ");
-                logger.LogInformation("SQL Server database column migrations & StoreReviews/StoreCoupons/SuperAdmins tables checked and applied successfully.");
+                logger.LogInformation("SQL Server database column migrations & StoreReviews/StoreCoupons/SuperAdmins/PlatformSettings tables checked and applied successfully.");
             }
         }
         catch (Exception colEx)
@@ -445,6 +481,38 @@ using (var scope = app.Services.CreateScope())
         catch (Exception adminEx)
         {
             logger.LogWarning(adminEx, "Super Admin seeding skipped or failed.");
+        }
+
+        // Auto-seed default PlatformSettings
+        try
+        {
+            var existingSettings = await db.PlatformSettings.FirstOrDefaultAsync(p => p.Id == 1);
+            if (existingSettings == null)
+            {
+                db.PlatformSettings.Add(new PlatformSetting
+                {
+                    Id = 1,
+                    ProMonthlyPrice = 299m,
+                    ProAnnualPrice = 2499m,
+                    ProProductLimit = 100,
+                    ProCouponLimit = 15,
+                    ProAiLimit = 15,
+                    VipMonthlyPrice = 599m,
+                    VipAnnualPrice = 4999m,
+                    VipProductLimit = 999999,
+                    VipCouponLimit = 999999,
+                    VipAiLimit = 150,
+                    IsLaunchDiscountBannerActive = true,
+                    LaunchDiscountText = "🔥 عروض الإطلاق التجاري: احصل على خصم إضافي عند الاشتراك السنوي اليوم!",
+                    UpdatedAt = DateTime.UtcNow
+                });
+                await db.SaveChangesAsync();
+                logger.LogInformation("PlatformSettings row seeded successfully.");
+            }
+        }
+        catch (Exception settingsEx)
+        {
+            logger.LogWarning(settingsEx, "PlatformSettings seeding skipped or failed.");
         }
 
         if (!await db.Stores.AnyAsync(s => s.Slug == "al-amal-fashion"))

@@ -327,4 +327,20 @@ export interface StorePlanUpdateResponse {
   message: string;
 }
 
+export interface PlatformPricingSettings {
+  proMonthlyPrice: number;
+  proAnnualPrice: number;
+  proProductLimit: number;
+  proCouponLimit: number;
+  proAiLimit: number;
+  vipMonthlyPrice: number;
+  vipAnnualPrice: number;
+  vipProductLimit: number;
+  vipCouponLimit: number;
+  vipAiLimit: number;
+  isLaunchDiscountBannerActive: boolean;
+  launchDiscountText: string;
+  updatedAt?: string;
+}
+
 

@@ -16,6 +16,7 @@ namespace WatsStore.Api.Infrastructure.Data
         public DbSet<StoreReview> StoreReviews => Set<StoreReview>();
         public DbSet<StoreCoupon> StoreCoupons => Set<StoreCoupon>();
         public DbSet<SuperAdmin> SuperAdmins => Set<SuperAdmin>();
+        public DbSet<PlatformSetting> PlatformSettings => Set<PlatformSetting>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

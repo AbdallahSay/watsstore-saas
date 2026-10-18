@@ -17,7 +17,8 @@ import {
   AdminPlatformStats,
   ToggleStoreStatusResponse,
   AdminForgotPasswordResponse,
-  StorePlanUpdateResponse
+  StorePlanUpdateResponse,
+  PlatformPricingSettings
 } from '../types';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://watsstore.runasp.net/api';
@@ -466,6 +467,30 @@ export const api = {
     return fetchJson<{ description: string; productName: string; status: string; aiGenerationsUsed?: number; aiGenerationsLimit?: number; remainingQuota?: number }>(`${API_BASE_URL}/merchant/ai/generate-description`, {
       method: 'POST',
       headers: { Authorization: `Bearer ${token}` },
+      body: JSON.stringify(data),
+    });
+  },
+
+  async getPublicPricing(): Promise<PlatformPricingSettings> {
+    return fetchJson<PlatformPricingSettings>(`${API_BASE_URL}/public/pricing`);
+  },
+
+  async getAdminPricing(token: string): Promise<PlatformPricingSettings> {
+    return fetchJson<PlatformPricingSettings>(`${API_BASE_URL}/admin/pricing`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'X-Admin-Key': token.startsWith('WatsStore_') ? token : '',
+      },
+    });
+  },
+
+  async updateAdminPricing(token: string, data: Partial<PlatformPricingSettings>): Promise<{ message: string; settings: PlatformPricingSettings }> {
+    return fetchJson<{ message: string; settings: PlatformPricingSettings }>(`${API_BASE_URL}/admin/pricing`, {
+      method: 'PUT',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'X-Admin-Key': token.startsWith('WatsStore_') ? token : '',
+      },
       body: JSON.stringify(data),
     });
   },

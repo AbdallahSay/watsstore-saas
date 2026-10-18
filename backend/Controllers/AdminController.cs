@@ -634,6 +634,117 @@ namespace WatsStore.Api.Controllers
             });
         }
 
+        [HttpGet("pricing")]
+        public async Task<IActionResult> GetPricing()
+        {
+            if (!IsAdminAuthorized())
+                return Unauthorized(new { message = "غير مصرح لك بالوصول إلى لوحة الإدارة العليا" });
+
+            var settings = await _db.PlatformSettings.FirstOrDefaultAsync(p => p.Id == 1);
+            if (settings == null)
+            {
+                settings = new PlatformSetting
+                {
+                    Id = 1,
+                    ProMonthlyPrice = 299m,
+                    ProAnnualPrice = 2499m,
+                    ProProductLimit = 100,
+                    ProCouponLimit = 15,
+                    ProAiLimit = 15,
+                    VipMonthlyPrice = 599m,
+                    VipAnnualPrice = 4999m,
+                    VipProductLimit = 999999,
+                    VipCouponLimit = 999999,
+                    VipAiLimit = 150,
+                    IsLaunchDiscountBannerActive = true,
+                    LaunchDiscountText = "🔥 عروض الإطلاق التجاري: احصل على خصم إضافي عند الاشتراك السنوي اليوم!",
+                    UpdatedAt = DateTime.UtcNow
+                };
+                _db.PlatformSettings.Add(settings);
+                await _db.SaveChangesAsync();
+            }
+
+            return Ok(new PlatformSettingsDto
+            {
+                ProMonthlyPrice = settings.ProMonthlyPrice,
+                ProAnnualPrice = settings.ProAnnualPrice,
+                ProProductLimit = settings.ProProductLimit,
+                ProCouponLimit = settings.ProCouponLimit,
+                ProAiLimit = settings.ProAiLimit,
+                VipMonthlyPrice = settings.VipMonthlyPrice,
+                VipAnnualPrice = settings.VipAnnualPrice,
+                VipProductLimit = settings.VipProductLimit,
+                VipCouponLimit = settings.VipCouponLimit,
+                VipAiLimit = settings.VipAiLimit,
+                IsLaunchDiscountBannerActive = settings.IsLaunchDiscountBannerActive,
+                LaunchDiscountText = settings.LaunchDiscountText,
+                UpdatedAt = settings.UpdatedAt
+            });
+        }
+
+        [HttpPut("pricing")]
+        public async Task<IActionResult> UpdatePricing([FromBody] UpdatePlatformSettingsRequest request)
+        {
+            if (!IsAdminAuthorized())
+                return Unauthorized(new { message = "غير مصرح لك بالوصول إلى لوحة الإدارة العليا" });
+
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var settings = await _db.PlatformSettings.FirstOrDefaultAsync(p => p.Id == 1);
+            if (settings == null)
+            {
+                settings = new PlatformSetting { Id = 1 };
+                _db.PlatformSettings.Add(settings);
+            }
+
+            // Update Pro
+            settings.ProMonthlyPrice = request.ProMonthlyPrice;
+            settings.ProAnnualPrice = request.ProAnnualPrice;
+            settings.ProProductLimit = request.ProProductLimit > 0 ? request.ProProductLimit : 100;
+            settings.ProCouponLimit = request.ProCouponLimit > 0 ? request.ProCouponLimit : 15;
+            settings.ProAiLimit = request.ProAiLimit >= 0 ? request.ProAiLimit : 15;
+
+            // Update VIP
+            settings.VipMonthlyPrice = request.VipMonthlyPrice;
+            settings.VipAnnualPrice = request.VipAnnualPrice;
+            settings.VipProductLimit = request.VipProductLimit > 0 ? request.VipProductLimit : 999999;
+            settings.VipCouponLimit = request.VipCouponLimit > 0 ? request.VipCouponLimit : 999999;
+            settings.VipAiLimit = request.VipAiLimit >= 0 ? request.VipAiLimit : 150;
+
+            // Update Marketing Banner
+            settings.IsLaunchDiscountBannerActive = request.IsLaunchDiscountBannerActive;
+            if (!string.IsNullOrWhiteSpace(request.LaunchDiscountText))
+            {
+                settings.LaunchDiscountText = request.LaunchDiscountText.Trim();
+            }
+
+            settings.UpdatedAt = DateTime.UtcNow;
+
+            await _db.SaveChangesAsync();
+
+            return Ok(new
+            {
+                message = "تم حفظ وتحديث باقات الاشتراك والأسعار بنجاح! تم تطبيق التعديلات فوراً على المنصة.",
+                settings = new PlatformSettingsDto
+                {
+                    ProMonthlyPrice = settings.ProMonthlyPrice,
+                    ProAnnualPrice = settings.ProAnnualPrice,
+                    ProProductLimit = settings.ProProductLimit,
+                    ProCouponLimit = settings.ProCouponLimit,
+                    ProAiLimit = settings.ProAiLimit,
+                    VipMonthlyPrice = settings.VipMonthlyPrice,
+                    VipAnnualPrice = settings.VipAnnualPrice,
+                    VipProductLimit = settings.VipProductLimit,
+                    VipCouponLimit = settings.VipCouponLimit,
+                    VipAiLimit = settings.VipAiLimit,
+                    IsLaunchDiscountBannerActive = settings.IsLaunchDiscountBannerActive,
+                    LaunchDiscountText = settings.LaunchDiscountText,
+                    UpdatedAt = settings.UpdatedAt
+                }
+            });
+        }
+
         private static (bool IsTrialExpired, int RemainingTrialDays, DateTime? TrialEndsAt) CalculateTrial(string planType, DateTime createdAt, DateTime? subscriptionEndsAt)
         {
             DateTime expiry = subscriptionEndsAt ?? createdAt.AddDays(14);

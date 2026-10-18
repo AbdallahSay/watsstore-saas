@@ -25,7 +25,8 @@ export const platformConfig = {
     },
     pro: {
       name: "باقة المحترفين (Pro)",
-      price: 149,
+      price: 299,
+      annualPrice: 2499,
       period: "ج.م / شهرياً",
       badge: "الأكثر طلباً ومبيعاً ⭐",
       maxProducts: 100,
@@ -44,7 +45,8 @@ export const platformConfig = {
     },
     vip: {
       name: "باقة النخبة (VIP)",
-      price: 299,
+      price: 599,
+      annualPrice: 4999,
       period: "ج.م / شهرياً",
       badge: "للتجار والبراندات الكبرى 👑",
       maxProducts: 999999,

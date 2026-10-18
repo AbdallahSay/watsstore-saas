@@ -35,10 +35,15 @@ import {
   Shield,
   Check,
   Crown,
-  Clock
+  Clock,
+  Save,
+  Megaphone,
+  Zap,
+  Tag,
+  Sliders
 } from 'lucide-react';
 import { api } from '@/lib/api';
-import { AdminPlatformStats, AdminStoreSummary } from '@/types';
+import { AdminPlatformStats, AdminStoreSummary, PlatformPricingSettings } from '@/types';
 
 export default function SuperAdminPage() {
   const [token, setToken] = useState<string | null>(null);
@@ -46,7 +51,26 @@ export default function SuperAdminPage() {
   const [isInitializing, setIsInitializing] = useState(true);
 
   // Active View Tab in Dashboard
-  const [activeTab, setActiveTab] = useState<'stores' | 'settings'>('stores');
+  const [activeTab, setActiveTab] = useState<'stores' | 'pricing' | 'settings'>('stores');
+
+  // Pricing & Plans Settings States
+  const [pricingSettings, setPricingSettings] = useState<PlatformPricingSettings>({
+    proMonthlyPrice: 299,
+    proAnnualPrice: 2499,
+    proProductLimit: 100,
+    proCouponLimit: 15,
+    proAiLimit: 15,
+    vipMonthlyPrice: 599,
+    vipAnnualPrice: 4999,
+    vipProductLimit: 9999,
+    vipCouponLimit: 9999,
+    vipAiLimit: 150,
+    isLaunchDiscountBannerActive: true,
+    launchDiscountText: '🔥 عرض الإطلاق التجاري: احصل على خصم إضافي عند الاشتراك السنوي اليوم!',
+  });
+  const [isSavingPricing, setIsSavingPricing] = useState(false);
+  const [pricingSuccessMsg, setPricingSuccessMsg] = useState<string | null>(null);
+  const [pricingErrorMsg, setPricingErrorMsg] = useState<string | null>(null);
 
   // Login Form States
   const [loginMethod, setLoginMethod] = useState<'key' | 'credentials'>('key');
@@ -102,12 +126,19 @@ export default function SuperAdminPage() {
   const loadDashboardData = useCallback(async (activeToken: string) => {
     setIsLoadingData(true);
     try {
-      const [statsRes, storesRes] = await Promise.all([
+      const [statsRes, storesRes, pricingRes] = await Promise.all([
         api.getAdminPlatformStats(activeToken),
-        api.getAdminStores(activeToken)
+        api.getAdminStores(activeToken),
+        api.getAdminPricing(activeToken).catch((err) => {
+          console.warn('Could not load admin pricing:', err);
+          return null;
+        })
       ]);
       setStats(statsRes);
       setStores(storesRes);
+      if (pricingRes) {
+        setPricingSettings(pricingRes);
+      }
     } catch (err: any) {
       console.error('Failed to load admin data:', err);
       if (err.message && err.message.includes('401')) {
@@ -233,6 +264,42 @@ export default function SuperAdminPage() {
       setChangePasswordError(err.message || 'فشل تحديث كلمة المرور. يرجى التأكد من كلمة المرور الحالية.');
     } finally {
       setIsChangingPassword(false);
+    }
+  };
+
+  // Handle Save Pricing Settings
+  const handleSavePricing = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!token) return;
+    setIsSavingPricing(true);
+    setPricingSuccessMsg(null);
+    setPricingErrorMsg(null);
+
+    try {
+      const res = await api.updateAdminPricing(token, pricingSettings);
+      setPricingSettings(res.settings);
+      setPricingSuccessMsg(res.message || 'تم تحديث أسعار المنصة والباقات بنجاح!');
+      Swal.fire({
+        icon: 'success',
+        title: 'تم حفظ وتحديث الأسعار! 💰',
+        text: 'تم تحديث أسعار الباقات وحدود الاستخدام والبانر التسويقي بنجاح.',
+        timer: 2000,
+        showConfirmButton: false,
+        background: '#0f172a',
+        color: '#f8fafc',
+      });
+    } catch (err: any) {
+      setPricingErrorMsg(err.message || 'فشل تحديث أسعار المنصة');
+      Swal.fire({
+        icon: 'error',
+        title: 'خطأ في التحديث',
+        text: err.message || 'حدث خطأ أثناء حفظ الأسعار',
+        confirmButtonColor: '#10B981',
+        background: '#0f172a',
+        color: '#f8fafc',
+      });
+    } finally {
+      setIsSavingPricing(false);
     }
   };
 
@@ -957,6 +1024,17 @@ export default function SuperAdminPage() {
             <span>المتاجر والإحصائيات</span>
           </button>
           <button
+            onClick={() => setActiveTab('pricing')}
+            className={`px-3.5 py-1.5 text-xs font-bold rounded-lg transition-all flex items-center gap-1.5 ${
+              activeTab === 'pricing'
+                ? 'bg-emerald-500 text-slate-950 font-black shadow-sm'
+                : 'text-slate-400 hover:text-white'
+            }`}
+          >
+            <DollarSign className="w-3.5 h-3.5" />
+            <span>إدارة الأسعار والباقات</span>
+          </button>
+          <button
             onClick={() => setActiveTab('settings')}
             className={`px-3.5 py-1.5 text-xs font-bold rounded-lg transition-all flex items-center gap-1.5 ${
               activeTab === 'settings'
@@ -999,7 +1077,7 @@ export default function SuperAdminPage() {
 
       {/* Mobile Tab Switcher */}
       <div className="md:hidden px-4 pt-4">
-        <div className="grid grid-cols-2 gap-1 bg-slate-900 border border-slate-800 p-1 rounded-xl">
+        <div className="grid grid-cols-3 gap-1 bg-slate-900 border border-slate-800 p-1 rounded-xl">
           <button
             onClick={() => setActiveTab('stores')}
             className={`py-2 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-1.5 ${
@@ -1012,6 +1090,17 @@ export default function SuperAdminPage() {
             <span>المتاجر</span>
           </button>
           <button
+            onClick={() => setActiveTab('pricing')}
+            className={`py-2 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-1.5 ${
+              activeTab === 'pricing'
+                ? 'bg-emerald-500 text-slate-950 font-black'
+                : 'text-slate-400 hover:text-white'
+            }`}
+          >
+            <DollarSign className="w-3.5 h-3.5" />
+            <span>الأسعار</span>
+          </button>
+          <button
             onClick={() => setActiveTab('settings')}
             className={`py-2 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-1.5 ${
               activeTab === 'settings'
@@ -1020,7 +1109,7 @@ export default function SuperAdminPage() {
             }`}
           >
             <Key className="w-3.5 h-3.5" />
-            <span>الحساب وكلمة المرور</span>
+            <span>الحساب</span>
           </button>
         </div>
       </div>
@@ -1139,6 +1228,353 @@ export default function SuperAdminPage() {
                       <>
                         <Shield className="w-4 h-4" />
                         <span>تحديث وحفظ كلمة المرور الجديدة</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        ) : activeTab === 'pricing' ? (
+          /* Pricing & Plans Control Panel Tab */
+          <div className="max-w-5xl mx-auto space-y-8">
+            <div className="bg-slate-900/70 border border-slate-800 rounded-3xl p-6 sm:p-8 space-y-8 shadow-xl">
+              {/* Header */}
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-6">
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-emerald-500 to-teal-400 text-slate-950 flex items-center justify-center shadow-lg shadow-emerald-500/20">
+                    <DollarSign className="w-6 h-6" />
+                  </div>
+                  <div>
+                    <h2 className="text-xl font-black text-white">إدارة باقات وأسعار المنصة والعروض</h2>
+                    <p className="text-xs text-slate-400">
+                      تعديل أسعار الاشتراكات الشهرية والسنوية، حدود المنتجات والكوبونات، كوتة الذكاء الاصطناعي، والبانر الترويجي.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <span className="text-[11px] px-3 py-1 bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 rounded-full font-bold">
+                    تطبيق فوري بدون إعادة تشغيل
+                  </span>
+                </div>
+              </div>
+
+              {pricingErrorMsg && (
+                <div className="p-3.5 bg-rose-500/10 border border-rose-500/20 rounded-xl text-rose-400 text-xs flex items-center gap-2">
+                  <AlertTriangle className="w-4 h-4 shrink-0 text-rose-400" />
+                  <span>{pricingErrorMsg}</span>
+                </div>
+              )}
+
+              {pricingSuccessMsg && (
+                <div className="p-3.5 bg-emerald-500/10 border border-emerald-500/20 rounded-xl text-emerald-400 text-xs flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-400" />
+                  <span>{pricingSuccessMsg}</span>
+                </div>
+              )}
+
+              <form onSubmit={handleSavePricing} className="space-y-8">
+                {/* 1. Marketing Launch Banner Settings */}
+                <div className="bg-slate-950/60 border border-slate-800/80 rounded-2xl p-5 sm:p-6 space-y-4">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-8 h-8 rounded-lg bg-amber-500/10 text-amber-400 flex items-center justify-center">
+                        <Megaphone className="w-4 h-4" />
+                      </div>
+                      <div>
+                        <h3 className="text-sm font-bold text-white">شريط الإعلانات والعروض الترويجية (أعلى الصفحة)</h3>
+                        <p className="text-[11px] text-slate-400">يظهر في أعلى صفحة الهبوط الرئيسية لجذب التجار وزيادة التحويل للاشتراكات السنوية</p>
+                      </div>
+                    </div>
+
+                    <label className="relative inline-flex items-center cursor-pointer select-none">
+                      <input
+                        type="checkbox"
+                        checked={pricingSettings.isLaunchDiscountBannerActive}
+                        onChange={(e) => setPricingSettings({
+                          ...pricingSettings,
+                          isLaunchDiscountBannerActive: e.target.checked
+                        })}
+                        className="sr-only peer"
+                      />
+                      <div className="w-11 h-6 bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500"></div>
+                      <span className="ms-3 text-xs font-bold text-slate-300">
+                        {pricingSettings.isLaunchDiscountBannerActive ? 'مفعل ومباشر' : 'معطل'}
+                      </span>
+                    </label>
+                  </div>
+
+                  <div className="pt-2">
+                    <label className="text-xs font-bold text-slate-300 block mb-1.5">نص العرض الترويجي للشريط</label>
+                    <input
+                      type="text"
+                      value={pricingSettings.launchDiscountText}
+                      onChange={(e) => setPricingSettings({
+                        ...pricingSettings,
+                        launchDiscountText: e.target.value
+                      })}
+                      placeholder="مثال: 🔥 عرض الإطلاق التجاري: احصل على خصم إضافي عند الاشتراك السنوي اليوم!"
+                      className="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 text-xs text-slate-100 focus:outline-none focus:border-emerald-500"
+                    />
+                  </div>
+                </div>
+
+                {/* 2. Plan Tier Matrix */}
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2">
+                    <Sliders className="w-4 h-4 text-emerald-400" />
+                    <h3 className="text-sm font-black text-white">هيكل الباقات والأسعار وحدود الاستخدام</h3>
+                  </div>
+
+                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+                    {/* Free Trial Card */}
+                    <div className="bg-slate-950/60 border border-slate-800 rounded-2xl p-5 space-y-4 flex flex-col justify-between opacity-80 hover:opacity-100 transition-opacity">
+                      <div className="space-y-3">
+                        <div className="flex items-center justify-between">
+                          <span className="px-2.5 py-1 rounded-lg bg-slate-800 text-slate-300 text-[11px] font-bold">
+                            باقة التجربة المجانية
+                          </span>
+                          <span className="text-xs font-black text-slate-400">14 يوماً فقط</span>
+                        </div>
+                        <div>
+                          <div className="text-2xl font-black text-white">0 <span className="text-xs text-slate-400">ج.م</span></div>
+                          <p className="text-[11px] text-slate-400 mt-1">تتيح للتاجر تجربة المتجر ورفع أول المنتجات واستقبال الطلبات</p>
+                        </div>
+
+                        <div className="border-t border-slate-800/80 pt-3 space-y-2 text-xs text-slate-300">
+                          <div className="flex justify-between py-1 border-b border-slate-800/50">
+                            <span className="text-slate-400">أقصى عدد منتجات:</span>
+                            <span className="font-bold text-white">10 منتجات</span>
+                          </div>
+                          <div className="flex justify-between py-1 border-b border-slate-800/50">
+                            <span className="text-slate-400">أقصى كوبونات نشطة:</span>
+                            <span className="font-bold text-white">1 كوبون</span>
+                          </div>
+                          <div className="flex justify-between py-1 border-b border-slate-800/50">
+                            <span className="text-slate-400">وصف المنتجات بالذكاء الاصطناعي:</span>
+                            <span className="font-bold text-rose-400">مغلق 🔒 (0)</span>
+                          </div>
+                          <div className="flex justify-between py-1">
+                            <span className="text-slate-400">تصدير إكسيل:</span>
+                            <span className="font-bold text-rose-400">مغلق 🔒</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="p-2.5 bg-slate-900 rounded-xl text-[10px] text-slate-400 text-center">
+                        قواعد الباقة المجانية ثابتة ومحمية برمجياً ضد التحايل
+                      </div>
+                    </div>
+
+                    {/* Pro Plan Card */}
+                    <div className="bg-slate-950/80 border-2 border-emerald-500/40 rounded-2xl p-5 space-y-4 shadow-lg shadow-emerald-950/30">
+                      <div className="flex items-center justify-between">
+                        <span className="px-2.5 py-1 rounded-lg bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-[11px] font-black">
+                          الأكثر طلباً للتجار ⭐ (Pro)
+                        </span>
+                        <Zap className="w-4 h-4 text-emerald-400" />
+                      </div>
+
+                      <div className="space-y-3">
+                        <div className="grid grid-cols-2 gap-2">
+                          <div>
+                            <label className="text-[11px] font-bold text-slate-400 block mb-1">السعر الشهري (ج.م)</label>
+                            <input
+                              type="number"
+                              min="0"
+                              value={pricingSettings.proMonthlyPrice}
+                              onChange={(e) => setPricingSettings({
+                                ...pricingSettings,
+                                proMonthlyPrice: Number(e.target.value)
+                              })}
+                              className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white font-mono font-bold focus:outline-none focus:border-emerald-500"
+                              required
+                            />
+                          </div>
+                          <div>
+                            <label className="text-[11px] font-bold text-slate-400 block mb-1">السعر السنوي (ج.م)</label>
+                            <input
+                              type="number"
+                              min="0"
+                              value={pricingSettings.proAnnualPrice}
+                              onChange={(e) => setPricingSettings({
+                                ...pricingSettings,
+                                proAnnualPrice: Number(e.target.value)
+                              })}
+                              className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white font-mono font-bold focus:outline-none focus:border-emerald-500"
+                              required
+                            />
+                          </div>
+                        </div>
+
+                        <div className="space-y-2.5 pt-2 border-t border-slate-800">
+                          <div>
+                            <label className="text-[11px] font-bold text-slate-400 block mb-1">الحد الأقصى للمنتجات</label>
+                            <input
+                              type="number"
+                              min="1"
+                              value={pricingSettings.proProductLimit}
+                              onChange={(e) => setPricingSettings({
+                                ...pricingSettings,
+                                proProductLimit: Number(e.target.value)
+                              })}
+                              className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-1.5 text-xs text-white font-mono focus:outline-none focus:border-emerald-500"
+                              required
+                            />
+                          </div>
+                          <div>
+                            <label className="text-[11px] font-bold text-slate-400 block mb-1">الحد الأقصى للكوبونات النشطة</label>
+                            <input
+                              type="number"
+                              min="1"
+                              value={pricingSettings.proCouponLimit}
+                              onChange={(e) => setPricingSettings({
+                                ...pricingSettings,
+                                proCouponLimit: Number(e.target.value)
+                              })}
+                              className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-1.5 text-xs text-white font-mono focus:outline-none focus:border-emerald-500"
+                              required
+                            />
+                          </div>
+                          <div>
+                            <label className="text-[11px] font-bold text-slate-400 block mb-1">توليد الذكاء الاصطناعي (شهرياً)</label>
+                            <input
+                              type="number"
+                              min="0"
+                              value={pricingSettings.proAiLimit}
+                              onChange={(e) => setPricingSettings({
+                                ...pricingSettings,
+                                proAiLimit: Number(e.target.value)
+                              })}
+                              className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-1.5 text-xs text-white font-mono focus:outline-none focus:border-emerald-500"
+                              required
+                            />
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="pt-2 text-[11px] text-emerald-400 flex items-center gap-1 font-bold">
+                        <Check className="w-3.5 h-3.5" />
+                        <span>تصدير الطلبات Excel مفعل تلقائياً</span>
+                      </div>
+                    </div>
+
+                    {/* VIP Plan Card */}
+                    <div className="bg-slate-950/80 border-2 border-amber-500/40 rounded-2xl p-5 space-y-4 shadow-lg shadow-amber-950/20">
+                      <div className="flex items-center justify-between">
+                        <span className="px-2.5 py-1 rounded-lg bg-amber-500/20 text-amber-400 border border-amber-500/30 text-[11px] font-black">
+                          كبار التجار والبراندات 👑 (VIP)
+                        </span>
+                        <Crown className="w-4 h-4 text-amber-400" />
+                      </div>
+
+                      <div className="space-y-3">
+                        <div className="grid grid-cols-2 gap-2">
+                          <div>
+                            <label className="text-[11px] font-bold text-slate-400 block mb-1">السعر الشهري (ج.م)</label>
+                            <input
+                              type="number"
+                              min="0"
+                              value={pricingSettings.vipMonthlyPrice}
+                              onChange={(e) => setPricingSettings({
+                                ...pricingSettings,
+                                vipMonthlyPrice: Number(e.target.value)
+                              })}
+                              className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white font-mono font-bold focus:outline-none focus:border-emerald-500"
+                              required
+                            />
+                          </div>
+                          <div>
+                            <label className="text-[11px] font-bold text-slate-400 block mb-1">السعر السنوي (ج.م)</label>
+                            <input
+                              type="number"
+                              min="0"
+                              value={pricingSettings.vipAnnualPrice}
+                              onChange={(e) => setPricingSettings({
+                                ...pricingSettings,
+                                vipAnnualPrice: Number(e.target.value)
+                              })}
+                              className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white font-mono font-bold focus:outline-none focus:border-emerald-500"
+                              required
+                            />
+                          </div>
+                        </div>
+
+                        <div className="space-y-2.5 pt-2 border-t border-slate-800">
+                          <div>
+                            <label className="text-[11px] font-bold text-slate-400 block mb-1">الحد الأقصى للمنتجات (9999 = غير محدود)</label>
+                            <input
+                              type="number"
+                              min="1"
+                              value={pricingSettings.vipProductLimit}
+                              onChange={(e) => setPricingSettings({
+                                ...pricingSettings,
+                                vipProductLimit: Number(e.target.value)
+                              })}
+                              className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-1.5 text-xs text-white font-mono focus:outline-none focus:border-emerald-500"
+                              required
+                            />
+                          </div>
+                          <div>
+                            <label className="text-[11px] font-bold text-slate-400 block mb-1">الحد الأقصى للكوبونات (9999 = غير محدود)</label>
+                            <input
+                              type="number"
+                              min="1"
+                              value={pricingSettings.vipCouponLimit}
+                              onChange={(e) => setPricingSettings({
+                                ...pricingSettings,
+                                vipCouponLimit: Number(e.target.value)
+                              })}
+                              className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-1.5 text-xs text-white font-mono focus:outline-none focus:border-emerald-500"
+                              required
+                            />
+                          </div>
+                          <div>
+                            <label className="text-[11px] font-bold text-slate-400 block mb-1">توليد الذكاء الاصطناعي (شهرياً)</label>
+                            <input
+                              type="number"
+                              min="0"
+                              value={pricingSettings.vipAiLimit}
+                              onChange={(e) => setPricingSettings({
+                                ...pricingSettings,
+                                vipAiLimit: Number(e.target.value)
+                              })}
+                              className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-1.5 text-xs text-white font-mono focus:outline-none focus:border-emerald-500"
+                              required
+                            />
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="pt-2 text-[11px] text-amber-400 flex items-center gap-1 font-bold">
+                        <Check className="w-3.5 h-3.5" />
+                        <span>أولوية دعم فني وتصدير Excel غير محدود</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Save Button */}
+                <div className="pt-4 border-t border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4">
+                  <p className="text-xs text-slate-400">
+                    ملاحظة: الضغط على الحفظ يقوم بتحديث قواعد الخادم وقاعدة البيانات مباشرة وتنعكس الأسعار فوراً في صفحة الهبوط وتطبيق التجار.
+                  </p>
+
+                  <button
+                    type="submit"
+                    disabled={isSavingPricing}
+                    className="w-full sm:w-auto px-8 py-3.5 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-black rounded-xl text-sm transition-all shadow-lg shadow-emerald-500/20 disabled:opacity-50 flex items-center justify-center gap-2"
+                  >
+                    {isSavingPricing ? (
+                      <>
+                        <div className="w-4 h-4 border-2 border-slate-950 border-t-transparent rounded-full animate-spin" />
+                        <span>جاري حفظ وتطبيق الأسعار...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Save className="w-4 h-4" />
+                        <span>حفظ وتطبيق تغييرات الأسعار فوراً</span>
                       </>
                     )}
                   </button>

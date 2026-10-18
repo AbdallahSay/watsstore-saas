@@ -820,7 +820,7 @@ export default function DashboardOverviewPage() {
                     : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
-                باقة Pro (149 ج.م/شهر) ⭐
+                باقة Pro (299 ج.م/شهر) ⭐
               </button>
               <button
                 type="button"
@@ -831,7 +831,7 @@ export default function DashboardOverviewPage() {
                     : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
-                باقة VIP (299 ج.م/شهر) 👑
+                باقة VIP (599 ج.م/شهر) 👑
               </button>
             </div>
 
@@ -840,7 +840,7 @@ export default function DashboardOverviewPage() {
               <div className="p-5 rounded-2xl bg-emerald-50/60 border border-emerald-200 space-y-3">
                 <div className="flex items-baseline justify-between">
                   <h4 className="font-extrabold text-emerald-950 text-base">باقة المحترفين (Pro)</h4>
-                  <span className="text-xl font-black text-emerald-700">149 ج.م <span className="text-xs font-semibold">/ شهرياً</span></span>
+                  <span className="text-xl font-black text-emerald-700">299 ج.م <span className="text-xs font-semibold">/ شهرياً (أو 2,499 سنوياً)</span></span>
                 </div>
                 <ul className="text-xs text-emerald-900 space-y-2 pt-2">
                   {platformConfig.pricing.pro.features.map((f, i) => (
@@ -855,7 +855,7 @@ export default function DashboardOverviewPage() {
               <div className="p-5 rounded-2xl bg-amber-50/60 border border-amber-200 space-y-3">
                 <div className="flex items-baseline justify-between">
                   <h4 className="font-extrabold text-amber-950 text-base">باقة النخبة (VIP)</h4>
-                  <span className="text-xl font-black text-amber-700">299 ج.م <span className="text-xs font-semibold">/ شهرياً</span></span>
+                  <span className="text-xl font-black text-amber-700">599 ج.م <span className="text-xs font-semibold">/ شهرياً (أو 4,999 سنوياً)</span></span>
                 </div>
                 <ul className="text-xs text-amber-900 space-y-2 pt-2">
                   {platformConfig.pricing.vip.features.map((f, i) => (
