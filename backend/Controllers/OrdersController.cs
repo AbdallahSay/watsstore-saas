@@ -35,6 +35,14 @@ namespace WatsStore.Api.Controllers
             if (request.Items == null || !request.Items.Any())
                 return BadRequest(new { message = "سلة المشتريات فارغة. يرجى اختيار منتج واحد على الأقل." });
 
+            if (request.Items.Any(i => i.Quantity <= 0))
+                return BadRequest(new { message = "الكمية يجب أن تكون 1 على الأقل لكل منتج." });
+
+            if (!SlugGenerator.IsValidEgyptianMobile(request.CustomerPhone))
+            {
+                return BadRequest(new { message = "رقم هاتف العميل غير صالح. يرجى إدخال رقم هاتف محمول مصري صحيح (مثال: 01012345678)." });
+            }
+
             var normalizedSlug = storeSlug.Trim().ToLowerInvariant();
 
             var store = await _db.Stores
@@ -93,31 +101,37 @@ namespace WatsStore.Api.Controllers
                 appliedCoupon = await _db.StoreCoupons
                     .FirstOrDefaultAsync(c => c.StoreId == store.Id && c.Code == couponCode && c.IsActive);
 
-                if (appliedCoupon != null)
+                if (appliedCoupon == null)
                 {
-                    bool isExpired = appliedCoupon.ExpiryDate.HasValue && appliedCoupon.ExpiryDate.Value < DateTime.UtcNow;
-                    bool limitExceeded = appliedCoupon.UsageLimit.HasValue && appliedCoupon.TimesUsed >= appliedCoupon.UsageLimit.Value;
-
-                    if (!isExpired && !limitExceeded)
-                    {
-                        if (string.Equals(appliedCoupon.DiscountType, "Percentage", StringComparison.OrdinalIgnoreCase))
-                        {
-                            discountAmount = Math.Round(subtotal * (appliedCoupon.DiscountValue / 100m), 2);
-                        }
-                        else
-                        {
-                            discountAmount = appliedCoupon.DiscountValue;
-                        }
-
-                        discountAmount = Math.Clamp(discountAmount, 0, subtotal);
-                        appliedCoupon.TimesUsed++; // Increment usage count
-                    }
+                    return BadRequest(new { message = "كود الخصم المدخل غير موجود أو تم إيقافه." });
                 }
+
+                if (appliedCoupon.ExpiryDate.HasValue && appliedCoupon.ExpiryDate.Value < DateTime.UtcNow)
+                {
+                    return BadRequest(new { message = "كود الخصم المدخل منتهي الصلاحية." });
+                }
+
+                if (appliedCoupon.UsageLimit.HasValue && appliedCoupon.TimesUsed >= appliedCoupon.UsageLimit.Value)
+                {
+                    return BadRequest(new { message = "وصل كود الخصم للحد الأقصى لعدد مرات الاستخدام." });
+                }
+
+                if (string.Equals(appliedCoupon.DiscountType, "Percentage", StringComparison.OrdinalIgnoreCase))
+                {
+                    discountAmount = Math.Round(subtotal * (appliedCoupon.DiscountValue / 100m), 2);
+                }
+                else
+                {
+                    discountAmount = appliedCoupon.DiscountValue;
+                }
+
+                discountAmount = Math.Clamp(discountAmount, 0, subtotal);
+                appliedCoupon.TimesUsed++; // Increment usage count
             }
 
             var deliveryFee = store.DeliveryFee;
             var discountedSubtotal = subtotal - discountAmount;
-            var totalAmount = discountedSubtotal + deliveryFee;
+            var totalAmount = Math.Max(0m, discountedSubtotal + deliveryFee);
 
             var cleanCustomerName = Sanitizer.Sanitize(request.CustomerName, 100);
             var cleanCustomerAddress = Sanitizer.Sanitize(request.CustomerAddress, 250);

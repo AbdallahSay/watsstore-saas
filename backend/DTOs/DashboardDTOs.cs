@@ -93,7 +93,7 @@ namespace WatsStore.Api.DTOs
         public int? CategoryId { get; set; }
         public string? Description { get; set; }
 
-        [Range(0, 10000000, ErrorMessage = "السعر يجب أن يكون أكبر من أو يساوي صفر")]
+        [Range(0.01, 10000000, ErrorMessage = "سعر المنتج يجب أن يكون أكبر من صفر")]
         public decimal Price { get; set; }
 
         public decimal? CompareAtPrice { get; set; }

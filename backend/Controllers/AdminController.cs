@@ -16,7 +16,7 @@ namespace WatsStore.Api.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    [EnableRateLimiting("sensitive-policy")]
+    [EnableRateLimiting("admin-policy")]
     public class AdminController : ControllerBase
     {
         private readonly AppDbContext _db;

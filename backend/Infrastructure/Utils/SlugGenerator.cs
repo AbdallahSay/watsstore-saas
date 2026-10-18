@@ -76,5 +76,15 @@ namespace WatsStore.Api.Infrastructure.Utils
             // Fallback: return digits or original
             return digits;
         }
+
+        public static bool IsValidEgyptianMobile(string? phone)
+        {
+            if (string.IsNullOrWhiteSpace(phone))
+                return false;
+
+            string digits = Regex.Replace(phone, @"[^\d]", "");
+
+            return Regex.IsMatch(digits, @"^(?:01[0125]\d{8}|201[0125]\d{8}|00201[0125]\d{8})$");
+        }
     }
 }

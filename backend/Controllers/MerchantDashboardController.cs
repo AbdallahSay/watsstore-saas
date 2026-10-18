@@ -327,6 +327,11 @@ namespace WatsStore.Api.Controllers
                 }
             }
 
+            if (request.Price <= 0)
+            {
+                return BadRequest(new { message = "سعر المنتج يجب أن يكون أكبر من صفر" });
+            }
+
             if (request.CategoryId.HasValue)
             {
                 var categoryExists = await _db.Categories
@@ -404,6 +409,11 @@ namespace WatsStore.Api.Controllers
 
             if (product == null)
                 return NotFound(new { message = "المنتج غير موجود" });
+
+            if (request.Price <= 0)
+            {
+                return BadRequest(new { message = "سعر المنتج يجب أن يكون أكبر من صفر" });
+            }
 
             if (request.CategoryId.HasValue)
             {
@@ -647,6 +657,22 @@ namespace WatsStore.Api.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
+            var code = request.Code.Trim().ToUpperInvariant();
+
+            var discountType = string.Equals(request.DiscountType, "FixedAmount", StringComparison.OrdinalIgnoreCase) 
+                ? "FixedAmount" 
+                : "Percentage";
+
+            if (request.DiscountValue <= 0)
+            {
+                return BadRequest(new { message = "قيمة الخصم يجب أن تكون أكبر من صفر" });
+            }
+
+            if (discountType == "Percentage" && (request.DiscountValue > 100 || request.DiscountValue < 1))
+            {
+                return BadRequest(new { message = "نسبة الخصم المئوية يجب أن تكون بين 1% و 100%" });
+            }
+
             var storeId = GetAuthenticatedStoreId();
             var store = await _db.Stores.FirstOrDefaultAsync(s => s.Id == storeId);
             if (store == null)
@@ -680,8 +706,6 @@ namespace WatsStore.Api.Controllers
                 }
             }
 
-            var code = request.Code.Trim().ToUpperInvariant();
-
             // Validate code uniqueness within merchant's store
             var exists = await _db.StoreCoupons
                 .AnyAsync(c => c.StoreId == storeId && c.Code == code);
@@ -689,15 +713,6 @@ namespace WatsStore.Api.Controllers
             if (exists)
             {
                 return BadRequest(new { message = $"كود الخصم '{code}' موجود بالفعل في متجرك. يرجى اختيار كود آخر." });
-            }
-
-            var discountType = string.Equals(request.DiscountType, "FixedAmount", StringComparison.OrdinalIgnoreCase) 
-                ? "FixedAmount" 
-                : "Percentage";
-
-            if (discountType == "Percentage" && request.DiscountValue > 100)
-            {
-                return BadRequest(new { message = "نسبة الخصم المئوية لا يمكن أن تتجاوز 100%" });
             }
 
             var coupon = new StoreCoupon

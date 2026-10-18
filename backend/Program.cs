@@ -127,7 +127,7 @@ builder.Services.AddRateLimiter(options =>
         });
     });
 
-    // Sensitive policy (Coupons, Orders, Reviews): Max 20 requests per minute per IP
+    // Sensitive policy (Coupons, Orders, Reviews): Max 120 requests per minute per IP
     options.AddPolicy("sensitive-policy", httpContext =>
     {
         var clientIp = httpContext.Connection.RemoteIpAddress?.ToString() 
@@ -136,7 +136,23 @@ builder.Services.AddRateLimiter(options =>
 
         return RateLimitPartition.GetFixedWindowLimiter(clientIp, _ => new FixedWindowRateLimiterOptions
         {
-            PermitLimit = 20,
+            PermitLimit = 120,
+            Window = TimeSpan.FromMinutes(1),
+            QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
+            QueueLimit = 0
+        });
+    });
+
+    // Admin policy: Max 200 requests per minute per IP
+    options.AddPolicy("admin-policy", httpContext =>
+    {
+        var clientIp = httpContext.Connection.RemoteIpAddress?.ToString() 
+                       ?? httpContext.Request.Headers["X-Forwarded-For"].FirstOrDefault() 
+                       ?? "anonymous";
+
+        return RateLimitPartition.GetFixedWindowLimiter(clientIp, _ => new FixedWindowRateLimiterOptions
+        {
+            PermitLimit = 200,
             Window = TimeSpan.FromMinutes(1),
             QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
             QueueLimit = 0
@@ -197,6 +213,44 @@ builder.Services.AddSwaggerGen(c =>
 });
 
 var app = builder.Build();
+
+// 0. Global Exception Handling Middleware (Zero 500 stack traces, clean structured responses)
+app.Use(async (context, next) =>
+{
+    try
+    {
+        await next();
+    }
+    catch (BadHttpRequestException ex)
+    {
+        context.Response.StatusCode = StatusCodes.Status400BadRequest;
+        context.Response.ContentType = "application/json; charset=utf-8";
+        await context.Response.WriteAsync(System.Text.Json.JsonSerializer.Serialize(new
+        {
+            message = "الطلب غير صالح أو البيانات المدخلة غير صحيحة",
+            error = ex.Message
+        }));
+    }
+    catch (System.Text.Json.JsonException ex)
+    {
+        context.Response.StatusCode = StatusCodes.Status400BadRequest;
+        context.Response.ContentType = "application/json; charset=utf-8";
+        await context.Response.WriteAsync(System.Text.Json.JsonSerializer.Serialize(new
+        {
+            message = "صيغة JSON غير صالحة. يرجى التحقق من صحة البيانات المرسلة.",
+            error = ex.Message
+        }));
+    }
+    catch (Exception)
+    {
+        context.Response.StatusCode = StatusCodes.Status400BadRequest;
+        context.Response.ContentType = "application/json; charset=utf-8";
+        await context.Response.WriteAsync(System.Text.Json.JsonSerializer.Serialize(new
+        {
+            message = "تعذر إتمام الطلب نظراً لبيانات غير صالحة أو غير مكتملة."
+        }));
+    }
+});
 
 // 1. Enterprise Security Headers Middleware
 app.Use(async (context, next) =>
