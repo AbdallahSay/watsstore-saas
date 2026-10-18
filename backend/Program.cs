@@ -77,6 +77,9 @@ builder.Services.AddCors(options =>
         policy.SetIsOriginAllowed(origin =>
                   string.IsNullOrEmpty(origin) ||
                   origin.EndsWith(".vercel.app") ||
+                  origin.EndsWith("watsstore.com") ||
+                  origin.EndsWith("masartech.com") ||
+                  origin.EndsWith("watsstore.app") ||
                   origin.StartsWith("http://localhost") ||
                   origin.StartsWith("https://localhost"))
               .AllowAnyMethod()

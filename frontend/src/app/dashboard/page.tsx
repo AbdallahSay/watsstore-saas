@@ -31,7 +31,8 @@ import {
   ChevronDown,
   ChevronUp,
   Circle,
-  ArrowLeft
+  ArrowLeft,
+  Globe
 } from 'lucide-react';
 import { platformConfig } from '@/config/platformConfig';
 
@@ -39,6 +40,7 @@ export default function DashboardOverviewPage() {
   const [summary, setSummary] = useState<DashboardSummary | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [copiedLink, setCopiedLink] = useState(false);
+  const [copiedSubdomain, setCopiedSubdomain] = useState(false);
   const [copiedQr, setCopiedQr] = useState(false);
   const [copiedWallet, setCopiedWallet] = useState(false);
   const [isUpgradeModalOpen, setIsUpgradeModalOpen] = useState(false);
@@ -128,7 +130,7 @@ export default function DashboardOverviewPage() {
     }
   };
 
-  const copyToClipboard = (text: string, type: 'link' | 'qr' | 'wallet') => {
+  const copyToClipboard = (text: string, type: 'link' | 'qr' | 'wallet' | 'subdomain') => {
     navigator.clipboard.writeText(text);
     const toast = Swal.mixin({
       toast: true,
@@ -141,6 +143,10 @@ export default function DashboardOverviewPage() {
       setCopiedQr(true);
       setTimeout(() => setCopiedQr(false), 2000);
       toast.fire({ icon: 'success', title: 'تم نسخ رابط الـ QR الدائم' });
+    } else if (type === 'subdomain') {
+      setCopiedSubdomain(true);
+      setTimeout(() => setCopiedSubdomain(false), 2000);
+      toast.fire({ icon: 'success', title: 'تم نسخ رابط النطاق الفرعي المباشر' });
     } else if (type === 'wallet') {
       setCopiedWallet(true);
       setTimeout(() => setCopiedWallet(false), 2000);
@@ -196,6 +202,10 @@ export default function DashboardOverviewPage() {
 
   const appUrl = typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000';
   const storeUrl = `${appUrl}/s/${summary.storeInfo.slug}`;
+  const host = typeof window !== 'undefined' ? window.location.host : 'localhost:3000';
+  const subdomainUrl = host.includes('localhost')
+    ? `http://${summary.storeInfo.slug}.localhost:3000`
+    : `https://${summary.storeInfo.slug}.watsstore.com`;
   const qrUrl = `${appUrl}/m/${summary.storeInfo.publicCode}`;
   const qrImageSrc = `https://api.qrserver.com/v1/create-qr-code/?size=350x350&data=${encodeURIComponent(qrUrl)}&format=png`;
 
@@ -565,6 +575,43 @@ export default function DashboardOverviewPage() {
 
           {/* Links Inputs */}
           <div className="md:col-span-2 space-y-4">
+            {/* Wildcard Subdomain Link */}
+            <div className="p-4 rounded-2xl bg-emerald-50/70 border border-emerald-200 space-y-1.5">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-bold text-emerald-950 flex items-center gap-1.5">
+                  <Globe className="w-3.5 h-3.5 text-emerald-600" />
+                  <span>رابط النطاق الفرعي لمتجرك (Subdomain URL):</span>
+                </span>
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-200/80 text-emerald-900">
+                  مباشر بدون /s/ 🌐
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                <input
+                  type="text"
+                  readOnly
+                  value={subdomainUrl}
+                  className="w-full text-xs font-mono font-bold text-emerald-900 bg-white px-3.5 py-2.5 rounded-xl border border-emerald-300"
+                />
+                <button
+                  onClick={() => copyToClipboard(subdomainUrl, 'subdomain')}
+                  className="px-4 py-2.5 bg-emerald-600 text-white rounded-xl text-xs font-bold hover:bg-emerald-700 shrink-0 flex items-center gap-1.5 transition-all shadow-sm"
+                >
+                  {copiedSubdomain ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                  <span>{copiedSubdomain ? 'تم' : 'نسخ'}</span>
+                </button>
+                <a
+                  href={subdomainUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="p-2.5 bg-white text-emerald-700 hover:bg-emerald-100 rounded-xl border border-emerald-300 shrink-0 transition-colors"
+                  title="فتح الرابط المباشر"
+                >
+                  <ExternalLink className="w-4 h-4" />
+                </a>
+              </div>
+            </div>
+
             <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-1.5">
               <span className="text-xs font-bold text-slate-700 block">رابط المتجر الحي الكامل (Online Web Store):</span>
               <div className="flex items-center gap-2">
