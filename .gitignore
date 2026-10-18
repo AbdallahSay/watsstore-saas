@@ -1,0 +1,35 @@
+# Dependencies
+node_modules/
+packages/
+
+# Next.js Build
+.next/
+out/
+build/
+dist/
+
+# .NET Build & Publish
+bin/
+obj/
+publish/
+*/bin/
+*/obj/
+*/publish/
+
+# Sensitive & Production Configuration
+appsettings.Production.json
+backend/appsettings.Production.json
+deploy_monsterasp.py
+.env
+.env.local
+.env.*.local
+*.user
+*.suo
+
+# Vercel & IDE
+.vercel/
+.idea/
+.vscode/
+*.swp
+Thumbs.db
+[Dd]esktop.ini

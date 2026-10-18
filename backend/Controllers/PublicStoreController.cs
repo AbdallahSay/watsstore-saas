@@ -1,0 +1,189 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using WatsStore.Api.Domain.Entities;
+using WatsStore.Api.DTOs;
+using WatsStore.Api.Infrastructure.Data;
+
+namespace WatsStore.Api.Controllers
+{
+    [ApiController]
+    [Route("api/public/stores")]
+    public class PublicStoreController : ControllerBase
+    {
+        private readonly AppDbContext _db;
+
+        public PublicStoreController(AppDbContext db)
+        {
+            _db = db;
+        }
+
+        [HttpGet("{slug}")]
+        public async Task<IActionResult> GetStoreBySlug(string slug)
+        {
+            if (string.IsNullOrWhiteSpace(slug))
+                return BadRequest(new { message = "معرف المتجر مطلوب" });
+
+            var normalizedSlug = slug.Trim().ToLowerInvariant();
+
+            var store = await _db.Stores
+                .AsNoTracking()
+                .Include(s => s.Categories.Where(c => c.IsActive).OrderBy(c => c.SortOrder))
+                .Include(s => s.Products.Where(p => p.IsAvailable).OrderBy(p => p.SortOrder).ThenByDescending(p => p.CreatedAt))
+                .FirstOrDefaultAsync(s => s.Slug == normalizedSlug && s.IsActive);
+
+            if (store == null)
+                return NotFound(new { message = "المتجر غير موجود أو تم إيقافه" });
+
+            // Dual Meta Pixel Rule: Only expose Merchant Pixel if PlanType is NOT Free
+            string? merchantMetaPixelId = null;
+            if (!string.Equals(store.PlanType, "Free", StringComparison.OrdinalIgnoreCase))
+            {
+                merchantMetaPixelId = store.MetaPixelId;
+            }
+
+            // Localized fallback SEO metadata if not explicitly set
+            var seoTitle = !string.IsNullOrWhiteSpace(store.SeoTitle)
+                ? store.SeoTitle
+                : $"{store.StoreName} | متجر ومنيو إلكتروني في {store.City}";
+
+            var seoDescription = !string.IsNullOrWhiteSpace(store.SeoDescription)
+                ? store.SeoDescription
+                : $"تصفح تشكيلة ومنتجات {store.StoreName} في {store.City}. اختر منتجاتك المفضلة واطلب مباشرة عبر الواتساب بضغطة زر مع أسرع خدمة توصيل.";
+
+            var response = new PublicStoreResponse
+            {
+                Id = store.Id,
+                StoreName = store.StoreName,
+                Slug = store.Slug,
+                PublicCode = store.PublicCode,
+                WhatsAppNumber = store.WhatsAppNumber,
+                BusinessCategory = store.BusinessCategory,
+                City = store.City,
+                AddressDetails = store.AddressDetails,
+                LogoUrl = store.LogoUrl,
+                CoverUrl = store.CoverUrl,
+                ThemeColor = store.ThemeColor,
+                Currency = store.Currency,
+                DeliveryFee = store.DeliveryFee,
+                SeoTitle = seoTitle,
+                SeoDescription = seoDescription,
+                MetaPixelId = merchantMetaPixelId,
+                PlanType = store.PlanType,
+                Categories = store.Categories.Select(c => new PublicCategoryDto
+                {
+                    Id = c.Id,
+                    Name = c.Name,
+                    SortOrder = c.SortOrder
+                }).ToList(),
+                Products = store.Products.Select(p => new PublicProductDto
+                {
+                    Id = p.Id,
+                    CategoryId = p.CategoryId,
+                    Name = p.Name,
+                    Slug = p.Slug,
+                    Description = p.Description,
+                    Price = p.Price,
+                    CompareAtPrice = p.CompareAtPrice,
+                    ImageUrl = p.ImageUrl,
+                    VariantsJson = p.VariantsJson,
+                    IsAvailable = p.IsAvailable,
+                    SortOrder = p.SortOrder
+                }).ToList()
+            };
+
+            return Ok(response);
+        }
+
+        [HttpGet("qr/{publicCode}")]
+        public async Task<IActionResult> ResolveQrCode(string publicCode)
+        {
+            if (string.IsNullOrWhiteSpace(publicCode) || !Regex.IsMatch(publicCode, @"^[a-zA-Z0-9]{6,20}$"))
+            {
+                return BadRequest(new { message = "رمز QR غير صالح" });
+            }
+
+            var store = await _db.Stores
+                .AsNoTracking()
+                .Where(s => s.PublicCode == publicCode && s.IsActive)
+                .Select(s => new { s.Slug, s.StoreName, s.IsActive })
+                .FirstOrDefaultAsync();
+
+            if (store == null)
+            {
+                return NotFound(new { message = "المتجر غير موجود أو غير نشط" });
+            }
+
+            return Ok(new
+            {
+                canonicalSlug = store.Slug,
+                storeName = store.StoreName
+            });
+        }
+
+        [HttpGet("directory")]
+        public async Task<IActionResult> GetDirectory([FromQuery] string? city, [FromQuery] string? category)
+        {
+            var query = _db.Stores
+                .AsNoTracking()
+                .Where(s => s.IsActive);
+
+            if (!string.IsNullOrWhiteSpace(city))
+            {
+                var trimmedCity = city.Trim();
+                query = query.Where(s => s.City == trimmedCity);
+            }
+
+            if (!string.IsNullOrWhiteSpace(category))
+            {
+                var trimmedCat = category.Trim();
+                query = query.Where(s => s.BusinessCategory == trimmedCat);
+            }
+
+            var stores = await query
+                .OrderByDescending(s => s.PlanType == "VIP")
+                .ThenByDescending(s => s.PlanType == "Pro")
+                .ThenByDescending(s => s.CreatedAt)
+                .Select(s => new StoreDirectoryCardDto
+                {
+                    StoreName = s.StoreName,
+                    Slug = s.Slug,
+                    PublicCode = s.PublicCode,
+                    BusinessCategory = s.BusinessCategory,
+                    City = s.City,
+                    LogoUrl = s.LogoUrl,
+                    ThemeColor = s.ThemeColor,
+                    Currency = s.Currency,
+                    DeliveryFee = s.DeliveryFee,
+                    ProductCount = s.Products.Count(p => p.IsAvailable)
+                })
+                .Take(60)
+                .ToListAsync();
+
+            return Ok(stores);
+        }
+
+        [HttpGet("sitemap-data")]
+        public async Task<IActionResult> GetSitemapData()
+        {
+            var activeStores = await _db.Stores
+                .AsNoTracking()
+                .Where(s => s.IsActive)
+                .Select(s => new { s.Slug, s.City, s.BusinessCategory })
+                .ToListAsync();
+
+            var response = new SitemapDataResponse
+            {
+                Slugs = activeStores.Select(s => s.Slug).Distinct().ToList(),
+                Cities = activeStores.Select(s => s.City).Where(c => !string.IsNullOrWhiteSpace(c)).Distinct().ToList(),
+                Categories = activeStores.Select(s => s.BusinessCategory).Where(c => !string.IsNullOrWhiteSpace(c)).Distinct().ToList()
+            };
+
+            return Ok(response);
+        }
+    }
+}
