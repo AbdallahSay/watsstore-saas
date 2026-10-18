@@ -124,7 +124,7 @@ export default function HomePage() {
                 <div className="w-12 h-12 rounded-2xl bg-emerald-600 text-white flex items-center justify-center shadow-md shadow-emerald-500/20">
                   <Search className="w-6 h-6" />
                 </div>
-                <h3 className="text-xl font-bold text-slate-900">سيو محلي ومحافظات مصر</h3>
+                <h3 className="text-xl font-bold text-slate-900">SEO محلي ومحافظات مصر</h3>
                 <p className="text-sm text-slate-600 leading-relaxed">
                   تهيئة تلقائية لنتائج بحث جوجل (SSR + JSON-LD Schema + خريطة موقع Sitemap) وظهور قوي في دليل المتاجر حسب محافظتك (القاهرة، الفيوم، الجيزة، الإسكندرية...).
                 </p>
