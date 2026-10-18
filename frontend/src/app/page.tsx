@@ -192,7 +192,15 @@ export default function HomePage() {
                   <ul className="space-y-3.5 text-sm text-slate-600 border-t border-slate-100 pt-6">
                     <li className="flex items-center gap-2.5">
                       <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                      <span>حتى 15 منتج خلال فترة التجربة</span>
+                      <span>حتى 10 منتجات خلال فترة التجربة</span>
+                    </li>
+                    <li className="flex items-center gap-2.5">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                      <span>كوبون خصم واحد نشط لمتجرك</span>
+                    </li>
+                    <li className="flex items-center gap-2.5">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                      <span className="font-bold text-emerald-700">ذكاء اصطناعي لكتابة وصف المنتجات (غير محدود) 🤖</span>
                     </li>
                     <li className="flex items-center gap-2.5">
                       <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
@@ -238,7 +246,11 @@ export default function HomePage() {
                   <ul className="space-y-3.5 text-sm text-slate-700 border-t border-slate-100 pt-6">
                     <li className="flex items-center gap-2.5">
                       <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                      <span className="font-bold">منتجات وأقسام غير محدودة</span>
+                      <span className="font-bold text-emerald-800">حتى 100 منتج و 20 كوبون خصم</span>
+                    </li>
+                    <li className="flex items-center gap-2.5">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                      <span className="font-bold text-emerald-700">ذكاء اصطناعي لكتابة وصف المنتجات (غير محدود) 🤖</span>
                     </li>
                     <li className="flex items-center gap-2.5">
                       <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />

@@ -303,13 +303,27 @@ namespace WatsStore.Api.Controllers
                 return StatusCode(StatusCodes.Status403Forbidden, new { isTrialExpired = true, message = "انتهت فترتك التجريبية المجانية (14 يوماً). يرجى ترقية باقتك إلى Pro أو VIP للاستمرار في إضافة المنتجات وإدارة متجرك." });
             }
 
-            // Enforce 15-product limit on Free Plan
+            // Enforce Plan Quota on Products
+            var currentProductCount = await _db.Products.CountAsync(p => p.StoreId == storeId);
+
             if (string.Equals(store.PlanType, "Free", StringComparison.OrdinalIgnoreCase))
             {
-                var productCount = await _db.Products.CountAsync(p => p.StoreId == storeId);
-                if (productCount >= 15)
+                if (currentProductCount >= 10)
                 {
-                    return BadRequest(new { message = "لقد وصلت للحد الأقصى للمنتجات في الخطة المجانية (15 منتج). يرجى ترقية باقتك إلى Pro أو VIP عبر التواصل معنا على 01011653619 لإضافة منتجات غير محدودة!" });
+                    return StatusCode(StatusCodes.Status403Forbidden, new { 
+                        isQuotaExceeded = true, 
+                        message = "لقد وصلت للحد الأقصى لعدد المنتجات في الباقة المجانية (10 منتجات). يرجى ترقية باقتك إلى Pro أو VIP لإضافة المزيد." 
+                    });
+                }
+            }
+            else if (string.Equals(store.PlanType, "Pro", StringComparison.OrdinalIgnoreCase))
+            {
+                if (currentProductCount >= 100)
+                {
+                    return StatusCode(StatusCodes.Status403Forbidden, new { 
+                        isQuotaExceeded = true, 
+                        message = "لقد وصلت للحد الأقصى لعدد المنتجات في باقة Pro (100 منتج). يرجى ترقية باقتك إلى VIP لإضافة منتجات غير محدودة." 
+                    });
                 }
             }
 
@@ -643,6 +657,29 @@ namespace WatsStore.Api.Controllers
                 return StatusCode(StatusCodes.Status403Forbidden, new { isTrialExpired = true, message = "انتهت فترتك التجريبية المجانية (14 يوماً). يرجى ترقية باقتك إلى Pro أو VIP للاستمرار في إنشاء كوبونات الخصم وإدارة متجرك." });
             }
 
+            // Enforce Plan Quota on Coupons
+            var activeCouponsCount = await _db.StoreCoupons.CountAsync(c => c.StoreId == storeId && c.IsActive);
+            if (string.Equals(store.PlanType, "Free", StringComparison.OrdinalIgnoreCase))
+            {
+                if (activeCouponsCount >= 1)
+                {
+                    return StatusCode(StatusCodes.Status403Forbidden, new { 
+                        isQuotaExceeded = true, 
+                        message = "لقد وصلت للحد الأقصى لعدد كوبونات الخصم في الباقة المجانية (كوبون واحد نشط). يرجى ترقية باقتك إلى Pro أو VIP لإضافة المزيد." 
+                    });
+                }
+            }
+            else if (string.Equals(store.PlanType, "Pro", StringComparison.OrdinalIgnoreCase))
+            {
+                if (activeCouponsCount >= 20)
+                {
+                    return StatusCode(StatusCodes.Status403Forbidden, new { 
+                        isQuotaExceeded = true, 
+                        message = "لقد وصلت للحد الأقصى لعدد كوبونات الخصم في باقة Pro (20 كوبون). يرجى ترقية باقتك إلى VIP لإضافة كوبونات غير محدودة." 
+                    });
+                }
+            }
+
             var code = request.Code.Trim().ToUpperInvariant();
 
             // Validate code uniqueness within merchant's store
@@ -707,6 +744,34 @@ namespace WatsStore.Api.Controllers
 
             if (coupon == null)
                 return NotFound(new { message = "كود الخصم غير موجود" });
+
+            if (!coupon.IsActive)
+            {
+                var store = await _db.Stores.FirstOrDefaultAsync(s => s.Id == storeId);
+                if (store != null)
+                {
+                    if (store.IsTrialExpired())
+                    {
+                        return StatusCode(StatusCodes.Status403Forbidden, new { isTrialExpired = true, message = "انتهت فترتك التجريبية المجانية (14 يوماً). يرجى ترقية باقتك إلى Pro أو VIP لإدارة وتفعيل الكوبونات." });
+                    }
+
+                    var activeCount = await _db.StoreCoupons.CountAsync(c => c.StoreId == storeId && c.IsActive);
+                    if (string.Equals(store.PlanType, "Free", StringComparison.OrdinalIgnoreCase) && activeCount >= 1)
+                    {
+                        return StatusCode(StatusCodes.Status403Forbidden, new { 
+                            isQuotaExceeded = true, 
+                            message = "لقد وصلت للحد الأقصى لعدد كوبونات الخصم في الباقة المجانية (كوبون واحد نشط). يرجى ترقية باقتك إلى Pro أو VIP لإضافة المزيد." 
+                        });
+                    }
+                    else if (string.Equals(store.PlanType, "Pro", StringComparison.OrdinalIgnoreCase) && activeCount >= 20)
+                    {
+                        return StatusCode(StatusCodes.Status403Forbidden, new { 
+                            isQuotaExceeded = true, 
+                            message = "لقد وصلت للحد الأقصى لعدد كوبونات الخصم في باقة Pro (20 كوبون). يرجى ترقية باقتك إلى VIP لإضافة كوبونات غير محدودة." 
+                        });
+                    }
+                }
+            }
 
             coupon.IsActive = !coupon.IsActive;
             await _db.SaveChangesAsync();

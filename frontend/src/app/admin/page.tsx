@@ -511,6 +511,52 @@ export default function SuperAdminPage() {
     }
   };
 
+  // Direct 1-Click Plan Change from Table Dropdown
+  const handleDirectPlanChange = async (store: AdminStoreSummary, newPlan: string) => {
+    if (!token || store.planType === newPlan) return;
+
+    const storeId = store.id;
+    setActionLoadingId(storeId);
+    try {
+      const res = await api.adminUpdateStorePlan(token, storeId, newPlan);
+      setStores(prev => prev.map(s => {
+        if (s.id === storeId) {
+          return {
+            ...s,
+            planType: res.planType,
+            isTrialExpired: res.isTrialExpired,
+            remainingTrialDays: res.remainingTrialDays,
+            trialEndsAt: res.trialEndsAt,
+          };
+        }
+        return s;
+      }));
+
+      const toast = Swal.mixin({
+        toast: true,
+        position: 'top-end',
+        showConfirmButton: false,
+        timer: 2000,
+        background: '#0f172a',
+        color: '#f8fafc',
+      });
+      toast.fire({
+        icon: 'success',
+        title: `تم تغيير باقة "${store.storeName}" إلى ${res.planType} بنجاح 🎉`,
+      });
+    } catch (err: any) {
+      Swal.fire({
+        icon: 'error',
+        title: 'خطأ أثناء تغيير الباقة',
+        text: err.message || 'فشل تحديث باقة المتجر',
+        background: '#0f172a',
+        color: '#f8fafc',
+      });
+    } finally {
+      setActionLoadingId(null);
+    }
+  };
+
   // Extend Store Trial
   const handleExtendTrial = async (store: AdminStoreSummary) => {
     if (!token) return;
@@ -1413,15 +1459,23 @@ export default function SuperAdminPage() {
                               {/* Plan & Trial Status */}
                               <td className="py-3.5 px-4">
                                 <div className="space-y-1">
-                                  <span className={`inline-block px-2.5 py-0.5 rounded-md text-[11px] font-black uppercase ${
-                                    plan === 'VIP'
-                                      ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
-                                      : plan === 'Pro'
-                                      ? 'bg-purple-500/20 text-purple-300 border border-purple-500/30'
-                                      : 'bg-slate-800 text-slate-400 border border-slate-700'
-                                  }`}>
-                                    {plan}
-                                  </span>
+                                  <select
+                                    value={plan}
+                                    onChange={(e) => handleDirectPlanChange(store, e.target.value)}
+                                    disabled={isActionPending}
+                                    title="تغيير باقة المتجر بضغطة زر واحدة"
+                                    className={`px-2.5 py-1 rounded-md text-[11px] font-black uppercase cursor-pointer border focus:outline-none transition-all ${
+                                      plan === 'VIP'
+                                        ? 'bg-amber-500/20 text-amber-300 border-amber-500/40 hover:bg-amber-500/30'
+                                        : plan === 'Pro'
+                                        ? 'bg-purple-500/20 text-purple-300 border-purple-500/40 hover:bg-purple-500/30'
+                                        : 'bg-slate-800 text-slate-300 border-slate-700 hover:bg-slate-700'
+                                    }`}
+                                  >
+                                    <option value="Free" className="bg-slate-900 text-slate-300">Free (10 منتجات)</option>
+                                    <option value="Pro" className="bg-slate-900 text-purple-300">Pro (100 منتج)</option>
+                                    <option value="VIP" className="bg-slate-900 text-amber-300">VIP (غير محدود 👑)</option>
+                                  </select>
 
                                   {plan === 'Free' ? (
                                     store.isTrialExpired ? (

@@ -572,7 +572,11 @@ namespace WatsStore.Api.Controllers
             var matchedPlan = validPlans.FirstOrDefault(p => string.Equals(p, request.Plan?.Trim(), StringComparison.OrdinalIgnoreCase)) ?? "Free";
 
             store.PlanType = matchedPlan;
-            if (matchedPlan == "Pro" || matchedPlan == "VIP")
+            if (matchedPlan == "Free")
+            {
+                store.SubscriptionEndsAt = store.CreatedAt.AddDays(14);
+            }
+            else if (matchedPlan == "Pro" || matchedPlan == "VIP")
             {
                 // When upgraded to Pro or VIP, ensure active subscription for 1 year if empty or expired
                 if (!store.SubscriptionEndsAt.HasValue || store.SubscriptionEndsAt.Value < DateTime.UtcNow)
