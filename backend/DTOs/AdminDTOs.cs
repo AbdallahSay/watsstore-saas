@@ -60,4 +60,41 @@ namespace WatsStore.Api.DTOs
         public bool IsActive { get; set; }
         public string Message { get; set; } = string.Empty;
     }
+
+    public class AdminChangePasswordRequest
+    {
+        [Required(ErrorMessage = "كلمة المرور الحالية مطلوبة")]
+        public string CurrentPassword { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "كلمة المرور الجديدة مطلوبة")]
+        [StringLength(100, MinimumLength = 6, ErrorMessage = "كلمة المرور الجديدة يجب أن تكون بين 6 و 100 حرف")]
+        public string NewPassword { get; set; } = string.Empty;
+    }
+
+    public class AdminForgotPasswordRequest
+    {
+        [Required(ErrorMessage = "البريد الإلكتروني مطلوب")]
+        [EmailAddress(ErrorMessage = "صيغة البريد الإلكتروني غير صحيحة")]
+        public string Email { get; set; } = string.Empty;
+    }
+
+    public class AdminForgotPasswordResponse
+    {
+        public string Message { get; set; } = string.Empty;
+        public string ResetToken { get; set; } = string.Empty;
+        public int ExpiresInMinutes { get; set; } = 15;
+    }
+
+    public class AdminResetPasswordRequest
+    {
+        [Required(ErrorMessage = "البريد الإلكتروني مطلوب")]
+        public string Email { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "رمز استعادة كلمة المرور مطلوب")]
+        public string ResetToken { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "كلمة المرور الجديدة مطلوبة")]
+        [StringLength(100, MinimumLength = 6, ErrorMessage = "كلمة المرور الجديدة يجب أن تكون بين 6 و 100 حرف")]
+        public string NewPassword { get; set; } = string.Empty;
+    }
 }

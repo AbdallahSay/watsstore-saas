@@ -29,7 +29,11 @@ import {
   Eye, 
   Sparkles,
   Building2,
-  AlertTriangle
+  AlertTriangle,
+  Settings,
+  ArrowRight,
+  Shield,
+  Check
 } from 'lucide-react';
 import { api } from '@/lib/api';
 import { AdminPlatformStats, AdminStoreSummary } from '@/types';
@@ -39,13 +43,35 @@ export default function SuperAdminPage() {
   const [adminUser, setAdminUser] = useState<any>(null);
   const [isInitializing, setIsInitializing] = useState(true);
 
+  // Active View Tab in Dashboard
+  const [activeTab, setActiveTab] = useState<'stores' | 'settings'>('stores');
+
   // Login Form States
   const [loginMethod, setLoginMethod] = useState<'key' | 'credentials'>('key');
   const [secretKey, setSecretKey] = useState('WatsStore_SuperAdmin_SecretKey_2026_Secure!');
-  const [email, setEmail] = useState('admin@watsstore.com');
+  const [email, setEmail] = useState('abdallahsay10@gmail.com');
   const [password, setPassword] = useState('Admin@WatsStore2026!');
   const [isLoggingIn, setIsLoggingIn] = useState(false);
   const [loginError, setLoginError] = useState<string | null>(null);
+
+  // Forgot Password Modal States
+  const [isForgotPasswordOpen, setIsForgotPasswordOpen] = useState(false);
+  const [forgotEmail, setForgotEmail] = useState('abdallahsay10@gmail.com');
+  const [forgotResetToken, setForgotResetToken] = useState('');
+  const [forgotNewPassword, setForgotNewPassword] = useState('');
+  const [forgotConfirmPassword, setForgotConfirmPassword] = useState('');
+  const [forgotStep, setForgotStep] = useState<1 | 2>(1);
+  const [isSubmittingForgot, setIsSubmittingForgot] = useState(false);
+  const [forgotMessage, setForgotMessage] = useState<string | null>(null);
+  const [forgotError, setForgotError] = useState<string | null>(null);
+
+  // Change Password Form States (Inside Settings Tab)
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [isChangingPassword, setIsChangingPassword] = useState(false);
+  const [changePasswordSuccess, setChangePasswordSuccess] = useState<string | null>(null);
+  const [changePasswordError, setChangePasswordError] = useState<string | null>(null);
 
   // Dashboard Data States
   const [stats, setStats] = useState<AdminPlatformStats | null>(null);
@@ -123,7 +149,7 @@ export default function SuperAdminPage() {
     try {
       const payload = loginMethod === 'key' 
         ? { secretKey }
-        : { email, password };
+        : { email: email.trim(), password };
 
       const res = await api.adminLogin(payload);
       setToken(res.token);
@@ -160,6 +186,134 @@ export default function SuperAdminPage() {
     setAdminUser(null);
     setStats(null);
     setStores([]);
+    setActiveTab('stores');
+  };
+
+  // Handle Change Password (Inside Settings Tab)
+  const handleChangePassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!token) return;
+    setChangePasswordError(null);
+    setChangePasswordSuccess(null);
+
+    if (newPassword.length < 6) {
+      setChangePasswordError('كلمة المرور الجديدة يجب أن لا تقل عن 6 أحرف.');
+      return;
+    }
+
+    if (newPassword !== confirmPassword) {
+      setChangePasswordError('كلمة المرور الجديدة غير متطابقة مع التأكيد.');
+      return;
+    }
+
+    setIsChangingPassword(true);
+    try {
+      const res = await api.adminChangePassword(token, {
+        currentPassword,
+        newPassword,
+      });
+
+      setChangePasswordSuccess(res.message || 'تم تحديث كلمة المرور بنجاح!');
+      setCurrentPassword('');
+      setNewPassword('');
+      setConfirmPassword('');
+
+      Swal.fire({
+        icon: 'success',
+        title: 'تم تحديث كلمة المرور 🔒',
+        text: res.message || 'تم تغيير كلمة مرور المسؤول العام بنجاح وحفظها في قاعدة البيانات.',
+        timer: 2000,
+        showConfirmButton: false,
+        background: '#0f172a',
+        color: '#f8fafc',
+      });
+    } catch (err: any) {
+      setChangePasswordError(err.message || 'فشل تحديث كلمة المرور. يرجى التأكد من كلمة المرور الحالية.');
+    } finally {
+      setIsChangingPassword(false);
+    }
+  };
+
+  // Forgot Password: Step 1 (Request Reset Token)
+  const handleRequestResetToken = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmittingForgot(true);
+    setForgotError(null);
+    setForgotMessage(null);
+
+    try {
+      const res = await api.adminForgotPassword(forgotEmail.trim());
+      setForgotResetToken(res.resetToken);
+      setForgotStep(2);
+      setForgotMessage(res.message);
+
+      Swal.fire({
+        icon: 'info',
+        title: 'تم إنشاء رمز الاستعادة بنجاح',
+        html: `
+          <div style="direction: rtl; text-align: right; font-size: 13px;">
+            <p>رمز استعادة كلمة المرور الخاص بك هو:</p>
+            <p style="font-size: 22px; font-weight: 900; color: #10B981; letter-spacing: 2px; margin: 12px 0; font-family: monospace;">${res.resetToken}</p>
+            <p style="color: #94a3b8; font-size: 11px;">الرمز صالح لمدة ${res.expiresInMinutes} دقيقة. تم إدخال الرمز تلقائياً في الخطوة التالية لتسهيل الإجراء.</p>
+          </div>
+        `,
+        confirmButtonText: 'متابعة تعيين كلمة المرور الجديدة',
+        confirmButtonColor: '#10B981',
+        background: '#0f172a',
+        color: '#f8fafc',
+      });
+    } catch (err: any) {
+      setForgotError(err.message || 'فشل طلب رمز استعادة كلمة المرور.');
+    } finally {
+      setIsSubmittingForgot(false);
+    }
+  };
+
+  // Forgot Password: Step 2 (Submit New Password)
+  const handleResetPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setForgotError(null);
+    setForgotMessage(null);
+
+    if (forgotNewPassword.length < 6) {
+      setForgotError('كلمة المرور الجديدة يجب ألا تقل عن 6 أحرف.');
+      return;
+    }
+
+    if (forgotNewPassword !== forgotConfirmPassword) {
+      setForgotError('كلمة المرور الجديدة وتأكيدها غير متطابقين.');
+      return;
+    }
+
+    setIsSubmittingForgot(true);
+    try {
+      const res = await api.adminResetPassword({
+        email: forgotEmail.trim(),
+        resetToken: forgotResetToken.trim(),
+        newPassword: forgotNewPassword.trim(),
+      });
+
+      Swal.fire({
+        icon: 'success',
+        title: 'تمت إعادة تعيين كلمة المرور بنجاح! 🎉',
+        text: res.message || 'تم تحديث كلمة المرور. يمكنك الآن تسجيل الدخول مباشرة.',
+        confirmButtonColor: '#10B981',
+        background: '#0f172a',
+        color: '#f8fafc',
+      });
+
+      setIsForgotPasswordOpen(false);
+      setForgotStep(1);
+      setForgotResetToken('');
+      setForgotNewPassword('');
+      setForgotConfirmPassword('');
+      setLoginMethod('credentials');
+      setPassword(forgotNewPassword);
+    } catch (err: any) {
+      setForgotError(err.message || 'فشل إعادة تعيين كلمة المرور. يرجى التحقق من صحة الرمز.');
+    } finally {
+      setIsSubmittingForgot(false);
+    }
   };
 
   // Toggle Store Active Status
@@ -400,7 +554,7 @@ export default function SuperAdminPage() {
                       type="email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      placeholder="admin@watsstore.com"
+                      placeholder="abdallahsay10@gmail.com"
                       className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-100 placeholder:text-slate-600 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all text-left"
                       required
                     />
@@ -408,7 +562,22 @@ export default function SuperAdminPage() {
                   </div>
                 </div>
                 <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-slate-300 block">كلمة المرور السرية</label>
+                  <div className="flex items-center justify-between">
+                    <label className="text-xs font-bold text-slate-300 block">كلمة المرور السرية</label>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setForgotEmail(email || 'abdallahsay10@gmail.com');
+                        setIsForgotPasswordOpen(true);
+                        setForgotStep(1);
+                        setForgotError(null);
+                        setForgotMessage(null);
+                      }}
+                      className="text-[11px] text-emerald-400 hover:text-emerald-300 font-bold hover:underline transition-colors"
+                    >
+                      نسيت كلمة المرور؟
+                    </button>
+                  </div>
                   <div className="relative">
                     <input
                       type="password"
@@ -453,6 +622,129 @@ export default function SuperAdminPage() {
             </Link>
           </div>
         </div>
+
+        {/* Forgot Password Modal */}
+        {isForgotPasswordOpen && (
+          <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+            <div className="w-full max-w-md bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl space-y-6">
+              <div className="flex items-center justify-between border-b border-slate-800 pb-4">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-8 h-8 rounded-lg bg-emerald-500/10 text-emerald-400 flex items-center justify-center">
+                    <Key className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <h3 className="font-black text-white text-base">استعادة كلمة مرور المسؤول</h3>
+                    <span className="text-[11px] text-slate-400">
+                      {forgotStep === 1 ? 'الخطوة 1: طلب رمز الاستعادة' : 'الخطوة 2: إدخال كلمة المرور الجديدة'}
+                    </span>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setIsForgotPasswordOpen(false)}
+                  className="w-7 h-7 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-400 flex items-center justify-center text-xs transition-colors"
+                >
+                  ✕
+                </button>
+              </div>
+
+              {forgotError && (
+                <div className="p-3 bg-rose-500/10 border border-rose-500/20 rounded-xl text-rose-400 text-xs flex items-center gap-2">
+                  <AlertTriangle className="w-4 h-4 shrink-0 text-rose-400" />
+                  <span>{forgotError}</span>
+                </div>
+              )}
+
+              {forgotMessage && (
+                <div className="p-3 bg-emerald-500/10 border border-emerald-500/20 rounded-xl text-emerald-400 text-xs flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-400" />
+                  <span>{forgotMessage}</span>
+                </div>
+              )}
+
+              {forgotStep === 1 ? (
+                <form onSubmit={handleRequestResetToken} className="space-y-4">
+                  <p className="text-xs text-slate-300 leading-relaxed">
+                    أدخل البريد الإلكتروني المعتمد للمسؤول العام (<span className="text-emerald-400 font-mono font-bold">abdallahsay10@gmail.com</span>) لإنشاء رمز استعادة آمن صالح لمدة 15 دقيقة:
+                  </p>
+
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-bold text-slate-300 block">بريد المسؤول</label>
+                    <input
+                      type="email"
+                      value={forgotEmail}
+                      onChange={(e) => setForgotEmail(e.target.value)}
+                      className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-slate-100 focus:outline-none focus:border-emerald-500 font-mono"
+                      required
+                    />
+                  </div>
+
+                  <button
+                    type="submit"
+                    disabled={isSubmittingForgot}
+                    className="w-full py-3 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black rounded-xl text-xs transition-all disabled:opacity-50 flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/20"
+                  >
+                    {isSubmittingForgot ? 'جاري التحقق وإنشاء الرمز...' : 'إنشاء رمز الاستعادة 🔑'}
+                  </button>
+                </form>
+              ) : (
+                <form onSubmit={handleResetPassword} className="space-y-4">
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-bold text-slate-300 block">رمز الاستعادة المؤقت</label>
+                    <input
+                      type="text"
+                      value={forgotResetToken}
+                      onChange={(e) => setForgotResetToken(e.target.value)}
+                      placeholder="WATS-XXXXXX"
+                      className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-emerald-400 font-mono font-bold tracking-widest focus:outline-none focus:border-emerald-500 text-center uppercase"
+                      required
+                    />
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-bold text-slate-300 block">كلمة المرور الجديدة</label>
+                    <input
+                      type="password"
+                      value={forgotNewPassword}
+                      onChange={(e) => setForgotNewPassword(e.target.value)}
+                      placeholder="6 أحرف على الأقل"
+                      className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-slate-100 focus:outline-none focus:border-emerald-500 text-left"
+                      required
+                    />
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-bold text-slate-300 block">تأكيد كلمة المرور الجديدة</label>
+                    <input
+                      type="password"
+                      value={forgotConfirmPassword}
+                      onChange={(e) => setForgotConfirmPassword(e.target.value)}
+                      placeholder="أعد كتابة كلمة المرور الجديدة"
+                      className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-slate-100 focus:outline-none focus:border-emerald-500 text-left"
+                      required
+                    />
+                  </div>
+
+                  <div className="flex items-center gap-2 pt-2">
+                    <button
+                      type="button"
+                      onClick={() => setForgotStep(1)}
+                      className="py-2.5 px-4 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-bold transition-colors"
+                    >
+                      رجوع
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={isSubmittingForgot}
+                      className="flex-1 py-2.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black rounded-xl text-xs transition-all disabled:opacity-50 flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/20"
+                    >
+                      {isSubmittingForgot ? 'جاري حفظ كلمة المرور...' : 'تأكيد كلمة المرور الجديدة ✅'}
+                    </button>
+                  </div>
+                </form>
+              )}
+            </div>
+          </div>
+        )}
       </div>
     );
   }
@@ -479,6 +771,32 @@ export default function SuperAdminPage() {
               <span className="text-slate-500">Masar Tech Engine</span>
             </p>
           </div>
+        </div>
+
+        {/* Center Navigation Tabs */}
+        <div className="hidden md:flex items-center gap-1.5 bg-slate-950/80 border border-slate-800 p-1 rounded-xl">
+          <button
+            onClick={() => setActiveTab('stores')}
+            className={`px-3.5 py-1.5 text-xs font-bold rounded-lg transition-all flex items-center gap-1.5 ${
+              activeTab === 'stores'
+                ? 'bg-emerald-500 text-slate-950 font-black shadow-sm'
+                : 'text-slate-400 hover:text-white'
+            }`}
+          >
+            <StoreIcon className="w-3.5 h-3.5" />
+            <span>المتاجر والإحصائيات</span>
+          </button>
+          <button
+            onClick={() => setActiveTab('settings')}
+            className={`px-3.5 py-1.5 text-xs font-bold rounded-lg transition-all flex items-center gap-1.5 ${
+              activeTab === 'settings'
+                ? 'bg-emerald-500 text-slate-950 font-black shadow-sm'
+                : 'text-slate-400 hover:text-white'
+            }`}
+          >
+            <Key className="w-3.5 h-3.5" />
+            <span>إعدادات الحساب وكلمة المرور</span>
+          </button>
         </div>
 
         <div className="flex items-center gap-3">
@@ -509,404 +827,556 @@ export default function SuperAdminPage() {
         </div>
       </header>
 
+      {/* Mobile Tab Switcher */}
+      <div className="md:hidden px-4 pt-4">
+        <div className="grid grid-cols-2 gap-1 bg-slate-900 border border-slate-800 p-1 rounded-xl">
+          <button
+            onClick={() => setActiveTab('stores')}
+            className={`py-2 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-1.5 ${
+              activeTab === 'stores'
+                ? 'bg-emerald-500 text-slate-950 font-black'
+                : 'text-slate-400 hover:text-white'
+            }`}
+          >
+            <StoreIcon className="w-3.5 h-3.5" />
+            <span>المتاجر</span>
+          </button>
+          <button
+            onClick={() => setActiveTab('settings')}
+            className={`py-2 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-1.5 ${
+              activeTab === 'settings'
+                ? 'bg-emerald-500 text-slate-950 font-black'
+                : 'text-slate-400 hover:text-white'
+            }`}
+          >
+            <Key className="w-3.5 h-3.5" />
+            <span>الحساب وكلمة المرور</span>
+          </button>
+        </div>
+      </div>
+
       {/* Main Container */}
       <main className="max-w-7xl mx-auto px-4 sm:px-8 pt-8 space-y-8">
-        {/* Welcome Banner */}
-        <div className="bg-gradient-to-r from-emerald-950/40 via-slate-900 to-slate-900 border border-emerald-500/20 rounded-2xl p-6 sm:p-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-          <div className="space-y-1">
-            <div className="inline-flex items-center gap-2 text-xs font-black text-emerald-400 uppercase tracking-wider">
-              <Sparkles className="w-4 h-4" />
-              <span>نظام السيطرة والتحكم المركزي</span>
-            </div>
-            <h2 className="text-xl sm:text-2xl font-black text-white">
-              مرحباً بك في لوحة تحكم مالك المنصة
-            </h2>
-            <p className="text-xs sm:text-sm text-slate-400 max-w-2xl">
-              راقب حركة المبيعات، الطلبات، المتاجر النشطة والموقوفة عبر منصة WatsStore في كافة محافظات مصر بنقرة واحدة.
-            </p>
-          </div>
+        {activeTab === 'settings' ? (
+          /* Account Settings & Password Change Tab */
+          <div className="max-w-2xl mx-auto space-y-6">
+            <div className="bg-slate-900/70 border border-slate-800 rounded-3xl p-6 sm:p-8 space-y-6 shadow-xl">
+              {/* Header */}
+              <div className="flex items-center gap-3 border-b border-slate-800 pb-5">
+                <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-emerald-500 to-teal-400 text-slate-950 flex items-center justify-center shadow-lg shadow-emerald-500/20">
+                  <Key className="w-6 h-6" />
+                </div>
+                <div>
+                  <h2 className="text-xl font-black text-white">إعدادات الحساب وتغيير كلمة المرور</h2>
+                  <p className="text-xs text-slate-400">
+                    إدارة حساب المسؤول العام وحماية بيانات الدخول المشفرة عبر خوارزمية BCrypt.
+                  </p>
+                </div>
+              </div>
 
-          <div className="flex items-center gap-2 self-stretch sm:self-auto justify-end">
-            <Link
-              href="/"
-              target="_blank"
-              className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-xl text-xs font-bold border border-slate-700 flex items-center gap-1.5 transition-all"
-            >
-              <span>معاينة الهبوط الرئيسية</span>
-              <ExternalLink className="w-3.5 h-3.5" />
-            </Link>
-          </div>
-        </div>
-
-        {/* Platform Overview Metrics Cards */}
-        {stats && (
-          <div className="space-y-4">
-            <h3 className="text-xs font-black text-slate-400 uppercase tracking-wider flex items-center gap-2">
-              <TrendingUp className="w-4 h-4 text-emerald-400" />
-              <span>مؤشرات أداء المنصة الإجمالية</span>
-            </h3>
-
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-              {/* Card 1: Total Stores */}
-              <div className="bg-slate-900/70 border border-slate-800 rounded-2xl p-5 hover:border-slate-700 transition-all">
-                <div className="flex items-center justify-between mb-3">
-                  <span className="text-xs font-bold text-slate-400">إجمالي المتاجر</span>
-                  <div className="w-8 h-8 rounded-lg bg-emerald-500/10 text-emerald-400 flex items-center justify-center">
-                    <StoreIcon className="w-4 h-4" />
+              {/* Account Info Pill */}
+              <div className="bg-slate-950/60 border border-slate-800 rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+                <div className="space-y-1">
+                  <span className="text-slate-400 block text-[11px]">البريد الإلكتروني المعتمد للمسؤول العام:</span>
+                  <div className="flex items-center gap-2">
+                    <span className="font-mono font-bold text-white text-sm">abdallahsay10@gmail.com</span>
+                    <span className="px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 text-[10px] font-bold">
+                      مالك المنصة
+                    </span>
                   </div>
                 </div>
-                <div className="flex items-baseline gap-2">
-                  <span className="text-2xl sm:text-3xl font-black text-white">{stats.totalStores}</span>
-                  <span className="text-xs text-slate-500 font-medium">متجر مسجل</span>
-                </div>
-                <div className="mt-3 pt-3 border-t border-slate-800/80 flex items-center justify-between text-[11px]">
-                  <span className="text-emerald-400 font-bold">{stats.activeStores} نشط</span>
-                  <span className="text-slate-500">{stats.suspendedStores} موقوف</span>
+                <div className="sm:text-left text-slate-400 text-[11px] space-y-0.5">
+                  <span className="block">حالة الحساب: <span className="text-emerald-400 font-bold">نشط ومؤمن 🛡️</span></span>
+                  <span className="block">التشفير: <span className="text-slate-300 font-mono">BCrypt Salted</span></span>
                 </div>
               </div>
 
-              {/* Card 2: Active Stores */}
-              <div className="bg-slate-900/70 border border-slate-800 rounded-2xl p-5 hover:border-slate-700 transition-all">
-                <div className="flex items-center justify-between mb-3">
-                  <span className="text-xs font-bold text-slate-400">المتاجر النشطة</span>
-                  <div className="w-8 h-8 rounded-lg bg-teal-500/10 text-teal-400 flex items-center justify-center">
-                    <Activity className="w-4 h-4" />
+              {changePasswordError && (
+                <div className="p-3.5 bg-rose-500/10 border border-rose-500/20 rounded-xl text-rose-400 text-xs flex items-center gap-2">
+                  <AlertTriangle className="w-4 h-4 shrink-0 text-rose-400" />
+                  <span>{changePasswordError}</span>
+                </div>
+              )}
+
+              {changePasswordSuccess && (
+                <div className="p-3.5 bg-emerald-500/10 border border-emerald-500/20 rounded-xl text-emerald-400 text-xs flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-400" />
+                  <span>{changePasswordSuccess}</span>
+                </div>
+              )}
+
+              {/* Form */}
+              <form onSubmit={handleChangePassword} className="space-y-4">
+                <div className="space-y-1.5">
+                  <label className="text-xs font-bold text-slate-300 block">كلمة المرور الحالية</label>
+                  <div className="relative">
+                    <input
+                      type="password"
+                      value={currentPassword}
+                      onChange={(e) => setCurrentPassword(e.target.value)}
+                      placeholder="أدخل كلمة المرور الحالية"
+                      className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-100 focus:outline-none focus:border-emerald-500 text-left font-mono"
+                      required
+                    />
+                    <Lock className="w-4 h-4 text-slate-500 absolute left-3 top-3.5" />
                   </div>
                 </div>
-                <div className="flex items-baseline gap-2">
-                  <span className="text-2xl sm:text-3xl font-black text-emerald-400">{stats.activeStores}</span>
-                  <span className="text-xs text-slate-500 font-medium">متجر يعمل</span>
-                </div>
-                <div className="mt-3 pt-3 border-t border-slate-800/80 flex items-center gap-1.5 text-[11px] text-teal-400">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                  <span>تستقبل طلبات ومبيعات حالياً</span>
-                </div>
-              </div>
 
-              {/* Card 3: Total Orders */}
-              <div className="bg-slate-900/70 border border-slate-800 rounded-2xl p-5 hover:border-slate-700 transition-all">
-                <div className="flex items-center justify-between mb-3">
-                  <span className="text-xs font-bold text-slate-400">إجمالي الطلبات</span>
-                  <div className="w-8 h-8 rounded-lg bg-blue-500/10 text-blue-400 flex items-center justify-center">
-                    <ShoppingBag className="w-4 h-4" />
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-bold text-slate-300 block">كلمة المرور الجديدة</label>
+                    <div className="relative">
+                      <input
+                        type="password"
+                        value={newPassword}
+                        onChange={(e) => setNewPassword(e.target.value)}
+                        placeholder="6 أحرف على الأقل"
+                        className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-100 focus:outline-none focus:border-emerald-500 text-left font-mono"
+                        required
+                      />
+                      <Key className="w-4 h-4 text-slate-500 absolute left-3 top-3.5" />
+                    </div>
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-bold text-slate-300 block">تأكيد كلمة المرور الجديدة</label>
+                    <div className="relative">
+                      <input
+                        type="password"
+                        value={confirmPassword}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
+                        placeholder="أعد كتابة كلمة المرور الجديدة"
+                        className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-100 focus:outline-none focus:border-emerald-500 text-left font-mono"
+                        required
+                      />
+                      <Key className="w-4 h-4 text-slate-500 absolute left-3 top-3.5" />
+                    </div>
                   </div>
                 </div>
-                <div className="flex items-baseline gap-2">
-                  <span className="text-2xl sm:text-3xl font-black text-white">{stats.totalOrders}</span>
-                  <span className="text-xs text-slate-500 font-medium">طلب تم تسجيله</span>
-                </div>
-                <div className="mt-3 pt-3 border-t border-slate-800/80 flex items-center justify-between text-[11px] text-slate-400">
-                  <span>طلب واتساب مسجل</span>
-                  <span className="text-blue-400 font-bold">100% نجاح</span>
-                </div>
-              </div>
 
-              {/* Card 4: Total Revenue */}
-              <div className="bg-slate-900/70 border border-slate-800 rounded-2xl p-5 hover:border-slate-700 transition-all">
-                <div className="flex items-center justify-between mb-3">
-                  <span className="text-xs font-bold text-slate-400">إجمالي مبيعات المنصة</span>
-                  <div className="w-8 h-8 rounded-lg bg-amber-500/10 text-amber-400 flex items-center justify-center">
-                    <DollarSign className="w-4 h-4" />
-                  </div>
+                <div className="pt-2">
+                  <button
+                    type="submit"
+                    disabled={isChangingPassword}
+                    className="w-full py-3.5 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-black rounded-xl text-sm transition-all shadow-lg shadow-emerald-500/20 disabled:opacity-50 flex items-center justify-center gap-2"
+                  >
+                    {isChangingPassword ? (
+                      <>
+                        <div className="w-4 h-4 border-2 border-slate-950 border-t-transparent rounded-full animate-spin" />
+                        <span>جاري حفظ كلمة المرور المشفرة...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Shield className="w-4 h-4" />
+                        <span>تحديث وحفظ كلمة المرور الجديدة</span>
+                      </>
+                    )}
+                  </button>
                 </div>
-                <div className="flex items-baseline gap-2">
-                  <span className="text-2xl sm:text-3xl font-black text-amber-400">
-                    {stats.totalRevenue.toLocaleString('ar-EG', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
-                  </span>
-                  <span className="text-xs text-slate-400 font-bold">ج.م</span>
-                </div>
-                <div className="mt-3 pt-3 border-t border-slate-800/80 flex items-center justify-between text-[11px] text-slate-400">
-                  <span>إجمالي قيمة سلات الشراء (GMV)</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Secondary Metrics Bar */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-slate-900/40 p-4 rounded-xl border border-slate-800/60 text-xs">
-              <div className="flex items-center gap-2.5">
-                <Package className="w-4 h-4 text-purple-400 shrink-0" />
-                <div>
-                  <span className="text-slate-400 block text-[11px]">المنتجات بالمنصة</span>
-                  <span className="font-bold text-white text-sm">{stats.totalProducts} منتج</span>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-2.5">
-                <Star className="w-4 h-4 text-amber-400 shrink-0" />
-                <div>
-                  <span className="text-slate-400 block text-[11px]">تقييمات المشترين</span>
-                  <span className="font-bold text-white text-sm">{stats.totalReviews} تقييم</span>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-2.5">
-                <Eye className="w-4 h-4 text-cyan-400 shrink-0" />
-                <div>
-                  <span className="text-slate-400 block text-[11px]">زيارات واجهات المتاجر</span>
-                  <span className="font-bold text-white text-sm">{stats.totalViews.toLocaleString()} زيارة</span>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-2.5">
-                <Building2 className="w-4 h-4 text-emerald-400 shrink-0" />
-                <div>
-                  <span className="text-slate-400 block text-[11px]">متاجر بالنطاقات الفرعية</span>
-                  <span className="font-bold text-white text-sm">{stats.activeStores} نطاق فعال</span>
-                </div>
-              </div>
+              </form>
             </div>
           </div>
-        )}
-
-        {/* Stores Management Section */}
-        <div className="space-y-4">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-            <div>
-              <h3 className="text-lg font-black text-white flex items-center gap-2">
-                <StoreIcon className="w-5 h-5 text-emerald-400" />
-                <span>إدارة جميع متاجر المنصة</span>
-                <span className="text-xs px-2.5 py-0.5 rounded-full bg-slate-800 text-slate-300 font-bold">
-                  {filteredStores.length} متجر
-                </span>
-              </h3>
-              <p className="text-xs text-slate-400">
-                يمكنك البحث، مراقبة المبيعات، إيقاف أي متجر مؤقتاً أو حذفه بالكامل مع كافة ملحقاته.
-              </p>
-            </div>
-
-            {/* Filter Buttons */}
-            <div className="flex items-center gap-1.5 bg-slate-900 border border-slate-800 p-1 rounded-xl">
-              <button
-                onClick={() => setStatusFilter('all')}
-                className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-all ${
-                  statusFilter === 'all'
-                    ? 'bg-emerald-500 text-slate-950 font-black'
-                    : 'text-slate-400 hover:text-white'
-                }`}
-              >
-                الكل ({stores.length})
-              </button>
-              <button
-                onClick={() => setStatusFilter('active')}
-                className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-all ${
-                  statusFilter === 'active'
-                    ? 'bg-emerald-500 text-slate-950 font-black'
-                    : 'text-slate-400 hover:text-white'
-                }`}
-              >
-                نشطة ({stores.filter(s => s.isActive).length})
-              </button>
-              <button
-                onClick={() => setStatusFilter('suspended')}
-                className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-all ${
-                  statusFilter === 'suspended'
-                    ? 'bg-rose-500 text-white font-black'
-                    : 'text-slate-400 hover:text-white'
-                }`}
-              >
-                موقوفة ({stores.filter(s => !s.isActive).length})
-              </button>
-            </div>
-          </div>
-
-          {/* Search Box */}
-          <div className="relative">
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="ابحث باسم المتجر، المالك، البريد، رقم الواتساب، المدينة أو النطاق..."
-              className="w-full bg-slate-900/90 border border-slate-800 rounded-xl pr-10 pl-4 py-3 text-sm text-slate-100 placeholder:text-slate-500 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all"
-            />
-            <Search className="w-4 h-4 text-slate-500 absolute right-3.5 top-3.5" />
-          </div>
-
-          {/* Stores Table */}
-          <div className="bg-slate-900/70 border border-slate-800 rounded-2xl overflow-hidden shadow-xl">
-            {filteredStores.length === 0 ? (
-              <div className="p-12 text-center space-y-3">
-                <div className="w-12 h-12 rounded-full bg-slate-800 text-slate-500 flex items-center justify-center mx-auto">
-                  <StoreIcon className="w-6 h-6" />
+        ) : (
+          /* Stores & Analytics Tab (Original View) */
+          <>
+            {/* Welcome Banner */}
+            <div className="bg-gradient-to-r from-emerald-950/40 via-slate-900 to-slate-900 border border-emerald-500/20 rounded-2xl p-6 sm:p-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+              <div className="space-y-1">
+                <div className="inline-flex items-center gap-2 text-xs font-black text-emerald-400 uppercase tracking-wider">
+                  <Sparkles className="w-4 h-4" />
+                  <span>نظام السيطرة والتحكم المركزي</span>
                 </div>
-                <h4 className="text-base font-bold text-slate-300">لم يتم العثور على أي متاجر</h4>
-                <p className="text-xs text-slate-500">
-                  {searchQuery ? 'لا توجد نتائج تطابق معايير البحث الحالية.' : 'لا توجد متاجر مسجلة في هذا التبويب.'}
+                <h2 className="text-xl sm:text-2xl font-black text-white">
+                  مرحباً بك في لوحة تحكم مالك المنصة
+                </h2>
+                <p className="text-xs sm:text-sm text-slate-400 max-w-2xl">
+                  الحساب الرئيسي مسجل باسم <span className="text-emerald-400 font-mono font-bold">abdallahsay10@gmail.com</span>. راقب حركة المبيعات، الطلبات، المتاجر النشطة والموقوفة عبر منصة WatsStore.
                 </p>
               </div>
-            ) : (
-              <div className="overflow-x-auto">
-                <table className="w-full text-right text-xs">
-                  <thead className="bg-slate-950/80 text-slate-400 font-bold border-b border-slate-800 uppercase tracking-wider">
-                    <tr>
-                      <th className="py-3.5 px-4">المتجر والرابط</th>
-                      <th className="py-3.5 px-4">المالك والتواصل</th>
-                      <th className="py-3.5 px-4">المدينة والتصنيف</th>
-                      <th className="py-3.5 px-4">الباقة</th>
-                      <th className="py-3.5 px-4">المبيعات والطلبات</th>
-                      <th className="py-3.5 px-4">الحالة</th>
-                      <th className="py-3.5 px-4 text-center">الإجراءات والتحكم</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-800/60 text-slate-300">
-                    {filteredStores.map((store) => {
-                      const storeId = store.id;
-                      const storeName = store.storeName;
-                      const ownerName = store.ownerName;
-                      const slug = store.slug;
-                      const emailVal = store.email;
-                      const phone = store.whatsAppNumber;
-                      const city = store.city;
-                      const category = store.businessCategory;
-                      const plan = store.planType || 'Free';
-                      const isActive = store.isActive;
-                      const ordersCount = store.ordersCount;
-                      const productsCount = store.productsCount;
-                      const revenue = store.totalRevenue;
-                      const isActionPending = actionLoadingId === storeId;
 
-                      return (
-                        <tr key={storeId} className="hover:bg-slate-800/30 transition-colors">
-                          {/* Store Name & Slug */}
-                          <td className="py-3.5 px-4">
-                            <div className="space-y-0.5">
-                              <span className="font-bold text-white text-sm block">
-                                {storeName}
-                              </span>
-                              <div className="flex items-center gap-1.5 text-[11px] text-slate-400 font-mono">
-                                <span className="text-emerald-400">/{slug}</span>
-                                <span>•</span>
-                                <span className="text-slate-500 font-sans">{store.publicCode}</span>
-                              </div>
-                              <span className="text-[10px] text-slate-500 block">
-                                تم التسجيل: {new Date(store.createdAt).toLocaleDateString('ar-EG')}
-                              </span>
-                            </div>
-                          </td>
+              <div className="flex items-center gap-2 self-stretch sm:self-auto justify-end">
+                <Link
+                  href="/"
+                  target="_blank"
+                  className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-xl text-xs font-bold border border-slate-700 flex items-center gap-1.5 transition-all"
+                >
+                  <span>معاينة الهبوط الرئيسية</span>
+                  <ExternalLink className="w-3.5 h-3.5" />
+                </Link>
+              </div>
+            </div>
 
-                          {/* Owner & Contact */}
-                          <td className="py-3.5 px-4">
-                            <div className="space-y-1">
-                              <span className="font-bold text-slate-200 block">
-                                {ownerName}
-                              </span>
-                              <div className="flex items-center gap-1 text-[11px] text-slate-400 font-mono">
-                                <a 
-                                  href={`https://wa.me/${phone}`} 
-                                  target="_blank" 
-                                  rel="noopener noreferrer"
-                                  className="text-emerald-400 hover:underline flex items-center gap-1"
-                                >
-                                  <Phone className="w-3 h-3" />
-                                  <span>{phone}</span>
-                                </a>
-                              </div>
-                              <span className="text-[11px] text-slate-400 block truncate max-w-[160px]" title={emailVal}>
-                                {emailVal}
-                              </span>
-                            </div>
-                          </td>
+            {/* Platform Overview Metrics Cards */}
+            {stats && (
+              <div className="space-y-4">
+                <h3 className="text-xs font-black text-slate-400 uppercase tracking-wider flex items-center gap-2">
+                  <TrendingUp className="w-4 h-4 text-emerald-400" />
+                  <span>مؤشرات أداء المنصة الإجمالية</span>
+                </h3>
 
-                          {/* City & Category */}
-                          <td className="py-3.5 px-4">
-                            <div className="space-y-0.5">
-                              <span className="font-bold text-slate-200 block">
-                                {city}
-                              </span>
-                              <span className="text-[11px] text-slate-400 block">
-                                {category}
-                              </span>
-                            </div>
-                          </td>
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                  {/* Card 1: Total Stores */}
+                  <div className="bg-slate-900/70 border border-slate-800 rounded-2xl p-5 hover:border-slate-700 transition-all">
+                    <div className="flex items-center justify-between mb-3">
+                      <span className="text-xs font-bold text-slate-400">إجمالي المتاجر</span>
+                      <div className="w-8 h-8 rounded-lg bg-emerald-500/10 text-emerald-400 flex items-center justify-center">
+                        <StoreIcon className="w-4 h-4" />
+                      </div>
+                    </div>
+                    <div className="flex items-baseline gap-2">
+                      <span className="text-2xl sm:text-3xl font-black text-white">{stats.totalStores}</span>
+                      <span className="text-xs text-slate-500 font-medium">متجر مسجل</span>
+                    </div>
+                    <div className="mt-3 pt-3 border-t border-slate-800/80 flex items-center justify-between text-[11px]">
+                      <span className="text-emerald-400 font-bold">{stats.activeStores} نشط</span>
+                      <span className="text-slate-500">{stats.suspendedStores} موقوف</span>
+                    </div>
+                  </div>
 
-                          {/* Plan */}
-                          <td className="py-3.5 px-4">
-                            <span className={`inline-block px-2.5 py-1 rounded-md text-[11px] font-black uppercase ${
-                              plan === 'VIP'
-                                ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
-                                : plan === 'Pro'
-                                ? 'bg-purple-500/20 text-purple-300 border border-purple-500/30'
-                                : 'bg-slate-800 text-slate-400 border border-slate-700'
-                            }`}>
-                              {plan}
-                            </span>
-                          </td>
+                  {/* Card 2: Active Stores */}
+                  <div className="bg-slate-900/70 border border-slate-800 rounded-2xl p-5 hover:border-slate-700 transition-all">
+                    <div className="flex items-center justify-between mb-3">
+                      <span className="text-xs font-bold text-slate-400">المتاجر النشطة</span>
+                      <div className="w-8 h-8 rounded-lg bg-teal-500/10 text-teal-400 flex items-center justify-center">
+                        <Activity className="w-4 h-4" />
+                      </div>
+                    </div>
+                    <div className="flex items-baseline gap-2">
+                      <span className="text-2xl sm:text-3xl font-black text-emerald-400">{stats.activeStores}</span>
+                      <span className="text-xs text-slate-500 font-medium">متجر يعمل</span>
+                    </div>
+                    <div className="mt-3 pt-3 border-t border-slate-800/80 flex items-center gap-1.5 text-[11px] text-teal-400">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                      <span>تستقبل طلبات ومبيعات حالياً</span>
+                    </div>
+                  </div>
 
-                          {/* Orders & Revenue */}
-                          <td className="py-3.5 px-4">
-                            <div className="space-y-0.5">
-                              <span className="font-black text-white text-xs block">
-                                {(revenue || 0).toLocaleString('ar-EG')} ج.م
-                              </span>
-                              <div className="flex items-center gap-2 text-[11px] text-slate-400">
-                                <span className="text-blue-400 font-bold">{ordersCount || 0} طلب</span>
-                                <span>•</span>
-                                <span>{productsCount || 0} منتج</span>
-                              </div>
-                            </div>
-                          </td>
+                  {/* Card 3: Total Orders */}
+                  <div className="bg-slate-900/70 border border-slate-800 rounded-2xl p-5 hover:border-slate-700 transition-all">
+                    <div className="flex items-center justify-between mb-3">
+                      <span className="text-xs font-bold text-slate-400">إجمالي الطلبات</span>
+                      <div className="w-8 h-8 rounded-lg bg-blue-500/10 text-blue-400 flex items-center justify-center">
+                        <ShoppingBag className="w-4 h-4" />
+                      </div>
+                    </div>
+                    <div className="flex items-baseline gap-2">
+                      <span className="text-2xl sm:text-3xl font-black text-white">{stats.totalOrders}</span>
+                      <span className="text-xs text-slate-500 font-medium">طلب تم تسجيله</span>
+                    </div>
+                    <div className="mt-3 pt-3 border-t border-slate-800/80 flex items-center justify-between text-[11px] text-slate-400">
+                      <span>طلب واتساب مسجل</span>
+                      <span className="text-blue-400 font-bold">100% نجاح</span>
+                    </div>
+                  </div>
 
-                          {/* Status Badge */}
-                          <td className="py-3.5 px-4">
-                            {isActive ? (
-                              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
-                                <CheckCircle2 className="w-3 h-3 text-emerald-400" />
-                                <span>نشط ومتاح</span>
-                              </span>
-                            ) : (
-                              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-rose-500/10 text-rose-400 border border-rose-500/30">
-                                <XCircle className="w-3 h-3 text-rose-400" />
-                                <span>موقوف مؤقتاً</span>
-                              </span>
-                            )}
-                          </td>
+                  {/* Card 4: Total Revenue */}
+                  <div className="bg-slate-900/70 border border-slate-800 rounded-2xl p-5 hover:border-slate-700 transition-all">
+                    <div className="flex items-center justify-between mb-3">
+                      <span className="text-xs font-bold text-slate-400">إجمالي مبيعات المنصة</span>
+                      <div className="w-8 h-8 rounded-lg bg-amber-500/10 text-amber-400 flex items-center justify-center">
+                        <DollarSign className="w-4 h-4" />
+                      </div>
+                    </div>
+                    <div className="flex items-baseline gap-2">
+                      <span className="text-2xl sm:text-3xl font-black text-amber-400">
+                        {stats.totalRevenue.toLocaleString('ar-EG', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
+                      </span>
+                      <span className="text-xs text-slate-400 font-bold">ج.م</span>
+                    </div>
+                    <div className="mt-3 pt-3 border-t border-slate-800/80 flex items-center justify-between text-[11px] text-slate-400">
+                      <span>إجمالي قيمة سلات الشراء (GMV)</span>
+                    </div>
+                  </div>
+                </div>
 
-                          {/* Actions */}
-                          <td className="py-3.5 px-4 text-center">
-                            <div className="flex items-center justify-center gap-1.5">
-                              {/* Visit Store Button */}
-                              <Link
-                                href={`/s/${slug}`}
-                                target="_blank"
-                                className="p-2 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-lg transition-colors border border-slate-700"
-                                title="زيارة المتجر"
-                              >
-                                <ExternalLink className="w-3.5 h-3.5" />
-                              </Link>
+                {/* Secondary Metrics Bar */}
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-slate-900/40 p-4 rounded-xl border border-slate-800/60 text-xs">
+                  <div className="flex items-center gap-2.5">
+                    <Package className="w-4 h-4 text-purple-400 shrink-0" />
+                    <div>
+                      <span className="text-slate-400 block text-[11px]">المنتجات بالمنصة</span>
+                      <span className="font-bold text-white text-sm">{stats.totalProducts} منتج</span>
+                    </div>
+                  </div>
 
-                              {/* Toggle Active Status Button */}
-                              <button
-                                onClick={() => handleToggleStatus(store)}
-                                disabled={isActionPending}
-                                className={`p-2 rounded-lg transition-colors border ${
-                                  isActive
-                                    ? 'bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border-amber-500/30'
-                                    : 'bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border-emerald-500/30'
-                                } disabled:opacity-50`}
-                                title={isActive ? 'إيقاف المتجر مؤقتاً' : 'تفعيل المتجر'}
-                              >
-                                <Power className="w-3.5 h-3.5" />
-                              </button>
+                  <div className="flex items-center gap-2.5">
+                    <Star className="w-4 h-4 text-amber-400 shrink-0" />
+                    <div>
+                      <span className="text-slate-400 block text-[11px]">تقييمات المشترين</span>
+                      <span className="font-bold text-white text-sm">{stats.totalReviews} تقييم</span>
+                    </div>
+                  </div>
 
-                              {/* Delete Store Button */}
-                              <button
-                                onClick={() => handleDeleteStore(store)}
-                                disabled={isActionPending}
-                                className="p-2 bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 hover:text-rose-300 border border-rose-500/30 rounded-lg transition-colors disabled:opacity-50"
-                                title="حذف المتجر نهائياً"
-                              >
-                                <Trash2 className="w-3.5 h-3.5" />
-                              </button>
-                            </div>
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
+                  <div className="flex items-center gap-2.5">
+                    <Eye className="w-4 h-4 text-cyan-400 shrink-0" />
+                    <div>
+                      <span className="text-slate-400 block text-[11px]">زيارات واجهات المتاجر</span>
+                      <span className="font-bold text-white text-sm">{stats.totalViews.toLocaleString()} زيارة</span>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2.5">
+                    <Building2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                    <div>
+                      <span className="text-slate-400 block text-[11px]">متاجر بالنطاقات الفرعية</span>
+                      <span className="font-bold text-white text-sm">{stats.activeStores} نطاق فعال</span>
+                    </div>
+                  </div>
+                </div>
               </div>
             )}
-          </div>
-        </div>
+
+            {/* Stores Management Section */}
+            <div className="space-y-4">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div>
+                  <h3 className="text-lg font-black text-white flex items-center gap-2">
+                    <StoreIcon className="w-5 h-5 text-emerald-400" />
+                    <span>إدارة جميع متاجر المنصة</span>
+                    <span className="text-xs px-2.5 py-0.5 rounded-full bg-slate-800 text-slate-300 font-bold">
+                      {filteredStores.length} متجر
+                    </span>
+                  </h3>
+                  <p className="text-xs text-slate-400">
+                    يمكنك البحث، مراقبة المبيعات، إيقاف أي متجر مؤقتاً أو حذفه بالكامل مع كافة ملحقاته.
+                  </p>
+                </div>
+
+                {/* Filter Buttons */}
+                <div className="flex items-center gap-1.5 bg-slate-900 border border-slate-800 p-1 rounded-xl">
+                  <button
+                    onClick={() => setStatusFilter('all')}
+                    className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-all ${
+                      statusFilter === 'all'
+                        ? 'bg-emerald-500 text-slate-950 font-black'
+                        : 'text-slate-400 hover:text-white'
+                    }`}
+                  >
+                    الكل ({stores.length})
+                  </button>
+                  <button
+                    onClick={() => setStatusFilter('active')}
+                    className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-all ${
+                      statusFilter === 'active'
+                        ? 'bg-emerald-500 text-slate-950 font-black'
+                        : 'text-slate-400 hover:text-white'
+                    }`}
+                  >
+                    نشطة ({stores.filter(s => s.isActive).length})
+                  </button>
+                  <button
+                    onClick={() => setStatusFilter('suspended')}
+                    className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-all ${
+                      statusFilter === 'suspended'
+                        ? 'bg-rose-500 text-white font-black'
+                        : 'text-slate-400 hover:text-white'
+                    }`}
+                  >
+                    موقوفة ({stores.filter(s => !s.isActive).length})
+                  </button>
+                </div>
+              </div>
+
+              {/* Search Box */}
+              <div className="relative">
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="ابحث باسم المتجر، المالك، البريد، رقم الواتساب، المدينة أو النطاق..."
+                  className="w-full bg-slate-900/90 border border-slate-800 rounded-xl pr-10 pl-4 py-3 text-sm text-slate-100 placeholder:text-slate-500 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all"
+                />
+                <Search className="w-4 h-4 text-slate-500 absolute right-3.5 top-3.5" />
+              </div>
+
+              {/* Stores Table */}
+              <div className="bg-slate-900/70 border border-slate-800 rounded-2xl overflow-hidden shadow-xl">
+                {filteredStores.length === 0 ? (
+                  <div className="p-12 text-center space-y-3">
+                    <div className="w-12 h-12 rounded-full bg-slate-800 text-slate-500 flex items-center justify-center mx-auto">
+                      <StoreIcon className="w-6 h-6" />
+                    </div>
+                    <h4 className="text-base font-bold text-slate-300">لم يتم العثور على أي متاجر</h4>
+                    <p className="text-xs text-slate-500">
+                      {searchQuery ? 'لا توجد نتائج تطابق معايير البحث الحالية.' : 'لا توجد متاجر مسجلة في هذا التبويب.'}
+                    </p>
+                  </div>
+                ) : (
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-right text-xs">
+                      <thead className="bg-slate-950/80 text-slate-400 font-bold border-b border-slate-800 uppercase tracking-wider">
+                        <tr>
+                          <th className="py-3.5 px-4">المتجر والرابط</th>
+                          <th className="py-3.5 px-4">المالك والتواصل</th>
+                          <th className="py-3.5 px-4">المدينة والتصنيف</th>
+                          <th className="py-3.5 px-4">الباقة</th>
+                          <th className="py-3.5 px-4">المبيعات والطلبات</th>
+                          <th className="py-3.5 px-4">الحالة</th>
+                          <th className="py-3.5 px-4 text-center">الإجراءات والتحكم</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-800/60 text-slate-300">
+                        {filteredStores.map((store) => {
+                          const storeId = store.id;
+                          const storeName = store.storeName;
+                          const ownerName = store.ownerName;
+                          const slug = store.slug;
+                          const emailVal = store.email;
+                          const phone = store.whatsAppNumber;
+                          const city = store.city;
+                          const category = store.businessCategory;
+                          const plan = store.planType || 'Free';
+                          const isActive = store.isActive;
+                          const ordersCount = store.ordersCount;
+                          const productsCount = store.productsCount;
+                          const revenue = store.totalRevenue;
+                          const isActionPending = actionLoadingId === storeId;
+
+                          return (
+                            <tr key={storeId} className="hover:bg-slate-800/30 transition-colors">
+                              {/* Store Name & Slug */}
+                              <td className="py-3.5 px-4">
+                                <div className="space-y-0.5">
+                                  <span className="font-bold text-white text-sm block">
+                                    {storeName}
+                                  </span>
+                                  <div className="flex items-center gap-1.5 text-[11px] text-slate-400 font-mono">
+                                    <span className="text-emerald-400">/{slug}</span>
+                                    <span>•</span>
+                                    <span className="text-slate-500 font-sans">{store.publicCode}</span>
+                                  </div>
+                                  <span className="text-[10px] text-slate-500 block">
+                                    تم التسجيل: {new Date(store.createdAt).toLocaleDateString('ar-EG')}
+                                  </span>
+                                </div>
+                              </td>
+
+                              {/* Owner & Contact */}
+                              <td className="py-3.5 px-4">
+                                <div className="space-y-1">
+                                  <span className="font-bold text-slate-200 block">
+                                    {ownerName}
+                                  </span>
+                                  <div className="flex items-center gap-1 text-[11px] text-slate-400 font-mono">
+                                    <a 
+                                      href={`https://wa.me/${phone}`} 
+                                      target="_blank" 
+                                      rel="noopener noreferrer"
+                                      className="text-emerald-400 hover:underline flex items-center gap-1"
+                                    >
+                                      <Phone className="w-3 h-3" />
+                                      <span>{phone}</span>
+                                    </a>
+                                  </div>
+                                  <span className="text-[11px] text-slate-400 block truncate max-w-[160px]" title={emailVal}>
+                                    {emailVal}
+                                  </span>
+                                </div>
+                              </td>
+
+                              {/* City & Category */}
+                              <td className="py-3.5 px-4">
+                                <div className="space-y-0.5">
+                                  <span className="font-bold text-slate-200 block">
+                                    {city}
+                                  </span>
+                                  <span className="text-[11px] text-slate-400 block">
+                                    {category}
+                                  </span>
+                                </div>
+                              </td>
+
+                              {/* Plan */}
+                              <td className="py-3.5 px-4">
+                                <span className={`inline-block px-2.5 py-1 rounded-md text-[11px] font-black uppercase ${
+                                  plan === 'VIP'
+                                    ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
+                                    : plan === 'Pro'
+                                    ? 'bg-purple-500/20 text-purple-300 border border-purple-500/30'
+                                    : 'bg-slate-800 text-slate-400 border border-slate-700'
+                                }`}>
+                                  {plan}
+                                </span>
+                              </td>
+
+                              {/* Orders & Revenue */}
+                              <td className="py-3.5 px-4">
+                                <div className="space-y-0.5">
+                                  <span className="font-black text-white text-xs block">
+                                    {(revenue || 0).toLocaleString('ar-EG')} ج.م
+                                  </span>
+                                  <div className="flex items-center gap-2 text-[11px] text-slate-400">
+                                    <span className="text-blue-400 font-bold">{ordersCount || 0} طلب</span>
+                                    <span>•</span>
+                                    <span>{productsCount || 0} منتج</span>
+                                  </div>
+                                </div>
+                              </td>
+
+                              {/* Status Badge */}
+                              <td className="py-3.5 px-4">
+                                {isActive ? (
+                                  <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
+                                    <CheckCircle2 className="w-3 h-3 text-emerald-400" />
+                                    <span>نشط ومتاح</span>
+                                  </span>
+                                ) : (
+                                  <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-rose-500/10 text-rose-400 border border-rose-500/30">
+                                    <XCircle className="w-3 h-3 text-rose-400" />
+                                    <span>موقوف مؤقتاً</span>
+                                  </span>
+                                )}
+                              </td>
+
+                              {/* Actions */}
+                              <td className="py-3.5 px-4 text-center">
+                                <div className="flex items-center justify-center gap-1.5">
+                                  {/* Visit Store Button */}
+                                  <Link
+                                    href={`/s/${slug}`}
+                                    target="_blank"
+                                    className="p-2 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-lg transition-colors border border-slate-700"
+                                    title="زيارة المتجر"
+                                  >
+                                    <ExternalLink className="w-3.5 h-3.5" />
+                                  </Link>
+
+                                  {/* Toggle Active Status Button */}
+                                  <button
+                                    onClick={() => handleToggleStatus(store)}
+                                    disabled={isActionPending}
+                                    className={`p-2 rounded-lg transition-colors border ${
+                                      isActive
+                                        ? 'bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border-amber-500/30'
+                                        : 'bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border-emerald-500/30'
+                                    } disabled:opacity-50`}
+                                    title={isActive ? 'إيقاف المتجر مؤقتاً' : 'تفعيل المتجر'}
+                                  >
+                                    <Power className="w-3.5 h-3.5" />
+                                  </button>
+
+                                  {/* Delete Store Button */}
+                                  <button
+                                    onClick={() => handleDeleteStore(store)}
+                                    disabled={isActionPending}
+                                    className="p-2 bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 hover:text-rose-300 border border-rose-500/30 rounded-lg transition-colors disabled:opacity-50"
+                                    title="حذف المتجر نهائياً"
+                                  >
+                                    <Trash2 className="w-3.5 h-3.5" />
+                                  </button>
+                                </div>
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
+            </div>
+          </>
+        )}
       </main>
     </div>
   );

@@ -275,10 +275,16 @@ using (var scope = app.Services.CreateScope())
                         ""IsActive"" BOOLEAN NOT NULL DEFAULT TRUE,
                         ""CreatedAt"" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
                     );
-                    CREATE UNIQUE INDEX IF NOT EXISTS ""IX_StoreCoupons_StoreId_Code"" ON ""StoreCoupons"" (""StoreId"", ""Code"");
-                    CREATE INDEX IF NOT EXISTS ""IX_StoreCoupons_StoreId_IsActive"" ON ""StoreCoupons"" (""StoreId"", ""IsActive"");
+                    CREATE TABLE IF NOT EXISTS ""SuperAdmins"" (
+                        ""Id"" UUID NOT NULL PRIMARY KEY,
+                        ""Email"" VARCHAR(150) NOT NULL UNIQUE,
+                        ""PasswordHash"" VARCHAR(255) NOT NULL,
+                        ""ResetToken"" VARCHAR(100) NULL,
+                        ""ResetTokenExpiresAt"" TIMESTAMP WITH TIME ZONE NULL,
+                        ""UpdatedAt"" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
+                    );
                 ");
-                logger.LogInformation("PostgreSQL database columns & StoreReviews/StoreCoupons tables verified/applied successfully.");
+                logger.LogInformation("PostgreSQL database columns & StoreReviews/StoreCoupons/SuperAdmins tables verified/applied successfully.");
             }
             else
             {
@@ -326,13 +332,55 @@ using (var scope = app.Services.CreateScope())
                         CREATE UNIQUE INDEX IX_StoreCoupons_StoreId_Code ON StoreCoupons (StoreId, Code);
                         CREATE INDEX IX_StoreCoupons_StoreId_IsActive ON StoreCoupons (StoreId, IsActive);
                     END
+
+                    IF NOT EXISTS (SELECT * FROM sys.tables WHERE name = 'SuperAdmins')
+                    BEGIN
+                        CREATE TABLE SuperAdmins (
+                            Id UNIQUEIDENTIFIER NOT NULL PRIMARY KEY,
+                            Email NVARCHAR(150) NOT NULL UNIQUE,
+                            PasswordHash NVARCHAR(255) NOT NULL,
+                            ResetToken NVARCHAR(100) NULL,
+                            ResetTokenExpiresAt DATETIME2 NULL,
+                            UpdatedAt DATETIME2 NOT NULL DEFAULT GETUTCDATE()
+                        );
+                    END
                 ");
-                logger.LogInformation("SQL Server database column migrations & StoreReviews/StoreCoupons tables checked and applied successfully.");
+                logger.LogInformation("SQL Server database column migrations & StoreReviews/StoreCoupons/SuperAdmins tables checked and applied successfully.");
             }
         }
         catch (Exception colEx)
         {
             logger.LogWarning(colEx, "Column/Table migration check skipped or failed.");
+        }
+
+        // Auto-seed default Super Admin account (abdallahsay10@gmail.com)
+        try
+        {
+            var adminEmail = "abdallahsay10@gmail.com";
+            var existingAdmin = await db.SuperAdmins.FirstOrDefaultAsync(a => a.Email == adminEmail);
+            if (existingAdmin == null)
+            {
+                var legacyAdmin = await db.SuperAdmins.FirstOrDefaultAsync(a => a.Email == "admin@watsstore.com");
+                if (legacyAdmin != null)
+                {
+                    db.SuperAdmins.Remove(legacyAdmin);
+                }
+
+                var defaultHash = BCrypt.Net.BCrypt.HashPassword("Admin@WatsStore2026!");
+                db.SuperAdmins.Add(new SuperAdmin
+                {
+                    Id = Guid.NewGuid(),
+                    Email = adminEmail,
+                    PasswordHash = defaultHash,
+                    UpdatedAt = DateTime.UtcNow
+                });
+                await db.SaveChangesAsync();
+                logger.LogInformation("Super Admin account seeded successfully for {Email}", adminEmail);
+            }
+        }
+        catch (Exception adminEx)
+        {
+            logger.LogWarning(adminEx, "Super Admin seeding skipped or failed.");
         }
 
         if (!await db.Stores.AnyAsync(s => s.Slug == "al-amal-fashion"))

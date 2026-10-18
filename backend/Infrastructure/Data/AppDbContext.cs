@@ -15,6 +15,7 @@ namespace WatsStore.Api.Infrastructure.Data
         public DbSet<WhatsAppOrder> WhatsAppOrders => Set<WhatsAppOrder>();
         public DbSet<StoreReview> StoreReviews => Set<StoreReview>();
         public DbSet<StoreCoupon> StoreCoupons => Set<StoreCoupon>();
+        public DbSet<SuperAdmin> SuperAdmins => Set<SuperAdmin>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -151,6 +152,16 @@ namespace WatsStore.Api.Infrastructure.Data
 
                 entity.HasIndex(c => new { c.StoreId, c.Code }).IsUnique();
                 entity.HasIndex(c => new { c.StoreId, c.IsActive });
+            });
+
+            // SuperAdmin Configuration
+            modelBuilder.Entity<SuperAdmin>(entity =>
+            {
+                entity.HasKey(a => a.Id);
+                entity.Property(a => a.Email).HasMaxLength(150).IsRequired();
+                entity.Property(a => a.PasswordHash).HasMaxLength(255).IsRequired();
+                entity.Property(a => a.ResetToken).HasMaxLength(100);
+                entity.HasIndex(a => a.Email).IsUnique();
             });
         }
     }

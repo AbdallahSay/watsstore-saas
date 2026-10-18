@@ -15,7 +15,8 @@ import {
   AdminLoginResponse,
   AdminStoreSummary,
   AdminPlatformStats,
-  ToggleStoreStatusResponse
+  ToggleStoreStatusResponse,
+  AdminForgotPasswordResponse
 } from '../types';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://watsstore.runasp.net/api';
@@ -410,6 +411,31 @@ export const api = {
         Authorization: `Bearer ${token}`,
         'X-Admin-Key': token.startsWith('WatsStore_') ? token : '',
       },
+    });
+  },
+
+  async adminChangePassword(token: string, data: { currentPassword: string; newPassword: string }): Promise<{ message: string }> {
+    return fetchJson<{ message: string }>(`${API_BASE_URL}/admin/change-password`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'X-Admin-Key': token.startsWith('WatsStore_') ? token : '',
+      },
+      body: JSON.stringify(data),
+    });
+  },
+
+  async adminForgotPassword(email: string): Promise<AdminForgotPasswordResponse> {
+    return fetchJson<AdminForgotPasswordResponse>(`${API_BASE_URL}/admin/forgot-password`, {
+      method: 'POST',
+      body: JSON.stringify({ email }),
+    });
+  },
+
+  async adminResetPassword(data: { email: string; resetToken: string; newPassword: string }): Promise<{ message: string }> {
+    return fetchJson<{ message: string }>(`${API_BASE_URL}/admin/reset-password`, {
+      method: 'POST',
+      body: JSON.stringify(data),
     });
   },
 };

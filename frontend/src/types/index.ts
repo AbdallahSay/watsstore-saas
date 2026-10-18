@@ -294,3 +294,9 @@ export interface ToggleStoreStatusResponse {
   message: string;
 }
 
+export interface AdminForgotPasswordResponse {
+  message: string;
+  resetToken: string;
+  expiresInMinutes: number;
+}
+
