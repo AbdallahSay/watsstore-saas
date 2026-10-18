@@ -14,6 +14,7 @@ using WatsStore.Api.Infrastructure.Utils;
 namespace WatsStore.Api.Controllers
 {
     [ApiController]
+    [Route("api/merchant")]
     [Route("api/[controller]")]
     [Authorize]
     public class MerchantDashboardController : ControllerBase

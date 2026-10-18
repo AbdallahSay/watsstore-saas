@@ -20,6 +20,7 @@ publish/
 appsettings.Production.json
 backend/appsettings.Production.json
 deploy_monsterasp.py
+deploy_monsterasp.ps1
 .env
 .env.local
 .env.*.local
