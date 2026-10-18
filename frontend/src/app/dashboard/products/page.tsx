@@ -31,6 +31,8 @@ export default function DashboardProductsPage() {
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [planType, setPlanType] = useState('Free');
   const [storeName, setStoreName] = useState('');
+  const [aiGenerationsUsed, setAiGenerationsUsed] = useState(0);
+  const [aiGenerationsLimit, setAiGenerationsLimit] = useState(0);
 
   // Form State
   const [formName, setFormName] = useState('');
@@ -69,6 +71,8 @@ export default function DashboardProductsPage() {
       setCategories(cats);
       setPlanType(summary.storeInfo?.planType || 'Free');
       setStoreName(summary.storeInfo?.storeName || '');
+      setAiGenerationsUsed(summary.aiGenerationsUsed ?? summary.storeInfo?.aiGenerationsUsed ?? 0);
+      setAiGenerationsLimit(summary.aiGenerationsLimit ?? summary.storeInfo?.aiGenerationsLimit ?? (summary.storeInfo?.planType === 'Pro' ? 15 : summary.storeInfo?.planType === 'VIP' ? 150 : 0));
     } catch (err: any) {
       Swal.fire({
         icon: 'error',
@@ -84,22 +88,22 @@ export default function DashboardProductsPage() {
     fetchInitialData();
   }, []);
 
-  const openUpgradeWhatsApp = () => {
+  const openUpgradeWhatsApp = (targetPlan: 'Pro' | 'VIP' = 'Pro') => {
     const text = encodeURIComponent(
-      `مرحباً Masar Tech، أرغب في ترقية باقة متجري (${storeName}) إلى باقة Pro لإضافة منتجات غير محدودة وتفعيل مميزات المتجر المتقدمة.`
+      `مرحباً Masar Tech، أرغب في ترقية باقة متجري (${storeName}) إلى باقة ${targetPlan} لزيادة المنتجات وتفعيل مميزات المتجر المتقدمة.`
     );
     window.open(`https://wa.me/${platformConfig.supportWhatsApp}?text=${text}`, '_blank');
   };
 
   const openCreateModal = () => {
-    if (planType === 'Free' && products.length >= 15) {
+    if (planType === 'Free' && products.length >= 10) {
       Swal.fire({
         icon: 'warning',
-        title: 'وصلت للحد الأقصى (15 منتج) 🔒',
+        title: 'وصلت للحد الأقصى (10 منتجات) 🔒',
         html: `
           <div class="text-right text-xs space-y-2 text-slate-600 leading-relaxed">
-            <p>أنت حالياً على <b>الباقة المجانية</b> والتي تتيح إضافة حتى 15 منتج كحد أقصى.</p>
-            <p>لإضافة عدد غير محدود من المنتجات وتفعيل Meta Pixel، قم بترقية متجرك لباقة <b>Pro</b> بسعر 149 ج.م فقط شهرياً!</p>
+            <p>أنت حالياً على <b>فترة التجربة المجانية (14 يوماً)</b> والتي تتيح إضافة حتى 10 منتجات كحد أقصى.</p>
+            <p>لإضافة حتى 100 منتج وتفعيل ميزة الذكاء الاصطناعي وتقارير Excel، قم بترقية متجرك لباقة <b>Pro</b> بسعر 149 ج.م فقط شهرياً!</p>
           </div>
         `,
         showCancelButton: true,
@@ -108,7 +112,29 @@ export default function DashboardProductsPage() {
         confirmButtonColor: '#059669',
       }).then((res) => {
         if (res.isConfirmed) {
-          openUpgradeWhatsApp();
+          openUpgradeWhatsApp('Pro');
+        }
+      });
+      return;
+    }
+
+    if (planType === 'Pro' && products.length >= 100) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'وصلت للحد الأقصى (100 منتج) 🔒',
+        html: `
+          <div class="text-right text-xs space-y-2 text-slate-600 leading-relaxed">
+            <p>لقد استهلكت كامل مساحة باقة <b>Pro</b> (100 منتج كحد أقصى).</p>
+            <p>لإضافة عدد غير محدود من المنتجات وتفعيل 150 وصف ذكاء اصطناعي شهرياً، قم بترقية متجرك لباقة <b>VIP</b> بسعر 299 ج.م شهرياً!</p>
+          </div>
+        `,
+        showCancelButton: true,
+        confirmButtonText: 'ترقية إلى VIP عبر واتساب',
+        cancelButtonText: 'لاحقاً',
+        confirmButtonColor: '#059669',
+      }).then((res) => {
+        if (res.isConfirmed) {
+          openUpgradeWhatsApp('VIP');
         }
       });
       return;
@@ -201,6 +227,63 @@ export default function DashboardProductsPage() {
       return;
     }
 
+    // Free plan strictly locked (0 AI quota)
+    if (planType === 'Free') {
+      Swal.fire({
+        icon: 'info',
+        title: 'ميزة الذكاء الاصطناعي مقفلة 🔒',
+        html: `
+          <div class="text-right text-xs space-y-2 text-slate-600 leading-relaxed">
+            <p class="font-bold text-slate-800">ميزة كتابة الوصف بالذكاء الاصطناعي متاحة فقط في باقات <b>Pro</b> و <b>VIP</b>.</p>
+            <p>رقِّ باقتك الآن لتوفير وقتك ومضاعفة مبيعاتك مع وصف تسويقي احترافي بضغطة زر واحدة!</p>
+            <div class="p-3 bg-emerald-50 rounded-xl border border-emerald-200 mt-2 space-y-1">
+              <p class="font-bold text-emerald-950">مميزات الترقية الفورية:</p>
+              <p>⭐ <b>باقة Pro</b>: 15 وصف ذكي شهرياً + 100 منتج + تقارير Excel</p>
+              <p>👑 <b>باقة VIP</b>: 150 وصف ذكي شهرياً + منتجات وكوبونات غير محدودة</p>
+            </div>
+          </div>
+        `,
+        showCancelButton: true,
+        confirmButtonText: 'ترقية الباقة الآن عبر واتساب',
+        cancelButtonText: 'إغلاق',
+        confirmButtonColor: '#059669',
+      }).then((res) => {
+        if (res.isConfirmed) {
+          openUpgradeWhatsApp('Pro');
+        }
+      });
+      return;
+    }
+
+    // Quota exhaustion check
+    const effectiveLimit = aiGenerationsLimit || (planType === 'Pro' ? 15 : planType === 'VIP' ? 150 : 0);
+    if (effectiveLimit > 0 && aiGenerationsUsed >= effectiveLimit) {
+      const isPro = planType === 'Pro';
+      Swal.fire({
+        icon: 'warning',
+        title: 'نفد رصيد الذكاء الاصطناعي الشهري ⚠️',
+        html: `
+          <div class="text-right text-xs space-y-2 text-slate-600 leading-relaxed">
+            <p>لقد استهلكت رصيدك الشهري من الذكاء الاصطناعي في باقة ${planType} (${aiGenerationsUsed}/${effectiveLimit} وصف).</p>
+            ${
+              isPro
+                ? '<p class="font-bold text-emerald-700">رقِّ باقتك إلى VIP للحصول على 150 وصفاً ذكياً شهرياً ومنتجات غير محدودة!</p>'
+                : '<p>يتجدد رصيدك الشهري تلقائياً مع بداية كل دورة اشتراك.</p>'
+            }
+          </div>
+        `,
+        showCancelButton: isPro,
+        confirmButtonText: isPro ? 'ترقية إلى VIP الآن' : 'حسناً',
+        cancelButtonText: 'إغلاق',
+        confirmButtonColor: '#059669',
+      }).then((res) => {
+        if (res.isConfirmed && isPro) {
+          openUpgradeWhatsApp('VIP');
+        }
+      });
+      return;
+    }
+
     const token = localStorage.getItem('watsstore_token');
     setIsGeneratingAi(true);
 
@@ -213,11 +296,22 @@ export default function DashboardProductsPage() {
         });
         if (res?.description) {
           setFormDescription(res.description);
+          const newUsed = res.aiGenerationsUsed ?? (aiGenerationsUsed + 1);
+          const newLimit = res.aiGenerationsLimit ?? effectiveLimit;
+          const remaining = res.remainingQuota ?? Math.max(0, newLimit - newUsed);
+          setAiGenerationsUsed(newUsed);
+          setAiGenerationsLimit(newLimit);
+
           Swal.fire({
             icon: 'success',
             title: 'تم توليد الوصف بنجاح! ✨',
-            text: 'تمت كتابة وصف تسويقي احترافي للمنتج بواسطة الذكاء الاصطناعي.',
-            timer: 2000,
+            html: `
+              <div class="text-right text-xs space-y-1.5 text-slate-600">
+                <p>تمت صياغة وصف تسويقي احترافي للمنتج بواسطة الذكاء الاصطناعي.</p>
+                <p class="font-bold text-emerald-700">المتبقي من رصيدك الشهري: ${remaining} من أصل ${newLimit} وصف.</p>
+              </div>
+            `,
+            timer: 3000,
             showConfirmButton: false,
           });
           return;
@@ -225,7 +319,31 @@ export default function DashboardProductsPage() {
       }
       throw new Error('Fallback required');
     } catch (err: any) {
-      console.warn('Backend AI generation fallback:', err);
+      console.warn('Backend AI generation response/error:', err);
+      const errMsg = err?.message || '';
+      if (
+        errMsg.includes('متاحة فقط في باقات') ||
+        errMsg.includes('استهلكت رصيدك') ||
+        errMsg.includes('ترقية') ||
+        errMsg.includes('403') ||
+        errMsg.includes('Forbidden')
+      ) {
+        Swal.fire({
+          icon: 'warning',
+          title: 'تنبيه الباقة 🔒',
+          text: errMsg,
+          showCancelButton: true,
+          confirmButtonText: 'ترقية الباقة عبر واتساب',
+          cancelButtonText: 'إلغاء',
+          confirmButtonColor: '#059669',
+        }).then((res) => {
+          if (res.isConfirmed) {
+            openUpgradeWhatsApp(planType === 'Pro' ? 'VIP' : 'Pro');
+          }
+        });
+        return;
+      }
+
       const fallbackDesc = `✨ استمتع بأعلى مستويات الجودة والراحة مع ${formName.trim()} الفاخر.\n\n💎 أهم المميزات:\n• خامات ممتازة مختارة بعناية تدوم طويلاً وتمنحك أفضل أداء.\n• تصميم عصري وأنيق يلبي احتياجاتك واستخدامك اليومي.\n• متوفر بأعلى معايير الدقة والتشطيب الاحترافي.\n\n🚚 توصيل سريع لجميع المحافظات مع ضمان المعاينة قبل الاستلام!\n⚡ اطلب الآن عبر الواتساب واستفد من العرض الحصري!`;
       setFormDescription(fallbackDesc);
       Swal.fire({
@@ -369,12 +487,17 @@ export default function DashboardProductsPage() {
             <h1 className="text-2xl font-black text-slate-900">إدارة المنتجات والكتالوج</h1>
             {planType === 'Free' ? (
               <span className="text-[11px] font-bold px-2.5 py-1 rounded-full bg-slate-100 text-slate-700 border border-slate-200">
-                منتجاتك: {products.length} / 15 (الباقة المجانية)
+                منتجاتك: {products.length} / 10 (تجربة مجانية 14 يوماً)
+              </span>
+            ) : planType === 'Pro' ? (
+              <span className="text-[11px] font-bold px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center gap-1">
+                <Crown className="w-3 h-3 text-amber-500" />
+                <span>منتجاتك: {products.length} / 100 (باقة Pro)</span>
               </span>
             ) : (
               <span className="text-[11px] font-bold px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center gap-1">
                 <Crown className="w-3 h-3 text-amber-500" />
-                <span>منتجات غير محدودة ({planType})</span>
+                <span>منتجات غير محدودة (VIP 👑)</span>
               </span>
             )}
           </div>
@@ -384,13 +507,23 @@ export default function DashboardProductsPage() {
         </div>
 
         <div className="flex items-center gap-3">
-          {planType === 'Free' && products.length >= 12 && (
+          {planType === 'Free' && products.length >= 8 && (
             <button
-              onClick={openUpgradeWhatsApp}
+              onClick={() => openUpgradeWhatsApp('Pro')}
               className="px-3.5 py-2 bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200 text-xs font-bold rounded-2xl flex items-center gap-1.5 transition-all"
             >
               <Crown className="w-3.5 h-3.5 text-amber-600" />
-              <span>ترقية لمنتجات غير محدودة</span>
+              <span>ترقية لباقة Pro</span>
+            </button>
+          )}
+
+          {planType === 'Pro' && products.length >= 85 && (
+            <button
+              onClick={() => openUpgradeWhatsApp('VIP')}
+              className="px-3.5 py-2 bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200 text-xs font-bold rounded-2xl flex items-center gap-1.5 transition-all"
+            >
+              <Crown className="w-3.5 h-3.5 text-amber-600" />
+              <span>ترقية لباقة VIP</span>
             </button>
           )}
 
@@ -405,19 +538,37 @@ export default function DashboardProductsPage() {
       </div>
 
       {/* Free Plan Limit Notice if Near Limit */}
-      {planType === 'Free' && products.length >= 14 && (
+      {planType === 'Free' && products.length >= 8 && (
         <div className="p-4 rounded-2xl bg-amber-50 border border-amber-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs text-amber-900">
           <div className="flex items-center gap-2">
             <AlertCircle className="w-5 h-5 text-amber-600 shrink-0" />
             <span>
-              لقد استخدمت <b>{products.length} من أصل 15 منتجاً</b> متاحاً في باقتك المجانية. ترقية متجرك تمنحك منتجات غير محدودة فوراً!
+              لقد أضفت <b>{products.length} من أصل 10 منتجات</b> مسموحة في فترة التجربة المجانية. ترقية متجرك تمنحك حتى 100 منتج وميزات الذكاء الاصطناعي فوراً!
             </span>
           </div>
           <button
-            onClick={openUpgradeWhatsApp}
+            onClick={() => openUpgradeWhatsApp('Pro')}
             className="px-3 py-1.5 bg-amber-600 hover:bg-amber-700 text-white font-bold rounded-xl whitespace-nowrap self-start sm:self-auto"
           >
             ترقية متجري الآن
+          </button>
+        </div>
+      )}
+
+      {/* Pro Plan Limit Notice if Near Limit */}
+      {planType === 'Pro' && products.length >= 85 && (
+        <div className="p-4 rounded-2xl bg-amber-50 border border-amber-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs text-amber-900">
+          <div className="flex items-center gap-2">
+            <AlertCircle className="w-5 h-5 text-amber-600 shrink-0" />
+            <span>
+              لقد أضفت <b>{products.length} من أصل 100 منتج</b> متاح في باقة Pro. ترقية متجرك لباقة VIP تمنحك منتجات غير محدودة و150 وصف ذكاء اصطناعي شهرياً!
+            </span>
+          </div>
+          <button
+            onClick={() => openUpgradeWhatsApp('VIP')}
+            className="px-3 py-1.5 bg-amber-600 hover:bg-amber-700 text-white font-bold rounded-xl whitespace-nowrap self-start sm:self-auto"
+          >
+            ترقية إلى VIP
           </button>
         </div>
       )}
@@ -698,21 +849,36 @@ export default function DashboardProductsPage() {
               </div>
 
               <div>
-                <div className="flex items-center justify-between mb-1.5">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 mb-1.5">
                   <label className="block font-bold text-slate-700">وصف المنتج ومميزاته</label>
-                  <button
-                    type="button"
-                    onClick={handleGenerateAiDescription}
-                    disabled={isGeneratingAi}
-                    className="flex items-center gap-1.5 text-xs font-bold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 px-2.5 py-1 rounded-lg transition-colors disabled:opacity-50"
-                  >
-                    {isGeneratingAi ? (
-                      <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                  <div className="flex items-center gap-2 flex-wrap">
+                    {planType === 'Free' ? (
+                      <span className="text-[10px] font-bold text-amber-800 bg-amber-50 border border-amber-300 px-2 py-0.5 rounded-full flex items-center gap-1">
+                        🔒 متاح في Pro و VIP
+                      </span>
                     ) : (
-                      <Sparkles className="w-3.5 h-3.5 text-emerald-600" />
+                      <span className="text-[10px] font-bold text-emerald-800 bg-emerald-50 border border-emerald-300 px-2 py-0.5 rounded-full flex items-center gap-1">
+                        ✨ متبقي {Math.max(0, (aiGenerationsLimit || (planType === 'Pro' ? 15 : 150)) - aiGenerationsUsed)} من {aiGenerationsLimit || (planType === 'Pro' ? 15 : 150)}
+                      </span>
                     )}
-                    <span>توليد وصف ذكي بالذكاء الاصطناعي ✨</span>
-                  </button>
+                    <button
+                      type="button"
+                      onClick={handleGenerateAiDescription}
+                      disabled={isGeneratingAi}
+                      className={`flex items-center gap-1.5 text-xs font-bold px-2.5 py-1 rounded-lg transition-colors disabled:opacity-50 ${
+                        planType === 'Free'
+                          ? 'text-amber-800 bg-amber-50 hover:bg-amber-100 border border-amber-300'
+                          : 'text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200'
+                      }`}
+                    >
+                      {isGeneratingAi ? (
+                        <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                      ) : (
+                        <Sparkles className={`w-3.5 h-3.5 ${planType === 'Free' ? 'text-amber-600' : 'text-emerald-600'}`} />
+                      )}
+                      <span>{planType === 'Free' ? 'توليد وصف ذكي (ترقية 🔒)' : 'توليد وصف ذكي بالذكاء الاصطناعي ✨'}</span>
+                    </button>
+                  </div>
                 </div>
                 <textarea
                   rows={3}

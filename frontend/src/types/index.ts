@@ -163,6 +163,9 @@ export interface DashboardSummary {
   isTrialExpired?: boolean;
   remainingTrialDays?: number;
   trialEndsAt?: string | null;
+  aiGenerationsUsed?: number;
+  aiGenerationsLimit?: number;
+  remainingAiQuota?: number;
   storeInfo: {
     id: string;
     storeName: string;
@@ -189,6 +192,9 @@ export interface DashboardSummary {
     isTrialExpired?: boolean;
     remainingTrialDays?: number;
     trialEndsAt?: string | null;
+    aiGenerationsUsed?: number;
+    aiGenerationsLimit?: number;
+    remainingAiQuota?: number;
     createdAt: string;
   };
   recentOrders: {

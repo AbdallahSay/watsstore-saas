@@ -490,7 +490,10 @@ export default function DashboardOverviewPage() {
                 {summary.totalProducts}
               </span>
               {summary.storeInfo.planType === 'Free' && (
-                <span className="text-xs font-bold text-slate-400">/ 15 متاح</span>
+                <span className="text-xs font-bold text-slate-400">/ 10 متاح</span>
+              )}
+              {summary.storeInfo.planType === 'Pro' && (
+                <span className="text-xs font-bold text-slate-400">/ 100 متاح</span>
               )}
             </div>
           </div>

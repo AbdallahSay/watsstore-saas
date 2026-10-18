@@ -12,6 +12,9 @@ namespace WatsStore.Api.DTOs
         public bool IsTrialExpired { get; set; }
         public int RemainingTrialDays { get; set; } = 14;
         public DateTime? TrialEndsAt { get; set; }
+        public int AiGenerationsUsed { get; set; }
+        public int AiGenerationsLimit { get; set; }
+        public int RemainingAiQuota { get; set; }
         public StoreProfileDto StoreInfo { get; set; } = new();
         public List<OrderDto> RecentOrders { get; set; } = new();
     }
@@ -43,6 +46,9 @@ namespace WatsStore.Api.DTOs
         public bool IsTrialExpired { get; set; }
         public int RemainingTrialDays { get; set; } = 14;
         public DateTime? TrialEndsAt { get; set; }
+        public int AiGenerationsUsed { get; set; }
+        public int AiGenerationsLimit { get; set; }
+        public int RemainingAiQuota { get; set; }
         public DateTime CreatedAt { get; set; }
     }
 
@@ -249,5 +255,8 @@ namespace WatsStore.Api.DTOs
         public string Description { get; set; } = string.Empty;
         public string ProductName { get; set; } = string.Empty;
         public string Status { get; set; } = "success";
+        public int AiGenerationsUsed { get; set; }
+        public int AiGenerationsLimit { get; set; }
+        public int RemainingQuota { get; set; }
     }
 }

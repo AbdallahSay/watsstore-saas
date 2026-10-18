@@ -198,9 +198,13 @@ export default function HomePage() {
                       <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
                       <span>كوبون خصم واحد نشط لمتجرك</span>
                     </li>
-                    <li className="flex items-center gap-2.5">
-                      <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                      <span className="font-bold text-emerald-700">ذكاء اصطناعي لكتابة وصف المنتجات (غير محدود) 🤖</span>
+                    <li className="flex items-center gap-2.5 text-slate-400">
+                      <span className="text-xs">🔒</span>
+                      <span className="line-through">كتابة الوصف بالذكاء الاصطناعي (متاح في Pro)</span>
+                    </li>
+                    <li className="flex items-center gap-2.5 text-slate-400">
+                      <span className="text-xs">🔒</span>
+                      <span className="line-through">تصدير تقارير الطلبات إلى Excel (متاح في Pro)</span>
                     </li>
                     <li className="flex items-center gap-2.5">
                       <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
@@ -208,15 +212,11 @@ export default function HomePage() {
                     </li>
                     <li className="flex items-center gap-2.5">
                       <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                      <span>دعم متغيرات المنتجات (المقاسات والألوان)</span>
+                      <span>دعم متغيرات المنتجات والمحافظ الإلكترونية</span>
                     </li>
                     <li className="flex items-center gap-2.5">
                       <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                      <span>دعم المحافظ الإلكترونية وإنستاباي 📱</span>
-                    </li>
-                    <li className="flex items-center gap-2.5">
-                      <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                      <span>رابط ورمز QR لمتجرك ومطبوعاتك</span>
+                      <span>رابط ورمز QR دائم لمتجرك ومطبوعاتك</span>
                     </li>
                   </ul>
                 </div>
@@ -237,7 +237,7 @@ export default function HomePage() {
 
                 <div>
                   <h3 className="text-xl font-bold text-slate-900">باقة المحترفين Pro</h3>
-                  <p className="text-xs text-slate-500 mt-1">للمتاجر الراغبة في التوسع وإطلاق الإعلانات الممولة</p>
+                  <p className="text-xs text-slate-500 mt-1">للمتاجر الراغبة في التوسع ومضاعفة المبيعات</p>
                   <div className="mt-6 mb-8 flex items-baseline gap-1">
                     <span className="text-4xl font-black text-emerald-600">149</span>
                     <span className="text-sm font-bold text-slate-600">ج.م / شهرياً</span>
@@ -246,11 +246,15 @@ export default function HomePage() {
                   <ul className="space-y-3.5 text-sm text-slate-700 border-t border-slate-100 pt-6">
                     <li className="flex items-center gap-2.5">
                       <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                      <span className="font-bold text-emerald-800">حتى 100 منتج و 20 كوبون خصم</span>
+                      <span className="font-bold text-emerald-800">حتى 100 منتج و 15 كوبون خصم</span>
                     </li>
                     <li className="flex items-center gap-2.5">
                       <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                      <span className="font-bold text-emerald-700">ذكاء اصطناعي لكتابة وصف المنتجات (غير محدود) 🤖</span>
+                      <span className="font-bold text-emerald-700">✨ 15 وصف بالذكاء الاصطناعي شهرياً 🤖</span>
+                    </li>
+                    <li className="flex items-center gap-2.5">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                      <span className="font-bold text-emerald-700">📊 تصدير الطلبات وتقارير المبيعات لـ Excel</span>
                     </li>
                     <li className="flex items-center gap-2.5">
                       <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
@@ -262,7 +266,7 @@ export default function HomePage() {
                     </li>
                     <li className="flex items-center gap-2.5">
                       <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                      <span>لوحة تحكم إحصائيات المبيعات والطلبات</span>
+                      <span>لوحة تحكم إحصائيات المبيعات والمنتجات الأكثر طلباً</span>
                     </li>
                     <li className="flex items-center gap-2.5">
                       <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
@@ -282,7 +286,7 @@ export default function HomePage() {
               {/* VIP PLAN */}
               <div className="bg-white rounded-3xl p-8 border border-slate-200/80 shadow-sm flex flex-col justify-between">
                 <div>
-                  <h3 className="text-xl font-bold text-slate-900">باقة النخبة VIP</h3>
+                  <h3 className="text-xl font-bold text-slate-900">باقة كبار التجار VIP 👑</h3>
                   <p className="text-xs text-slate-500 mt-1">للعلامات التجارية الكبرى والمتاجر الرائدة</p>
                   <div className="mt-6 mb-8 flex items-baseline gap-1">
                     <span className="text-4xl font-black text-slate-900">299</span>
@@ -292,19 +296,27 @@ export default function HomePage() {
                   <ul className="space-y-3.5 text-sm text-slate-600 border-t border-slate-100 pt-6">
                     <li className="flex items-center gap-2.5">
                       <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                      <span className="font-bold text-slate-900">منتجات غير محدودة وكوبونات غير محدودة 🚀</span>
+                    </li>
+                    <li className="flex items-center gap-2.5">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                      <span className="font-bold text-emerald-700">💎 150 وصفاً ذكياً بالذكاء الاصطناعي شهرياً</span>
+                    </li>
+                    <li className="flex items-center gap-2.5">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                      <span className="font-bold text-emerald-700">📊 تصدير الطلبات وتقارير المبيعات لـ Excel</span>
+                    </li>
+                    <li className="flex items-center gap-2.5">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                      <span className="font-bold">دعم النطاق الخاص الكامل (Custom Domain)</span>
+                    </li>
+                    <li className="flex items-center gap-2.5">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
                       <span>جميع مميزات باقة Pro بالكامل</span>
                     </li>
                     <li className="flex items-center gap-2.5">
                       <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                      <span className="font-bold">دعم النطاق الخاص (Custom Domain)</span>
-                    </li>
-                    <li className="flex items-center gap-2.5">
-                      <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                      <span>مدير حساب مخصص لمساعدتك في إدخال المنتجات</span>
-                    </li>
-                    <li className="flex items-center gap-2.5">
-                      <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                      <span>استشارات تسويقية وحملات لزيادة مبيعاتك</span>
+                      <span>مدير حساب مخصص وأولوية قصوى في الدعم الفني</span>
                     </li>
                   </ul>
                 </div>

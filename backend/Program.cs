@@ -306,6 +306,8 @@ using (var scope = app.Services.CreateScope())
                     ALTER TABLE ""Stores"" ADD COLUMN IF NOT EXISTS ""InstaPayAddress"" VARCHAR(100) NULL;
                     ALTER TABLE ""Stores"" ADD COLUMN IF NOT EXISTS ""ViewCount"" INT NOT NULL DEFAULT 0;
                     ALTER TABLE ""Stores"" ADD COLUMN IF NOT EXISTS ""SubscriptionEndsAt"" TIMESTAMP WITH TIME ZONE NULL;
+                    ALTER TABLE ""Stores"" ADD COLUMN IF NOT EXISTS ""AiGenerationsCount"" INT NOT NULL DEFAULT 0;
+                    ALTER TABLE ""Stores"" ADD COLUMN IF NOT EXISTS ""AiQuotaResetDate"" TIMESTAMP WITH TIME ZONE NULL;
                     ALTER TABLE ""WhatsAppOrders"" ADD COLUMN IF NOT EXISTS ""PaymentMethod"" VARCHAR(50) NOT NULL DEFAULT 'الدفع عند الاستلام';
 
                     CREATE TABLE IF NOT EXISTS ""StoreReviews"" (
@@ -353,6 +355,10 @@ using (var scope = app.Services.CreateScope())
                         ALTER TABLE Stores ADD ViewCount INT NOT NULL CONSTRAINT DF_Stores_ViewCount DEFAULT 0;
                     IF COL_LENGTH('Stores', 'SubscriptionEndsAt') IS NULL 
                         ALTER TABLE Stores ADD SubscriptionEndsAt DATETIME2 NULL;
+                    IF COL_LENGTH('Stores', 'AiGenerationsCount') IS NULL 
+                        ALTER TABLE Stores ADD AiGenerationsCount INT NOT NULL CONSTRAINT DF_Stores_AiGenerationsCount DEFAULT 0;
+                    IF COL_LENGTH('Stores', 'AiQuotaResetDate') IS NULL 
+                        ALTER TABLE Stores ADD AiQuotaResetDate DATETIME2 NULL;
                     IF COL_LENGTH('WhatsAppOrders', 'PaymentMethod') IS NULL 
                         ALTER TABLE WhatsAppOrders ADD PaymentMethod NVARCHAR(50) NOT NULL CONSTRAINT DF_WhatsAppOrders_PaymentMethod DEFAULT N'الدفع عند الاستلام';
 

@@ -572,6 +572,9 @@ namespace WatsStore.Api.Controllers
             var matchedPlan = validPlans.FirstOrDefault(p => string.Equals(p, request.Plan?.Trim(), StringComparison.OrdinalIgnoreCase)) ?? "Free";
 
             store.PlanType = matchedPlan;
+            store.AiGenerationsCount = 0;
+            store.AiQuotaResetDate = DateTime.UtcNow;
+
             if (matchedPlan == "Free")
             {
                 store.SubscriptionEndsAt = store.CreatedAt.AddDays(14);

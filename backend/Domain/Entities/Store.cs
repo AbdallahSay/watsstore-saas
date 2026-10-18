@@ -29,6 +29,8 @@ namespace WatsStore.Api.Domain.Entities
         public string PlanType { get; set; } = "Free"; // Free, Pro, VIP
         public bool IsActive { get; set; } = true;
         public int ViewCount { get; set; } = 0;
+        public int AiGenerationsCount { get; set; } = 0;
+        public DateTime? AiQuotaResetDate { get; set; }
         public DateTime? SubscriptionEndsAt { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
@@ -38,6 +40,25 @@ namespace WatsStore.Api.Domain.Entities
         public ICollection<WhatsAppOrder> Orders { get; set; } = new List<WhatsAppOrder>();
         public ICollection<StoreReview> Reviews { get; set; } = new List<StoreReview>();
         public ICollection<StoreCoupon> Coupons { get; set; } = new List<StoreCoupon>();
+
+        public int GetAiGenerationsLimit()
+        {
+            if (string.Equals(PlanType, "VIP", StringComparison.OrdinalIgnoreCase))
+                return 150;
+            if (string.Equals(PlanType, "Pro", StringComparison.OrdinalIgnoreCase))
+                return 15;
+            return 0; // Free plan has 0 AI quota (strictly locked)
+        }
+
+        public void CheckAndResetMonthlyAiQuota()
+        {
+            var now = DateTime.UtcNow;
+            if (!AiQuotaResetDate.HasValue || now >= AiQuotaResetDate.Value.AddMonths(1))
+            {
+                AiGenerationsCount = 0;
+                AiQuotaResetDate = now;
+            }
+        }
 
         public DateTime GetEffectiveTrialOrSubscriptionEndsAt()
         {

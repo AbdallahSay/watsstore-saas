@@ -83,6 +83,17 @@ namespace WatsStore.Api.Controllers
             var remainingDays = store.GetRemainingTrialDays();
             var trialEndsAt = store.GetEffectiveTrialOrSubscriptionEndsAt();
 
+            var prevReset = store.AiQuotaResetDate;
+            store.CheckAndResetMonthlyAiQuota();
+            if (store.AiQuotaResetDate != prevReset)
+            {
+                await _db.SaveChangesAsync();
+            }
+
+            var aiUsed = store.AiGenerationsCount;
+            var aiLimit = store.GetAiGenerationsLimit();
+            var aiRemaining = Math.Max(0, aiLimit - aiUsed);
+
             var response = new DashboardSummaryResponse
             {
                 TotalProducts = totalProducts,
@@ -91,6 +102,9 @@ namespace WatsStore.Api.Controllers
                 IsTrialExpired = isTrialExpired,
                 RemainingTrialDays = remainingDays,
                 TrialEndsAt = trialEndsAt,
+                AiGenerationsUsed = aiUsed,
+                AiGenerationsLimit = aiLimit,
+                RemainingAiQuota = aiRemaining,
                 StoreInfo = new StoreProfileDto
                 {
                     Id = store.Id,
@@ -118,6 +132,9 @@ namespace WatsStore.Api.Controllers
                     IsTrialExpired = isTrialExpired,
                     RemainingTrialDays = remainingDays,
                     TrialEndsAt = trialEndsAt,
+                    AiGenerationsUsed = aiUsed,
+                    AiGenerationsLimit = aiLimit,
+                    RemainingAiQuota = aiRemaining,
                     CreatedAt = store.CreatedAt
                 },
                 RecentOrders = recentOrders
@@ -496,6 +513,17 @@ namespace WatsStore.Api.Controllers
         public async Task<IActionResult> ExportOrdersCsv()
         {
             var storeId = GetAuthenticatedStoreId();
+            var store = await _db.Stores.AsNoTracking().FirstOrDefaultAsync(s => s.Id == storeId);
+            if (store == null)
+                return NotFound(new { message = "المتجر غير موجود" });
+
+            if (string.Equals(store.PlanType, "Free", StringComparison.OrdinalIgnoreCase))
+            {
+                return StatusCode(StatusCodes.Status403Forbidden, new { 
+                    isQuotaExceeded = true, 
+                    message = "ميزة تصدير الطلبات إلى ملف Excel متاحة فقط في باقات Pro و VIP. رقِّ باقتك الآن للوصول الكامل لبيانات وتقارير مبيعاتك!" 
+                });
+            }
 
             var orders = await _db.WhatsAppOrders
                 .AsNoTracking()
@@ -697,11 +725,11 @@ namespace WatsStore.Api.Controllers
             }
             else if (string.Equals(store.PlanType, "Pro", StringComparison.OrdinalIgnoreCase))
             {
-                if (activeCouponsCount >= 20)
+                if (activeCouponsCount >= 15)
                 {
                     return StatusCode(StatusCodes.Status403Forbidden, new { 
                         isQuotaExceeded = true, 
-                        message = "لقد وصلت للحد الأقصى لعدد كوبونات الخصم في باقة Pro (20 كوبون). يرجى ترقية باقتك إلى VIP لإضافة كوبونات غير محدودة." 
+                        message = "لقد وصلت للحد الأقصى لعدد كوبونات الخصم في باقة Pro (15 كوبون). يرجى ترقية باقتك إلى VIP لإضافة كوبونات غير محدودة." 
                     });
                 }
             }
@@ -778,11 +806,11 @@ namespace WatsStore.Api.Controllers
                             message = "لقد وصلت للحد الأقصى لعدد كوبونات الخصم في الباقة المجانية (كوبون واحد نشط). يرجى ترقية باقتك إلى Pro أو VIP لإضافة المزيد." 
                         });
                     }
-                    else if (string.Equals(store.PlanType, "Pro", StringComparison.OrdinalIgnoreCase) && activeCount >= 20)
+                    else if (string.Equals(store.PlanType, "Pro", StringComparison.OrdinalIgnoreCase) && activeCount >= 15)
                     {
                         return StatusCode(StatusCodes.Status403Forbidden, new { 
                             isQuotaExceeded = true, 
-                            message = "لقد وصلت للحد الأقصى لعدد كوبونات الخصم في باقة Pro (20 كوبون). يرجى ترقية باقتك إلى VIP لإضافة كوبونات غير محدودة." 
+                            message = "لقد وصلت للحد الأقصى لعدد كوبونات الخصم في باقة Pro (15 كوبون). يرجى ترقية باقتك إلى VIP لإضافة كوبونات غير محدودة." 
                         });
                     }
                 }
@@ -993,10 +1021,69 @@ namespace WatsStore.Api.Controllers
                 return BadRequest(ModelState);
 
             var storeId = GetAuthenticatedStoreId();
-            var store = await _db.Stores.AsNoTracking().FirstOrDefaultAsync(s => s.Id == storeId);
+            var store = await _db.Stores.FirstOrDefaultAsync(s => s.Id == storeId);
+            if (store == null)
+                return NotFound(new { message = "المتجر غير موجود" });
+
+            if (store.IsTrialExpired())
+            {
+                return StatusCode(StatusCodes.Status403Forbidden, new { 
+                    isTrialExpired = true, 
+                    message = "انتهت فترتك التجريبية المجانية (14 يوماً). يرجى ترقية باقتك إلى Pro أو VIP للاستمرار في استخدام المنصة." 
+                });
+            }
+
+            // 1. Free plan: Strictly locked 🔒 (0 quota)
+            if (string.Equals(store.PlanType, "Free", StringComparison.OrdinalIgnoreCase))
+            {
+                return StatusCode(StatusCodes.Status403Forbidden, new 
+                { 
+                    isQuotaExceeded = true, 
+                    aiGenerationsUsed = 0,
+                    aiGenerationsLimit = 0,
+                    remainingQuota = 0,
+                    message = "ميزة كتابة الوصف بالذكاء الاصطناعي متاحة فقط في باقات Pro و VIP. رقِّ باقتك الآن لتوفير وقتك ومضاعفة مبيعاتك!" 
+                });
+            }
+
+            // Reset monthly quota if a new month has arrived
+            store.CheckAndResetMonthlyAiQuota();
+
+            int maxQuota = store.GetAiGenerationsLimit();
+
+            // 2. Pro plan: 15 generations per month
+            if (string.Equals(store.PlanType, "Pro", StringComparison.OrdinalIgnoreCase))
+            {
+                if (store.AiGenerationsCount >= maxQuota)
+                {
+                    return StatusCode(StatusCodes.Status403Forbidden, new 
+                    { 
+                        isQuotaExceeded = true, 
+                        aiGenerationsUsed = store.AiGenerationsCount,
+                        aiGenerationsLimit = maxQuota,
+                        remainingQuota = 0,
+                        message = "لقد استهلكت رصيدك الشهري من الذكاء الاصطناعي في باقة Pro (15/15 وصف). رقِّ باقتك إلى VIP للحصول على 150 وصفاً ذكياً شهرياً!" 
+                    });
+                }
+            }
+            // 3. VIP plan: 150 generations per month
+            else if (string.Equals(store.PlanType, "VIP", StringComparison.OrdinalIgnoreCase))
+            {
+                if (store.AiGenerationsCount >= maxQuota)
+                {
+                    return StatusCode(StatusCodes.Status403Forbidden, new 
+                    { 
+                        isQuotaExceeded = true, 
+                        aiGenerationsUsed = store.AiGenerationsCount,
+                        aiGenerationsLimit = maxQuota,
+                        remainingQuota = 0,
+                        message = "لقد استهلكت رصيدك الشهري من الذكاء الاصطناعي في باقة VIP (150/150 وصف)." 
+                    });
+                }
+            }
 
             var productName = Sanitizer.Sanitize(request.ProductName, 150);
-            var category = !string.IsNullOrWhiteSpace(request.Category) ? Sanitizer.Sanitize(request.Category, 100) : (store?.BusinessCategory ?? "منتجات مختارة");
+            var category = !string.IsNullOrWhiteSpace(request.Category) ? Sanitizer.Sanitize(request.Category, 100) : (store.BusinessCategory ?? "منتجات مختارة");
             var keywords = !string.IsNullOrWhiteSpace(request.Keywords) ? Sanitizer.Sanitize(request.Keywords, 200) : string.Empty;
 
             var sb = new StringBuilder();
@@ -1017,11 +1104,18 @@ namespace WatsStore.Api.Controllers
             sb.AppendLine();
             sb.AppendLine("⚡ اطلب الآن عبر الواتساب واستفد من العرض الحصري قبل نفاد الكمية!");
 
+            // Increment usage count and save
+            store.AiGenerationsCount++;
+            await _db.SaveChangesAsync();
+
             return Ok(new GenerateDescriptionResponse
             {
                 ProductName = productName,
                 Description = sb.ToString(),
-                Status = "success"
+                Status = "success",
+                AiGenerationsUsed = store.AiGenerationsCount,
+                AiGenerationsLimit = maxQuota,
+                RemainingQuota = Math.Max(0, maxQuota - store.AiGenerationsCount)
             });
         }
     }
