@@ -4,6 +4,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using WatsStore.Api.Domain.Entities;
@@ -15,6 +16,7 @@ namespace WatsStore.Api.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [EnableRateLimiting("sensitive-policy")]
     public class AdminController : ControllerBase
     {
         private readonly AppDbContext _db;
@@ -63,6 +65,7 @@ namespace WatsStore.Api.Controllers
         }
 
         [HttpPost("login")]
+        [EnableRateLimiting("auth-policy")]
         public async Task<IActionResult> Login([FromBody] AdminLoginRequest request)
         {
             var adminEmail = _config["AdminSettings:Email"] ?? "abdallahsay10@gmail.com";
@@ -118,6 +121,7 @@ namespace WatsStore.Api.Controllers
         }
 
         [HttpPost("change-password")]
+        [EnableRateLimiting("auth-policy")]
         public async Task<IActionResult> ChangePassword([FromBody] AdminChangePasswordRequest request)
         {
             if (!IsAdminAuthorized())
@@ -171,6 +175,7 @@ namespace WatsStore.Api.Controllers
         }
 
         [HttpPost("forgot-password")]
+        [EnableRateLimiting("auth-policy")]
         public async Task<IActionResult> ForgotPassword([FromBody] AdminForgotPasswordRequest request)
         {
             if (!ModelState.IsValid)
@@ -217,6 +222,7 @@ namespace WatsStore.Api.Controllers
         }
 
         [HttpPost("reset-password")]
+        [EnableRateLimiting("auth-policy")]
         public async Task<IActionResult> ResetPassword([FromBody] AdminResetPasswordRequest request)
         {
             if (!ModelState.IsValid)

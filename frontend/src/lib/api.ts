@@ -438,4 +438,12 @@ export const api = {
       body: JSON.stringify(data),
     });
   },
+
+  async generateAiDescription(token: string, data: { productName: string; category?: string; keywords?: string }): Promise<{ description: string; productName: string; status: string }> {
+    return fetchJson<{ description: string; productName: string; status: string }>(`${API_BASE_URL}/merchant/ai/generate-description`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+      body: JSON.stringify(data),
+    });
+  },
 };

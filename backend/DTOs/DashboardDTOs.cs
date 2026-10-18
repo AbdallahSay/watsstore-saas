@@ -229,4 +229,19 @@ namespace WatsStore.Api.DTOs
         public decimal TotalAmount { get; set; }
         public double Percentage { get; set; }
     }
+
+    public class GenerateDescriptionRequest
+    {
+        [Required(ErrorMessage = "اسم المنتج مطلوب")]
+        public string ProductName { get; set; } = string.Empty;
+        public string? Category { get; set; }
+        public string? Keywords { get; set; }
+    }
+
+    public class GenerateDescriptionResponse
+    {
+        public string Description { get; set; } = string.Empty;
+        public string ProductName { get; set; } = string.Empty;
+        public string Status { get; set; } = "success";
+    }
 }

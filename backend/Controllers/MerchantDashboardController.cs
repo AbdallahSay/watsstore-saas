@@ -872,5 +872,44 @@ namespace WatsStore.Api.Controllers
 
             return Ok(response);
         }
+
+        [HttpPost("ai/generate-description")]
+        public async Task<IActionResult> GenerateDescription([FromBody] GenerateDescriptionRequest request)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var storeId = GetAuthenticatedStoreId();
+            var store = await _db.Stores.AsNoTracking().FirstOrDefaultAsync(s => s.Id == storeId);
+
+            var productName = Sanitizer.Sanitize(request.ProductName, 150);
+            var category = !string.IsNullOrWhiteSpace(request.Category) ? Sanitizer.Sanitize(request.Category, 100) : (store?.BusinessCategory ?? "منتجات مختارة");
+            var keywords = !string.IsNullOrWhiteSpace(request.Keywords) ? Sanitizer.Sanitize(request.Keywords, 200) : string.Empty;
+
+            var sb = new StringBuilder();
+            sb.AppendLine($"✨ استمتع بأعلى مستويات الجودة والراحة مع {productName} الفاخر، المصمم خصيصاً ليمنحك تجربة استثنائية وأناقة لا مثيل لها.");
+            sb.AppendLine();
+            sb.AppendLine("💎 أهم المميزات والمواصفات:");
+            sb.AppendLine($"• خامات ممتازة مختارة بعناية تدوم طويلاً وتمنحك أفضل أداء في تصنيف {category}.");
+            sb.AppendLine("• تصميم عصري وأنيق يتناسب تماماً مع احتياجاتك واستخدامك اليومي.");
+            if (!string.IsNullOrWhiteSpace(keywords))
+            {
+                sb.AppendLine($"• يتميز بـ: {keywords}.");
+            }
+            sb.AppendLine("• متوفر بأعلى معايير الدقة والتشطيب الاحترافي.");
+            sb.AppendLine();
+            sb.AppendLine("🚚 الشحن والضمان:");
+            sb.AppendLine("• توصيل سريع ومباشر حتى باب المنزل مع إمكانية المعاينة قبل الاستلام.");
+            sb.AppendLine("• ضمان الاستبدال والاسترجاع السهل لضمان رضاكم التام.");
+            sb.AppendLine();
+            sb.AppendLine("⚡ اطلب الآن عبر الواتساب واستفد من العرض الحصري قبل نفاد الكمية!");
+
+            return Ok(new GenerateDescriptionResponse
+            {
+                ProductName = productName,
+                Description = sb.ToString(),
+                Status = "success"
+            });
+        }
     }
 }

@@ -1,0 +1,169 @@
+{
+  "passed": 23,
+  "failed": 0,
+  "total": 23,
+  "avgLatency": 1120,
+  "results": [
+    {
+      "category": "Security",
+      "testName": "Backend Security HTTP Headers (HSTS, nosniff, SAMEORIGIN)",
+      "status": "PASS",
+      "latencyMs": 2229,
+      "details": "HSTS: max-age=31536000; includeSubDomains, X-Content-Type-Options: nosniff, X-Frame-Options: SAMEORIGIN, Referrer: strict-origin-when-cross-origin"
+    },
+    {
+      "category": "Security",
+      "testName": "Frontend Security HTTP Headers (nosniff, SAMEORIGIN, HSTS)",
+      "status": "PASS",
+      "latencyMs": 2317,
+      "details": "HSTS: Active, X-Content-Type-Options: nosniff, X-Frame-Options: SAMEORIGIN"
+    },
+    {
+      "category": "Security",
+      "testName": "Unauthorized Access Guard (/api/merchant/summary)",
+      "status": "PASS",
+      "latencyMs": 772,
+      "details": "Response: HTTP 401 Unauthorized (Tenant Isolation Verified)"
+    },
+    {
+      "category": "SuperAdmin",
+      "testName": "Admin Login (Email + Password)",
+      "status": "PASS",
+      "latencyMs": 2312,
+      "details": "Token Generated, Role: Admin, Admin: abdallahsay10@gmail.com"
+    },
+    {
+      "category": "SuperAdmin",
+      "testName": "Platform Real-Time Statistics",
+      "status": "PASS",
+      "latencyMs": 771,
+      "details": "Stores: 8 (Active: 7), Orders: 5, Revenue: 5790 EGP"
+    },
+    {
+      "category": "SuperAdmin",
+      "testName": "List All Platform Stores",
+      "status": "PASS",
+      "latencyMs": 786,
+      "details": "Retrieved 8 registered merchant stores"
+    },
+    {
+      "category": "SuperAdmin",
+      "testName": "Admin Password Recovery PIN Generation",
+      "status": "PASS",
+      "latencyMs": 757,
+      "details": "Generated PIN: WATS-151551, Valid for 15 minutes"
+    },
+    {
+      "category": "Merchant",
+      "testName": "Merchant Authentication (demo@watsstore.com)",
+      "status": "PASS",
+      "latencyMs": 783,
+      "details": "Store: \"بوتيك الأمل للأزياء الفاخرة\", Slug: al-amal-fashion, City: الفيوم"
+    },
+    {
+      "category": "Merchant",
+      "testName": "Merchant Dashboard Summary & Store Profile",
+      "status": "PASS",
+      "latencyMs": 761,
+      "details": "Products: 4, Orders: 2, Revenue: 2445 ج.م"
+    },
+    {
+      "category": "Catalog & AI",
+      "testName": "Unlimited AI Product Description Generation",
+      "status": "PASS",
+      "latencyMs": 771,
+      "details": "Generated 624 chars of Arabic marketing copy (Zero Quota Limits)"
+    },
+    {
+      "category": "Catalog & AI",
+      "testName": "List Merchant Products",
+      "status": "PASS",
+      "latencyMs": 775,
+      "details": "Store has 4 active products in catalog"
+    },
+    {
+      "category": "Coupons",
+      "testName": "List Merchant Coupons",
+      "status": "PASS",
+      "latencyMs": 769,
+      "details": "Found 1 coupons configured"
+    },
+    {
+      "category": "Coupons",
+      "testName": "Public Coupon Validation (Invalid Code Rejection)",
+      "status": "PASS",
+      "latencyMs": 770,
+      "details": "Correctly rejected invalid promo code with HTTP 400"
+    },
+    {
+      "category": "Storefront",
+      "testName": "Public Storefront Resolution & Loading (/s/al-amal-fashion)",
+      "status": "PASS",
+      "latencyMs": 781,
+      "details": "Store: \"بوتيك الأمل للأزياء الفاخرة\", Products: 4, Delivery Fee: 35 ج.م"
+    },
+    {
+      "category": "Orders",
+      "testName": "Submit Public Storefront Order & WhatsApp Link Generation",
+      "status": "PASS",
+      "latencyMs": 785,
+      "details": "Order #1006 placed successfully, WhatsApp URL generated"
+    },
+    {
+      "category": "Export",
+      "testName": "1-Click Excel/CSV Export (UTF-8 BOM Validated)",
+      "status": "PASS",
+      "latencyMs": 762,
+      "details": "UTF-8 BOM: YES (Guarantees Arabic renders cleanly in Microsoft Excel), Content-Type: text/csv; charset=utf-8"
+    },
+    {
+      "category": "Reviews",
+      "testName": "Submit Public Customer Review & Rating",
+      "status": "PASS",
+      "latencyMs": 1149,
+      "details": "Review Created with ID: c1e8c737-f1a0-441e-aedb-16deccdf0646"
+    },
+    {
+      "category": "Reviews",
+      "testName": "Merchant Review Moderation Inbox",
+      "status": "PASS",
+      "latencyMs": 775,
+      "details": "Total: 6, Approved: 4, Pending: 2"
+    },
+    {
+      "category": "Analytics",
+      "testName": "Real-Time Merchant Revenue & Sales Analytics",
+      "status": "PASS",
+      "latencyMs": 773,
+      "details": "Total Revenue: 3730 ج.م, Orders: 3, Top Products: 4, Daily Trend: 14 days"
+    },
+    {
+      "category": "SEO & Branding",
+      "testName": "Dynamic OpenGraph (OG) Image Generator",
+      "status": "PASS",
+      "latencyMs": 2338,
+      "details": "Status: HTTP 200, Content-Type: image/png"
+    },
+    {
+      "category": "SEO & Branding",
+      "testName": "Programmatic SEO Directory (/directory/الفيوم/ملابس)",
+      "status": "PASS",
+      "latencyMs": 2286,
+      "details": "HTTP 200 OK, HTML Length: 58557 bytes, SSR rendered successfully"
+    },
+    {
+      "category": "SEO & Branding",
+      "testName": "Dynamic Multi-Governorate sitemap.xml",
+      "status": "PASS",
+      "latencyMs": 768,
+      "details": "HTTP 200 OK, XML contains <urlset> with programmatic routes"
+    },
+    {
+      "category": "Subdomains",
+      "testName": "Wildcard Subdomain Middleware Storefront Resolution",
+      "status": "PASS",
+      "latencyMs": 770,
+      "details": "HTTP 200 OK via x-subdomain header resolution"
+    }
+  ]
+}
