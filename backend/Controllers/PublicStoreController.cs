@@ -4,15 +4,18 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using WatsStore.Api.Domain.Entities;
 using WatsStore.Api.DTOs;
 using WatsStore.Api.Infrastructure.Data;
+using WatsStore.Api.Infrastructure.Utils;
 
 namespace WatsStore.Api.Controllers
 {
     [ApiController]
     [Route("api/public/stores")]
+    [EnableRateLimiting("public-policy")]
     public class PublicStoreController : ControllerBase
     {
         private readonly AppDbContext _db;
@@ -137,6 +140,7 @@ namespace WatsStore.Api.Controllers
         }
 
         [HttpPost("{slug}/reviews")]
+        [EnableRateLimiting("sensitive-policy")]
         public async Task<IActionResult> SubmitReview(string slug, [FromBody] SubmitReviewRequest request)
         {
             if (!ModelState.IsValid)
@@ -153,13 +157,16 @@ namespace WatsStore.Api.Controllers
             if (store == null)
                 return NotFound(new { message = "المتجر غير موجود أو تم إيقافه" });
 
+            var cleanName = Sanitizer.Sanitize(request.CustomerName, 100);
+            var cleanComment = Sanitizer.Sanitize(request.Comment, 500);
+
             var review = new StoreReview
             {
                 Id = Guid.NewGuid(),
                 StoreId = store.Id,
-                CustomerName = request.CustomerName.Trim(),
+                CustomerName = cleanName,
                 Rating = Math.Clamp(request.Rating, 1, 5),
-                Comment = request.Comment.Trim(),
+                Comment = cleanComment,
                 IsApproved = false,
                 CreatedAt = DateTime.UtcNow
             };
@@ -175,6 +182,7 @@ namespace WatsStore.Api.Controllers
         }
 
         [HttpPost("{slug}/apply-coupon")]
+        [EnableRateLimiting("sensitive-policy")]
         public async Task<IActionResult> ApplyCoupon(string slug, [FromBody] ApplyCouponRequest request)
         {
             if (!ModelState.IsValid)

@@ -5,6 +5,7 @@ using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using WatsStore.Api.Domain.Entities;
 using WatsStore.Api.DTOs;
@@ -15,6 +16,7 @@ namespace WatsStore.Api.Controllers
 {
     [ApiController]
     [Route("api/public/stores/{storeSlug}/orders")]
+    [EnableRateLimiting("sensitive-policy")]
     public class OrdersController : ControllerBase
     {
         private readonly AppDbContext _db;
@@ -109,19 +111,25 @@ namespace WatsStore.Api.Controllers
             var discountedSubtotal = subtotal - discountAmount;
             var totalAmount = discountedSubtotal + deliveryFee;
 
+            var cleanCustomerName = Sanitizer.Sanitize(request.CustomerName, 100);
+            var cleanCustomerAddress = Sanitizer.Sanitize(request.CustomerAddress, 250);
+            var cleanCustomerNotes = string.IsNullOrWhiteSpace(request.CustomerNotes) ? null : Sanitizer.Sanitize(request.CustomerNotes, 500);
+            var cleanPaymentMethod = string.IsNullOrWhiteSpace(request.PaymentMethod) 
+                ? "الدفع عند الاستلام" 
+                : Sanitizer.Sanitize(request.PaymentMethod, 50);
+
             var normalizedCustomerPhone = SlugGenerator.NormalizeEgyptianPhone(request.CustomerPhone);
             var itemsJson = JsonSerializer.Serialize(savedItems);
-            var paymentMethod = string.IsNullOrWhiteSpace(request.PaymentMethod) ? "الدفع عند الاستلام" : request.PaymentMethod.Trim();
 
             var order = new WhatsAppOrder
             {
                 Id = Guid.NewGuid(),
                 StoreId = store.Id,
-                CustomerName = request.CustomerName.Trim(),
+                CustomerName = cleanCustomerName,
                 CustomerPhone = normalizedCustomerPhone,
-                CustomerAddress = request.CustomerAddress.Trim(),
-                CustomerNotes = string.IsNullOrWhiteSpace(request.CustomerNotes) ? null : request.CustomerNotes.Trim(),
-                PaymentMethod = paymentMethod,
+                CustomerAddress = cleanCustomerAddress,
+                CustomerNotes = cleanCustomerNotes,
+                PaymentMethod = cleanPaymentMethod,
                 ItemsJson = itemsJson,
                 TotalAmount = totalAmount,
                 CreatedAt = DateTime.UtcNow

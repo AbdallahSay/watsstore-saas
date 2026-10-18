@@ -11,6 +11,7 @@ namespace WatsStore.Api.Infrastructure.Utils
     public interface IJwtTokenGenerator
     {
         string GenerateToken(Store store);
+        string GenerateAdminToken(string email, string name = "مدير النظام");
     }
 
     public class JwtTokenGenerator : IJwtTokenGenerator
@@ -24,7 +25,7 @@ namespace WatsStore.Api.Infrastructure.Utils
 
         public string GenerateToken(Store store)
         {
-            var secretKey = _configuration["Jwt:SecretKey"] ?? "WatsStore_Super_Secret_Key_For_Egypt_Merchants_2026_Secure_Key!";
+            var secretKey = _configuration["Jwt:SecretKey"] ?? "WatsStore_Super_Secret_Key_For_Egypt_Merchants_2026_Secure_Key_Must_Be_Long_Enough!";
             var issuer = _configuration["Jwt:Issuer"] ?? "WatsStoreApi";
             var audience = _configuration["Jwt:Audience"] ?? "WatsStoreClients";
             var expiryDays = int.TryParse(_configuration["Jwt:ExpiryDays"], out var days) ? days : 30;
@@ -41,6 +42,39 @@ namespace WatsStore.Api.Infrastructure.Utils
                 new Claim("email", store.Email),
                 new Claim("storeName", store.StoreName),
                 new Claim("ownerName", store.OwnerName),
+                new Claim(ClaimTypes.Role, "Merchant"),
+                new Claim("role", "Merchant"),
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+            };
+
+            var token = new JwtSecurityToken(
+                issuer: issuer,
+                audience: audience,
+                claims: claims,
+                expires: DateTime.UtcNow.AddDays(expiryDays),
+                signingCredentials: credentials);
+
+            return new JwtSecurityTokenHandler().WriteToken(token);
+        }
+
+        public string GenerateAdminToken(string email, string name = "مدير المنصة")
+        {
+            var secretKey = _configuration["Jwt:SecretKey"] ?? "WatsStore_Super_Secret_Key_For_Egypt_Merchants_2026_Secure_Key_Must_Be_Long_Enough!";
+            var issuer = _configuration["Jwt:Issuer"] ?? "WatsStoreApi";
+            var audience = _configuration["Jwt:Audience"] ?? "WatsStoreClients";
+            var expiryDays = 7;
+
+            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey));
+            var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
+
+            var claims = new[]
+            {
+                new Claim(JwtRegisteredClaimNames.Sub, "admin-master-account"),
+                new Claim(ClaimTypes.Name, name),
+                new Claim(ClaimTypes.Email, email),
+                new Claim(ClaimTypes.Role, "Admin"),
+                new Claim("role", "Admin"),
+                new Claim("isAdmin", "true"),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
             };
 

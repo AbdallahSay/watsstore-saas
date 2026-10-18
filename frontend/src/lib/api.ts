@@ -11,33 +11,72 @@ import {
   MerchantReviewsResponse,
   StoreCoupon,
   ApplyCouponResponse,
-  MerchantAnalyticsResponse
+  MerchantAnalyticsResponse,
+  AdminLoginResponse,
+  AdminStoreSummary,
+  AdminPlatformStats,
+  ToggleStoreStatusResponse
 } from '../types';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://watsstore.runasp.net/api';
 
-async function fetchJson<T>(url: string, options?: RequestInit): Promise<T> {
-  const res = await fetch(url, {
-    ...options,
-    headers: {
-      'Content-Type': 'application/json',
-      ...options?.headers,
-    },
-    // Next.js caching or revalidation
-    next: options?.next,
-    cache: options?.cache,
-  });
+async function handleResponseError(res: Response): Promise<never> {
+  // 401 Unauthorized handling: Auto-logout & redirect to login if merchant session expired
+  if (res.status === 401) {
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('watsstore_token');
+      localStorage.removeItem('watsstore_user');
+      if (window.location.pathname.startsWith('/dashboard')) {
+        window.location.href = '/login?session_expired=1';
+      }
+    }
+    throw new Error('انتهت صلاحية الجلسة، يرجى تسجيل الدخول مجدداً.');
+  }
 
-  if (!res.ok) {
-    let errorMsg = `HTTP Error ${res.status}`;
+  // 429 Too Many Requests handling: Rate limit protection
+  if (res.status === 429) {
+    let retryAfterMsg = 'لقد تجاوزت الحد المسموح من الطلبات السريعة. يرجى الانتظار دقيقة واحدة ثم المحاولة مجدداً.';
     try {
       const errorData = await res.json();
-      errorMsg = errorData.message || JSON.stringify(errorData);
+      if (errorData?.message) retryAfterMsg = errorData.message;
     } catch {
-      // fallback to status text
-      errorMsg = res.statusText || errorMsg;
+      // fallback
     }
-    throw new Error(errorMsg);
+    throw new Error(retryAfterMsg);
+  }
+
+  let errorMsg = `HTTP Error ${res.status}`;
+  try {
+    const errorData = await res.json();
+    errorMsg = errorData.message || JSON.stringify(errorData);
+  } catch {
+    errorMsg = res.statusText || errorMsg;
+  }
+  throw new Error(errorMsg);
+}
+
+async function fetchJson<T>(url: string, options?: RequestInit): Promise<T> {
+  let res: Response;
+  try {
+    res = await fetch(url, {
+      ...options,
+      headers: {
+        'Content-Type': 'application/json',
+        ...options?.headers,
+      },
+      // Next.js caching or revalidation
+      next: options?.next,
+      cache: options?.cache,
+    });
+  } catch {
+    if (typeof window !== 'undefined' && !navigator.onLine) {
+      throw new Error('انقطع الاتصال بالإنترنت. يرجى التحقق من اتصالك والمحاولة مجدداً.');
+    }
+    throw new Error('تعذر الاتصال بالخادم. يرجى التحقق من اتصال الإنترنت والمحاولة لاحقاً.');
+  }
+
+  if (!res.ok) {
+    await handleResponseError(res);
   }
 
   return res.json() as Promise<T>;
@@ -183,23 +222,21 @@ export const api = {
     const formData = new FormData();
     formData.append('file', file);
 
-    const res = await fetch(`${API_BASE_URL}/merchant/upload`, {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-      body: formData,
-    });
+    let res: Response;
+    try {
+      res = await fetch(`${API_BASE_URL}/merchant/upload`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: formData,
+      });
+    } catch {
+      throw new Error('فشل رفع الصورة بسبب مشكلة في الاتصال بالشبكة.');
+    }
 
     if (!res.ok) {
-      let errorMsg = `HTTP Error ${res.status}`;
-      try {
-        const errorData = await res.json();
-        errorMsg = errorData.message || JSON.stringify(errorData);
-      } catch {
-        errorMsg = res.statusText || errorMsg;
-      }
-      throw new Error(errorMsg);
+      await handleResponseError(res);
     }
 
     return res.json();
@@ -215,14 +252,19 @@ export const api = {
   },
 
   async exportOrdersCsv(token: string): Promise<void> {
-    const res = await fetch(`${API_BASE_URL}/merchant/orders/export`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    let res: Response;
+    try {
+      res = await fetch(`${API_BASE_URL}/merchant/orders/export`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+    } catch {
+      throw new Error('فشل تصدير الطلبات بسبب مشكلة في الاتصال بالشبكة.');
+    }
 
     if (!res.ok) {
-      throw new Error('فشل تصدير الطلبات. يرجى المحاولة لاحقاً');
+      await handleResponseError(res);
     }
 
     const blob = await res.blob();
@@ -317,6 +359,57 @@ export const api = {
   async getMerchantAnalytics(token: string): Promise<MerchantAnalyticsResponse> {
     return fetchJson<MerchantAnalyticsResponse>(`${API_BASE_URL}/merchant/analytics`, {
       headers: { Authorization: `Bearer ${token}` },
+    });
+  },
+
+  // Super Admin Control Panel
+  async adminLogin(data: { email?: string; password?: string; secretKey?: string }): Promise<AdminLoginResponse> {
+    return fetchJson<AdminLoginResponse>(`${API_BASE_URL}/admin/login`, {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
+
+  async getAdminPlatformStats(token: string): Promise<AdminPlatformStats> {
+    return fetchJson<AdminPlatformStats>(`${API_BASE_URL}/admin/stats`, {
+      headers: { 
+        Authorization: `Bearer ${token}`,
+        'X-Admin-Key': token.startsWith('WatsStore_') ? token : '',
+      },
+    });
+  },
+
+  async getAdminStores(token: string, search?: string, status?: string): Promise<AdminStoreSummary[]> {
+    const params = new URLSearchParams();
+    if (search) params.append('search', search);
+    if (status) params.append('status', status);
+    const qs = params.toString();
+    const url = `${API_BASE_URL}/admin/stores${qs ? `?${qs}` : ''}`;
+    return fetchJson<AdminStoreSummary[]>(url, {
+      headers: { 
+        Authorization: `Bearer ${token}`,
+        'X-Admin-Key': token.startsWith('WatsStore_') ? token : '',
+      },
+    });
+  },
+
+  async toggleStoreStatus(token: string, storeId: string): Promise<ToggleStoreStatusResponse> {
+    return fetchJson<ToggleStoreStatusResponse>(`${API_BASE_URL}/admin/stores/${storeId}/toggle-status`, {
+      method: 'PATCH',
+      headers: { 
+        Authorization: `Bearer ${token}`,
+        'X-Admin-Key': token.startsWith('WatsStore_') ? token : '',
+      },
+    });
+  },
+
+  async deleteStore(token: string, storeId: string): Promise<{ id: string; message: string }> {
+    return fetchJson<{ id: string; message: string }>(`${API_BASE_URL}/admin/stores/${storeId}`, {
+      method: 'DELETE',
+      headers: { 
+        Authorization: `Bearer ${token}`,
+        'X-Admin-Key': token.startsWith('WatsStore_') ? token : '',
+      },
     });
   },
 };

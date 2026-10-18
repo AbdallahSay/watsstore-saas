@@ -248,3 +248,49 @@ export interface MerchantAnalyticsResponse {
   paymentMethodsBreakdown: PaymentMethodStat[];
 }
 
+export interface AdminLoginResponse {
+  token: string;
+  email: string;
+  name: string;
+  role: string;
+}
+
+export interface AdminStoreSummary {
+  id: string;
+  storeName: string;
+  ownerName: string;
+  email: string;
+  whatsAppNumber: string;
+  slug: string;
+  publicCode: string;
+  subdomain: string;
+  businessCategory: string;
+  city: string;
+  planType: string;
+  isActive: boolean;
+  createdAt: string;
+  ordersCount: number;
+  productsCount: number;
+  totalRevenue: number;
+  viewCount: number;
+}
+
+export interface AdminPlatformStats {
+  totalStores: number;
+  activeStores: number;
+  suspendedStores: number;
+  totalOrders: number;
+  totalRevenue: number;
+  totalProducts: number;
+  totalReviews: number;
+  totalViews: number;
+  recentStores: AdminStoreSummary[];
+  topStores: AdminStoreSummary[];
+}
+
+export interface ToggleStoreStatusResponse {
+  id: string;
+  isActive: boolean;
+  message: string;
+}
+

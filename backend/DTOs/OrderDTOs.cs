@@ -7,16 +7,24 @@ namespace WatsStore.Api.DTOs
     public class CreateOrderRequest
     {
         [Required(ErrorMessage = "اسم العميل مطلوب")]
+        [StringLength(100, MinimumLength = 2, ErrorMessage = "اسم العميل يجب أن يتراوح بين حرفين و 100 حرف")]
         public string CustomerName { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "رقم هاتف العميل مطلوب")]
+        [StringLength(20, MinimumLength = 10, ErrorMessage = "رقم هاتف العميل غير صحيح")]
         public string CustomerPhone { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "عنوان التوصيل مطلوب")]
+        [StringLength(300, MinimumLength = 5, ErrorMessage = "عنوان التوصيل يجب أن يكون بين 5 و 300 حرف")]
         public string CustomerAddress { get; set; } = string.Empty;
 
+        [StringLength(500, ErrorMessage = "ملاحظات الطلب يجب ألا تتجاوز 500 حرف")]
         public string? CustomerNotes { get; set; }
+
+        [StringLength(80, ErrorMessage = "طريقة الدفع غير صالحة")]
         public string? PaymentMethod { get; set; } = "الدفع عند الاستلام";
+
+        [StringLength(50, ErrorMessage = "رمز كود الخصم غير صالح")]
         public string? CouponCode { get; set; }
 
         [Required]

@@ -1,6 +1,8 @@
 using System.Text;
 using System.Text.Json.Serialization;
+using System.Threading.RateLimiting;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -96,7 +98,69 @@ builder.Services.AddControllers()
         options.JsonSerializerOptions.PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase;
     });
 
-// 6. Swagger documentation
+// 6. Rate Limiting Configuration
+builder.Services.AddRateLimiter(options =>
+{
+    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+    options.OnRejected = async (context, token) =>
+    {
+        context.HttpContext.Response.ContentType = "application/json; charset=utf-8";
+        context.HttpContext.Response.Headers.Append("Retry-After", "60");
+        await context.HttpContext.Response.WriteAsync(
+            "{\"message\":\"لقد تجاوزت الحد المسموح من الطلبات السريعة. يرجى الانتظار دقيقة واحدة ثم المحاولة مجدداً.\"}",
+            token);
+    };
+
+    // Auth policy: Max 10 requests per minute per IP
+    options.AddPolicy("auth-policy", httpContext =>
+    {
+        var clientIp = httpContext.Connection.RemoteIpAddress?.ToString() 
+                       ?? httpContext.Request.Headers["X-Forwarded-For"].FirstOrDefault() 
+                       ?? "anonymous";
+
+        return RateLimitPartition.GetFixedWindowLimiter(clientIp, _ => new FixedWindowRateLimiterOptions
+        {
+            PermitLimit = 10,
+            Window = TimeSpan.FromMinutes(1),
+            QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
+            QueueLimit = 0
+        });
+    });
+
+    // Sensitive policy (Coupons, Orders, Reviews): Max 20 requests per minute per IP
+    options.AddPolicy("sensitive-policy", httpContext =>
+    {
+        var clientIp = httpContext.Connection.RemoteIpAddress?.ToString() 
+                       ?? httpContext.Request.Headers["X-Forwarded-For"].FirstOrDefault() 
+                       ?? "anonymous";
+
+        return RateLimitPartition.GetFixedWindowLimiter(clientIp, _ => new FixedWindowRateLimiterOptions
+        {
+            PermitLimit = 20,
+            Window = TimeSpan.FromMinutes(1),
+            QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
+            QueueLimit = 0
+        });
+    });
+
+    // Public storefront policy: Max 120 requests per minute per IP
+    options.AddPolicy("public-policy", httpContext =>
+    {
+        var clientIp = httpContext.Connection.RemoteIpAddress?.ToString() 
+                       ?? httpContext.Request.Headers["X-Forwarded-For"].FirstOrDefault() 
+                       ?? "anonymous";
+
+        return RateLimitPartition.GetFixedWindowLimiter(clientIp, _ => new FixedWindowRateLimiterOptions
+        {
+            PermitLimit = 120,
+            Window = TimeSpan.FromMinutes(1),
+            QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
+            QueueLimit = 0
+        });
+    });
+});
+
+// 7. Swagger documentation
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
@@ -134,8 +198,24 @@ builder.Services.AddSwaggerGen(c =>
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline
+// 1. Enterprise Security Headers Middleware
+app.Use(async (context, next) =>
+{
+    context.Response.Headers["X-Content-Type-Options"] = "nosniff";
+    context.Response.Headers["X-Frame-Options"] = "SAMEORIGIN";
+    context.Response.Headers["X-XSS-Protection"] = "1; mode=block";
+    context.Response.Headers["Referrer-Policy"] = "strict-origin-when-cross-origin";
+    context.Response.Headers["Permissions-Policy"] = "camera=(), microphone=(), geolocation=()";
+    context.Response.Headers.Remove("X-Powered-By");
+
+    await next();
+});
+
+// 2. Configure the HTTP request pipeline
 app.UseCors("AllowAll");
+
+// 3. Rate Limiter Middleware
+app.UseRateLimiter();
 
 app.UseStaticFiles();
 

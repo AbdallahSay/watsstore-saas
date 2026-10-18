@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using WatsStore.Api.Domain.Entities;
 using WatsStore.Api.DTOs;
@@ -12,6 +13,7 @@ namespace WatsStore.Api.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [EnableRateLimiting("auth-policy")]
     public class AuthController : ControllerBase
     {
         private readonly AppDbContext _db;
@@ -37,8 +39,13 @@ namespace WatsStore.Api.Controllers
                 return BadRequest(new { message = "البريد الإلكتروني مسجل بالفعل. يرجى تسجيل الدخول أو استخدام بريد آخر." });
             }
 
+            var cleanOwnerName = Sanitizer.Sanitize(request.OwnerName, 100);
+            var cleanStoreName = Sanitizer.Sanitize(request.StoreName, 100);
+            var cleanCategory = Sanitizer.Sanitize(request.BusinessCategory, 50);
+            var cleanCity = Sanitizer.Sanitize(request.City, 50);
+
             // Generate unique slug from StoreName
-            var baseSlug = SlugGenerator.GenerateSlug(request.StoreName);
+            var baseSlug = SlugGenerator.GenerateSlug(cleanStoreName);
             var slug = baseSlug;
             int counter = 1;
             while (await _db.Stores.AnyAsync(s => s.Slug == slug))
@@ -59,23 +66,23 @@ namespace WatsStore.Api.Controllers
             var store = new Store
             {
                 Id = Guid.NewGuid(),
-                OwnerName = request.OwnerName.Trim(),
+                OwnerName = cleanOwnerName,
                 Email = normalizedEmail,
                 PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.Password),
-                StoreName = request.StoreName.Trim(),
+                StoreName = cleanStoreName,
                 Slug = slug,
                 PublicCode = publicCode,
                 WhatsAppNumber = normalizedPhone,
-                BusinessCategory = request.BusinessCategory.Trim(),
-                City = request.City.Trim(),
+                BusinessCategory = cleanCategory,
+                City = cleanCity,
                 ThemeColor = "#10B981",
                 Currency = "ج.م",
                 DeliveryFee = 0.00m,
                 PlanType = "Free",
                 IsActive = true,
                 CreatedAt = DateTime.UtcNow,
-                SeoTitle = $"{request.StoreName.Trim()} | تسوق أونلاين عبر الواتساب في {request.City.Trim()}",
-                SeoDescription = $"تصفح كتالوج ومنتجات {request.StoreName.Trim()} في {request.City.Trim()}. اطلب مباشرة وبأفضل الأسعار عبر الواتساب مع التوصيل السريع."
+                SeoTitle = $"{cleanStoreName} | تسوق أونلاين عبر الواتساب في {cleanCity}",
+                SeoDescription = $"تصفح كتالوج ومنتجات {cleanStoreName} في {cleanCity}. اطلب مباشرة وبأفضل الأسعار عبر الواتساب مع التوصيل السريع."
             };
 
             // Add default category "الأكثر مبيعاً"

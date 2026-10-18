@@ -21,6 +21,7 @@ const RESERVED_SUBDOMAINS = new Set([
 // Main platform routes that should not be rewritten when visited on a subdomain
 const PASSTHROUGH_ROUTES = [
   '/dashboard',
+  '/admin',
   '/login',
   '/register',
   '/directory',
