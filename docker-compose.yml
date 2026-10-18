@@ -1,0 +1,82 @@
+services:
+  # -----------------------------------------------------------
+  # 1. PostgreSQL Database Service
+  # -----------------------------------------------------------
+  postgres:
+    image: postgres:16-alpine
+    container_name: watsstore-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-watsstoredb}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-SecurePassword123}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d watsstoredb"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - watsstore-network
+
+  # -----------------------------------------------------------
+  # 2. ASP.NET Core 8 Backend Web API
+  # -----------------------------------------------------------
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: watsstore-backend
+    restart: unless-stopped
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_URLS=http://+:5000
+      - DatabaseProvider=PostgreSQL
+      - ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;Database=${POSTGRES_DB:-watsstoredb};Username=${POSTGRES_USER:-postgres};Password=${POSTGRES_PASSWORD:-SecurePassword123};
+      - Jwt__SecretKey=${JWT_SECRET:-WatsStore_Super_Secret_Key_For_Egypt_Merchants_2026_Secure_Key_Must_Be_Long_Enough!}
+      - Jwt__Issuer=WatsStoreApi
+      - Jwt__Audience=WatsStoreClients
+    volumes:
+      - backend_uploads:/app/wwwroot/uploads
+    ports:
+      - "5000:5000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - watsstore-network
+
+  # -----------------------------------------------------------
+  # 3. Next.js 14 Frontend (App Router, SSR)
+  # -----------------------------------------------------------
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:5000}
+    container_name: watsstore-frontend
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL:-http://localhost:5000}
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    networks:
+      - watsstore-network
+
+volumes:
+  postgres_data:
+    driver: local
+  backend_uploads:
+    driver: local
+
+networks:
+  watsstore-network:
+    driver: bridge

@@ -94,7 +94,18 @@ namespace WatsStore.Api.Infrastructure.Data
             modelBuilder.Entity<WhatsAppOrder>(entity =>
             {
                 entity.HasKey(o => o.Id);
-                entity.Property(o => o.OrderNumber).UseIdentityColumn(1001, 1);
+                
+                if (Database.ProviderName?.Contains("Npgsql", StringComparison.OrdinalIgnoreCase) == true)
+                {
+                    entity.Property(o => o.OrderNumber)
+                          .UseIdentityByDefaultColumn()
+                          .HasIdentityOptions(startValue: 1001, incrementBy: 1);
+                }
+                else
+                {
+                    entity.Property(o => o.OrderNumber).UseIdentityColumn(1001, 1);
+                }
+
                 entity.Property(o => o.TotalAmount).HasPrecision(10, 2);
                 entity.Property(o => o.PaymentMethod).HasMaxLength(50).HasDefaultValue("الدفع عند الاستلام");
                 entity.Property(o => o.CustomerName).HasMaxLength(150).IsRequired();

@@ -10,13 +10,36 @@ using WatsStore.Api.Infrastructure.Utils;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// 1. Database Context
+// 1. Database Context - Dual Provider (PostgreSQL & SQL Server)
+var provider = builder.Configuration.GetValue<string>("DatabaseProvider") 
+               ?? Environment.GetEnvironmentVariable("DB_PROVIDER") 
+               ?? "";
+
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") 
     ?? "Server=.;Database=WatsStoreDb;Trusted_Connection=True;TrustServerCertificate=True;MultipleActiveResultSets=true";
 
+bool isPostgres = provider.Equals("PostgreSQL", StringComparison.OrdinalIgnoreCase) 
+               || provider.Equals("Postgres", StringComparison.OrdinalIgnoreCase)
+               || connectionString.Contains("Host=", StringComparison.OrdinalIgnoreCase)
+               || connectionString.Contains("Port=5432", StringComparison.OrdinalIgnoreCase)
+               || connectionString.Contains("Username=", StringComparison.OrdinalIgnoreCase);
+
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
-    options.UseSqlServer(connectionString);
+    if (isPostgres)
+    {
+        options.UseNpgsql(connectionString, npgsqlOptions =>
+        {
+            npgsqlOptions.EnableRetryOnFailure(5, TimeSpan.FromSeconds(10), null);
+        });
+    }
+    else
+    {
+        options.UseSqlServer(connectionString, sqlOptions =>
+        {
+            sqlOptions.EnableRetryOnFailure(5, TimeSpan.FromSeconds(10), null);
+        });
+    }
 });
 
 // 2. Dependency Injection
@@ -138,15 +161,27 @@ using (var scope = app.Services.CreateScope())
         // Safe production column inspection and migration
         try
         {
-            await db.Database.ExecuteSqlRawAsync(@"
-                IF COL_LENGTH('Stores', 'VodafoneCashNumber') IS NULL 
-                    ALTER TABLE Stores ADD VodafoneCashNumber NVARCHAR(20) NULL;
-                IF COL_LENGTH('Stores', 'InstaPayAddress') IS NULL 
-                    ALTER TABLE Stores ADD InstaPayAddress NVARCHAR(100) NULL;
-                IF COL_LENGTH('WhatsAppOrders', 'PaymentMethod') IS NULL 
-                    ALTER TABLE WhatsAppOrders ADD PaymentMethod NVARCHAR(50) NOT NULL CONSTRAINT DF_WhatsAppOrders_PaymentMethod DEFAULT N'الدفع عند الاستلام';
-            ");
-            logger.LogInformation("Database column migrations checked and applied successfully.");
+            if (db.Database.IsNpgsql())
+            {
+                await db.Database.ExecuteSqlRawAsync(@"
+                    ALTER TABLE ""Stores"" ADD COLUMN IF NOT EXISTS ""VodafoneCashNumber"" VARCHAR(20) NULL;
+                    ALTER TABLE ""Stores"" ADD COLUMN IF NOT EXISTS ""InstaPayAddress"" VARCHAR(100) NULL;
+                    ALTER TABLE ""WhatsAppOrders"" ADD COLUMN IF NOT EXISTS ""PaymentMethod"" VARCHAR(50) NOT NULL DEFAULT 'الدفع عند الاستلام';
+                ");
+                logger.LogInformation("PostgreSQL database columns verified/applied successfully.");
+            }
+            else
+            {
+                await db.Database.ExecuteSqlRawAsync(@"
+                    IF COL_LENGTH('Stores', 'VodafoneCashNumber') IS NULL 
+                        ALTER TABLE Stores ADD VodafoneCashNumber NVARCHAR(20) NULL;
+                    IF COL_LENGTH('Stores', 'InstaPayAddress') IS NULL 
+                        ALTER TABLE Stores ADD InstaPayAddress NVARCHAR(100) NULL;
+                    IF COL_LENGTH('WhatsAppOrders', 'PaymentMethod') IS NULL 
+                        ALTER TABLE WhatsAppOrders ADD PaymentMethod NVARCHAR(50) NOT NULL CONSTRAINT DF_WhatsAppOrders_PaymentMethod DEFAULT N'الدفع عند الاستلام';
+                ");
+                logger.LogInformation("SQL Server database column migrations checked and applied successfully.");
+            }
         }
         catch (Exception colEx)
         {

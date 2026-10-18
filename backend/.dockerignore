@@ -1,0 +1,7 @@
+bin/
+obj/
+publish/
+appsettings.Development.json
+.git
+.vs
+.vscode
