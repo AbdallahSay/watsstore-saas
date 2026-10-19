@@ -68,6 +68,40 @@ export default function HomePage() {
       <Navbar />
 
       <main className="flex-1">
+        {/* Schema.org Structured Data */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              '@context': 'https://schema.org',
+              '@graph': [
+                {
+                  '@type': 'Organization',
+                  '@id': 'https://frontend-bay-ten-58.vercel.app/#organization',
+                  name: 'WatsStore',
+                  url: 'https://frontend-bay-ten-58.vercel.app',
+                  logo: 'https://frontend-bay-ten-58.vercel.app/favicon.ico',
+                  description: 'منصة التجارة الإلكترونية وكتالوجات الواتساب الرائدة في مصر',
+                },
+                {
+                  '@type': 'SoftwareApplication',
+                  '@id': 'https://frontend-bay-ten-58.vercel.app/#software',
+                  name: 'WatsStore SaaS',
+                  applicationCategory: 'BusinessApplication',
+                  operatingSystem: 'All',
+                  offers: {
+                    '@type': 'AggregateOffer',
+                    priceCurrency: 'EGP',
+                    lowPrice: '0',
+                    highPrice: '599',
+                    offerCount: '3',
+                  },
+                },
+              ],
+            }),
+          }}
+        />
+
         {/* HERO SECTION */}
         <section className="relative overflow-hidden bg-gradient-to-b from-emerald-50/60 via-white to-slate-50 pt-16 pb-24 md:pt-24 md:pb-32">
           {/* Subtle decorative circles */}
@@ -336,8 +370,8 @@ export default function HomePage() {
                         <span className="text-xs font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200">
                           وفر 1,089 ج.م (شهران مجاناً) 🎁
                         </span>
-                        <span className="text-[11px] text-slate-400">
-                          (~{Math.round(pricing.proAnnualPrice / 12)} ج.م/شهرياً)
+                        <span className="text-[11px] text-slate-500 font-semibold">
+                          بدلاً من {pricing.proMonthlyPrice} ج.م شهرياً (~{Math.round(pricing.proAnnualPrice / 12)} ج.م/شهرياً)
                         </span>
                       </div>
                     </div>
@@ -407,8 +441,8 @@ export default function HomePage() {
                         <span className="text-xs font-bold text-amber-800 bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200">
                           وفر 2,189 ج.م سنوياً 👑
                         </span>
-                        <span className="text-[11px] text-slate-400">
-                          (~{Math.round(pricing.vipAnnualPrice / 12)} ج.م/شهرياً)
+                        <span className="text-[11px] text-slate-500 font-semibold">
+                          بدلاً من {pricing.vipMonthlyPrice} ج.م شهرياً (~{Math.round(pricing.vipAnnualPrice / 12)} ج.م/شهرياً)
                         </span>
                       </div>
                     </div>
