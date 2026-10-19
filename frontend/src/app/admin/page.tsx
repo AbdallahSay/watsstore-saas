@@ -1748,11 +1748,11 @@ export default function SuperAdminPage() {
                               </td>
 
                               <td className="py-3.5 px-4 text-center">
-                                <div className="flex items-center justify-center gap-1.5">
+                                <div className="flex items-center justify-center gap-2">
                                   <button
                                     onClick={() => handleApproveSubscription(sub)}
                                     disabled={isProcessingSubId === sub.id}
-                                    className="px-3 py-1.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black rounded-xl text-xs transition-all shadow-sm flex items-center gap-1 disabled:opacity-50"
+                                    className="px-3 py-2 min-h-[38px] bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black rounded-xl text-xs transition-all shadow-sm flex items-center gap-1.5 disabled:opacity-50"
                                     title="قبول الحوالة وترقية المتجر فوراً"
                                   >
                                     {isProcessingSubId === sub.id ? (
@@ -1766,10 +1766,10 @@ export default function SuperAdminPage() {
                                   <button
                                     onClick={() => handleRejectSubscription(sub)}
                                     disabled={isProcessingSubId === sub.id}
-                                    className="px-2.5 py-1.5 bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 font-bold rounded-xl text-xs transition-all disabled:opacity-50"
+                                    className="w-9 h-9 min-w-[36px] min-h-[36px] flex items-center justify-center bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 font-bold rounded-xl text-xs transition-all disabled:opacity-50"
                                     title="رفض الطلب"
                                   >
-                                    <XCircle className="w-3.5 h-3.5" />
+                                    <XCircle className="w-4 h-4" />
                                   </button>
                                 </div>
                               </td>
@@ -2840,20 +2840,20 @@ export default function SuperAdminPage() {
                                   <Link
                                     href={`/s/${slug}`}
                                     target="_blank"
-                                    className="p-2 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-lg transition-colors border border-slate-700"
+                                    className="w-9 h-9 min-w-[36px] min-h-[36px] flex items-center justify-center bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-lg transition-colors border border-slate-700"
                                     title="زيارة المتجر"
                                   >
-                                    <ExternalLink className="w-3.5 h-3.5" />
+                                    <ExternalLink className="w-4 h-4" />
                                   </Link>
 
                                   {/* Upgrade / Change Plan Button */}
                                   <button
                                     onClick={() => handleUpdateStorePlan(store)}
                                     disabled={isActionPending}
-                                    className="p-2 bg-purple-500/10 hover:bg-purple-500/20 text-purple-400 hover:text-purple-300 border border-purple-500/30 rounded-lg transition-colors disabled:opacity-50"
+                                    className="w-9 h-9 min-w-[36px] min-h-[36px] flex items-center justify-center bg-purple-500/10 hover:bg-purple-500/20 text-purple-400 hover:text-purple-300 border border-purple-500/30 rounded-lg transition-colors disabled:opacity-50"
                                     title="ترقية أو تعديل باقة المتجر (Pro / VIP / Free)"
                                   >
-                                    <Crown className="w-3.5 h-3.5" />
+                                    <Crown className="w-4 h-4" />
                                   </button>
 
                                   {/* Extend Trial Button */}
@@ -2861,10 +2861,10 @@ export default function SuperAdminPage() {
                                     <button
                                       onClick={() => handleExtendTrial(store)}
                                       disabled={isActionPending}
-                                      className="p-2 bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 hover:text-blue-300 border border-blue-500/30 rounded-lg transition-colors disabled:opacity-50"
+                                      className="w-9 h-9 min-w-[36px] min-h-[36px] flex items-center justify-center bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 hover:text-blue-300 border border-blue-500/30 rounded-lg transition-colors disabled:opacity-50"
                                       title="تمديد الفترة التجريبية 14 يوماً إضافياً"
                                     >
-                                      <Clock className="w-3.5 h-3.5" />
+                                      <Clock className="w-4 h-4" />
                                     </button>
                                   )}
 
@@ -2872,24 +2872,24 @@ export default function SuperAdminPage() {
                                   <button
                                     onClick={() => handleToggleStatus(store)}
                                     disabled={isActionPending}
-                                    className={`p-2 rounded-lg transition-colors border ${
+                                    className={`w-9 h-9 min-w-[36px] min-h-[36px] flex items-center justify-center rounded-lg transition-colors border ${
                                       isActive
                                         ? 'bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border-amber-500/30'
                                         : 'bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border-emerald-500/30'
                                     } disabled:opacity-50`}
                                     title={isActive ? 'إيقاف المتجر مؤقتاً' : 'تفعيل المتجر'}
                                   >
-                                    <Power className="w-3.5 h-3.5" />
+                                    <Power className="w-4 h-4" />
                                   </button>
 
                                   {/* Delete Store Button */}
                                   <button
                                     onClick={() => handleDeleteStore(store)}
                                     disabled={isActionPending}
-                                    className="p-2 bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 hover:text-rose-300 border border-rose-500/30 rounded-lg transition-colors disabled:opacity-50"
+                                    className="w-9 h-9 min-w-[36px] min-h-[36px] flex items-center justify-center bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 hover:text-rose-300 border border-rose-500/30 rounded-lg transition-colors disabled:opacity-50"
                                     title="حذف المتجر نهائياً"
                                   >
-                                    <Trash2 className="w-3.5 h-3.5" />
+                                    <Trash2 className="w-4 h-4" />
                                   </button>
                                 </div>
                               </td>

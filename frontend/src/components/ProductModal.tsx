@@ -49,6 +49,18 @@ export default function ProductModal({
     }
   }, [product]);
 
+  // Lock body scroll when product modal is open
+  useEffect(() => {
+    if (isOpen && product) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isOpen, product]);
+
   if (!isOpen || !product) return null;
 
   const isOutOfStock = product.isAvailable === false;
@@ -72,7 +84,10 @@ export default function ProductModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fadeIn">
+    <div 
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fadeIn"
+      onClick={onClose}
+    >
       <div 
         className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 rounded-3xl max-w-lg w-full max-h-[90vh] overflow-y-auto shadow-2xl relative border border-slate-100 dark:border-slate-800 flex flex-col"
         onClick={(e) => e.stopPropagation()}
@@ -80,7 +95,7 @@ export default function ProductModal({
         {/* Close Button */}
         <button
           onClick={onClose}
-          className="absolute top-4 left-4 z-10 w-9 h-9 rounded-full bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 flex items-center justify-center transition-colors"
+          className="absolute top-4 left-4 z-10 w-10 h-10 min-w-[44px] min-h-[44px] rounded-full bg-slate-100/90 dark:bg-slate-800/90 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 flex items-center justify-center transition-colors shadow-sm"
           aria-label="إغلاق"
         >
           <X className="w-5 h-5" />
@@ -155,7 +170,7 @@ export default function ProductModal({
                             }));
                             setValidationError(null);
                           }}
-                          className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all flex items-center gap-1.5 border ${
+                          className={`px-4 py-2.5 rounded-xl text-sm font-semibold transition-all flex items-center gap-1.5 border min-h-[44px] ${
                             isSelected
                               ? 'bg-emerald-600 text-white border-emerald-600 shadow-sm shadow-emerald-600/30 ring-2 ring-emerald-600/20'
                               : 'bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-200 border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700'
@@ -186,7 +201,7 @@ export default function ProductModal({
                 type="button"
                 disabled={isOutOfStock}
                 onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-                className="w-8 h-8 rounded-lg bg-white dark:bg-slate-700 text-slate-700 dark:text-slate-200 flex items-center justify-center hover:bg-slate-200 dark:hover:bg-slate-600 font-bold disabled:opacity-40"
+                className="w-9 h-9 min-w-[36px] min-h-[36px] rounded-lg bg-white dark:bg-slate-700 text-slate-700 dark:text-slate-200 flex items-center justify-center hover:bg-slate-200 dark:hover:bg-slate-600 font-bold disabled:opacity-40 active:scale-95 transition-transform"
                 aria-label="إنقاص الكمية"
               >
                 <Minus className="w-4 h-4" />
@@ -198,7 +213,7 @@ export default function ProductModal({
                 type="button"
                 disabled={isOutOfStock}
                 onClick={() => setQuantity((q) => q + 1)}
-                className="w-8 h-8 rounded-lg bg-white dark:bg-slate-700 text-slate-700 dark:text-slate-200 flex items-center justify-center hover:bg-slate-200 dark:hover:bg-slate-600 font-bold disabled:opacity-40"
+                className="w-9 h-9 min-w-[36px] min-h-[36px] rounded-lg bg-white dark:bg-slate-700 text-slate-700 dark:text-slate-200 flex items-center justify-center hover:bg-slate-200 dark:hover:bg-slate-600 font-bold disabled:opacity-40 active:scale-95 transition-transform"
                 aria-label="زيادة الكمية"
               >
                 <Plus className="w-4 h-4" />
@@ -206,24 +221,26 @@ export default function ProductModal({
             </div>
           </div>
 
-          {/* Add to Cart Submit Button */}
-          <button
-            type="button"
-            disabled={isOutOfStock}
-            onClick={handleConfirm}
-            className={`w-full mt-2 py-3.5 font-bold rounded-2xl shadow-lg flex items-center justify-center gap-2 transition-all ${
-              isOutOfStock
-                ? 'bg-slate-300 dark:bg-slate-700 text-slate-500 cursor-not-allowed opacity-60'
-                : 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-emerald-600/25 active:scale-[0.98]'
-            }`}
-          >
-            <ShoppingBag className="w-5 h-5" />
-            <span>
-              {isOutOfStock
-                ? 'المنتج غير متوفر حالياً'
-                : `إضافة إلى السلة (${(product.price * quantity).toFixed(2)} ${currency})`}
-            </span>
-          </button>
+          {/* Sticky Add to Cart Submit Button */}
+          <div className="sticky bottom-0 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md pt-3 pb-safe border-t border-slate-100 dark:border-slate-800 -mx-6 -mb-6 px-6">
+            <button
+              type="button"
+              disabled={isOutOfStock}
+              onClick={handleConfirm}
+              className={`w-full min-h-[48px] py-3.5 font-bold rounded-2xl shadow-lg flex items-center justify-center gap-2 transition-all ${
+                isOutOfStock
+                  ? 'bg-slate-300 dark:bg-slate-700 text-slate-500 cursor-not-allowed opacity-60'
+                  : 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-emerald-600/25 active:scale-[0.98]'
+              }`}
+            >
+              <ShoppingBag className="w-5 h-5" />
+              <span>
+                {isOutOfStock
+                  ? 'المنتج غير متوفر حالياً'
+                  : `إضافة إلى السلة (${(product.price * quantity).toFixed(2)} ${currency})`}
+              </span>
+            </button>
+          </div>
         </div>
       </div>
     </div>

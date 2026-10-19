@@ -123,7 +123,7 @@ export default function MerchantOrdersPage() {
         <button
           onClick={handleExportCsv}
           disabled={isExporting || orders.length === 0}
-          className="w-full sm:w-auto px-5 py-3 bg-emerald-600 hover:bg-emerald-700 disabled:bg-slate-300 dark:disabled:bg-slate-800 text-white font-bold rounded-2xl flex items-center justify-center gap-2 shadow-sm transition-all"
+          className="w-full sm:w-auto px-5 py-3 min-h-[44px] bg-emerald-600 hover:bg-emerald-700 disabled:bg-slate-300 dark:disabled:bg-slate-800 text-white font-bold rounded-2xl flex items-center justify-center gap-2 shadow-sm transition-all"
         >
           {isExporting ? (
             <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
@@ -166,7 +166,7 @@ export default function MerchantOrdersPage() {
         <div className="flex items-center gap-2 w-full md:w-auto overflow-x-auto pb-1 md:pb-0">
           <button
             onClick={() => setPaymentFilter('ALL')}
-            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-colors whitespace-nowrap ${
+            className={`min-h-[40px] px-3.5 py-2 rounded-xl text-xs font-bold transition-colors whitespace-nowrap ${
               paymentFilter === 'ALL'
                 ? 'bg-slate-900 dark:bg-emerald-600 text-white'
                 : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
@@ -176,7 +176,7 @@ export default function MerchantOrdersPage() {
           </button>
           <button
             onClick={() => setPaymentFilter('CASH')}
-            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-colors whitespace-nowrap ${
+            className={`min-h-[40px] px-3.5 py-2 rounded-xl text-xs font-bold transition-colors whitespace-nowrap ${
               paymentFilter === 'CASH'
                 ? 'bg-emerald-600 text-white'
                 : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
@@ -186,7 +186,7 @@ export default function MerchantOrdersPage() {
           </button>
           <button
             onClick={() => setPaymentFilter('WALLET')}
-            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-colors whitespace-nowrap ${
+            className={`min-h-[40px] px-3.5 py-2 rounded-xl text-xs font-bold transition-colors whitespace-nowrap ${
               paymentFilter === 'WALLET'
                 ? 'bg-emerald-600 text-white'
                 : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
@@ -196,7 +196,7 @@ export default function MerchantOrdersPage() {
           </button>
           <button
             onClick={() => setPaymentFilter('INSTAPAY')}
-            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-colors whitespace-nowrap ${
+            className={`min-h-[40px] px-3.5 py-2 rounded-xl text-xs font-bold transition-colors whitespace-nowrap ${
               paymentFilter === 'INSTAPAY'
                 ? 'bg-emerald-600 text-white'
                 : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
@@ -292,9 +292,9 @@ export default function MerchantOrdersPage() {
                           href={waLink}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1 px-3 py-1.5 bg-emerald-50 dark:bg-emerald-950/40 hover:bg-emerald-100 dark:hover:bg-emerald-900/50 text-emerald-700 dark:text-emerald-400 font-bold rounded-xl text-[11px] border border-emerald-200 dark:border-emerald-800/60 transition-colors"
+                          className="inline-flex items-center justify-center gap-1.5 px-3 py-2 min-h-[36px] bg-emerald-50 dark:bg-emerald-950/40 hover:bg-emerald-100 dark:hover:bg-emerald-900/50 text-emerald-700 dark:text-emerald-400 font-bold rounded-xl text-[11px] border border-emerald-200 dark:border-emerald-800/60 transition-colors"
                         >
-                          <MessageCircle className="w-3.5 h-3.5" />
+                          <MessageCircle className="w-4 h-4" />
                           <span>واتساب</span>
                         </a>
                       </td>

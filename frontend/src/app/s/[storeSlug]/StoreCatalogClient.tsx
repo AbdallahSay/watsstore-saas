@@ -79,6 +79,18 @@ export default function StoreCatalogClient({ store }: StoreCatalogClientProps) {
   const [reviewComment, setReviewComment] = useState('');
   const [isSubmittingReview, setIsSubmittingReview] = useState(false);
 
+  // Lock body scroll when review modal is open
+  useEffect(() => {
+    if (isReviewModalOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isReviewModalOpen]);
+
   // Cart total calculations
   const cartCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
   const cartTotal = cartItems.reduce((sum, item) => sum + item.product.price * item.quantity, 0);
@@ -373,7 +385,7 @@ export default function StoreCatalogClient({ store }: StoreCatalogClientProps) {
               <button
                 type="button"
                 onClick={() => setActiveCategory('all')}
-                className={`px-5 py-2 rounded-xl text-xs sm:text-sm font-bold whitespace-nowrap transition-all border ${
+                className={`px-4 py-2.5 min-h-[44px] rounded-xl text-xs sm:text-sm font-bold whitespace-nowrap transition-all border inline-flex items-center ${
                   activeCategory === 'all'
                     ? 'bg-slate-900 dark:bg-emerald-600 text-white border-slate-900 dark:border-emerald-600 shadow-sm'
                     : 'bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800'
@@ -389,7 +401,7 @@ export default function StoreCatalogClient({ store }: StoreCatalogClientProps) {
                     key={cat.id}
                     type="button"
                     onClick={() => setActiveCategory(cat.id)}
-                    className={`px-5 py-2 rounded-xl text-xs sm:text-sm font-bold whitespace-nowrap transition-all border ${
+                    className={`px-4 py-2.5 min-h-[44px] rounded-xl text-xs sm:text-sm font-bold whitespace-nowrap transition-all border inline-flex items-center ${
                       activeCategory === cat.id
                         ? 'bg-emerald-600 text-white border-emerald-600 shadow-sm'
                         : 'bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800'
@@ -586,17 +598,17 @@ export default function StoreCatalogClient({ store }: StoreCatalogClientProps) {
 
       {/* Floating Bottom Cart Bar (Mobile) */}
       {cartCount > 0 && (
-        <div className="sm:hidden fixed bottom-4 inset-x-4 z-30">
+        <div className="sm:hidden fixed bottom-4 inset-x-4 z-30 pb-safe">
           <button
             onClick={() => setIsCartOpen(true)}
             style={{ backgroundColor: store.themeColor }}
-            className="w-full py-3.5 px-5 rounded-2xl text-white font-black shadow-2xl flex items-center justify-between animate-bounce"
+            className="w-full min-h-[48px] py-3.5 px-5 rounded-2xl text-white font-black shadow-2xl flex items-center justify-between active:scale-95 transition-transform"
           >
             <div className="flex items-center gap-2">
               <ShoppingBag className="w-5 h-5" />
               <span>عرض السلة ({cartCount})</span>
             </div>
-            <span className="text-sm">
+            <span className="text-sm font-black">
               {cartTotal.toFixed(2)} {store.currency}
             </span>
           </button>
@@ -638,12 +650,19 @@ export default function StoreCatalogClient({ store }: StoreCatalogClientProps) {
 
       {/* Review Submission Modal */}
       {isReviewModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-xs animate-fadeIn">
-          <div className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 w-full max-w-lg rounded-3xl p-6 sm:p-7 shadow-2xl border border-slate-100 dark:border-slate-800 relative">
+        <div 
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-xs animate-fadeIn"
+          onClick={() => setIsReviewModalOpen(false)}
+        >
+          <div 
+            className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 w-full max-w-lg rounded-3xl p-6 sm:p-7 shadow-2xl border border-slate-100 dark:border-slate-800 relative"
+            onClick={(e) => e.stopPropagation()}
+          >
             {/* Close Button */}
             <button
               onClick={() => setIsReviewModalOpen(false)}
-              className="absolute left-5 top-5 p-2 rounded-full text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+              className="absolute left-5 top-5 w-10 h-10 min-w-[44px] min-h-[44px] rounded-full text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center justify-center transition-colors"
+              aria-label="إغلاق نافذة التقييم"
             >
               <X className="w-5 h-5" />
             </button>

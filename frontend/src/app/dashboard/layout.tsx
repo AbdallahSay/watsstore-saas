@@ -81,6 +81,18 @@ export default function DashboardLayout({
     }
   }, [router]);
 
+  // Lock body scroll when mobile menu drawer is open
+  useEffect(() => {
+    if (isMobileMenuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isMobileMenuOpen]);
+
   const handleLogout = () => {
     localStorage.removeItem('watsstore_merchant_token');
     localStorage.removeItem('watsstore_token');
@@ -217,19 +229,19 @@ export default function DashboardLayout({
       </aside>
 
       {/* Mobile Top Header */}
-      <header className="md:hidden bg-slate-900 text-white p-4 flex items-center justify-between border-b border-slate-800">
+      <header className="md:hidden bg-slate-900 text-white px-4 py-3 flex items-center justify-between border-b border-slate-800 z-30 sticky top-0">
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 rounded-xl bg-emerald-500 flex items-center justify-center text-white font-bold">
             <StoreIcon className="w-4 h-4" />
           </div>
-          <span className="font-bold text-base">WatsStore</span>
+          <span className="font-bold text-base text-white">WatsStore</span>
         </div>
 
         <div className="flex items-center gap-2">
           <ThemeLanguageBar variant="compact" />
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="p-2 text-slate-300 hover:text-white"
+            className="p-2 text-slate-300 hover:text-white rounded-xl hover:bg-slate-800 min-w-[44px] min-h-[44px] flex items-center justify-center transition-colors"
             aria-label="القائمة"
           >
             {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
@@ -237,48 +249,88 @@ export default function DashboardLayout({
         </div>
       </header>
 
-      {/* Mobile Menu Drawer */}
+      {/* Mobile Menu Drawer (Off-Canvas) */}
       {isMobileMenuOpen && (
-        <div className="md:hidden bg-slate-900 text-slate-300 p-4 border-b border-slate-800 space-y-3">
-          <nav className="space-y-1">
-            {navLinks.map((link) => {
-              const Icon = link.icon;
-              const isActive = pathname === link.href;
-              return (
-                <Link
-                  key={link.href}
-                  href={link.href}
+        <div 
+          className="md:hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-sm animate-fadeIn"
+          onClick={() => setIsMobileMenuOpen(false)}
+        >
+          <div 
+            className="fixed inset-y-0 rtl:right-0 ltr:left-0 w-72 max-w-[85vw] bg-slate-900 text-slate-300 p-5 flex flex-col justify-between overflow-y-auto rtl:border-l ltr:border-r border-slate-800 shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="space-y-4">
+              {/* Header with Close */}
+              <div className="flex items-center justify-between pb-3 border-b border-slate-800">
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-xl bg-emerald-500 flex items-center justify-center text-white font-bold">
+                    <StoreIcon className="w-4 h-4" />
+                  </div>
+                  <span className="font-bold text-base text-white">WatsStore</span>
+                </div>
+                <button
                   onClick={() => setIsMobileMenuOpen(false)}
-                  className={`flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-bold ${
-                    isActive ? 'bg-emerald-600 text-white' : 'text-slate-400 hover:bg-slate-800'
-                  }`}
+                  className="w-10 h-10 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white flex items-center justify-center min-w-[44px] min-h-[44px]"
+                  aria-label="إغلاق القائمة"
                 >
-                  <Icon className="w-4 h-4" />
-                  <span>{link.name}</span>
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              {/* User Info Card */}
+              <div className="flex items-center gap-2.5 px-3 py-2.5 bg-slate-800/60 rounded-xl border border-slate-800">
+                <div className="w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center text-slate-300 font-bold text-xs shrink-0">
+                  <User className="w-4 h-4" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs font-bold text-white truncate">{user?.ownerName}</p>
+                  <p className="text-[11px] text-slate-400 truncate">{user?.storeName}</p>
+                </div>
+              </div>
+
+              {/* Nav Links with 44px min touch target */}
+              <nav className="space-y-1">
+                {navLinks.map((link) => {
+                  const Icon = link.icon;
+                  const isActive = pathname === link.href;
+                  return (
+                    <Link
+                      key={link.href}
+                      href={link.href}
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className={`flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-bold min-h-[44px] transition-colors ${
+                        isActive ? 'bg-emerald-600 text-white shadow-md shadow-emerald-600/30' : 'text-slate-400 hover:bg-slate-800 hover:text-slate-200'
+                      }`}
+                    >
+                      <Icon className="w-4 h-4 shrink-0" />
+                      <span>{link.name}</span>
+                    </Link>
+                  );
+                })}
+              </nav>
+            </div>
+
+            {/* Bottom Actions */}
+            <div className="pt-4 border-t border-slate-800 space-y-2 pb-safe">
+              {user && (
+                <Link
+                  href={`/s/${user.slug}`}
+                  target="_blank"
+                  className="w-full py-3 px-3 rounded-xl bg-emerald-950/60 text-emerald-400 font-bold text-xs flex items-center justify-center gap-2 border border-emerald-800/60 min-h-[44px]"
+                >
+                  <ExternalLink className="w-4 h-4" />
+                  <span>{t('dash.view_store', undefined, 'معاينة متجرك الحي')}</span>
                 </Link>
-              );
-            })}
-          </nav>
+              )}
 
-          <div className="pt-2 border-t border-slate-800 flex items-center justify-between">
-            {user && (
-              <Link
-                href={`/s/${user.slug}`}
-                target="_blank"
-                className="text-xs text-emerald-400 font-bold flex items-center gap-1"
+              <button
+                onClick={handleLogout}
+                className="w-full py-3 px-3 rounded-xl bg-slate-800 hover:bg-rose-950/50 text-rose-400 font-bold text-xs flex items-center justify-center gap-2 transition-colors min-h-[44px]"
               >
-                <span>{t('dash.view_store', undefined, 'معاينة المتجر')}</span>
-                <ExternalLink className="w-3.5 h-3.5" />
-              </Link>
-            )}
-
-            <button
-              onClick={handleLogout}
-              className="text-xs text-rose-400 font-bold flex items-center gap-1"
-            >
-              <LogOut className="w-3.5 h-3.5" />
-              <span>{t('dash.logout', undefined, 'خروج')}</span>
-            </button>
+                <LogOut className="w-4 h-4" />
+                <span>{t('dash.logout', undefined, 'تسجيل الخروج')}</span>
+              </button>
+            </div>
           </div>
         </div>
       )}

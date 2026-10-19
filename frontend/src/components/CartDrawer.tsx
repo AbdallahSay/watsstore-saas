@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Store, CartItem, ApplyCouponResponse } from '../types';
 import { api } from '../lib/api';
 import { pixel } from '../lib/pixel';
@@ -60,6 +60,18 @@ export default function CartDrawer({
   const [isApplyingCoupon, setIsApplyingCoupon] = useState(false);
   const [couponError, setCouponError] = useState<string | null>(null);
   const [showCouponInput, setShowCouponInput] = useState(false);
+
+  // Lock body scroll when cart drawer is open
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isOpen]);
 
   if (!isOpen) return null;
 
@@ -215,7 +227,10 @@ export default function CartDrawer({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex justify-end bg-black/50 backdrop-blur-sm animate-fadeIn">
+    <div 
+      className="fixed inset-0 z-50 flex justify-end bg-black/60 backdrop-blur-sm animate-fadeIn"
+      onClick={onClose}
+    >
       <div 
         className="w-full max-w-md bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 h-full shadow-2xl flex flex-col justify-between overflow-hidden"
         onClick={(e) => e.stopPropagation()}
@@ -234,10 +249,10 @@ export default function CartDrawer({
 
           <button
             onClick={onClose}
-            className="w-8 h-8 rounded-full bg-white dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-500 dark:text-slate-300 flex items-center justify-center border border-slate-200 dark:border-slate-700 transition-colors"
+            className="w-10 h-10 rounded-full bg-white dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-500 dark:text-slate-300 flex items-center justify-center border border-slate-200 dark:border-slate-700 min-w-[44px] min-h-[44px] transition-colors"
             aria-label="إغلاق السلة"
           >
-            <X className="w-4 h-4" />
+            <X className="w-5 h-5" />
           </button>
         </div>
 
@@ -306,27 +321,27 @@ export default function CartDrawer({
                         <button
                           type="button"
                           onClick={() => onUpdateQuantity(idx, item.quantity - 1)}
-                          className="w-6 h-6 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 flex items-center justify-center font-bold"
+                          className="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 flex items-center justify-center font-bold min-w-[32px] min-h-[32px] active:scale-95 transition-all"
                           aria-label="إنقاص"
                         >
-                          <Minus className="w-3 h-3" />
+                          <Minus className="w-3.5 h-3.5" />
                         </button>
-                        <span className="w-6 text-center text-xs font-black text-slate-900 dark:text-white">
+                        <span className="w-7 text-center text-xs font-black text-slate-900 dark:text-white">
                           {item.quantity}
                         </span>
                         <button
                           type="button"
                           onClick={() => onUpdateQuantity(idx, item.quantity + 1)}
-                          className="w-6 h-6 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 flex items-center justify-center font-bold"
+                          className="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 flex items-center justify-center font-bold min-w-[32px] min-h-[32px] active:scale-95 transition-all"
                           aria-label="زيادة"
                         >
-                          <Plus className="w-3 h-3" />
+                          <Plus className="w-3.5 h-3.5" />
                         </button>
                       </div>
 
                       <button
                         onClick={() => onRemoveItem(idx)}
-                        className="text-slate-400 hover:text-rose-500 p-1 transition-colors"
+                        className="text-slate-400 hover:text-rose-500 p-2 min-w-[36px] min-h-[36px] flex items-center justify-center rounded-lg hover:bg-rose-50 dark:hover:bg-rose-950/30 transition-colors"
                         aria-label="حذف المنتج"
                       >
                         <X className="w-4 h-4" />
@@ -543,7 +558,7 @@ export default function CartDrawer({
 
         {/* Drawer Footer / Summary */}
         {cartItems.length > 0 && (
-          <div className="p-4 bg-slate-50 dark:bg-slate-900/90 border-t border-slate-200 dark:border-slate-800 space-y-3">
+          <div className="p-4 bg-slate-50 dark:bg-slate-900/90 border-t border-slate-200 dark:border-slate-800 space-y-3 pb-safe shrink-0">
             {/* Promo Code Box */}
             <div className="bg-white dark:bg-slate-800 p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm">
               {!appliedCoupon ? (
@@ -662,13 +677,14 @@ export default function CartDrawer({
             <button
               onClick={handleSubmitOrder}
               disabled={isSubmitting}
-              className="w-full py-3.5 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white font-bold rounded-2xl shadow-lg shadow-emerald-600/25 flex items-center justify-center gap-2 transition-all active:scale-[0.98]"
+              className="w-full min-h-[48px] py-4 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white font-bold rounded-2xl shadow-lg shadow-emerald-600/25 flex items-center justify-center gap-2 transition-all active:scale-[0.98]"
             >
               <Send className="w-4 h-4" />
               <span>{isSubmitting ? 'جاري تجهيز الطلب...' : 'إرسال الطلب عبر الواتساب 💬'}</span>
             </button>
           </div>
         )}
+
       </div>
     </div>
   );

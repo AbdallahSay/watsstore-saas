@@ -45,6 +45,18 @@ export default function DashboardCategoriesPage() {
     fetchCategories();
   }, []);
 
+  // Lock body scroll when category modal is open
+  useEffect(() => {
+    if (isModalOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isModalOpen]);
+
   const openCreateModal = () => {
     setEditingCategory(null);
     setFormName('');
@@ -187,15 +199,15 @@ export default function DashboardCategoriesPage() {
                     <div className="flex items-center justify-center gap-2">
                       <button
                         onClick={() => openEditModal(cat)}
-                        className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 transition-colors"
-                        aria-label="تعديل"
+                        className="w-10 h-10 min-w-[40px] min-h-[40px] rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 flex items-center justify-center active:scale-95 transition-all"
+                        aria-label="تعديل القسم"
                       >
                         <Edit3 className="w-4 h-4" />
                       </button>
                       <button
                         onClick={() => handleDeleteCategory(cat)}
-                        className="p-2 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-600 transition-colors"
-                        aria-label="حذف"
+                        className="w-10 h-10 min-w-[40px] min-h-[40px] rounded-xl bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/40 dark:hover:bg-rose-900/50 text-rose-600 dark:text-rose-400 flex items-center justify-center active:scale-95 transition-all"
+                        aria-label="حذف القسم"
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>
@@ -210,7 +222,10 @@ export default function DashboardCategoriesPage() {
 
       {/* Category Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm animate-fadeIn">
+        <div 
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm animate-fadeIn"
+          onClick={() => setIsModalOpen(false)}
+        >
           <div 
             className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 rounded-3xl max-w-md w-full shadow-2xl p-6 border border-slate-200 dark:border-slate-800 space-y-4"
             onClick={(e) => e.stopPropagation()}
@@ -221,10 +236,11 @@ export default function DashboardCategoriesPage() {
               </h3>
               <button
                 onClick={() => setIsModalOpen(false)}
-                className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 flex items-center justify-center text-slate-500 dark:text-slate-400 transition-colors"
+                className="w-10 h-10 min-w-[44px] min-h-[44px] rounded-full bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 flex items-center justify-center text-slate-500 dark:text-slate-400 transition-colors"
                 title="إغلاق النافذة"
+                aria-label="إغلاق النافذة"
               >
-                <X className="w-4 h-4" />
+                <X className="w-5 h-5" />
               </button>
             </div>
 

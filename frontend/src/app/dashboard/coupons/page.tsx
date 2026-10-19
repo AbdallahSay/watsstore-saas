@@ -63,6 +63,18 @@ export default function DashboardCouponsPage() {
     fetchCoupons();
   }, []);
 
+  // Lock body scroll when coupon create modal is open
+  useEffect(() => {
+    if (isModalOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isModalOpen]);
+
   const handleCopyCode = (code: string) => {
     navigator.clipboard.writeText(code);
     setCopiedCode(code);
@@ -476,24 +488,26 @@ export default function DashboardCouponsPage() {
                             type="button"
                             onClick={() => handleToggleStatus(coupon)}
                             disabled={actionLoadingId === coupon.id}
-                            className={`p-2 rounded-xl border transition-all ${
+                            className={`w-10 h-10 min-w-[40px] min-h-[40px] flex items-center justify-center rounded-xl border transition-all active:scale-95 ${
                               coupon.isActive
-                                ? 'bg-amber-50 text-amber-700 border-amber-200 hover:bg-amber-100'
-                                : 'bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100'
+                                ? 'bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-400 border-amber-200 dark:border-amber-800 hover:bg-amber-100'
+                                : 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800 hover:bg-emerald-100'
                             }`}
                             title={coupon.isActive ? 'تعطيل الكوبون' : 'تفعيل الكوبون'}
+                            aria-label={coupon.isActive ? 'تعطيل الكوبون' : 'تفعيل الكوبون'}
                           >
-                            <Power className="w-3.5 h-3.5" />
+                            <Power className="w-4 h-4" />
                           </button>
 
                           <button
                             type="button"
                             onClick={() => handleDeleteCoupon(coupon)}
                             disabled={actionLoadingId === coupon.id}
-                            className="p-2 rounded-xl border border-rose-200 bg-rose-50 text-rose-600 hover:bg-rose-100 transition-all"
+                            className="w-10 h-10 min-w-[40px] min-h-[40px] flex items-center justify-center rounded-xl border border-rose-200 dark:border-rose-800 bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 hover:bg-rose-100 transition-all active:scale-95"
                             title="حذف الكوبون"
+                            aria-label="حذف الكوبون"
                           >
-                            <Trash2 className="w-3.5 h-3.5" />
+                            <Trash2 className="w-4 h-4" />
                           </button>
                         </div>
                       </td>
@@ -508,8 +522,14 @@ export default function DashboardCouponsPage() {
 
       {/* Create Coupon Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 backdrop-blur-sm p-4 animate-fadeIn">
-          <div className="w-full max-w-lg bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden">
+        <div 
+          className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 backdrop-blur-sm p-4 animate-fadeIn"
+          onClick={() => setIsModalOpen(false)}
+        >
+          <div 
+            className="w-full max-w-lg bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden"
+            onClick={(e) => e.stopPropagation()}
+          >
             {/* Modal Header */}
             <div className="p-5 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between bg-slate-50 dark:bg-slate-800/60">
               <div className="flex items-center gap-2.5">
@@ -523,8 +543,9 @@ export default function DashboardCouponsPage() {
               </div>
               <button
                 onClick={() => setIsModalOpen(false)}
-                className="w-8 h-8 rounded-full bg-white dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-500 dark:text-slate-400 flex items-center justify-center border border-slate-200 dark:border-slate-700 transition-colors"
+                className="w-10 h-10 min-w-[44px] min-h-[44px] rounded-full bg-white dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-500 dark:text-slate-400 flex items-center justify-center border border-slate-200 dark:border-slate-700 transition-colors"
                 title="إغلاق النافذة"
+                aria-label="إغلاق النافذة"
               >
                 <X className="w-4 h-4" />
               </button>

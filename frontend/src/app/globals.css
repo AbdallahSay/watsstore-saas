@@ -303,4 +303,31 @@ input[type="datetime-local"] {
   opacity: 1;
 }
 
+/* =========================================================================
+   Mobile Touch UX, iOS Safari Auto-Zoom Prevention & Safe Area Insets
+   ========================================================================= */
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+@media screen and (max-width: 768px) {
+  input,
+  select,
+  textarea {
+    font-size: 16px !important;
+  }
+}
+
+.pb-safe {
+  padding-bottom: max(1rem, env(safe-area-inset-bottom, 1rem));
+}
+
+.pt-safe {
+  padding-top: max(1rem, env(safe-area-inset-top, 1rem));
+}
+
+.mb-safe {
+  margin-bottom: max(1rem, env(safe-area-inset-bottom, 1rem));
+}
+
 

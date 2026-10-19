@@ -49,6 +49,18 @@ export default function DashboardOverviewPage() {
   const [isOnboardingDismissed, setIsOnboardingDismissed] = useState(false);
   const [isLinkShared, setIsLinkShared] = useState(false);
 
+  // Body scroll lock when upgrade modal is open
+  useEffect(() => {
+    if (isUpgradeModalOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [isUpgradeModalOpen]);
+
   useEffect(() => {
     const fetchSummary = async () => {
       const token = localStorage.getItem('watsstore_token');
@@ -240,7 +252,7 @@ export default function DashboardOverviewPage() {
           <div className="flex items-center gap-2.5">
             <button
               onClick={() => setIsUpgradeModalOpen(true)}
-              className="px-4 py-2.5 bg-amber-400 hover:bg-amber-300 text-slate-900 rounded-2xl font-black text-xs sm:text-sm shadow-md flex items-center gap-1.5 transition-all hover:scale-105"
+              className="px-4 py-2.5 min-h-[44px] bg-amber-400 hover:bg-amber-300 text-slate-900 rounded-2xl font-black text-xs sm:text-sm shadow-md flex items-center justify-center gap-1.5 transition-all hover:scale-105"
             >
               <Crown className="w-4 h-4 text-amber-900" />
               <span>ترقية الباقة</span>
@@ -249,7 +261,7 @@ export default function DashboardOverviewPage() {
               href={storeUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="px-4 py-2.5 bg-white text-emerald-800 hover:bg-emerald-50 rounded-2xl font-bold text-xs sm:text-sm shadow-md flex items-center gap-2 transition-all hover:scale-105"
+              className="px-4 py-2.5 min-h-[44px] bg-white text-emerald-800 hover:bg-emerald-50 rounded-2xl font-bold text-xs sm:text-sm shadow-md flex items-center justify-center gap-2 transition-all hover:scale-105"
             >
               <span>زيارة المتجر الحي</span>
               <ExternalLink className="w-4 h-4" />
@@ -791,9 +803,12 @@ export default function DashboardOverviewPage() {
 
       {/* Plan Upgrade Modal */}
       {isUpgradeModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fadeIn">
+        <div 
+          onClick={() => setIsUpgradeModalOpen(false)}
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fadeIn"
+        >
           <div 
-            className="bg-white dark:bg-slate-900 rounded-3xl max-w-2xl w-full max-h-[92vh] overflow-y-auto shadow-2xl p-6 sm:p-8 border border-slate-200 dark:border-slate-800 space-y-6 transition-colors"
+            className="bg-white dark:bg-slate-900 rounded-3xl max-w-2xl w-full max-h-[92vh] overflow-y-auto shadow-2xl p-6 sm:p-8 border border-slate-200 dark:border-slate-800 space-y-6 transition-colors pb-safe"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
@@ -802,10 +817,12 @@ export default function DashboardOverviewPage() {
                 <h3 className="text-lg font-black text-slate-900 dark:text-white">ترقية باقة المتجر — Masar Tech</h3>
               </div>
               <button
+                type="button"
                 onClick={() => setIsUpgradeModalOpen(false)}
-                className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 flex items-center justify-center text-slate-500 dark:text-slate-400 transition-colors"
+                className="w-10 h-10 min-w-[40px] min-h-[40px] rounded-full bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 flex items-center justify-center text-slate-500 dark:text-slate-400 transition-colors"
+                title="إغلاق"
               >
-                <X className="w-4 h-4" />
+                <X className="w-5 h-5" />
               </button>
             </div>
 
@@ -814,7 +831,7 @@ export default function DashboardOverviewPage() {
               <button
                 type="button"
                 onClick={() => setSelectedPlan('pro')}
-                className={`py-3 px-4 rounded-xl font-black text-xs sm:text-sm transition-all ${
+                className={`min-h-[44px] py-3 px-4 rounded-xl font-black text-xs sm:text-sm transition-all ${
                   selectedPlan === 'pro'
                     ? 'bg-white dark:bg-slate-900 text-emerald-700 dark:text-emerald-400 shadow-md'
                     : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
@@ -825,7 +842,7 @@ export default function DashboardOverviewPage() {
               <button
                 type="button"
                 onClick={() => setSelectedPlan('vip')}
-                className={`py-3 px-4 rounded-xl font-black text-xs sm:text-sm transition-all ${
+                className={`min-h-[44px] py-3 px-4 rounded-xl font-black text-xs sm:text-sm transition-all ${
                   selectedPlan === 'vip'
                     ? 'bg-white dark:bg-slate-900 text-emerald-700 dark:text-emerald-400 shadow-md'
                     : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
@@ -889,9 +906,9 @@ export default function DashboardOverviewPage() {
                 <button
                   type="button"
                   onClick={() => copyToClipboard(platformConfig.subscriptionWalletNumber, 'wallet')}
-                  className="px-3 py-1.5 bg-white dark:bg-slate-800 text-slate-900 dark:text-white hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg text-xs font-bold flex items-center gap-1 shrink-0 transition-colors"
+                  className="px-3.5 py-2 min-h-[38px] bg-white dark:bg-slate-800 text-slate-900 dark:text-white hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg text-xs font-bold flex items-center gap-1.5 shrink-0 transition-colors"
                 >
-                  {copiedWallet ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
+                  {copiedWallet ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
                   <span>{copiedWallet ? 'تم النسخ' : 'نسخ الرقم'}</span>
                 </button>
               </div>
@@ -902,7 +919,7 @@ export default function DashboardOverviewPage() {
               <button
                 type="button"
                 onClick={() => openWhatsAppUpgrade(selectedPlan)}
-                className="w-full py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-2xl font-black text-sm shadow-lg flex items-center justify-center gap-2 transition-all hover:scale-[1.01]"
+                className="w-full py-3.5 min-h-[48px] bg-emerald-600 hover:bg-emerald-700 text-white rounded-2xl font-black text-sm shadow-lg flex items-center justify-center gap-2 transition-all hover:scale-[1.01]"
               >
                 <MessageCircle className="w-5 h-5" />
                 <span>إرسال إيصال التحويل لتفعيل الباقة فوراً عبر واتساب</span>
