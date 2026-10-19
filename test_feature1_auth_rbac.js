@@ -212,8 +212,8 @@ async function runTests() {
       headers: { Authorization: `Bearer ${tokenA}` }
     });
     const slugA = summaryA.body?.storeInfo?.slug;
-    if (slugA) {
-      const orderRes = await request(`/api/storefront/${slugA}/orders`, {
+    if (slugA && productA_id) {
+      const orderRes = await request(`/api/public/stores/${slugA}/orders`, {
         method: 'POST',
         body: JSON.stringify({
           customerName: 'عميل اختبار',
@@ -221,15 +221,14 @@ async function runTests() {
           customerAddress: 'القاهرة - المعادي',
           customerNotes: 'ملاحظة طلب تجريبي',
           paymentMethod: 'CashOnDelivery',
-          itemsJson: JSON.stringify([
-            { productId: productA_id, productName: 'منتج أ', unitPrice: 250, quantity: 1, subtotal: 250 }
-          ]),
-          totalAmount: 250
+          items: [
+            { productId: productA_id, quantity: 1 }
+          ]
         })
       });
-      if ((orderRes.status === 200 || orderRes.status === 201) && orderRes.body?.orderId) {
+      if ((orderRes.status === 200 || orderRes.status === 201) && (orderRes.body?.orderId || orderRes.body?.orderNumber)) {
         orderA_id = orderRes.body.orderId;
-        recordTest('Create Order on Store A', true, `Order ID: ${orderA_id}`);
+        recordTest('Create Order on Store A', true, `Order ID: ${orderA_id}, Number: ${orderRes.body.orderNumber}`);
       } else {
         recordTest('Create Order on Store A', false, `Status ${orderRes.status}: ${JSON.stringify(orderRes.body)}`);
       }
@@ -361,7 +360,7 @@ async function runTests() {
   const merchantAdminRes4 = await request('/api/admin/change-password', {
     method: 'POST',
     headers: { Authorization: `Bearer ${tokenA}` },
-    body: JSON.stringify({ currentPassword: 'test', newPassword: 'test' })
+    body: JSON.stringify({ currentPassword: 'OldPassword123!', newPassword: 'NewPassword123!' })
   });
   recordTest('RBAC: Merchant JWT accessing /api/admin/change-password returns 403', merchantAdminRes4.status === 403, `Returned HTTP ${merchantAdminRes4.status}`);
 
