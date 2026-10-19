@@ -36,6 +36,38 @@ export default function RootLayout({
     <html lang="ar" dir="rtl" className={cairo.variable}>
       <head>
         <link rel="icon" href="/favicon.ico" sizes="any" />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              '@context': 'https://schema.org',
+              '@graph': [
+                {
+                  '@type': 'Organization',
+                  '@id': 'https://frontend-bay-ten-58.vercel.app/#organization',
+                  name: 'WatsStore',
+                  url: 'https://frontend-bay-ten-58.vercel.app',
+                  logo: 'https://frontend-bay-ten-58.vercel.app/favicon.ico',
+                  description: 'منصة التجارة الإلكترونية وكتالوجات الواتساب الرائدة في مصر',
+                },
+                {
+                  '@type': 'SoftwareApplication',
+                  '@id': 'https://frontend-bay-ten-58.vercel.app/#software',
+                  name: 'WatsStore SaaS',
+                  applicationCategory: 'BusinessApplication',
+                  operatingSystem: 'All',
+                  offers: {
+                    '@type': 'AggregateOffer',
+                    priceCurrency: 'EGP',
+                    lowPrice: '0',
+                    highPrice: '599',
+                    offerCount: '3',
+                  },
+                },
+              ],
+            }),
+          }}
+        />
       </head>
       <body className="min-h-screen bg-slate-50 flex flex-col font-cairo">
         {/* Dual Meta Pixel: Platform SaaS Owner Pixel */}
