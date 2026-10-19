@@ -1,0 +1,264 @@
+{
+  "timestamp": "2026-10-19T08:10:07.464Z",
+  "backendUrl": "https://watsstore.runasp.net",
+  "frontendUrl": "https://frontend-bay-ten-58.vercel.app",
+  "summary": {
+    "total": 25,
+    "passed": 25,
+    "failed": 0,
+    "passRate": "100.0%",
+    "averageLatencyMs": 360
+  },
+  "results": [
+    {
+      "id": "P1-01",
+      "page": "Page 1: Landing Page (/)",
+      "feature": "Hero Section & Primary CTA Links",
+      "expected": "HTTP 200 with 14-day trial CTA (/register) and live demo store link",
+      "actual": "HTTP 200, CTA: true, Demo: true",
+      "latencyMs": 445,
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "id": "P1-02",
+      "page": "Page 1: Landing Page (/)",
+      "feature": "Navigation Links & Anchor Tags",
+      "expected": "Contains #features, #pricing, and /login navigation targets",
+      "actual": "Features: true, Pricing: true, Login: true",
+      "latencyMs": 445,
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "id": "P1-03",
+      "page": "Page 1: Landing Page (/)",
+      "feature": "Launch Urgency Banner & Backend Pricing API Sync",
+      "expected": "HTTP 200, banner displayed and synced with backend pricing configuration",
+      "actual": "Pricing API HTTP: 200, Pro Price: 299 EGP, Banner: true",
+      "latencyMs": 937,
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "id": "P1-04",
+      "page": "Page 1: Landing Page (/)",
+      "feature": "Pricing Matrix: Free Trial Tier (14 Days, 10 Products, 1 Coupon, 0 AI)",
+      "expected": "Displays Free Trial 14-day tier with 10 products and 1 coupon limit",
+      "actual": "Free Trial Tier Rendered: true",
+      "latencyMs": 445,
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "id": "P1-05",
+      "page": "Page 1: Landing Page (/)",
+      "feature": "Pricing Matrix: Pro Plan (299 EGP/mo, ⭐ Most Popular, 100 Products, 15 Coupons, 15 AI)",
+      "expected": "Displays Pro tier with Most Popular badge, 299 EGP monthly / 2499 annual option",
+      "actual": "Pro Plan Rendered: true",
+      "latencyMs": 445,
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "id": "P1-06",
+      "page": "Page 1: Landing Page (/)",
+      "feature": "Pricing Matrix: VIP Plan (599 EGP/mo, 👑 VIP, Unlimited Products/Coupons, 150 AI)",
+      "expected": "Displays VIP tier with 599 EGP monthly / 4999 annual option",
+      "actual": "VIP Plan Rendered: true",
+      "latencyMs": 445,
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "id": "P1-07",
+      "page": "Page 1: Landing Page (/)",
+      "feature": "Monthly/Annual Toggle Switcher & Savings Incentives",
+      "expected": "Interactive billing switch with up to 30% savings incentive",
+      "actual": "Billing Toggle & Savings: true",
+      "latencyMs": 445,
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "id": "P1-08",
+      "page": "Page 1: Landing Page (/)",
+      "feature": "SEO Meta Tags (Title & Description)",
+      "expected": "Valid Arabic title and rich meta description tailored for Egyptian market",
+      "actual": "Has Title: true, Has Description: true",
+      "latencyMs": 445,
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "id": "P1-09",
+      "page": "Page 1: Landing Page (/)",
+      "feature": "Schema.org Rich Structured Data (Organization & SoftwareApplication)",
+      "expected": "application/ld+json contains Organization and SoftwareApplication schemas with aggregate offers",
+      "actual": "Codebase Verified: true, Live Verified: true",
+      "latencyMs": 814,
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "id": "P2-01",
+      "page": "Page 2: SEO Directory",
+      "feature": "Directory Index Root Rendering (/directory)",
+      "expected": "HTTP 200, renders Egyptian governorates and business categories",
+      "actual": "HTTP 200, Has Cities: true",
+      "latencyMs": 326,
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "id": "P2-02",
+      "page": "Page 2: SEO Directory",
+      "feature": "Dynamic City/Category Route (/directory/الفيوم/ملابس وأزياء)",
+      "expected": "HTTP 200, localized title, store listing or professional empty state",
+      "actual": "HTTP 200, City/Cat matched: true",
+      "latencyMs": 264,
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "id": "P2-03",
+      "page": "Page 2: SEO Directory",
+      "feature": "Dynamic City/Category Route (/directory/القاهرة/مطاعم وأكلات)",
+      "expected": "HTTP 200, localized restaurant listings in Cairo with filter navigation",
+      "actual": "HTTP 200",
+      "latencyMs": 261,
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "id": "P2-04",
+      "page": "Page 2: SEO Directory",
+      "feature": "Structured Data: BreadcrumbList & ItemList Schema Injection",
+      "expected": "Contains valid BreadcrumbList and ItemList schemas for Google rich snippets",
+      "actual": "BreadcrumbList: true, ItemList: true",
+      "latencyMs": 264,
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "id": "P2-05",
+      "page": "Page 2: SEO Directory",
+      "feature": "Dynamic Sitemap XML Generation (/sitemap.xml)",
+      "expected": "HTTP 200, valid urlset, includes directory routes, strictly excludes /admin and /dashboard",
+      "actual": "HTTP 200, Valid urlset: true, Excludes Admin: true, Includes Dir: true",
+      "latencyMs": 124,
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "id": "P2-06",
+      "page": "Page 2: SEO Directory",
+      "feature": "Robots.txt Crawler Rules & Sitemap Reference",
+      "expected": "HTTP 200, User-Agent rules, disallow protected routes (/dashboard), references /sitemap.xml",
+      "actual": "HTTP 200, Disallows Dashboard: true, Has Sitemap: true",
+      "latencyMs": 120,
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "id": "P3-01",
+      "page": "Page 3: Merchant Registration",
+      "feature": "Registration Form UI & Field Bindings (/register)",
+      "expected": "HTTP 200, renders all mandatory merchant fields (Owner, Store, Email, Password, WhatsApp, City)",
+      "actual": "HTTP 200, Owner: true, Store: true, Phone: true",
+      "latencyMs": 379,
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "id": "P3-02",
+      "page": "Page 3: Merchant Registration",
+      "feature": "Backend Registration API (POST /api/auth/register)",
+      "expected": "HTTP 200, returns valid JWT token, PlanType: Free, and unique store slug",
+      "actual": "HTTP 200, Plan: Free, Token: true, Slug: متجر-التدقيق-الألف-304390",
+      "latencyMs": 391,
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "id": "P3-03",
+      "page": "Page 3: Merchant Registration",
+      "feature": "Slug Generation Engine (Arabic & English URL-safe Slugs)",
+      "expected": "Generates URL-safe hypenated slug without illegal characters or whitespace",
+      "actual": "Generated Slug: \"متجر-التدقيق-الألف-304390\", Is URL-Safe: true",
+      "latencyMs": 391,
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "id": "P3-04",
+      "page": "Page 3: Merchant Registration",
+      "feature": "Duplicate Registration Defense (Email Collision)",
+      "expected": "HTTP 400 Bad Request with clear Arabic duplicate message",
+      "actual": "HTTP 400, Message: البريد الإلكتروني مسجل بالفعل. يرجى تسجيل الدخول أو استخدام بريد آخر.",
+      "latencyMs": 426,
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "id": "P3-05",
+      "page": "Page 3: Merchant Registration",
+      "feature": "Egyptian Mobile Phone Number Validation (010/011/012/015)",
+      "expected": "HTTP 400 Bad Request rejecting invalid mobile prefix (019...) with Arabic warning",
+      "actual": "HTTP 400, Message: رقم هاتف الواتساب غير صالح. يرجى إدخال رقم محمول مصري صحيح (مثال: 01012345678 أو 011/012/015).",
+      "latencyMs": 114,
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "id": "P4-01",
+      "page": "Page 4: Merchant Login",
+      "feature": "Login Page UI & Demo Store Quick-Fill Pill (/login)",
+      "expected": "HTTP 200, renders email/password inputs and interactive demo quick-fill pill",
+      "actual": "HTTP 200, Has Demo Pill: true",
+      "latencyMs": 122,
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "id": "P4-02",
+      "page": "Page 4: Merchant Login",
+      "feature": "Merchant Login Flow with Valid Credentials (POST /api/auth/login)",
+      "expected": "HTTP 200, returns valid JWT token, StoreId, StoreName, and profile data",
+      "actual": "HTTP 200, Token: true, StoreId: 0aa1aafc-1a59-4b87-87f2-3d96476b9287",
+      "latencyMs": 370,
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "id": "P4-03",
+      "page": "Page 4: Merchant Login",
+      "feature": "Invalid Password Defense",
+      "expected": "HTTP 401 Unauthorized with Arabic error message",
+      "actual": "HTTP 401, Message: بيانات الدخول غير صحيحة. يرجى التأكد من البريد الإلكتروني وكلمة المرور.",
+      "latencyMs": 353,
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "id": "P4-04",
+      "page": "Page 4: Merchant Login",
+      "feature": "Unregistered Email Defense",
+      "expected": "HTTP 401 Unauthorized with Arabic error message",
+      "actual": "HTTP 401, Message: بيانات الدخول غير صحيحة. يرجى التأكد من البريد الإلكتروني وكلمة المرور.",
+      "latencyMs": 117,
+      "status": "PASS",
+      "details": ""
+    },
+    {
+      "id": "P4-05",
+      "page": "Page 4: Merchant Login",
+      "feature": "Auth Rate Limiting Policy Active (auth-policy)",
+      "expected": "HTTP 401 or HTTP 429 indicating auth-policy rate limiter is actively governing the endpoint",
+      "actual": "HTTP 401, Rate Limiting Active: true",
+      "latencyMs": 117,
+      "status": "PASS",
+      "details": ""
+    }
+  ]
+}
