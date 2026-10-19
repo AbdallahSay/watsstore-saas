@@ -67,14 +67,15 @@ async function runTests() {
   const uniqueSuffix = Date.now().toString().slice(-6);
   const merchantEmail = `test_merchant_${uniqueSuffix}@watsstore.qa`;
   const merchantPass = 'Password123!';
-  const regRes = await request('/api/merchant/register', {
+  const phoneA = '010' + Math.floor(10000000 + Math.random() * 90000000);
+  const regRes = await request('/api/auth/register', {
     method: 'POST',
     body: JSON.stringify({
       storeName: `Hardened Store ${uniqueSuffix}`,
       ownerName: `Tester ${uniqueSuffix}`,
       email: merchantEmail,
       password: merchantPass,
-      whatsAppNumber: `010${uniqueSuffix}123`,
+      whatsAppNumber: phoneA,
       city: 'القاهرة',
       businessCategory: 'إلكترونيات',
       themeColor: '#10B981',
@@ -124,11 +125,11 @@ async function runTests() {
       senderIdentifier: '01012345678'
     })
   });
-  assert(cardReqRes.status === 200 && cardReqRes.data?.request?.status === 'Pending', 
+  assert(cardReqRes.status === 200 && cardReqRes.data?.status === 'Pending', 
     'OnlineCard enters Status=Pending awaiting verification', 
-    `Got status: ${cardReqRes.data?.request?.status}`
+    `Got status: ${cardReqRes.data?.status}`
   );
-  const firstReqId = cardReqRes.data?.request?.id;
+  const firstReqId = cardReqRes.data?.requestId;
 
   // Step 4: Test Single Active Request Lock (409 Conflict)
   console.log(`\n[4] Testing Single Active Request Lock (409 Conflict)...`);
@@ -154,9 +155,9 @@ async function runTests() {
     method: 'POST',
     headers: { Authorization: `Bearer ${merchantToken}` }
   });
-  assert(cancelRes.status === 200 && cancelRes.data?.request?.status === 'Cancelled',
+  assert(cancelRes.status === 200 && cancelRes.data?.status === 'Cancelled',
     'Cancel active pending upgrade request',
-    `Got status: ${cancelRes.data?.request?.status}`
+    `Got status: ${cancelRes.data?.status}`
   );
 
   // Verify status is Cancelled and no activePendingRequest exists
@@ -183,22 +184,23 @@ async function runTests() {
       amount: 1 // Malicious client attempt to pay 1 EGP
     })
   });
-  assert(newUpgradeRes.status === 200, 'Submit new upgrade request after cancel', JSON.stringify(newUpgradeRes.data));
-  assert(newUpgradeRes.data?.request?.amount === 2499, 'Server overrides client price to active annual price (2499)', `Got amount: ${newUpgradeRes.data?.request?.amount}`);
-  assert(newUpgradeRes.data?.request?.senderIdentifier === 'qa_sender@instapay', 'SenderIdentifier properly saved', `Got: ${newUpgradeRes.data?.request?.senderIdentifier}`);
-  const activeReqId = newUpgradeRes.data?.request?.id;
+  assert(newUpgradeRes.status === 200 && newUpgradeRes.data?.status === 'Pending', 'Submit new upgrade request after cancel', JSON.stringify(newUpgradeRes.data));
+  assert(newUpgradeRes.data?.amount === 2499, 'Server overrides client price to active annual price (2499)', `Got amount: ${newUpgradeRes.data?.amount}`);
+  assert(newUpgradeRes.data?.senderIdentifier === 'qa_sender@instapay', 'SenderIdentifier properly saved', `Got: ${newUpgradeRes.data?.senderIdentifier}`);
+  const activeReqId = newUpgradeRes.data?.requestId;
 
   // Step 7: Test Duplicate Transaction ID Guard from another merchant (400 Bad Request)
   console.log(`\n[7] Testing Duplicate Transaction ID Rejection across merchants...`);
   const merchantBEmail = `merchant_b_${uniqueSuffix}@watsstore.qa`;
-  const regBRes = await request('/api/merchant/register', {
+  const phoneB = '011' + Math.floor(10000000 + Math.random() * 90000000);
+  const regBRes = await request('/api/auth/register', {
     method: 'POST',
     body: JSON.stringify({
       storeName: `Store B ${uniqueSuffix}`,
       ownerName: `Owner B`,
       email: merchantBEmail,
       password: 'Password123!',
-      whatsAppNumber: `011${uniqueSuffix}999`,
+      whatsAppNumber: phoneB,
       city: 'الإسكندرية',
       businessCategory: 'ملابس',
       themeColor: '#10B981',
