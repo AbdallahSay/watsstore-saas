@@ -943,7 +943,34 @@ namespace WatsStore.Api.Controllers
 
             await _db.SaveChangesAsync();
 
-            return await GetPaymentGateways();
+            var gateways = await _db.PaymentGateways
+                .OrderBy(g => g.SortOrder)
+                .ThenBy(g => g.Id)
+                .ToListAsync();
+
+            var dtos = gateways.Select(g => new PaymentGatewayDto
+            {
+                Id = g.Id,
+                GatewayKey = g.GatewayKey,
+                DisplayName = g.DisplayName,
+                IsEnabled = g.IsEnabled,
+                Instructions = g.Instructions,
+                SortOrder = g.SortOrder,
+                Accounts = g.GetAccounts().Select(a => new GatewayAccountItemDto
+                {
+                    AccountNumber = a.AccountNumber,
+                    AccountName = a.AccountName,
+                    IsActive = a.IsActive,
+                    QrCodeUrl = a.QrCodeUrl
+                }).ToList(),
+                UpdatedAt = g.UpdatedAt
+            }).ToList();
+
+            return Ok(new
+            {
+                message = "تم حفظ وتحديث إعدادات وسائل الدفع والمحافظ بنجاح",
+                gateways = dtos
+            });
         }
 
         [HttpGet("subscriptions/pending")]
