@@ -84,7 +84,7 @@ namespace WatsStore.Api.Infrastructure.Utils
 
             string digits = Regex.Replace(phone, @"[^\d]", "");
 
-            return Regex.IsMatch(digits, @"^(?:01[0125]\d{8}|201[0125]\d{8}|00201[0125]\d{8})$");
+            return Regex.IsMatch(digits, @"^(?:01[0125]\d{8}|201[0125]\d{8}|00201[0125]\d{8}|1[0125]\d{8})$");
         }
     }
 }

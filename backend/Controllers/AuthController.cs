@@ -39,6 +39,12 @@ namespace WatsStore.Api.Controllers
                 return BadRequest(new { message = "البريد الإلكتروني مسجل بالفعل. يرجى تسجيل الدخول أو استخدام بريد آخر." });
             }
 
+            // Validate Egyptian WhatsApp mobile number
+            if (!SlugGenerator.IsValidEgyptianMobile(request.WhatsAppNumber))
+            {
+                return BadRequest(new { message = "رقم هاتف الواتساب غير صالح. يرجى إدخال رقم محمول مصري صحيح (مثال: 01012345678 أو 011/012/015)." });
+            }
+
             var cleanOwnerName = Sanitizer.Sanitize(request.OwnerName, 100);
             var cleanStoreName = Sanitizer.Sanitize(request.StoreName, 100);
             var cleanCategory = Sanitizer.Sanitize(request.BusinessCategory, 50);

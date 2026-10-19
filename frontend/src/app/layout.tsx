@@ -11,7 +11,7 @@ const cairo = Cairo({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'https://frontend-bay-ten-58.vercel.app'),
   title: {
     default: 'WatsStore | منصة إنشاء متاجر وكتالوجات الواتساب في مصر',
     template: '%s | WatsStore',
@@ -22,6 +22,19 @@ export const metadata: Metadata = {
   robots: {
     index: true,
     follow: true,
+  },
+  openGraph: {
+    title: 'WatsStore | منصة إنشاء متاجر وكتالوجات الواتساب في مصر',
+    description: 'أنشئ متجرك الإلكتروني ومنيو منتجاتك في دقيقتين واستقبل طلبات العملاء مباشرة ومفلترة على الواتساب مع دعم كامل لتحسين محركات البحث و SEO المحافظات المصرية.',
+    url: 'https://frontend-bay-ten-58.vercel.app',
+    siteName: 'WatsStore',
+    locale: 'ar_EG',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'WatsStore | منصة إنشاء متاجر وكتالوجات الواتساب في مصر',
+    description: 'أنشئ متجرك الإلكتروني ومنيو منتجاتك في دقيقتين واستقبل طلبات العملاء مباشرة ومفلترة على الواتساب.',
   },
 };
 
