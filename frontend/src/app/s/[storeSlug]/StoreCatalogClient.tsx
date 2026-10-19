@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import Link from 'next/link';
 import { Store, Product, CartItem, StoreReview } from '@/types';
 import StoreNavbar from '@/components/StoreNavbar';
@@ -49,21 +49,23 @@ export default function StoreCatalogClient({ store }: StoreCatalogClientProps) {
   const [reviewComment, setReviewComment] = useState('');
   const [isSubmittingReview, setIsSubmittingReview] = useState(false);
 
-  // Cart total calculations
-  const cartCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
-  const cartTotal = cartItems.reduce((sum, item) => sum + item.product.price * item.quantity, 0);
+  // Cart total calculations memoized
+  const cartCount = useMemo(() => cartItems.reduce((sum, item) => sum + item.quantity, 0), [cartItems]);
+  const cartTotal = useMemo(() => cartItems.reduce((sum, item) => sum + item.product.price * item.quantity, 0), [cartItems]);
 
-  // Filter products by category and search
-  const filteredProducts = store.products.filter((product) => {
-    const matchesCategory =
-      activeCategory === 'all' || product.categoryId === activeCategory;
-    const matchesSearch =
-      searchQuery.trim() === '' ||
-      product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (product.description &&
-        product.description.toLowerCase().includes(searchQuery.toLowerCase()));
-    return matchesCategory && matchesSearch;
-  });
+  // Filter products by category and search memoized
+  const filteredProducts = useMemo(() => {
+    return store.products.filter((product) => {
+      const matchesCategory =
+        activeCategory === 'all' || product.categoryId === activeCategory;
+      const matchesSearch =
+        searchQuery.trim() === '' ||
+        product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (product.description &&
+          product.description.toLowerCase().includes(searchQuery.toLowerCase()));
+      return matchesCategory && matchesSearch;
+    });
+  }, [store.products, activeCategory, searchQuery]);
 
   const handleSelectProduct = (product: Product) => {
     // Fire Meta Pixel ViewContent event
