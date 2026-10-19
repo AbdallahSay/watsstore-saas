@@ -540,7 +540,7 @@ export default function SuperAdminPage() {
 
     const { value: reason } = await Swal.fire({
       title: 'رفض طلب الاشتراك',
-      input: 'text',
+      input: 'textarea',
       inputLabel: 'سبب الرفض (سيظهر في صفحة التاجر):',
       inputPlaceholder: 'مثال: رقم العملية غير مسجل بمحفظتنا، أو المبلغ المحول غير مطابق...',
       showCancelButton: true,

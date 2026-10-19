@@ -210,18 +210,19 @@ export default function DashboardCategoriesPage() {
 
       {/* Category Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fadeIn">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm animate-fadeIn">
           <div 
-            className="bg-white rounded-3xl max-w-md w-full shadow-2xl p-6 border border-slate-200 space-y-4"
+            className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 rounded-3xl max-w-md w-full shadow-2xl p-6 border border-slate-200 dark:border-slate-800 space-y-4"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
-              <h3 className="text-base font-black text-slate-900">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
+              <h3 className="text-base font-black text-slate-900 dark:text-white">
                 {editingCategory ? 'تعديل بيانات القسم' : 'إضافة قسم جديد'}
               </h3>
               <button
                 onClick={() => setIsModalOpen(false)}
-                className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-500"
+                className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 flex items-center justify-center text-slate-500 dark:text-slate-400 transition-colors"
+                title="إغلاق النافذة"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -229,43 +230,43 @@ export default function DashboardCategoriesPage() {
 
             <form onSubmit={handleSaveCategory} className="space-y-4 text-xs">
               <div>
-                <label className="block font-bold text-slate-700 mb-1">اسم القسم *</label>
+                <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">اسم القسم *</label>
                 <input
                   type="text"
                   required
                   value={formName}
                   onChange={(e) => setFormName(e.target.value)}
                   placeholder="مثال: عبايات كاجوال"
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 font-medium text-sm focus:outline-none focus:border-emerald-500"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-medium text-sm focus:outline-none focus:border-emerald-500"
                 />
               </div>
 
               <div>
-                <label className="block font-bold text-slate-700 mb-1">ترتيب الظهور في القائمة</label>
+                <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">ترتيب الظهور في القائمة</label>
                 <input
                   type="number"
                   min="1"
                   required
                   value={formSortOrder}
                   onChange={(e) => setFormSortOrder(Number(e.target.value))}
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 font-medium text-sm focus:outline-none focus:border-emerald-500"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-medium text-sm focus:outline-none focus:border-emerald-500"
                 />
               </div>
 
-              <div className="pt-2 border-t border-slate-100 flex items-center justify-end gap-2">
+              <div className="pt-2 border-t border-slate-100 dark:border-slate-800 flex items-center justify-end gap-2">
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
-                  className="px-4 py-2 text-xs font-bold text-slate-600 hover:bg-slate-100 rounded-xl"
+                  className="px-4 py-2 text-xs font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-colors"
                 >
                   إلغاء
                 </button>
                 <button
                   type="submit"
                   disabled={isSaving}
-                  className="px-5 py-2 text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl shadow-md disabled:opacity-50"
+                  className="px-5 py-2 text-xs font-bold bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl shadow-md disabled:opacity-50 transition-all active:scale-95"
                 >
-                  {isSaving ? 'جاري الحفظ...' : 'حفظ القسم'}
+                  {isSaving ? 'جاري الحفظ...' : 'حفظ القسم 🚀'}
                 </button>
               </div>
             </form>

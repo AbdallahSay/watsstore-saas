@@ -793,31 +793,31 @@ export default function DashboardOverviewPage() {
       {isUpgradeModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fadeIn">
           <div 
-            className="bg-white rounded-3xl max-w-2xl w-full max-h-[92vh] overflow-y-auto shadow-2xl p-6 sm:p-8 border border-slate-200 space-y-6"
+            className="bg-white dark:bg-slate-900 rounded-3xl max-w-2xl w-full max-h-[92vh] overflow-y-auto shadow-2xl p-6 sm:p-8 border border-slate-200 dark:border-slate-800 space-y-6 transition-colors"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
               <div className="flex items-center gap-2">
                 <Crown className="w-5 h-5 text-amber-500" />
-                <h3 className="text-lg font-black text-slate-900">ترقية باقة المتجر — Masar Tech</h3>
+                <h3 className="text-lg font-black text-slate-900 dark:text-white">ترقية باقة المتجر — Masar Tech</h3>
               </div>
               <button
                 onClick={() => setIsUpgradeModalOpen(false)}
-                className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-500"
+                className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 flex items-center justify-center text-slate-500 dark:text-slate-400 transition-colors"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
 
             {/* Plans Tabs */}
-            <div className="grid grid-cols-2 gap-3 p-1.5 bg-slate-100 rounded-2xl">
+            <div className="grid grid-cols-2 gap-3 p-1.5 bg-slate-100 dark:bg-slate-800 rounded-2xl">
               <button
                 type="button"
                 onClick={() => setSelectedPlan('pro')}
                 className={`py-3 px-4 rounded-xl font-black text-xs sm:text-sm transition-all ${
                   selectedPlan === 'pro'
-                    ? 'bg-white text-emerald-700 shadow-md'
-                    : 'text-slate-600 hover:text-slate-900'
+                    ? 'bg-white dark:bg-slate-900 text-emerald-700 dark:text-emerald-400 shadow-md'
+                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
                 }`}
               >
                 باقة Pro (299 ج.م/شهر) ⭐
@@ -827,8 +827,8 @@ export default function DashboardOverviewPage() {
                 onClick={() => setSelectedPlan('vip')}
                 className={`py-3 px-4 rounded-xl font-black text-xs sm:text-sm transition-all ${
                   selectedPlan === 'vip'
-                    ? 'bg-white text-emerald-700 shadow-md'
-                    : 'text-slate-600 hover:text-slate-900'
+                    ? 'bg-white dark:bg-slate-900 text-emerald-700 dark:text-emerald-400 shadow-md'
+                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
                 }`}
               >
                 باقة VIP (599 ج.م/شهر) 👑
@@ -837,30 +837,30 @@ export default function DashboardOverviewPage() {
 
             {/* Plan Details Card */}
             {selectedPlan === 'pro' ? (
-              <div className="p-5 rounded-2xl bg-emerald-50/60 border border-emerald-200 space-y-3">
+              <div className="p-5 rounded-2xl bg-emerald-50/60 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/60 space-y-3">
                 <div className="flex items-baseline justify-between">
-                  <h4 className="font-extrabold text-emerald-950 text-base">باقة المحترفين (Pro)</h4>
-                  <span className="text-xl font-black text-emerald-700">299 ج.م <span className="text-xs font-semibold">/ شهرياً (أو 2,499 سنوياً)</span></span>
+                  <h4 className="font-extrabold text-emerald-950 dark:text-emerald-300 text-base">باقة المحترفين (Pro)</h4>
+                  <span className="text-xl font-black text-emerald-700 dark:text-emerald-400">299 ج.م <span className="text-xs font-semibold">/ شهرياً (أو 2,499 سنوياً)</span></span>
                 </div>
-                <ul className="text-xs text-emerald-900 space-y-2 pt-2">
+                <ul className="text-xs text-emerald-900 dark:text-emerald-200 space-y-2 pt-2">
                   {platformConfig.pricing.pro.features.map((f, i) => (
                     <li key={i} className="flex items-center gap-2">
-                      <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                      <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
                       <span>{f}</span>
                     </li>
                   ))}
                 </ul>
               </div>
             ) : (
-              <div className="p-5 rounded-2xl bg-amber-50/60 border border-amber-200 space-y-3">
+              <div className="p-5 rounded-2xl bg-amber-50/60 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/60 space-y-3">
                 <div className="flex items-baseline justify-between">
-                  <h4 className="font-extrabold text-amber-950 text-base">باقة النخبة (VIP)</h4>
-                  <span className="text-xl font-black text-amber-700">599 ج.م <span className="text-xs font-semibold">/ شهرياً (أو 4,999 سنوياً)</span></span>
+                  <h4 className="font-extrabold text-amber-950 dark:text-amber-300 text-base">باقة النخبة (VIP)</h4>
+                  <span className="text-xl font-black text-amber-700 dark:text-amber-400">599 ج.م <span className="text-xs font-semibold">/ شهرياً (أو 4,999 سنوياً)</span></span>
                 </div>
-                <ul className="text-xs text-amber-900 space-y-2 pt-2">
+                <ul className="text-xs text-amber-900 dark:text-amber-200 space-y-2 pt-2">
                   {platformConfig.pricing.vip.features.map((f, i) => (
                     <li key={i} className="flex items-center gap-2">
-                      <CheckCircle2 className="w-4 h-4 text-amber-600 shrink-0" />
+                      <CheckCircle2 className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0" />
                       <span>{f}</span>
                     </li>
                   ))}
@@ -869,13 +869,13 @@ export default function DashboardOverviewPage() {
             )}
 
             {/* Payment Details Box */}
-            <div className="p-5 rounded-2xl bg-slate-900 text-white space-y-3">
+            <div className="p-5 rounded-2xl bg-slate-900 dark:bg-slate-950 border border-slate-800 text-white space-y-3">
               <span className="text-xs font-bold text-slate-400 block">طريقة الدفع والتفعيل المباشر:</span>
               <p className="text-xs text-slate-300 leading-relaxed">
                 يرجى تحويل مبلغ الاشتراك عبر <b>فودافون كاش أو إنستاباي</b> إلى الرقم الرسمي التالي التابع لإدارة <b>Masar Tech</b>:
               </p>
               
-              <div className="p-3 bg-white/10 rounded-xl flex items-center justify-between gap-3">
+              <div className="p-3 bg-white/10 dark:bg-white/5 border border-white/10 rounded-xl flex items-center justify-between gap-3">
                 <div className="flex items-center gap-2.5">
                   <Wallet className="w-5 h-5 text-emerald-400" />
                   <div>
@@ -889,7 +889,7 @@ export default function DashboardOverviewPage() {
                 <button
                   type="button"
                   onClick={() => copyToClipboard(platformConfig.subscriptionWalletNumber, 'wallet')}
-                  className="px-3 py-1.5 bg-white text-slate-900 hover:bg-slate-100 rounded-lg text-xs font-bold flex items-center gap-1 shrink-0"
+                  className="px-3 py-1.5 bg-white dark:bg-slate-800 text-slate-900 dark:text-white hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg text-xs font-bold flex items-center gap-1 shrink-0 transition-colors"
                 >
                   {copiedWallet ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
                   <span>{copiedWallet ? 'تم النسخ' : 'نسخ الرقم'}</span>
@@ -907,7 +907,7 @@ export default function DashboardOverviewPage() {
                 <MessageCircle className="w-5 h-5" />
                 <span>إرسال إيصال التحويل لتفعيل الباقة فوراً عبر واتساب</span>
               </button>
-              <p className="text-center text-[11px] text-slate-400">
+              <p className="text-center text-[11px] text-slate-400 dark:text-slate-500">
                 فريق Masar Tech متواجد على مدار اليوم لتأكيد وتفعيل باقتك خلال 15 دقيقة.
               </p>
             </div>

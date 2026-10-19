@@ -252,62 +252,62 @@ export default function DashboardSettingsPage() {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
             <div>
-              <label className="block font-bold text-slate-700 mb-1">اسم المتجر *</label>
+              <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">اسم المتجر *</label>
               <input
                 type="text"
                 required
                 value={formData.storeName}
                 onChange={(e) => setFormData({ ...formData, storeName: e.target.value })}
-                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 font-medium text-sm focus:outline-none focus:border-emerald-500"
+                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-medium text-sm focus:outline-none focus:border-emerald-500"
               />
             </div>
 
             <div>
-              <label className="block font-bold text-slate-700 mb-1">رقم الواتساب لاستقبال الطلبات *</label>
+              <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">رقم الواتساب لاستقبال الطلبات *</label>
               <input
                 type="tel"
                 required
                 value={formData.whatsAppNumber}
                 onChange={(e) => setFormData({ ...formData, whatsAppNumber: e.target.value })}
                 placeholder="010xxxxxxxx"
-                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 font-medium text-sm focus:outline-none focus:border-emerald-500"
+                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-medium text-sm focus:outline-none focus:border-emerald-500"
               />
             </div>
 
             <div>
-              <label className="block font-bold text-slate-700 mb-1">المحافظة / المدينة *</label>
+              <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">المحافظة / المدينة *</label>
               <select
                 value={formData.city}
                 onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 font-medium text-sm focus:outline-none focus:border-emerald-500 bg-white"
+                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 font-medium text-sm focus:outline-none focus:border-emerald-500 bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
               >
                 {EGYPT_CITIES.map((c) => (
-                  <option key={c} value={c}>{c}</option>
+                  <option key={c} value={c} className="bg-white dark:bg-slate-800 text-slate-900 dark:text-white">{c}</option>
                 ))}
               </select>
             </div>
 
             <div>
-              <label className="block font-bold text-slate-700 mb-1">تصنيف النشاط *</label>
+              <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">تصنيف النشاط *</label>
               <select
                 value={formData.businessCategory}
                 onChange={(e) => setFormData({ ...formData, businessCategory: e.target.value })}
-                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 font-medium text-sm focus:outline-none focus:border-emerald-500 bg-white"
+                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 font-medium text-sm focus:outline-none focus:border-emerald-500 bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
               >
                 {BUSINESS_CATEGORIES.map((b) => (
-                  <option key={b} value={b}>{b}</option>
+                  <option key={b} value={b} className="bg-white dark:bg-slate-800 text-slate-900 dark:text-white">{b}</option>
                 ))}
               </select>
             </div>
 
             <div className="sm:col-span-2">
-              <label className="block font-bold text-slate-700 mb-1">العنوان بالتفصيل</label>
+              <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">العنوان بالتفصيل</label>
               <input
                 type="text"
                 value={formData.addressDetails}
                 onChange={(e) => setFormData({ ...formData, addressDetails: e.target.value })}
                 placeholder="اسم الشارع، رقم العمارة أو علامة مميزة"
-                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 font-medium text-sm focus:outline-none focus:border-emerald-500"
+                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-medium text-sm focus:outline-none focus:border-emerald-500"
               />
             </div>
           </div>

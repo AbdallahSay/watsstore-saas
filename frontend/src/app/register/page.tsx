@@ -16,8 +16,10 @@ import {
   Tag, 
   ArrowLeft, 
   AlertCircle,
-  Sparkles
+  Sparkles,
+  Home
 } from 'lucide-react';
+import ThemeLanguageBar from '@/components/ThemeLanguageBar';
 
 const EGYPT_CITIES = [
   'الفيوم',
@@ -112,8 +114,20 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8">
-      <div className="sm:mx-auto sm:w-full sm:max-w-md text-center">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8 relative transition-colors duration-200">
+      {/* Top Floating Utility Bar */}
+      <div className="absolute top-4 left-4 right-4 flex items-center justify-between max-w-4xl mx-auto">
+        <Link
+          href="/"
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-slate-600 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-sm transition-colors"
+        >
+          <Home className="w-3.5 h-3.5" />
+          <span>الرئيسية</span>
+        </Link>
+        <ThemeLanguageBar variant="navbar" />
+      </div>
+
+      <div className="sm:mx-auto sm:w-full sm:max-w-md text-center mt-6">
         <Link href="/" className="inline-flex items-center gap-2 group mb-4">
           <div className="w-11 h-11 rounded-2xl bg-emerald-600 flex items-center justify-center text-white shadow-md shadow-emerald-500/20 group-hover:scale-105 transition-transform">
             <StoreIcon className="w-6 h-6" />
@@ -122,24 +136,24 @@ export default function RegisterPage() {
             WatsStore
           </span>
         </Link>
-        <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900">
+        <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white">
           ابدأ فترتك التجريبية المجانية (14 يوماً)
         </h2>
-        <p className="mt-1 text-xs text-emerald-600 font-bold">
+        <p className="mt-1 text-xs text-emerald-600 dark:text-emerald-400 font-bold">
           بدون بطاقة بنكية — تجربة كاملة لكافة المميزات لمدة أسبوعين
         </p>
-        <p className="mt-2 text-xs sm:text-sm text-slate-600">
+        <p className="mt-2 text-xs sm:text-sm text-slate-600 dark:text-slate-400">
           لديك حساب بالفعل؟{' '}
-          <Link href="/login" className="font-bold text-emerald-600 hover:text-emerald-700">
+          <Link href="/login" className="font-bold text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300">
             تسجيل الدخول هنا
           </Link>
         </p>
       </div>
 
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-xl">
-        <div className="bg-white py-8 px-6 sm:px-10 rounded-3xl shadow-xl shadow-slate-200/50 border border-slate-200/80">
+        <div className="bg-white dark:bg-slate-900 py-8 px-6 sm:px-10 rounded-3xl shadow-xl shadow-slate-200/50 dark:shadow-slate-950/60 border border-slate-200/80 dark:border-slate-800 transition-colors">
           {errorMsg && (
-            <div className="mb-6 p-3.5 bg-rose-50 border border-rose-200 rounded-2xl text-rose-700 text-xs flex items-center gap-2 font-bold">
+            <div className="mb-6 p-3.5 bg-rose-50 dark:bg-rose-950/50 border border-rose-200 dark:border-rose-800 rounded-2xl text-rose-700 dark:text-rose-300 text-xs flex items-center gap-2 font-bold">
               <AlertCircle className="w-4 h-4 shrink-0" />
               <span>{errorMsg}</span>
             </div>
@@ -148,7 +162,7 @@ export default function RegisterPage() {
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
                   اسم صاحب المتجر *
                 </label>
                 <div className="relative">
@@ -159,13 +173,13 @@ export default function RegisterPage() {
                     value={formData.ownerName}
                     onChange={(e) => setFormData({ ...formData, ownerName: e.target.value })}
                     placeholder="مثال: أحمد محمود"
-                    className="w-full pr-10 pl-3.5 py-3 rounded-2xl border border-slate-200 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500"
+                    className="w-full pr-10 pl-3.5 py-3 rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
                   اسم المتجر / البراند *
                 </label>
                 <div className="relative">
@@ -176,7 +190,7 @@ export default function RegisterPage() {
                     value={formData.storeName}
                     onChange={(e) => setFormData({ ...formData, storeName: e.target.value })}
                     placeholder="مثال: براند الأناقة"
-                    className="w-full pr-10 pl-3.5 py-3 rounded-2xl border border-slate-200 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500"
+                    className="w-full pr-10 pl-3.5 py-3 rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500"
                   />
                 </div>
               </div>
@@ -184,7 +198,7 @@ export default function RegisterPage() {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
                   البريد الإلكتروني *
                 </label>
                 <div className="relative">
@@ -195,13 +209,13 @@ export default function RegisterPage() {
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                     placeholder="merchant@example.com"
-                    className="w-full pr-10 pl-3.5 py-3 rounded-2xl border border-slate-200 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500"
+                    className="w-full pr-10 pl-3.5 py-3 rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
                   كلمة المرور *
                 </label>
                 <div className="relative">
@@ -213,14 +227,14 @@ export default function RegisterPage() {
                     value={formData.password}
                     onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                     placeholder="6 أحرف على الأقل"
-                    className="w-full pr-10 pl-3.5 py-3 rounded-2xl border border-slate-200 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500"
+                    className="w-full pr-10 pl-3.5 py-3 rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500"
                   />
                 </div>
               </div>
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1.5">
+              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
                 رقم الواتساب لاستقبال الطلبات *
               </label>
               <div className="relative">
@@ -231,14 +245,14 @@ export default function RegisterPage() {
                   value={formData.whatsAppNumber}
                   onChange={(e) => setFormData({ ...formData, whatsAppNumber: e.target.value })}
                   placeholder="مثال: 01012345678 أو 201012345678"
-                  className="w-full pr-10 pl-3.5 py-3 rounded-2xl border border-slate-200 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500"
+                  className="w-full pr-10 pl-3.5 py-3 rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500"
                 />
               </div>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
                   المحافظة / المدينة *
                 </label>
                 <div className="relative">
@@ -246,10 +260,10 @@ export default function RegisterPage() {
                   <select
                     value={formData.city}
                     onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-                    className="w-full pr-10 pl-3.5 py-3 rounded-2xl border border-slate-200 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 bg-white"
+                    className="w-full pr-10 pl-3.5 py-3 rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-sm font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500"
                   >
                     {EGYPT_CITIES.map((c) => (
-                      <option key={c} value={c}>
+                      <option key={c} value={c} className="bg-white dark:bg-slate-800 text-slate-900 dark:text-white">
                         {c}
                       </option>
                     ))}
@@ -258,7 +272,7 @@ export default function RegisterPage() {
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
                   نوع النشاط التجاري *
                 </label>
                 <div className="relative">
@@ -266,10 +280,10 @@ export default function RegisterPage() {
                   <select
                     value={formData.businessCategory}
                     onChange={(e) => setFormData({ ...formData, businessCategory: e.target.value })}
-                    className="w-full pr-10 pl-3.5 py-3 rounded-2xl border border-slate-200 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 bg-white"
+                    className="w-full pr-10 pl-3.5 py-3 rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-sm font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500"
                   >
                     {BUSINESS_CATEGORIES.map((b) => (
-                      <option key={b} value={b}>
+                      <option key={b} value={b} className="bg-white dark:bg-slate-800 text-slate-900 dark:text-white">
                         {b}
                       </option>
                     ))}
@@ -294,3 +308,4 @@ export default function RegisterPage() {
     </div>
   );
 }
+

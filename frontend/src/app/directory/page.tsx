@@ -92,37 +92,37 @@ export default async function DirectoryPage({ searchParams }: DirectoryPageProps
     <>
       <Navbar />
 
-      <main className="flex-1 bg-slate-50 py-10 md:py-16">
+      <main className="flex-1 bg-slate-50 dark:bg-slate-950 py-10 md:py-16 transition-colors duration-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Header */}
           <div className="text-center max-w-3xl mx-auto mb-12">
-            <div className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-700 bg-emerald-100/70 px-3.5 py-1.5 rounded-full mb-4">
+            <div className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-100/70 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/60 px-3.5 py-1.5 rounded-full mb-4">
               <Sparkles className="w-3.5 h-3.5" />
               <span>دليل المتاجر والكتالوجات المحلية في محافظات مصر</span>
             </div>
 
-            <h1 className="text-3xl sm:text-4xl md:text-5xl font-black text-slate-900 leading-tight">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-black text-slate-900 dark:text-white leading-tight">
               {selectedCity || selectedCategory ? (
                 <>
                   متاجر{' '}
-                  <span className="text-emerald-600">{selectedCategory || 'جميع الأنشطة'}</span>
-                  {selectedCity && <> في <span className="text-emerald-600">{selectedCity}</span></>}
+                  <span className="text-emerald-600 dark:text-emerald-400">{selectedCategory || 'جميع الأنشطة'}</span>
+                  {selectedCity && <> في <span className="text-emerald-600 dark:text-emerald-400">{selectedCity}</span></>}
                 </>
               ) : (
                 'اكتشف أفضل المتاجر المحلية في منطقتك'
               )}
             </h1>
 
-            <p className="mt-4 text-sm sm:text-base text-slate-600 leading-relaxed">
+            <p className="mt-4 text-sm sm:text-base text-slate-600 dark:text-slate-400 leading-relaxed">
               تصفح منيو وكتالوجات المحلات القريبة منك، اختر منتجاتك، وتواصل فوراً مع التاجر عبر الواتساب بدون عمولات وساطة.
             </p>
           </div>
 
           {/* Filter Bar */}
-          <div className="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-sm mb-10 space-y-5">
+          <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 border border-slate-200/80 dark:border-slate-800 shadow-sm mb-10 space-y-5 transition-colors">
             {/* Cities Filter */}
             <div>
-              <span className="text-xs font-bold text-slate-500 block mb-2.5">المحافظة / المدينة:</span>
+              <span className="text-xs font-bold text-slate-500 dark:text-slate-400 block mb-2.5">المحافظة / المدينة:</span>
               <div className="flex flex-wrap gap-2">
                 {EGYPT_CITIES.map((city) => {
                   const isActive = (!selectedCity && city === 'الكل') || selectedCity === city;
@@ -143,7 +143,7 @@ export default async function DirectoryPage({ searchParams }: DirectoryPageProps
                       className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all border ${
                         isActive
                           ? 'bg-emerald-600 text-white border-emerald-600 shadow-sm'
-                          : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
+                          : 'bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700'
                       }`}
                     >
                       {city}
@@ -154,8 +154,8 @@ export default async function DirectoryPage({ searchParams }: DirectoryPageProps
             </div>
 
             {/* Categories Filter */}
-            <div className="pt-4 border-t border-slate-100">
-              <span className="text-xs font-bold text-slate-500 block mb-2.5">نوع النشاط:</span>
+            <div className="pt-4 border-t border-slate-100 dark:border-slate-800">
+              <span className="text-xs font-bold text-slate-500 dark:text-slate-400 block mb-2.5">نوع النشاط:</span>
               <div className="flex flex-wrap gap-2">
                 {BUSINESS_CATEGORIES.map((cat) => {
                   const isActive = (!selectedCategory && cat === 'الكل') || selectedCategory === cat;
@@ -176,8 +176,8 @@ export default async function DirectoryPage({ searchParams }: DirectoryPageProps
                       href={href}
                       className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all border ${
                         isActive
-                          ? 'bg-slate-900 text-white border-slate-900 shadow-sm'
-                          : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
+                          ? 'bg-slate-900 dark:bg-emerald-600 text-white border-slate-900 dark:border-emerald-600 shadow-sm'
+                          : 'bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700'
                       }`}
                     >
                       {cat}
@@ -190,12 +190,12 @@ export default async function DirectoryPage({ searchParams }: DirectoryPageProps
 
           {/* Stores Grid */}
           {stores.length === 0 ? (
-            <div className="bg-white rounded-3xl p-16 text-center border border-slate-200 max-w-md mx-auto my-8 space-y-4">
-              <div className="w-16 h-16 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center mx-auto">
+            <div className="bg-white dark:bg-slate-900 rounded-3xl p-16 text-center border border-slate-200 dark:border-slate-800 max-w-md mx-auto my-8 space-y-4">
+              <div className="w-16 h-16 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-500 flex items-center justify-center mx-auto">
                 <StoreIcon className="w-8 h-8 stroke-1" />
               </div>
-              <h3 className="text-lg font-bold text-slate-800">لا توجد متاجر مطابقة في هذا التصنيف</h3>
-              <p className="text-xs text-slate-500 leading-relaxed">
+              <h3 className="text-lg font-bold text-slate-800 dark:text-slate-200">لا توجد متاجر مطابقة في هذا التصنيف</h3>
+              <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
                 كن أول تاجر يسجل في هذه المنطقة أو اختر تصنيفاً آخر لتصفح المتاجر المتاحة.
               </p>
               <Link
@@ -211,7 +211,7 @@ export default async function DirectoryPage({ searchParams }: DirectoryPageProps
               {stores.map((store) => (
                 <div
                   key={store.slug}
-                  className="bg-white rounded-3xl p-6 border border-slate-200/80 hover:border-slate-300 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col justify-between group"
+                  className="bg-white dark:bg-slate-900 rounded-3xl p-6 border border-slate-200/80 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col justify-between group"
                 >
                   <div className="space-y-4">
                     <div className="flex items-start justify-between gap-4">
@@ -219,7 +219,7 @@ export default async function DirectoryPage({ searchParams }: DirectoryPageProps
                         <img
                           src={store.logoUrl}
                           alt={store.storeName}
-                          className="w-16 h-16 rounded-2xl object-cover border border-slate-200 shadow-sm shrink-0"
+                          className="w-16 h-16 rounded-2xl object-cover border border-slate-200 dark:border-slate-700 shadow-sm shrink-0"
                         />
                       ) : (
                         <div
@@ -230,32 +230,32 @@ export default async function DirectoryPage({ searchParams }: DirectoryPageProps
                         </div>
                       )}
 
-                      <span className="bg-emerald-50 text-emerald-700 border border-emerald-200/60 text-[11px] font-bold px-2.5 py-1 rounded-lg">
+                      <span className="bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border border-emerald-200/60 dark:border-emerald-800/60 text-[11px] font-bold px-2.5 py-1 rounded-lg">
                         {store.productCount} منتج متوفر
                       </span>
                     </div>
 
                     <div>
-                      <h3 className="text-lg font-bold text-slate-900 group-hover:text-emerald-600 transition-colors line-clamp-1">
+                      <h3 className="text-lg font-bold text-slate-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors line-clamp-1">
                         {store.storeName}
                       </h3>
-                      <div className="flex flex-wrap items-center gap-2 text-xs text-slate-500 mt-2">
+                      <div className="flex flex-wrap items-center gap-2 text-xs text-slate-500 dark:text-slate-400 mt-2">
                         <span className="flex items-center gap-1 font-medium">
-                          <MapPin className="w-3.5 h-3.5 text-slate-400" />
+                          <MapPin className="w-3.5 h-3.5 text-slate-400 dark:text-slate-500" />
                           {store.city}
                         </span>
                         <span>•</span>
-                        <span className="flex items-center gap-1 font-medium bg-slate-100 text-slate-700 px-2 py-0.5 rounded-md">
-                          <Tag className="w-3 h-3 text-slate-400" />
+                        <span className="flex items-center gap-1 font-medium bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 px-2 py-0.5 rounded-md">
+                          <Tag className="w-3 h-3 text-slate-400 dark:text-slate-500" />
                           {store.businessCategory}
                         </span>
                       </div>
                     </div>
                   </div>
 
-                  <div className="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between">
-                    <span className="text-xs text-slate-500">
-                      التوصيل: <strong className="text-slate-700 font-bold">{store.deliveryFee > 0 ? `${store.deliveryFee} ${store.currency}` : 'مجاني'}</strong>
+                  <div className="mt-6 pt-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
+                    <span className="text-xs text-slate-500 dark:text-slate-400">
+                      التوصيل: <strong className="text-slate-700 dark:text-slate-200 font-bold">{store.deliveryFee > 0 ? `${store.deliveryFee} ${store.currency}` : 'مجاني'}</strong>
                     </span>
 
                     <Link

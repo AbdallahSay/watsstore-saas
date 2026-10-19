@@ -120,7 +120,7 @@ export default function ThemeLanguageBar({
           <div
             role="listbox"
             aria-label={t('lang.select')}
-            className="absolute top-full mt-1.5 right-0 z-50 w-48 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xl shadow-slate-900/10 dark:shadow-slate-950/50 p-1.5 animate-fadeIn backdrop-blur-md"
+            className="absolute top-full mt-1.5 ltr:left-0 ltr:right-auto rtl:right-0 rtl:left-auto z-[100] w-48 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xl shadow-slate-900/15 dark:shadow-slate-950/80 p-1.5 animate-fadeIn backdrop-blur-md"
             data-testid="language-menu"
           >
             <div className="px-2.5 py-1.5 text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider border-b border-slate-100 dark:border-slate-800 mb-1 flex items-center justify-between">

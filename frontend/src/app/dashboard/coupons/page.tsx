@@ -508,22 +508,23 @@ export default function DashboardCouponsPage() {
 
       {/* Create Coupon Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 animate-fadeIn">
-          <div className="w-full max-w-lg bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 backdrop-blur-sm p-4 animate-fadeIn">
+          <div className="w-full max-w-lg bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden">
             {/* Modal Header */}
-            <div className="p-5 border-b border-slate-200 flex items-center justify-between bg-slate-50">
+            <div className="p-5 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between bg-slate-50 dark:bg-slate-800/60">
               <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center font-bold">
+                <div className="w-9 h-9 rounded-xl bg-emerald-100 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400 flex items-center justify-center font-bold border border-emerald-200 dark:border-emerald-800">
                   <Tag className="w-5 h-5" />
                 </div>
                 <div>
-                  <h3 className="font-bold text-slate-800 text-base">إنشاء كود خصم جديد</h3>
-                  <span className="text-xs text-slate-500">حدد رمز الكوبون، نوع الخصم، وشروط الاستخدام</span>
+                  <h3 className="font-bold text-slate-800 dark:text-white text-base">إنشاء كود خصم جديد</h3>
+                  <span className="text-xs text-slate-500 dark:text-slate-400">حدد رمز الكوبون، نوع الخصم، وشروط الاستخدام</span>
                 </div>
               </div>
               <button
                 onClick={() => setIsModalOpen(false)}
-                className="w-8 h-8 rounded-full bg-white hover:bg-slate-200 text-slate-500 flex items-center justify-center border border-slate-200 transition-colors"
+                className="w-8 h-8 rounded-full bg-white dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-500 dark:text-slate-400 flex items-center justify-center border border-slate-200 dark:border-slate-700 transition-colors"
+                title="إغلاق النافذة"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -532,7 +533,7 @@ export default function DashboardCouponsPage() {
             {/* Modal Body */}
             <form onSubmit={handleCreateCoupon} className="p-6 space-y-4">
               {formError && (
-                <div className="p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-center gap-2">
+                <div className="p-3 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800 text-rose-700 dark:text-rose-400 text-xs flex items-center gap-2">
                   <AlertCircle className="w-4 h-4 flex-shrink-0" />
                   <span>{formError}</span>
                 </div>
@@ -540,7 +541,7 @@ export default function DashboardCouponsPage() {
 
               {/* Coupon Code */}
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
                   كود الخصم (Promo Code) <span className="text-rose-500">*</span>
                 </label>
                 <input
@@ -548,7 +549,7 @@ export default function DashboardCouponsPage() {
                   value={formCode}
                   onChange={(e) => setFormCode(e.target.value.toUpperCase())}
                   placeholder="مثال: MASAR10 أو EID2026 أو SAVE50"
-                  className="w-full text-sm font-mono font-bold px-3.5 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 uppercase tracking-wider"
+                  className="w-full text-sm font-mono font-bold px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 uppercase tracking-wider"
                   required
                 />
                 <span className="text-[11px] text-slate-400 mt-1 block">
@@ -563,11 +564,11 @@ export default function DashboardCouponsPage() {
                   onClick={() => setFormDiscountType('Percentage')}
                   className={`p-3 rounded-xl border text-xs font-bold flex items-center justify-center gap-2 transition-all ${
                     formDiscountType === 'Percentage'
-                      ? 'border-emerald-500 bg-emerald-50 text-emerald-800 ring-2 ring-emerald-500/20'
-                      : 'border-slate-200 text-slate-600 hover:bg-slate-50'
+                      ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 ring-2 ring-emerald-500/20'
+                      : 'border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/60'
                   }`}
                 >
-                  <Percent className="w-4 h-4 text-emerald-600" />
+                  <Percent className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                   <span>نسبة مئوية (%)</span>
                 </button>
 
@@ -576,18 +577,18 @@ export default function DashboardCouponsPage() {
                   onClick={() => setFormDiscountType('FixedAmount')}
                   className={`p-3 rounded-xl border text-xs font-bold flex items-center justify-center gap-2 transition-all ${
                     formDiscountType === 'FixedAmount'
-                      ? 'border-emerald-500 bg-emerald-50 text-emerald-800 ring-2 ring-emerald-500/20'
-                      : 'border-slate-200 text-slate-600 hover:bg-slate-50'
+                      ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 ring-2 ring-emerald-500/20'
+                      : 'border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/60'
                   }`}
                 >
-                  <Coins className="w-4 h-4 text-emerald-600" />
+                  <Coins className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                   <span>مبلغ ثابت (ج.م)</span>
                 </button>
               </div>
 
               {/* Discount Value */}
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
                   قيمة الخصم {formDiscountType === 'Percentage' ? '(%)' : '(ج.م)'} <span className="text-rose-500">*</span>
                 </label>
                 <input
@@ -598,7 +599,7 @@ export default function DashboardCouponsPage() {
                   value={formDiscountValue}
                   onChange={(e) => setFormDiscountValue(e.target.value)}
                   placeholder={formDiscountType === 'Percentage' ? 'مثال: 10 أو 20' : 'مثال: 50 أو 100'}
-                  className="w-full text-sm font-bold px-3.5 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500"
+                  className="w-full text-sm font-bold px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500"
                   required
                 />
               </div>
@@ -606,7 +607,7 @@ export default function DashboardCouponsPage() {
               {/* Usage Limit & Expiry */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                  <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
                     الحد الأقصى للاستخدام (اختياري)
                   </label>
                   <input
@@ -615,19 +616,19 @@ export default function DashboardCouponsPage() {
                     value={formUsageLimit}
                     onChange={(e) => setFormUsageLimit(e.target.value)}
                     placeholder="اتركه فارغاً لغير محدود"
-                    className="w-full text-xs font-medium px-3.5 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500"
+                    className="w-full text-xs font-medium px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                  <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
                     تاريخ انتهاء الكوبون (اختياري)
                   </label>
                   <input
                     type="date"
                     value={formExpiryDate}
                     onChange={(e) => setFormExpiryDate(e.target.value)}
-                    className="w-full text-xs font-medium px-3.5 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500"
+                    className="w-full text-xs font-medium px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500"
                   />
                 </div>
               </div>
@@ -639,27 +640,27 @@ export default function DashboardCouponsPage() {
                     type="checkbox"
                     checked={formIsActive}
                     onChange={(e) => setFormIsActive(e.target.checked)}
-                    className="w-4 h-4 text-emerald-600 rounded border-slate-300 focus:ring-emerald-500"
+                    className="w-4 h-4 text-emerald-600 rounded border-slate-300 dark:border-slate-600 dark:bg-slate-800 focus:ring-emerald-500"
                   />
-                  <span className="text-xs font-bold text-slate-700">تفعيل كود الخصم فوراً في المتجر</span>
+                  <span className="text-xs font-bold text-slate-700 dark:text-slate-300">تفعيل كود الخصم فوراً في المتجر</span>
                 </label>
               </div>
 
               {/* Submit / Cancel Buttons */}
-              <div className="pt-3 border-t border-slate-100 flex items-center justify-end gap-2">
+              <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-end gap-2">
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
-                  className="px-4 py-2.5 rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-50 text-xs font-bold transition-colors"
+                  className="px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 text-xs font-bold transition-colors"
                 >
                   إلغاء
                 </button>
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white text-xs font-bold rounded-xl shadow-lg shadow-emerald-600/20 transition-all flex items-center gap-1.5"
+                  className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white text-xs font-bold rounded-xl shadow-lg shadow-emerald-600/20 transition-all flex items-center gap-1.5 active:scale-95"
                 >
-                  <span>{isSubmitting ? 'جاري الإنشاء...' : 'حفظ ونشر الكود'}</span>
+                  <span>{isSubmitting ? 'جاري الإنشاء...' : 'حفظ ونشر الكود 🚀'}</span>
                 </button>
               </div>
             </form>

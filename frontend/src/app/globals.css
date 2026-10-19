@@ -211,3 +211,96 @@
   box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.25) !important;
 }
 
+/* SweetAlert2 Input Labels & Placeholders */
+.swal2-input-label {
+  font-size: 0.875rem !important;
+  font-weight: 700 !important;
+  margin-bottom: 0.5rem !important;
+  color: #334155 !important;
+  text-align: inherit !important;
+}
+
+.dark .swal2-input-label,
+.swal2-popup[style*="#0f172a"] .swal2-input-label {
+  color: #cbd5e1 !important;
+}
+
+.swal2-input::placeholder,
+.swal2-textarea::placeholder {
+  color: #94a3b8 !important;
+}
+
+.dark .swal2-input::placeholder,
+.dark .swal2-textarea::placeholder,
+.swal2-popup[style*="#0f172a"] .swal2-input::placeholder,
+.swal2-popup[style*="#0f172a"] .swal2-textarea::placeholder {
+  color: #64748b !important;
+}
+
+/* =========================================================================
+   Platform-Wide Native Select & Option High-Contrast Enforcement
+   ========================================================================= */
+select {
+  background-color: #ffffff;
+  color: #0f172a;
+  border-color: #cbd5e1;
+}
+
+select option {
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+  font-weight: 600;
+  padding: 0.5rem !important;
+}
+
+.dark select {
+  background-color: #0f172a;
+  color: #f8fafc;
+  border-color: #334155;
+}
+
+.dark select option {
+  background-color: #0f172a !important;
+  color: #f8fafc !important;
+  font-weight: 600;
+  padding: 0.5rem !important;
+}
+
+select:focus {
+  outline: none;
+  border-color: #10b981;
+}
+
+/* =========================================================================
+   Native Date & Time Pickers (High Contrast Icons & Pickers)
+   ========================================================================= */
+input[type="date"],
+input[type="time"],
+input[type="datetime-local"] {
+  color-scheme: light;
+  background-color: #ffffff;
+  color: #0f172a;
+  border-color: #cbd5e1;
+}
+
+.dark input[type="date"],
+.dark input[type="time"],
+.dark input[type="datetime-local"] {
+  color-scheme: dark;
+  background-color: #0f172a;
+  color: #f8fafc;
+  border-color: #334155;
+}
+
+/* Global Placeholder High-Contrast */
+::placeholder {
+  color: #94a3b8;
+  opacity: 1;
+}
+
+.dark ::placeholder {
+  color: #64748b;
+  opacity: 1;
+}
+
+
