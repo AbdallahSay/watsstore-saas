@@ -192,6 +192,12 @@ export default function SuperAdminPage() {
   const [statusFilter, setStatusFilter] = useState<'all' | 'free' | 'pro' | 'vip' | 'active' | 'suspended'>('all');
   const [actionLoadingId, setActionLoadingId] = useState<string | null>(null);
 
+  // Dedicated Store Plan Upgrade / Modification Modal States
+  const [storeForPlanModal, setStoreForPlanModal] = useState<AdminStoreSummary | null>(null);
+  const [modalSelectedPlan, setModalSelectedPlan] = useState<'Free' | 'Pro' | 'VIP'>('Free');
+  const [modalDurationDays, setModalDurationDays] = useState<number>(30); // 30 (monthly) or 365 (annual)
+  const [isUpdatingPlanModal, setIsUpdatingPlanModal] = useState(false);
+
   // Initialize Auth
   useEffect(() => {
     const savedToken = localStorage.getItem('watsstore_admin_token');
@@ -785,36 +791,29 @@ export default function SuperAdminPage() {
     }
   };
 
-  // Update Store Plan
-  const handleUpdateStorePlan = async (store: AdminStoreSummary) => {
-    if (!token) return;
+  // Dedicated React Modal for Store Plan Modification
+  const handleUpdateStorePlan = (store: AdminStoreSummary) => {
+    setStoreForPlanModal(store);
+    const validPlan = (['Free', 'Pro', 'VIP'].includes(store.planType) ? store.planType : 'Free') as 'Free' | 'Pro' | 'VIP';
+    setModalSelectedPlan(validPlan);
+    setModalDurationDays(30);
+  };
 
-    const { value: selectedPlan } = await Swal.fire({
-      title: `تعديل باقة متجر "${store.storeName}"`,
-      text: `الباقة الحالية: ${store.planType}`,
-      icon: 'question',
-      input: 'radio',
-      inputOptions: {
-        'Pro': 'باقة المحترفين Pro (149 ج.م) ⭐',
-        'VIP': 'باقة النخبة VIP (299 ج.م) 👑',
-        'Free': 'تجربة مجانية Free (14 يوماً)',
-      },
-      inputValue: store.planType || 'Free',
-      showCancelButton: true,
-      confirmButtonText: 'تحديث الباقة 🚀',
-      cancelButtonText: 'إلغاء',
-      confirmButtonColor: '#10B981',
-      cancelButtonColor: '#64748b',
-      background: '#0f172a',
-      color: '#f8fafc',
-    });
+  const handleConfirmPlanUpdate = async () => {
+    if (!token || !storeForPlanModal) return;
 
-    if (!selectedPlan) return;
-
-    const storeId = store.id;
+    const storeId = storeForPlanModal.id;
+    setIsUpdatingPlanModal(true);
     setActionLoadingId(storeId);
+
     try {
-      const res = await api.adminUpdateStorePlan(token, storeId, selectedPlan);
+      const res = await api.adminUpdateStorePlan(
+        token,
+        storeId,
+        modalSelectedPlan,
+        modalSelectedPlan === 'Free' ? undefined : modalDurationDays
+      );
+
       setStores(prev => prev.map(s => {
         if (s.id === storeId) {
           return {
@@ -837,6 +836,8 @@ export default function SuperAdminPage() {
         background: '#0f172a',
         color: '#f8fafc',
       });
+
+      setStoreForPlanModal(null);
     } catch (err: any) {
       Swal.fire({
         icon: 'error',
@@ -846,6 +847,7 @@ export default function SuperAdminPage() {
         color: '#f8fafc',
       });
     } finally {
+      setIsUpdatingPlanModal(false);
       setActionLoadingId(null);
     }
   };
@@ -2771,17 +2773,17 @@ export default function SuperAdminPage() {
                                     onChange={(e) => handleDirectPlanChange(store, e.target.value)}
                                     disabled={isActionPending}
                                     title="تغيير باقة المتجر بضغطة زر واحدة"
-                                    className={`px-2.5 py-1 rounded-md text-[11px] font-black uppercase cursor-pointer border focus:outline-none transition-all ${
+                                    className={`px-2.5 py-1 rounded-md text-[11px] font-black uppercase cursor-pointer border focus:outline-none transition-all shadow-sm ${
                                       plan === 'VIP'
-                                        ? 'bg-amber-500/20 text-amber-300 border-amber-500/40 hover:bg-amber-500/30'
+                                        ? 'bg-amber-100 text-amber-900 border-amber-300 dark:bg-amber-500/20 dark:text-amber-300 dark:border-amber-500/40 hover:bg-amber-200 dark:hover:bg-amber-500/30'
                                         : plan === 'Pro'
-                                        ? 'bg-purple-500/20 text-purple-300 border-purple-500/40 hover:bg-purple-500/30'
-                                        : 'bg-slate-800 text-slate-300 border-slate-700 hover:bg-slate-700'
+                                        ? 'bg-purple-100 text-purple-900 border-purple-300 dark:bg-purple-500/20 dark:text-purple-300 dark:border-purple-500/40 hover:bg-purple-200 dark:hover:bg-purple-500/30'
+                                        : 'bg-slate-100 text-slate-800 border-slate-300 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700 hover:bg-slate-200 dark:hover:bg-slate-700'
                                     }`}
                                   >
-                                    <option value="Free" className="bg-slate-900 text-slate-300">Free (10 منتجات)</option>
-                                    <option value="Pro" className="bg-slate-900 text-purple-300">Pro (100 منتج)</option>
-                                    <option value="VIP" className="bg-slate-900 text-amber-300">VIP (غير محدود 👑)</option>
+                                    <option value="Free" className="bg-white text-slate-900 dark:bg-slate-900 dark:text-slate-200 font-semibold">Free (10 منتجات)</option>
+                                    <option value="Pro" className="bg-white text-purple-700 dark:bg-slate-900 dark:text-purple-300 font-semibold">Pro (100 منتج ⭐)</option>
+                                    <option value="VIP" className="bg-white text-amber-700 dark:bg-slate-900 dark:text-amber-300 font-semibold">VIP (غير محدود 👑)</option>
                                   </select>
 
                                   {plan === 'Free' ? (
@@ -2902,6 +2904,256 @@ export default function SuperAdminPage() {
             </div>
           </>
         </AdminTabErrorBoundary>
+      )}
+
+      {/* Dedicated Store Plan Upgrade / Modification Modal */}
+      {storeForPlanModal && (
+        <div 
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm animate-fadeIn"
+          onClick={(e) => {
+            if (e.target === e.currentTarget && !isUpdatingPlanModal) {
+              setStoreForPlanModal(null);
+            }
+          }}
+        >
+          <div className="relative w-full max-w-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+            {/* Modal Header */}
+            <div className="flex items-center justify-between p-5 border-b border-slate-100 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-800/50">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-purple-500/10 text-purple-600 dark:text-purple-400 flex items-center justify-center border border-purple-500/20 shadow-sm">
+                  <Crown className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-black text-slate-900 dark:text-white">
+                    تعديل باقة متجر &quot;{storeForPlanModal.storeName}&quot;
+                  </h3>
+                  <div className="flex items-center gap-2 mt-0.5">
+                    <span className="text-xs text-slate-500 dark:text-slate-400">الباقة الحالية:</span>
+                    <span className={`text-[11px] font-black px-2 py-0.5 rounded-full ${
+                      storeForPlanModal.planType === 'VIP' 
+                        ? 'bg-amber-100 text-amber-800 dark:bg-amber-500/20 dark:text-amber-300'
+                        : storeForPlanModal.planType === 'Pro'
+                        ? 'bg-purple-100 text-purple-800 dark:bg-purple-500/20 dark:text-purple-300'
+                        : 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300'
+                    }`}>
+                      {storeForPlanModal.planType === 'VIP' ? 'VIP 👑' : storeForPlanModal.planType === 'Pro' ? 'Pro ⭐' : 'Free ⏳'}
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setStoreForPlanModal(null)}
+                disabled={isUpdatingPlanModal}
+                className="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors disabled:opacity-50"
+                title="إغلاق النافذة"
+              >
+                <XCircle className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Modal Body */}
+            <div className="p-6 overflow-y-auto space-y-6">
+              {/* Plan Cards Grid */}
+              <div>
+                <label className="block text-sm font-bold text-slate-800 dark:text-slate-200 mb-3">
+                  اختر الباقة الجديدة للمتجر:
+                </label>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
+                  {/* Free Card */}
+                  <div
+                    onClick={() => setModalSelectedPlan('Free')}
+                    className={`relative p-4 rounded-xl border-2 cursor-pointer transition-all duration-200 ${
+                      modalSelectedPlan === 'Free'
+                        ? 'border-emerald-500 bg-emerald-50/70 dark:bg-emerald-950/25 shadow-md ring-2 ring-emerald-500/20'
+                        : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700'
+                    }`}
+                  >
+                    {modalSelectedPlan === 'Free' && (
+                      <div className="absolute top-2 left-2 w-5 h-5 bg-emerald-500 text-white rounded-full flex items-center justify-center shadow-sm">
+                        <Check className="w-3 h-3 stroke-[3]" />
+                      </div>
+                    )}
+                    <div className="font-bold text-slate-900 dark:text-white text-base mb-1">
+                      Free (المجانية)
+                    </div>
+                    <div className="text-emerald-600 dark:text-emerald-400 font-extrabold text-sm mb-3">
+                      مجاناً (14 يوم)
+                    </div>
+                    <ul className="text-xs text-slate-600 dark:text-slate-300 space-y-1.5 font-medium">
+                      <li className="flex items-center gap-1.5">
+                        <Check className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+                        10 منتجات كحد أقصى
+                      </li>
+                      <li className="flex items-center gap-1.5">
+                        <Check className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+                        كوبون خصم واحد
+                      </li>
+                      <li className="flex items-center gap-1.5">
+                        <Check className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+                        0 وصف ذكاء اصطناعي
+                      </li>
+                      <li className="flex items-center gap-1.5">
+                        <Check className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+                        تقارير متجر أساسية
+                      </li>
+                    </ul>
+                  </div>
+
+                  {/* Pro Card */}
+                  <div
+                    onClick={() => setModalSelectedPlan('Pro')}
+                    className={`relative p-4 rounded-xl border-2 cursor-pointer transition-all duration-200 ${
+                      modalSelectedPlan === 'Pro'
+                        ? 'border-purple-500 bg-purple-50/70 dark:bg-purple-950/25 shadow-md ring-2 ring-purple-500/20'
+                        : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700'
+                    }`}
+                  >
+                    {modalSelectedPlan === 'Pro' && (
+                      <div className="absolute top-2 left-2 w-5 h-5 bg-purple-500 text-white rounded-full flex items-center justify-center shadow-sm">
+                        <Check className="w-3 h-3 stroke-[3]" />
+                      </div>
+                    )}
+                    <div className="font-bold text-slate-900 dark:text-white text-base mb-1 flex items-center gap-1">
+                      Pro ⭐ (المحترفين)
+                    </div>
+                    <div className="text-purple-600 dark:text-purple-400 font-extrabold text-sm mb-3">
+                      {pricingSettings.proMonthlyPrice} ج.م / شهرياً
+                    </div>
+                    <ul className="text-xs text-slate-600 dark:text-slate-300 space-y-1.5 font-medium">
+                      <li className="flex items-center gap-1.5">
+                        <Check className="w-3.5 h-3.5 text-purple-500 shrink-0" />
+                        {pricingSettings.proProductLimit || 100} منتج مفعل
+                      </li>
+                      <li className="flex items-center gap-1.5">
+                        <Check className="w-3.5 h-3.5 text-purple-500 shrink-0" />
+                        {pricingSettings.proCouponLimit || 15} كوبون ترويجي
+                      </li>
+                      <li className="flex items-center gap-1.5">
+                        <Check className="w-3.5 h-3.5 text-purple-500 shrink-0" />
+                        {pricingSettings.proAiLimit || 15} وصف AI شهرياً
+                      </li>
+                      <li className="flex items-center gap-1.5">
+                        <Check className="w-3.5 h-3.5 text-purple-500 shrink-0" />
+                        دعم فني سريع وأولوية
+                      </li>
+                    </ul>
+                  </div>
+
+                  {/* VIP Card */}
+                  <div
+                    onClick={() => setModalSelectedPlan('VIP')}
+                    className={`relative p-4 rounded-xl border-2 cursor-pointer transition-all duration-200 ${
+                      modalSelectedPlan === 'VIP'
+                        ? 'border-amber-500 bg-amber-50/70 dark:bg-amber-950/25 shadow-md ring-2 ring-amber-500/20'
+                        : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800/60 hover:border-slate-300 dark:hover:border-slate-700'
+                    }`}
+                  >
+                    {modalSelectedPlan === 'VIP' && (
+                      <div className="absolute top-2 left-2 w-5 h-5 bg-amber-500 text-white rounded-full flex items-center justify-center shadow-sm">
+                        <Check className="w-3 h-3 stroke-[3]" />
+                      </div>
+                    )}
+                    <div className="font-bold text-slate-900 dark:text-white text-base mb-1 flex items-center gap-1">
+                      VIP 👑 (كبار التجار)
+                    </div>
+                    <div className="text-amber-600 dark:text-amber-400 font-extrabold text-sm mb-3">
+                      {pricingSettings.vipMonthlyPrice} ج.م / شهرياً
+                    </div>
+                    <ul className="text-xs text-slate-600 dark:text-slate-300 space-y-1.5 font-medium">
+                      <li className="flex items-center gap-1.5">
+                        <Check className="w-3.5 h-3.5 text-amber-500 shrink-0" />
+                        منتجات غير محدودة 🚀
+                      </li>
+                      <li className="flex items-center gap-1.5">
+                        <Check className="w-3.5 h-3.5 text-amber-500 shrink-0" />
+                        كوبونات غير محدودة
+                      </li>
+                      <li className="flex items-center gap-1.5">
+                        <Check className="w-3.5 h-3.5 text-amber-500 shrink-0" />
+                        {pricingSettings.vipAiLimit || 150} وصف AI شهرياً
+                      </li>
+                      <li className="flex items-center gap-1.5">
+                        <Check className="w-3.5 h-3.5 text-amber-500 shrink-0" />
+                        دعم خاص لكبار العملاء VIP
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+
+              {/* Renewal Duration Selector (Visible for Pro / VIP) */}
+              {modalSelectedPlan !== 'Free' && (
+                <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800">
+                  <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-2.5">
+                    مدة الاشتراك / التجديد الممنوحة للمتجر:
+                  </label>
+                  <div className="grid grid-cols-2 gap-3">
+                    <button
+                      type="button"
+                      onClick={() => setModalDurationDays(30)}
+                      className={`py-2.5 px-4 rounded-lg font-bold text-xs flex items-center justify-center gap-2 border transition-all ${
+                        modalDurationDays === 30
+                          ? 'bg-emerald-600 text-white border-emerald-600 shadow-sm'
+                          : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600'
+                      }`}
+                    >
+                      <Clock className="w-3.5 h-3.5" />
+                      اشتراك شهري (30 يوماً)
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setModalDurationDays(365)}
+                      className={`py-2.5 px-4 rounded-lg font-bold text-xs flex items-center justify-center gap-2 border transition-all ${
+                        modalDurationDays === 365
+                          ? 'bg-emerald-600 text-white border-emerald-600 shadow-sm'
+                          : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600'
+                      }`}
+                    >
+                      <Crown className="w-3.5 h-3.5" />
+                      اشتراك سنوي (365 يوماً) ⭐
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* Notice / Helper Box */}
+              <div className="text-xs text-slate-500 dark:text-slate-400 bg-slate-100/70 dark:bg-slate-800/30 p-3 rounded-lg border border-slate-200 dark:border-slate-800/60 leading-relaxed">
+                💡 <strong className="text-slate-700 dark:text-slate-300">ملاحظة المدير العام:</strong> عند ترقية المتجر إلى ({modalSelectedPlan})، سيتم تحديث قيود الكتالوج فوراً، وتصفير عداد استخدام الذكاء الاصطناعي للمتجر تلقائياً، وتمديد فترة الصلاحية {modalSelectedPlan === 'Free' ? 'لمدة 14 يوماً تجريبية' : `لمدة ${modalDurationDays} يوماً`}.
+              </div>
+            </div>
+
+            {/* Modal Footer */}
+            <div className="flex items-center justify-end gap-3 p-5 border-t border-slate-100 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-800/50">
+              <button
+                type="button"
+                onClick={() => setStoreForPlanModal(null)}
+                disabled={isUpdatingPlanModal}
+                className="px-4 py-2.5 rounded-xl font-bold text-xs text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors disabled:opacity-50"
+              >
+                إلغاء
+              </button>
+              <button
+                type="button"
+                onClick={handleConfirmPlanUpdate}
+                disabled={isUpdatingPlanModal}
+                className="px-6 py-2.5 rounded-xl font-bold text-xs text-white bg-emerald-600 hover:bg-emerald-500 active:scale-95 transition-all shadow-md flex items-center gap-2 disabled:opacity-50"
+              >
+                {isUpdatingPlanModal ? (
+                  <>
+                    <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                    جاري التحديث...
+                  </>
+                ) : (
+                  <>
+                    <Save className="w-3.5 h-3.5" />
+                    تأكيد وتحديث باقة المتجر 🚀
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
       )}
       </main>
     </div>

@@ -458,14 +458,14 @@ export const api = {
     });
   },
 
-  async adminUpdateStorePlan(token: string, storeId: string, plan: string): Promise<StorePlanUpdateResponse> {
+  async adminUpdateStorePlan(token: string, storeId: string, plan: string, durationDays?: number): Promise<StorePlanUpdateResponse> {
     return fetchJson<StorePlanUpdateResponse>(`${API_BASE_URL}/admin/stores/${storeId}/plan`, {
       method: 'PATCH',
       headers: {
         Authorization: `Bearer ${token}`,
         'X-Admin-Key': token.startsWith('WatsStore_') ? token : '',
       },
-      body: JSON.stringify({ plan }),
+      body: JSON.stringify({ plan, durationDays }),
     });
   },
 

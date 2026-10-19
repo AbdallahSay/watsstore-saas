@@ -85,3 +85,129 @@
   transform: translateX(0%);
   transition: transform 300ms ease-in-out;
 }
+
+/* =========================================================================
+   SweetAlert2 Global Hardening & Theme Alignment (Light & Dark)
+   ========================================================================= */
+.swal2-container {
+  z-index: 999999 !important;
+}
+
+.swal2-popup {
+  font-family: inherit !important;
+  border-radius: 1.25rem !important;
+  padding: 1.75rem !important;
+}
+
+/* Radio buttons container */
+.swal2-radio {
+  background: transparent !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 0.625rem !important;
+  margin: 1.25rem 0 !important;
+  padding: 0 !important;
+  width: 100% !important;
+}
+
+/* SweetAlert2 Radio Option Item */
+.swal2-radio label {
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.75rem !important;
+  margin: 0 !important;
+  padding: 0.875rem 1.25rem !important;
+  border-radius: 0.75rem !important;
+  cursor: pointer !important;
+  font-size: 0.95rem !important;
+  font-weight: 700 !important;
+  transition: all 180ms cubic-bezier(0.4, 0, 0.2, 1) !important;
+  border: 1.5px solid #e2e8f0 !important;
+  background-color: #f8fafc !important;
+  color: #0f172a !important;
+}
+
+.swal2-radio label:hover {
+  background-color: #f1f5f9 !important;
+  border-color: #cbd5e1 !important;
+}
+
+.swal2-radio label input[type="radio"] {
+  accent-color: #10b981 !important;
+  width: 1.25rem !important;
+  height: 1.25rem !important;
+  margin: 0 !important;
+}
+
+/* Inputs, Textareas, and Selects */
+.swal2-input,
+.swal2-textarea,
+.swal2-select {
+  border-radius: 0.75rem !important;
+  font-family: inherit !important;
+  border: 1.5px solid #cbd5e1 !important;
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+  transition: all 180ms ease !important;
+}
+
+.swal2-input:focus,
+.swal2-textarea:focus,
+.swal2-select:focus {
+  border-color: #10b981 !important;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2) !important;
+}
+
+/* Dark mode overrides (by .dark html class OR when popup has dark background) */
+.dark .swal2-popup,
+.swal2-popup[style*="background: rgb(15, 23, 42)"],
+.swal2-popup[style*="background-color: rgb(15, 23, 42)"],
+.swal2-popup[style*="#0f172a"] {
+  border: 1px solid #334155 !important;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7) !important;
+}
+
+.dark .swal2-title,
+.swal2-popup[style*="#0f172a"] .swal2-title {
+  color: #f8fafc !important;
+}
+
+.dark .swal2-html-container,
+.swal2-popup[style*="#0f172a"] .swal2-html-container {
+  color: #cbd5e1 !important;
+}
+
+.dark .swal2-radio label,
+.swal2-popup[style*="#0f172a"] .swal2-radio label {
+  background-color: #1e293b !important;
+  color: #f8fafc !important;
+  border-color: #334155 !important;
+}
+
+.dark .swal2-radio label:hover,
+.swal2-popup[style*="#0f172a"] .swal2-radio label:hover {
+  background-color: #334155 !important;
+  border-color: #10b981 !important;
+}
+
+.dark .swal2-input,
+.dark .swal2-textarea,
+.dark .swal2-select,
+.swal2-popup[style*="#0f172a"] .swal2-input,
+.swal2-popup[style*="#0f172a"] .swal2-textarea,
+.swal2-popup[style*="#0f172a"] .swal2-select {
+  background-color: #1e293b !important;
+  color: #f8fafc !important;
+  border-color: #334155 !important;
+}
+
+.dark .swal2-input:focus,
+.dark .swal2-textarea:focus,
+.dark .swal2-select:focus,
+.swal2-popup[style*="#0f172a"] .swal2-input:focus,
+.swal2-popup[style*="#0f172a"] .swal2-textarea:focus,
+.swal2-popup[style*="#0f172a"] .swal2-select:focus {
+  border-color: #10b981 !important;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.25) !important;
+}
+

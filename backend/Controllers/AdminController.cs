@@ -591,17 +591,21 @@ namespace WatsStore.Api.Controllers
             store.AiGenerationsCount = 0;
             store.AiQuotaResetDate = DateTime.UtcNow;
 
+            int durationDays = (request.DurationDays.HasValue && request.DurationDays.Value > 0)
+                ? request.DurationDays.Value
+                : 365;
+
             if (matchedPlan == "Free")
             {
                 store.SubscriptionEndsAt = store.CreatedAt.AddDays(14);
             }
             else if (matchedPlan == "Pro" || matchedPlan == "VIP")
             {
-                // When upgraded to Pro or VIP, ensure active subscription for 1 year if empty or expired
-                if (!store.SubscriptionEndsAt.HasValue || store.SubscriptionEndsAt.Value < DateTime.UtcNow)
-                {
-                    store.SubscriptionEndsAt = DateTime.UtcNow.AddYears(1);
-                }
+                // When upgraded or renewed, set or extend subscription for specified duration
+                var baseDate = (store.SubscriptionEndsAt.HasValue && store.SubscriptionEndsAt.Value > DateTime.UtcNow)
+                    ? store.SubscriptionEndsAt.Value
+                    : DateTime.UtcNow;
+                store.SubscriptionEndsAt = baseDate.AddDays(durationDays);
             }
 
             await _db.SaveChangesAsync();

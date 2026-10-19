@@ -105,6 +105,8 @@ namespace WatsStore.Api.DTOs
     {
         [Required(ErrorMessage = "نوع الباقة مطلوب")]
         public string Plan { get; set; } = "Free"; // Free, Pro, VIP
+
+        public int? DurationDays { get; set; } // e.g. 30 (monthly) or 365 (yearly)
     }
 
     public class ExtendStoreTrialRequest
