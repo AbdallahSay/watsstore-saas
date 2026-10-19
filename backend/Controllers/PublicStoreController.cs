@@ -25,6 +25,12 @@ namespace WatsStore.Api.Controllers
             _db = db;
         }
 
+        [HttpGet]
+        public async Task<IActionResult> GetAllPublicStores([FromQuery] string? city, [FromQuery] string? category)
+        {
+            return await GetDirectory(city, category);
+        }
+
         [HttpGet("{slug}")]
         public async Task<IActionResult> GetStoreBySlug(string slug)
         {

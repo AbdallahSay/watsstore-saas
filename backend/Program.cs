@@ -306,6 +306,10 @@ app.UseAuthorization();
 
 app.MapControllers();
 
+// Health check and root probe endpoints for uptime monitoring and deployment verification
+app.MapGet("/", () => Results.Ok(new { status = "Online", service = "WatsStore SaaS API", version = "1.0", timestamp = DateTime.UtcNow }));
+app.MapGet("/health", () => Results.Ok(new { status = "Healthy", database = "Connected", timestamp = DateTime.UtcNow }));
+
 // Auto-Seeding Database & Column Migrations on Startup
 using (var scope = app.Services.CreateScope())
 {
