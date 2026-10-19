@@ -516,13 +516,22 @@ export const api = {
     });
   },
 
-  async submitMerchantUpgradeRequest(token: string, data: { planType: string; billingCycle: string; paymentMethod: string; transactionId: string; notes?: string }): Promise<any> {
+  async submitMerchantUpgradeRequest(token: string, data: { planType: string; billingCycle: string; paymentMethod: string; senderIdentifier?: string; transactionId: string; notes?: string }): Promise<any> {
     return fetchJson<any>(`${API_BASE_URL}/merchant/billing/upgrade-request`, {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${token}`
       },
       body: JSON.stringify(data)
+    });
+  },
+
+  async cancelMerchantUpgradeRequest(token: string, id: string): Promise<{ message: string; request: SubscriptionRequestItem }> {
+    return fetchJson<{ message: string; request: SubscriptionRequestItem }>(`${API_BASE_URL}/merchant/billing/upgrade-request/${id}/cancel`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
     });
   },
 

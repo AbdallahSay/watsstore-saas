@@ -874,6 +874,11 @@ namespace WatsStore.Api.Controllers
                 return NotFound(new { message = "طلب الاشتراك غير موجود" });
             }
 
+            if (sub.Status != "Pending")
+            {
+                return BadRequest(new { message = $"لا يمكن اعتماد هذا الطلب لأن حالته الحالية هي '{sub.Status}' وليست قيد المراجعة." });
+            }
+
             sub.Status = "Approved";
             sub.ReviewedAt = DateTime.UtcNow;
             sub.AdminNotes = "تمت مراجعة الحوالة واعتماد الترقية بنجاح من قبل المسؤول العام";
@@ -913,6 +918,11 @@ namespace WatsStore.Api.Controllers
                 return NotFound(new { message = "طلب الاشتراك غير موجود" });
             }
 
+            if (sub.Status != "Pending")
+            {
+                return BadRequest(new { message = $"لا يمكن رفض هذا الطلب لأن حالته الحالية هي '{sub.Status}' وليست قيد المراجعة." });
+            }
+
             sub.Status = "Rejected";
             sub.ReviewedAt = DateTime.UtcNow;
             sub.AdminNotes = string.IsNullOrWhiteSpace(req?.AdminNotes) 
@@ -941,6 +951,7 @@ namespace WatsStore.Api.Controllers
                 BillingCycle = r.BillingCycle,
                 Amount = r.Amount,
                 PaymentMethod = r.PaymentMethod,
+                SenderIdentifier = r.SenderIdentifier,
                 TransactionId = r.TransactionId,
                 Notes = r.Notes,
                 Status = r.Status,

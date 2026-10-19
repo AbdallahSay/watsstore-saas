@@ -18,10 +18,11 @@ namespace WatsStore.Api.Domain.Entities
         public decimal Amount { get; set; }
 
         public string PaymentMethod { get; set; } = "VodafoneCash"; // VodafoneCash, InstaPay, OnlineCard
+        public string? SenderIdentifier { get; set; } // Sender phone or InstaPay address
         public string TransactionId { get; set; } = string.Empty;
         public string? Notes { get; set; }
 
-        public string Status { get; set; } = "Pending"; // Pending, Approved, Rejected
+        public string Status { get; set; } = "Pending"; // Pending, Approved, Rejected, Cancelled
         public string? AdminNotes { get; set; }
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;

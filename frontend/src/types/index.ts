@@ -374,9 +374,10 @@ export interface SubscriptionRequestItem {
   billingCycle: string;
   amount: number;
   paymentMethod: string;
+  senderIdentifier?: string | null;
   transactionId: string;
   notes?: string | null;
-  status: string; // 'Pending' | 'Approved' | 'Rejected'
+  status: string; // 'Pending' | 'Approved' | 'Rejected' | 'Cancelled'
   adminNotes?: string | null;
   createdAt: string;
   reviewedAt?: string | null;

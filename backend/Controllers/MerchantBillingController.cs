@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using System.Security.Claims;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -9,6 +10,7 @@ using Microsoft.EntityFrameworkCore;
 using WatsStore.Api.Domain.Entities;
 using WatsStore.Api.DTOs;
 using WatsStore.Api.Infrastructure.Data;
+using WatsStore.Api.Infrastructure.Utils;
 
 namespace WatsStore.Api.Controllers
 {
@@ -102,7 +104,15 @@ namespace WatsStore.Api.Controllers
             var settings = await _db.PlatformSettings.FirstOrDefaultAsync(p => p.Id == 1)
                            ?? new PlatformSetting();
 
-            // Strict Plan validation
+            // 1. Single Active Request Lock: Reject if there's already a Pending request
+            bool hasPending = await _db.SubscriptionRequests.AnyAsync(r => 
+                r.StoreId == store.Id && r.Status == "Pending");
+            if (hasPending)
+            {
+                return StatusCode(409, new { message = "لديك طلب ترقية قيد المراجعة بالفعل. انتظر اعتماده أو قم بإلغائه أولاً." });
+            }
+
+            // 2. Strict Plan validation
             if (!string.Equals(request.PlanType, "Pro", StringComparison.OrdinalIgnoreCase) &&
                 !string.Equals(request.PlanType, "VIP", StringComparison.OrdinalIgnoreCase))
             {
@@ -110,7 +120,7 @@ namespace WatsStore.Api.Controllers
             }
             string targetPlan = string.Equals(request.PlanType, "VIP", StringComparison.OrdinalIgnoreCase) ? "VIP" : "Pro";
 
-            // Strict Billing Cycle validation
+            // 3. Strict Billing Cycle validation
             if (!string.Equals(request.BillingCycle, "Monthly", StringComparison.OrdinalIgnoreCase) &&
                 !string.Equals(request.BillingCycle, "Annual", StringComparison.OrdinalIgnoreCase))
             {
@@ -118,7 +128,7 @@ namespace WatsStore.Api.Controllers
             }
             string cycle = string.Equals(request.BillingCycle, "Annual", StringComparison.OrdinalIgnoreCase) ? "Annual" : "Monthly";
 
-            // Strict Payment Method validation
+            // 4. Strict Payment Method validation
             string[] validMethods = { "VodafoneCash", "InstaPay", "OnlineCard" };
             if (!validMethods.Any(m => string.Equals(m, request.PaymentMethod, StringComparison.OrdinalIgnoreCase)))
             {
@@ -126,21 +136,29 @@ namespace WatsStore.Api.Controllers
             }
             string paymentMethod = validMethods.First(m => string.Equals(m, request.PaymentMethod, StringComparison.OrdinalIgnoreCase));
 
-            // Strict Transaction ID validation
+            // 5. Anti-Fraud & Transaction ID validation (trimmed, alphanumeric/digits, 6 to 30 chars, no script tags)
             string transactionId = request.TransactionId?.Trim() ?? string.Empty;
-            if (string.IsNullOrWhiteSpace(transactionId) || transactionId.Length < 3)
+            if (string.IsNullOrWhiteSpace(transactionId) || transactionId.Length < 6 || transactionId.Length > 30 || !Regex.IsMatch(transactionId, @"^[a-zA-Z0-9_\-\.]{6,30}$"))
             {
-                return BadRequest(new { message = "يرجى كتابة رقم العملية أو كود الحوالة التأكيدي (3 أحرف أو أرقام على الأقل)." });
+                return BadRequest(new { message = "رقم العملية غير صالح. يجب أن يتكون من 6 إلى 30 حرفاً أو رقماً إنجليزياً بدون مسافات أو رموز خاصة." });
             }
 
-            // Check if transaction ID was already used in a pending or approved request
+            // 6. Anti-Fraud: Enforce Unique Transaction ID across all Pending or Approved requests
             bool duplicateTx = await _db.SubscriptionRequests.AnyAsync(r => 
                 r.TransactionId == transactionId && (r.Status == "Pending" || r.Status == "Approved"));
             if (duplicateTx)
             {
-                return BadRequest(new { message = "رقم العملية هذا مسجل بالفعل ومستخدم في طلب سابق" });
+                return BadRequest(new { message = "رقم العملية مسجل مسبقاً في النظام" });
             }
 
+            // 7. Sanitize SenderIdentifier
+            string? senderIdentifier = Sanitizer.Sanitize(request.SenderIdentifier?.Trim(), 100);
+            if (string.IsNullOrWhiteSpace(senderIdentifier))
+            {
+                senderIdentifier = null;
+            }
+
+            // 8. Strict Server-Side Price Calculation (ignoring any client-sent price)
             decimal amount = 0m;
             if (targetPlan == "VIP")
             {
@@ -151,6 +169,7 @@ namespace WatsStore.Api.Controllers
                 amount = cycle == "Annual" ? settings.ProAnnualPrice : settings.ProMonthlyPrice;
             }
 
+            // 9. All merchant submissions enter Pending status awaiting verification (Eliminate unverified instant bypass)
             var subRequest = new SubscriptionRequest
             {
                 Id = Guid.NewGuid(),
@@ -162,45 +181,13 @@ namespace WatsStore.Api.Controllers
                 BillingCycle = cycle,
                 Amount = amount,
                 PaymentMethod = paymentMethod,
+                SenderIdentifier = senderIdentifier,
                 TransactionId = transactionId,
-                Notes = request.Notes?.Trim(),
+                Notes = Sanitizer.Sanitize(request.Notes?.Trim(), 500),
                 Status = "Pending",
                 CreatedAt = DateTime.UtcNow
             };
 
-            // Automated Payment Hook simulation for Online Card:
-            if (string.Equals(paymentMethod, "OnlineCard", StringComparison.OrdinalIgnoreCase))
-            {
-                // Instant activation
-                subRequest.Status = "Approved";
-                subRequest.ReviewedAt = DateTime.UtcNow;
-                subRequest.AdminNotes = "تم التفعيل التلقائي الفوري عبر بوابة الدفع الإلكتروني";
-
-                store.PlanType = targetPlan;
-                store.AiGenerationsCount = 0;
-                store.AiQuotaResetDate = DateTime.UtcNow;
-
-                int daysToAdd = cycle == "Annual" ? 365 : 30;
-                var baseDate = (store.SubscriptionEndsAt.HasValue && store.SubscriptionEndsAt.Value > DateTime.UtcNow)
-                    ? store.SubscriptionEndsAt.Value
-                    : DateTime.UtcNow;
-
-                store.SubscriptionEndsAt = baseDate.AddDays(daysToAdd);
-
-                _db.SubscriptionRequests.Add(subRequest);
-                await _db.SaveChangesAsync();
-
-                return Ok(new
-                {
-                    message = $"تم الدفع الإلكتروني بنجاح وترقية متجرك إلى باقة {targetPlan} فوراً! 🎉",
-                    status = "Approved",
-                    requestId = subRequest.Id,
-                    planType = store.PlanType,
-                    subscriptionEndsAt = store.SubscriptionEndsAt
-                });
-            }
-
-            // Vodafone Cash or InstaPay: pending review
             _db.SubscriptionRequests.Add(subRequest);
             await _db.SaveChangesAsync();
 
@@ -210,7 +197,41 @@ namespace WatsStore.Api.Controllers
                 status = "Pending",
                 requestId = subRequest.Id,
                 planType = targetPlan,
-                amount = amount
+                amount = amount,
+                senderIdentifier = senderIdentifier,
+                transactionId = transactionId
+            });
+        }
+
+        [HttpDelete("upgrade-request/{id:guid}/cancel")]
+        [HttpPost("upgrade-request/{id:guid}/cancel")]
+        public async Task<IActionResult> CancelUpgradeRequest(Guid id)
+        {
+            var storeId = GetCurrentStoreId();
+            if (storeId == null)
+                return Unauthorized(new { message = "غير مصرح لك بالوصول، يرجى تسجيل الدخول مجدداً" });
+
+            var sub = await _db.SubscriptionRequests.FirstOrDefaultAsync(r => r.Id == id);
+            if (sub == null)
+                return NotFound(new { message = "طلب الترقية غير موجود" });
+
+            if (sub.StoreId != storeId.Value)
+                return StatusCode(403, new { message = "غير مصرح لك بإلغاء طلب يخص متجراً آخر" });
+
+            if (sub.Status != "Pending")
+                return BadRequest(new { message = "لا يمكن إلغاء هذا الطلب لأن حالته لم تعد قيد المراجعة." });
+
+            sub.Status = "Cancelled";
+            sub.AdminNotes = "تم إلغاء الطلب بواسطة التاجر لتعديل البيانات";
+            sub.ReviewedAt = DateTime.UtcNow;
+
+            await _db.SaveChangesAsync();
+
+            return Ok(new
+            {
+                message = "تم إلغاء طلب الترقية بنجاح. يمكنك الآن تقديم طلب جديد بالبيانات المصححة.",
+                requestId = sub.Id,
+                status = "Cancelled"
             });
         }
 
@@ -291,6 +312,7 @@ namespace WatsStore.Api.Controllers
                 BillingCycle = r.BillingCycle,
                 Amount = r.Amount,
                 PaymentMethod = r.PaymentMethod,
+                SenderIdentifier = r.SenderIdentifier,
                 TransactionId = r.TransactionId,
                 Notes = r.Notes,
                 Status = r.Status,

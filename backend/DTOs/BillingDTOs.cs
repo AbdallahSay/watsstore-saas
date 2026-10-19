@@ -40,8 +40,12 @@ namespace WatsStore.Api.DTOs
         public string PaymentMethod { get; set; } = "VodafoneCash";
 
         [Required(AllowEmptyStrings = false, ErrorMessage = "يرجى إدخال رقم العملية أو الحوالة التأكيدية")]
-        [MinLength(3, ErrorMessage = "رقم العملية التأكيدي قصير جداً")]
+        [MinLength(6, ErrorMessage = "رقم العملية التأكيدي يجب أن يكون 6 أحرف أو أرقام على الأقل")]
+        [MaxLength(30, ErrorMessage = "رقم العملية التأكيدي يجب ألا يتجاوز 30 حرفاً")]
         public string TransactionId { get; set; } = string.Empty;
+
+        [MaxLength(100, ErrorMessage = "رقم المحفظة أو حساب المحول منه يجب ألا يتجاوز 100 حرف")]
+        public string? SenderIdentifier { get; set; }
 
         public string? Notes { get; set; }
     }
@@ -57,6 +61,7 @@ namespace WatsStore.Api.DTOs
         public string BillingCycle { get; set; } = "Monthly";
         public decimal Amount { get; set; }
         public string PaymentMethod { get; set; } = "VodafoneCash";
+        public string? SenderIdentifier { get; set; }
         public string TransactionId { get; set; } = string.Empty;
         public string? Notes { get; set; }
         public string Status { get; set; } = "Pending";

@@ -42,7 +42,8 @@ import {
   Tag,
   Sliders,
   CreditCard,
-  UserCheck
+  UserCheck,
+  Copy
 } from 'lucide-react';
 import { api } from '@/lib/api';
 import { AdminPlatformStats, AdminStoreSummary, PlatformPricingSettings, SubscriptionRequestItem } from '@/types';
@@ -112,7 +113,7 @@ export default function SuperAdminPage() {
   const [stores, setStores] = useState<AdminStoreSummary[]>([]);
   const [isLoadingData, setIsLoadingData] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'suspended'>('all');
+  const [statusFilter, setStatusFilter] = useState<'all' | 'free' | 'pro' | 'vip' | 'active' | 'suspended'>('all');
   const [actionLoadingId, setActionLoadingId] = useState<string | null>(null);
 
   // Initialize Auth
@@ -801,6 +802,9 @@ export default function SuperAdminPage() {
 
     if (statusFilter === 'active') return matchesSearch && store.isActive;
     if (statusFilter === 'suspended') return matchesSearch && !store.isActive;
+    if (statusFilter === 'free') return matchesSearch && (store.planType === 'Free' || !store.planType);
+    if (statusFilter === 'pro') return matchesSearch && store.planType === 'Pro';
+    if (statusFilter === 'vip') return matchesSearch && store.planType === 'VIP';
     return matchesSearch;
   });
 
@@ -1470,18 +1474,51 @@ export default function SuperAdminPage() {
                           </td>
 
                           <td className="py-3.5 px-4">
-                            <span className="px-2 py-1 rounded-lg bg-slate-800 text-slate-300 font-bold text-[11px]">
-                              {sub.paymentMethod === 'VodafoneCash' ? 'فودافون كاش' : sub.paymentMethod === 'InstaPay' ? 'إنستاباي' : sub.paymentMethod}
-                            </span>
+                            <div className="space-y-1">
+                              <span className="px-2 py-0.5 rounded-lg bg-slate-800 text-slate-300 font-bold text-[11px] inline-block">
+                                {sub.paymentMethod === 'VodafoneCash' ? 'فودافون كاش' : sub.paymentMethod === 'InstaPay' ? 'إنستاباي' : sub.paymentMethod}
+                              </span>
+                              {sub.senderIdentifier && (
+                                <span className="text-[10px] text-slate-400 block font-mono">
+                                  من: <strong className="text-slate-200">{sub.senderIdentifier}</strong>
+                                </span>
+                              )}
+                            </div>
                           </td>
 
                           <td className="py-3.5 px-4">
                             <div className="space-y-1">
-                              <code className="text-amber-400 font-mono font-bold bg-slate-950 px-2 py-1 rounded border border-slate-800 block text-center">
-                                {sub.transactionId}
-                              </code>
+                              <div className="flex items-center justify-between gap-1 bg-slate-950 px-2 py-1 rounded border border-slate-800 max-w-[170px]">
+                                <code className="text-amber-400 font-mono font-bold text-[11px] truncate" title={sub.transactionId}>
+                                  {sub.transactionId}
+                                </code>
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    if (typeof navigator !== 'undefined' && navigator.clipboard) {
+                                      navigator.clipboard.writeText(sub.transactionId);
+                                      const toast = Swal.mixin({
+                                        toast: true,
+                                        position: 'top-end',
+                                        showConfirmButton: false,
+                                        timer: 1500,
+                                        background: '#0f172a',
+                                        color: '#f8fafc',
+                                      });
+                                      toast.fire({
+                                        icon: 'success',
+                                        title: 'تم نسخ رقم العملية!',
+                                      });
+                                    }
+                                  }}
+                                  className="p-1 text-slate-400 hover:text-emerald-400 transition-colors shrink-0"
+                                  title="نسخ رقم العملية"
+                                >
+                                  <Copy className="w-3 h-3" />
+                                </button>
+                              </div>
                               {sub.notes && (
-                                <span className="text-[10px] text-slate-400 block italic">
+                                <span className="text-[10px] text-slate-400 block italic max-w-[170px] truncate" title={sub.notes}>
                                   ملاحظة: {sub.notes}
                                 </span>
                               )}
@@ -2068,23 +2105,53 @@ export default function SuperAdminPage() {
                   </p>
                 </div>
 
-                {/* Filter Buttons */}
-                <div className="flex items-center gap-1.5 bg-slate-900 border border-slate-800 p-1 rounded-xl">
+                {/* Filter Buttons & Pills */}
+                <div className="flex flex-wrap items-center gap-1.5 bg-slate-900 border border-slate-800 p-1.5 rounded-xl">
                   <button
                     onClick={() => setStatusFilter('all')}
                     className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-all ${
                       statusFilter === 'all'
-                        ? 'bg-emerald-500 text-slate-950 font-black'
+                        ? 'bg-emerald-500 text-slate-950 font-black shadow-sm'
                         : 'text-slate-400 hover:text-white'
                     }`}
                   >
                     الكل ({stores.length})
                   </button>
                   <button
+                    onClick={() => setStatusFilter('free')}
+                    className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-all ${
+                      statusFilter === 'free'
+                        ? 'bg-amber-400 text-slate-950 font-black shadow-sm'
+                        : 'text-slate-400 hover:text-white'
+                    }`}
+                  >
+                    تجربة مجانية ({stores.filter(s => s.planType === 'Free' || !s.planType).length})
+                  </button>
+                  <button
+                    onClick={() => setStatusFilter('pro')}
+                    className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-all ${
+                      statusFilter === 'pro'
+                        ? 'bg-emerald-500 text-slate-950 font-black shadow-sm'
+                        : 'text-slate-400 hover:text-white'
+                    }`}
+                  >
+                    Pro ({stores.filter(s => s.planType === 'Pro').length})
+                  </button>
+                  <button
+                    onClick={() => setStatusFilter('vip')}
+                    className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-all ${
+                      statusFilter === 'vip'
+                        ? 'bg-purple-500 text-white font-black shadow-sm'
+                        : 'text-slate-400 hover:text-white'
+                    }`}
+                  >
+                    VIP ({stores.filter(s => s.planType === 'VIP').length})
+                  </button>
+                  <button
                     onClick={() => setStatusFilter('active')}
                     className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-all ${
                       statusFilter === 'active'
-                        ? 'bg-emerald-500 text-slate-950 font-black'
+                        ? 'bg-teal-500 text-slate-950 font-black shadow-sm'
                         : 'text-slate-400 hover:text-white'
                     }`}
                   >
@@ -2094,7 +2161,7 @@ export default function SuperAdminPage() {
                     onClick={() => setStatusFilter('suspended')}
                     className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-all ${
                       statusFilter === 'suspended'
-                        ? 'bg-rose-500 text-white font-black'
+                        ? 'bg-rose-500 text-white font-black shadow-sm'
                         : 'text-slate-400 hover:text-white'
                     }`}
                   >

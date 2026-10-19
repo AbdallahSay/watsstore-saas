@@ -372,6 +372,7 @@ using (var scope = app.Services.CreateScope())
                         ""BillingCycle"" VARCHAR(20) NOT NULL,
                         ""Amount"" NUMERIC(10, 2) NOT NULL,
                         ""PaymentMethod"" VARCHAR(50) NOT NULL,
+                        ""SenderIdentifier"" VARCHAR(100) NULL,
                         ""TransactionId"" VARCHAR(100) NOT NULL,
                         ""Notes"" TEXT NULL,
                         ""Status"" VARCHAR(20) NOT NULL DEFAULT 'Pending',
@@ -379,6 +380,7 @@ using (var scope = app.Services.CreateScope())
                         ""CreatedAt"" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
                         ""ReviewedAt"" TIMESTAMP WITH TIME ZONE NULL
                     );
+                    ALTER TABLE ""SubscriptionRequests"" ADD COLUMN IF NOT EXISTS ""SenderIdentifier"" VARCHAR(100) NULL;
                     CREATE INDEX IF NOT EXISTS ""IX_SubscriptionRequests_StoreId_Status"" ON ""SubscriptionRequests"" (""StoreId"", ""Status"");
                     CREATE INDEX IF NOT EXISTS ""IX_SubscriptionRequests_CreatedAt"" ON ""SubscriptionRequests"" (""CreatedAt"");
                 ");
@@ -488,6 +490,7 @@ using (var scope = app.Services.CreateScope())
                             BillingCycle NVARCHAR(20) NOT NULL,
                             Amount DECIMAL(10, 2) NOT NULL,
                             PaymentMethod NVARCHAR(50) NOT NULL,
+                            SenderIdentifier NVARCHAR(100) NULL,
                             TransactionId NVARCHAR(100) NOT NULL,
                             Notes NVARCHAR(MAX) NULL,
                             Status NVARCHAR(20) NOT NULL DEFAULT 'Pending',
@@ -499,6 +502,9 @@ using (var scope = app.Services.CreateScope())
                         CREATE INDEX IX_SubscriptionRequests_StoreId_Status ON SubscriptionRequests (StoreId, Status);
                         CREATE INDEX IX_SubscriptionRequests_CreatedAt ON SubscriptionRequests (CreatedAt);
                     END
+
+                    IF COL_LENGTH('SubscriptionRequests', 'SenderIdentifier') IS NULL 
+                        ALTER TABLE SubscriptionRequests ADD SenderIdentifier NVARCHAR(100) NULL;
                 ");
                 logger.LogInformation("SQL Server database column migrations & StoreReviews/StoreCoupons/SuperAdmins/PlatformSettings/SubscriptionRequests tables checked and applied successfully.");
             }
