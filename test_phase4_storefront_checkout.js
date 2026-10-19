@@ -117,8 +117,8 @@ async function runPhase4Audit() {
 
     if (regRes.statusCode === 200 || regRes.statusCode === 201) {
       merchantToken = regRes.data.token;
-      storeSlug = regRes.data.store.slug;
-      storeId = regRes.data.store.id;
+      storeSlug = regRes.data.slug || regRes.data.store?.slug;
+      storeId = regRes.data.storeId || regRes.data.store?.id;
       recordResult('Merchant Setup & Registration', 'PASS', `Store: ${storeSlug}`, regRes.latencyMs);
     } else {
       recordResult('Merchant Setup & Registration', 'FAIL', `Status: ${regRes.statusCode}`, regRes.latencyMs);
@@ -211,7 +211,7 @@ async function runPhase4Audit() {
         businessCategory: 'أزياء وموضة'
       }
     });
-    secondStoreSlug = regB.data?.store?.slug;
+    secondStoreSlug = regB.data?.slug || regB.data?.store?.slug;
   } catch (err) {
     console.error('Setup failed:', err);
     return;
