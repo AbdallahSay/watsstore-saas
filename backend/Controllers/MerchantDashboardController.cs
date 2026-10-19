@@ -29,6 +29,22 @@ namespace WatsStore.Api.Controllers
 
         private Guid GetAuthenticatedStoreId()
         {
+            if (User?.Identity?.IsAuthenticated != true)
+            {
+                throw new UnauthorizedAccessException("غير مصرح لك بالوصول. يرجى تسجيل الدخول كتاجر.");
+            }
+
+            // An admin token without explicit storeId cannot access merchant endpoints
+            if (User.IsInRole("Admin") || User.HasClaim(c => c.Type == "role" && c.Value == "Admin"))
+            {
+                var adminStoreClaim = User.FindFirst("storeId")?.Value;
+                if (!Guid.TryParse(adminStoreClaim, out var adminStoreId))
+                {
+                    throw new UnauthorizedAccessException("غير مصرح لمدير النظام بدخول لوحة المتجر بدون تحديد معرف المتجر.");
+                }
+                return adminStoreId;
+            }
+
             var storeIdClaim = User.FindFirst("storeId")?.Value 
                                ?? User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
@@ -228,6 +244,35 @@ namespace WatsStore.Api.Controllers
             });
         }
 
+        [HttpGet("categories/{id:int}")]
+        public async Task<IActionResult> GetCategoryById(int id)
+        {
+            var storeId = GetAuthenticatedStoreId();
+            var category = await _db.Categories
+                .Where(c => c.Id == id && c.StoreId == storeId)
+                .Select(c => new CategoryDto
+                {
+                    Id = c.Id,
+                    Name = c.Name,
+                    SortOrder = c.SortOrder,
+                    IsActive = c.IsActive,
+                    ProductCount = c.Products.Count
+                })
+                .FirstOrDefaultAsync();
+
+            if (category == null)
+            {
+                var existsInDb = await _db.Categories.AnyAsync(c => c.Id == id);
+                if (existsInDb)
+                {
+                    return StatusCode(StatusCodes.Status403Forbidden, new { message = "غير مصرح لك بالاطلاع على قسم يتبع متجراً آخر." });
+                }
+                return NotFound(new { message = "القسم غير موجود" });
+            }
+
+            return Ok(category);
+        }
+
         [HttpPut("categories/{id:int}")]
         public async Task<IActionResult> UpdateCategory(int id, [FromBody] CategoryCreateUpdateRequest request)
         {
@@ -239,7 +284,14 @@ namespace WatsStore.Api.Controllers
                 .FirstOrDefaultAsync(c => c.Id == id && c.StoreId == storeId);
 
             if (category == null)
+            {
+                var existsInDb = await _db.Categories.AnyAsync(c => c.Id == id);
+                if (existsInDb)
+                {
+                    return StatusCode(StatusCodes.Status403Forbidden, new { message = "غير مصرح لك بتعديل قسم يتبع متجراً آخر." });
+                }
                 return NotFound(new { message = "القسم غير موجود" });
+            }
 
             category.Name = request.Name.Trim();
             category.SortOrder = request.SortOrder;
@@ -264,7 +316,14 @@ namespace WatsStore.Api.Controllers
                 .FirstOrDefaultAsync(c => c.Id == id && c.StoreId == storeId);
 
             if (category == null)
+            {
+                var existsInDb = await _db.Categories.AnyAsync(c => c.Id == id);
+                if (existsInDb)
+                {
+                    return StatusCode(StatusCodes.Status403Forbidden, new { message = "غير مصرح لك بحذف قسم يتبع متجراً آخر." });
+                }
                 return NotFound(new { message = "القسم غير موجود" });
+            }
 
             _db.Categories.Remove(category);
             await _db.SaveChangesAsync();
@@ -397,6 +456,44 @@ namespace WatsStore.Api.Controllers
             });
         }
 
+        [HttpGet("products/{id:guid}")]
+        public async Task<IActionResult> GetProductById(Guid id)
+        {
+            var storeId = GetAuthenticatedStoreId();
+            var product = await _db.Products
+                .Include(p => p.Category)
+                .Where(p => p.Id == id && p.StoreId == storeId)
+                .Select(p => new ProductDto
+                {
+                    Id = p.Id,
+                    Name = p.Name,
+                    Slug = p.Slug,
+                    CategoryId = p.CategoryId,
+                    CategoryName = p.Category != null ? p.Category.Name : null,
+                    Description = p.Description,
+                    Price = p.Price,
+                    CompareAtPrice = p.CompareAtPrice,
+                    ImageUrl = p.ImageUrl,
+                    VariantsJson = p.VariantsJson,
+                    IsAvailable = p.IsAvailable,
+                    SortOrder = p.SortOrder,
+                    CreatedAt = p.CreatedAt
+                })
+                .FirstOrDefaultAsync();
+
+            if (product == null)
+            {
+                var existsInDb = await _db.Products.AnyAsync(p => p.Id == id);
+                if (existsInDb)
+                {
+                    return StatusCode(StatusCodes.Status403Forbidden, new { message = "غير مصرح لك بالاطلاع على منتج يتبع متجراً آخر." });
+                }
+                return NotFound(new { message = "المنتج غير موجود" });
+            }
+
+            return Ok(product);
+        }
+
         [HttpPatch("products/{id:guid}/availability")]
         [HttpPut("products/{id:guid}/toggle-availability")]
         public async Task<IActionResult> ToggleProductAvailability(Guid id)
@@ -406,7 +503,14 @@ namespace WatsStore.Api.Controllers
                 .FirstOrDefaultAsync(p => p.Id == id && p.StoreId == storeId);
 
             if (product == null)
+            {
+                var existsInDb = await _db.Products.AnyAsync(p => p.Id == id);
+                if (existsInDb)
+                {
+                    return StatusCode(StatusCodes.Status403Forbidden, new { message = "غير مصرح لك بتعديل حالة توفر منتج يتبع متجراً آخر." });
+                }
                 return NotFound(new { message = "المنتج غير موجود" });
+            }
 
             product.IsAvailable = !product.IsAvailable;
             await _db.SaveChangesAsync();
@@ -439,7 +543,14 @@ namespace WatsStore.Api.Controllers
                 .FirstOrDefaultAsync(p => p.Id == id && p.StoreId == storeId);
 
             if (product == null)
+            {
+                var existsInDb = await _db.Products.AnyAsync(p => p.Id == id);
+                if (existsInDb)
+                {
+                    return StatusCode(StatusCodes.Status403Forbidden, new { message = "غير مصرح لك بتعديل منتج يتبع متجراً آخر." });
+                }
                 return NotFound(new { message = "المنتج غير موجود" });
+            }
 
             if (request.Price <= 0)
             {
@@ -491,7 +602,14 @@ namespace WatsStore.Api.Controllers
                 .FirstOrDefaultAsync(p => p.Id == id && p.StoreId == storeId);
 
             if (product == null)
+            {
+                var existsInDb = await _db.Products.AnyAsync(p => p.Id == id);
+                if (existsInDb)
+                {
+                    return StatusCode(StatusCodes.Status403Forbidden, new { message = "غير مصرح لك بحذف منتج يتبع متجراً آخر." });
+                }
                 return NotFound(new { message = "المنتج غير موجود" });
+            }
 
             _db.Products.Remove(product);
             await _db.SaveChangesAsync();
@@ -535,6 +653,41 @@ namespace WatsStore.Api.Controllers
                 pageSize,
                 orders
             });
+        }
+
+        [HttpGet("orders/{id:guid}")]
+        public async Task<IActionResult> GetOrderById(Guid id)
+        {
+            var storeId = GetAuthenticatedStoreId();
+            var order = await _db.WhatsAppOrders
+                .AsNoTracking()
+                .Where(o => o.Id == id && o.StoreId == storeId)
+                .Select(o => new OrderDto
+                {
+                    Id = o.Id,
+                    OrderNumber = o.OrderNumber,
+                    CustomerName = o.CustomerName,
+                    CustomerPhone = o.CustomerPhone,
+                    CustomerAddress = o.CustomerAddress,
+                    CustomerNotes = o.CustomerNotes,
+                    PaymentMethod = o.PaymentMethod,
+                    ItemsJson = o.ItemsJson,
+                    TotalAmount = o.TotalAmount,
+                    CreatedAt = o.CreatedAt
+                })
+                .FirstOrDefaultAsync();
+
+            if (order == null)
+            {
+                var existsInDb = await _db.WhatsAppOrders.AnyAsync(o => o.Id == id);
+                if (existsInDb)
+                {
+                    return StatusCode(StatusCodes.Status403Forbidden, new { message = "غير مصرح لك بالاطلاع على تفاصيل طلب يتبع متجراً آخر." });
+                }
+                return NotFound(new { message = "الطلب غير موجود" });
+            }
+
+            return Ok(order);
         }
 
         [HttpGet("orders/export")]
@@ -641,7 +794,14 @@ namespace WatsStore.Api.Controllers
                 .FirstOrDefaultAsync(r => r.Id == id && r.StoreId == storeId);
 
             if (review == null)
-                return NotFound(new { message = "التقييم غير موجود أو لا ينتمي لهذا المتجر" });
+            {
+                var existsInDb = await _db.StoreReviews.AnyAsync(r => r.Id == id);
+                if (existsInDb)
+                {
+                    return StatusCode(StatusCodes.Status403Forbidden, new { message = "غير مصرح لك باعتماد تقييم يتبع متجراً آخر." });
+                }
+                return NotFound(new { message = "التقييم غير موجود" });
+            }
 
             if (request != null)
             {
@@ -670,7 +830,14 @@ namespace WatsStore.Api.Controllers
                 .FirstOrDefaultAsync(r => r.Id == id && r.StoreId == storeId);
 
             if (review == null)
-                return NotFound(new { message = "التقييم غير موجود أو لا ينتمي لهذا المتجر" });
+            {
+                var existsInDb = await _db.StoreReviews.AnyAsync(r => r.Id == id);
+                if (existsInDb)
+                {
+                    return StatusCode(StatusCodes.Status403Forbidden, new { message = "غير مصرح لك بحذف تقييم يتبع متجراً آخر." });
+                }
+                return NotFound(new { message = "التقييم غير موجود" });
+            }
 
             _db.StoreReviews.Remove(review);
             await _db.SaveChangesAsync();
@@ -705,6 +872,42 @@ namespace WatsStore.Api.Controllers
                 .ToListAsync();
 
             return Ok(coupons);
+        }
+
+        [HttpGet("coupons/{id:guid}")]
+        public async Task<IActionResult> GetCouponById(Guid id)
+        {
+            var storeId = GetAuthenticatedStoreId();
+
+            var coupon = await _db.StoreCoupons
+                .AsNoTracking()
+                .Where(c => c.Id == id && c.StoreId == storeId)
+                .Select(c => new CouponDto
+                {
+                    Id = c.Id,
+                    StoreId = c.StoreId,
+                    Code = c.Code,
+                    DiscountType = c.DiscountType,
+                    DiscountValue = c.DiscountValue,
+                    ExpiryDate = c.ExpiryDate,
+                    UsageLimit = c.UsageLimit,
+                    TimesUsed = c.TimesUsed,
+                    IsActive = c.IsActive,
+                    CreatedAt = c.CreatedAt
+                })
+                .FirstOrDefaultAsync();
+
+            if (coupon == null)
+            {
+                var existsInDb = await _db.StoreCoupons.AnyAsync(c => c.Id == id);
+                if (existsInDb)
+                {
+                    return StatusCode(StatusCodes.Status403Forbidden, new { message = "غير مصرح لك بالاطلاع على كود خصم يتبع متجراً آخر." });
+                }
+                return NotFound(new { message = "كود الخصم غير موجود" });
+            }
+
+            return Ok(coupon);
         }
 
         [HttpPost("coupons")]
@@ -814,7 +1017,14 @@ namespace WatsStore.Api.Controllers
                 .FirstOrDefaultAsync(c => c.Id == id && c.StoreId == storeId);
 
             if (coupon == null)
+            {
+                var existsInDb = await _db.StoreCoupons.AnyAsync(c => c.Id == id);
+                if (existsInDb)
+                {
+                    return StatusCode(StatusCodes.Status403Forbidden, new { message = "غير مصرح لك بتعديل كود خصم يتبع متجراً آخر." });
+                }
                 return NotFound(new { message = "كود الخصم غير موجود" });
+            }
 
             if (!coupon.IsActive)
             {
@@ -863,7 +1073,14 @@ namespace WatsStore.Api.Controllers
                 .FirstOrDefaultAsync(c => c.Id == id && c.StoreId == storeId);
 
             if (coupon == null)
+            {
+                var existsInDb = await _db.StoreCoupons.AnyAsync(c => c.Id == id);
+                if (existsInDb)
+                {
+                    return StatusCode(StatusCodes.Status403Forbidden, new { message = "غير مصرح لك بحذف كود خصم يتبع متجراً آخر." });
+                }
                 return NotFound(new { message = "كود الخصم غير موجود" });
+            }
 
             _db.StoreCoupons.Remove(coupon);
             await _db.SaveChangesAsync();

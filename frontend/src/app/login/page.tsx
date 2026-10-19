@@ -30,8 +30,9 @@ export default function LoginPage() {
     try {
       const res = await api.login({ email, password });
       
-      // Store token & user session in localStorage
+      // Store token & user session in localStorage (isolated merchant session)
       localStorage.setItem('watsstore_token', res.token);
+      localStorage.setItem('watsstore_merchant_token', res.token);
       localStorage.setItem('watsstore_user', JSON.stringify(res));
 
       await Swal.fire({

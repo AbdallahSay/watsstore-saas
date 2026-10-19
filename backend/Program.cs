@@ -111,28 +111,43 @@ builder.Services.AddRateLimiter(options =>
             token);
     };
 
-    // Auth policy: Max 120 requests per minute per IP
+    string GetClientIp(HttpContext httpContext)
+    {
+        var forwarded = httpContext.Request.Headers["X-Forwarded-For"].FirstOrDefault();
+        if (!string.IsNullOrWhiteSpace(forwarded))
+        {
+            var firstIp = forwarded.Split(',', StringSplitOptions.RemoveEmptyEntries)[0].Trim();
+            if (!string.IsNullOrWhiteSpace(firstIp))
+                return firstIp;
+        }
+
+        var realIp = httpContext.Request.Headers["X-Real-IP"].FirstOrDefault();
+        if (!string.IsNullOrWhiteSpace(realIp))
+        {
+            return realIp.Trim();
+        }
+
+        return httpContext.Connection.RemoteIpAddress?.ToString() ?? "anonymous";
+    }
+
+    // Auth policy: Max 20 requests per minute per IP to protect against brute-force attacks
     options.AddPolicy("auth-policy", httpContext =>
     {
-        var clientIp = httpContext.Connection.RemoteIpAddress?.ToString() 
-                       ?? httpContext.Request.Headers["X-Forwarded-For"].FirstOrDefault() 
-                       ?? "anonymous";
+        var clientIp = GetClientIp(httpContext);
 
         return RateLimitPartition.GetFixedWindowLimiter(clientIp, _ => new FixedWindowRateLimiterOptions
         {
-            PermitLimit = 120,
+            PermitLimit = 20,
             Window = TimeSpan.FromMinutes(1),
             QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
-            QueueLimit = 5
+            QueueLimit = 0
         });
     });
 
     // Sensitive policy (Coupons, Orders, Reviews): Max 120 requests per minute per IP
     options.AddPolicy("sensitive-policy", httpContext =>
     {
-        var clientIp = httpContext.Connection.RemoteIpAddress?.ToString() 
-                       ?? httpContext.Request.Headers["X-Forwarded-For"].FirstOrDefault() 
-                       ?? "anonymous";
+        var clientIp = GetClientIp(httpContext);
 
         return RateLimitPartition.GetFixedWindowLimiter(clientIp, _ => new FixedWindowRateLimiterOptions
         {
@@ -146,9 +161,7 @@ builder.Services.AddRateLimiter(options =>
     // Admin policy: Max 200 requests per minute per IP
     options.AddPolicy("admin-policy", httpContext =>
     {
-        var clientIp = httpContext.Connection.RemoteIpAddress?.ToString() 
-                       ?? httpContext.Request.Headers["X-Forwarded-For"].FirstOrDefault() 
-                       ?? "anonymous";
+        var clientIp = GetClientIp(httpContext);
 
         return RateLimitPartition.GetFixedWindowLimiter(clientIp, _ => new FixedWindowRateLimiterOptions
         {
@@ -162,9 +175,7 @@ builder.Services.AddRateLimiter(options =>
     // Public storefront policy: Max 120 requests per minute per IP
     options.AddPolicy("public-policy", httpContext =>
     {
-        var clientIp = httpContext.Connection.RemoteIpAddress?.ToString() 
-                       ?? httpContext.Request.Headers["X-Forwarded-For"].FirstOrDefault() 
-                       ?? "anonymous";
+        var clientIp = GetClientIp(httpContext);
 
         return RateLimitPartition.GetFixedWindowLimiter(clientIp, _ => new FixedWindowRateLimiterOptions
         {
@@ -229,6 +240,15 @@ app.Use(async (context, next) =>
         {
             message = "الطلب غير صالح أو البيانات المدخلة غير صحيحة",
             error = ex.Message
+        }));
+    }
+    catch (UnauthorizedAccessException ex)
+    {
+        context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+        context.Response.ContentType = "application/json; charset=utf-8";
+        await context.Response.WriteAsync(System.Text.Json.JsonSerializer.Serialize(new
+        {
+            message = ex.Message ?? "غير مصرح لك بالوصول، يرجى تسجيل الدخول مجدداً."
         }));
     }
     catch (System.Text.Json.JsonException ex)

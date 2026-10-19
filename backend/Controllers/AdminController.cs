@@ -64,6 +64,21 @@ namespace WatsStore.Api.Controllers
             return false;
         }
 
+        private IActionResult? EnsureAdminAccess()
+        {
+            if (IsAdminAuthorized())
+            {
+                return null;
+            }
+
+            if (User?.Identity?.IsAuthenticated == true)
+            {
+                return StatusCode(StatusCodes.Status403Forbidden, new { message = "غير مصرح لك. تتطلب هذه العملية صلاحيات الإدارة العليا للمنصة (Admin)." });
+            }
+
+            return Unauthorized(new { message = "يجب تسجيل الدخول كمسؤول للوصول إلى لوحة الإدارة العليا." });
+        }
+
         [HttpPost("login")]
         [EnableRateLimiting("auth-policy")]
         public async Task<IActionResult> Login([FromBody] AdminLoginRequest request)
@@ -124,8 +139,8 @@ namespace WatsStore.Api.Controllers
         [EnableRateLimiting("auth-policy")]
         public async Task<IActionResult> ChangePassword([FromBody] AdminChangePasswordRequest request)
         {
-            if (!IsAdminAuthorized())
-                return Unauthorized(new { message = "غير مصرح لك بتغيير كلمة مرور الإدارة العليا" });
+            var authError = EnsureAdminAccess();
+            if (authError != null) return authError;
 
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -269,8 +284,8 @@ namespace WatsStore.Api.Controllers
         [HttpGet("stats")]
         public async Task<IActionResult> GetPlatformStats()
         {
-            if (!IsAdminAuthorized())
-                return Unauthorized(new { message = "غير مصرح لك بالوصول إلى لوحة الإدارة العليا" });
+            var authError = EnsureAdminAccess();
+            if (authError != null) return authError;
 
             var totalStores = await _db.Stores.CountAsync();
             var activeStores = await _db.Stores.CountAsync(s => s.IsActive);
@@ -409,8 +424,8 @@ namespace WatsStore.Api.Controllers
         [HttpGet("stores")]
         public async Task<IActionResult> GetAllStores([FromQuery] string? search, [FromQuery] string? status)
         {
-            if (!IsAdminAuthorized())
-                return Unauthorized(new { message = "غير مصرح لك بالوصول إلى لوحة الإدارة العليا" });
+            var authError = EnsureAdminAccess();
+            if (authError != null) return authError;
 
             var query = _db.Stores.AsNoTracking().AsQueryable();
 
@@ -493,8 +508,8 @@ namespace WatsStore.Api.Controllers
         [HttpPatch("stores/{id}/toggle-status")]
         public async Task<IActionResult> ToggleStoreStatus(Guid id)
         {
-            if (!IsAdminAuthorized())
-                return Unauthorized(new { message = "غير مصرح لك بالوصول إلى لوحة الإدارة العليا" });
+            var authError = EnsureAdminAccess();
+            if (authError != null) return authError;
 
             var store = await _db.Stores.FirstOrDefaultAsync(s => s.Id == id);
             if (store == null)
@@ -518,8 +533,8 @@ namespace WatsStore.Api.Controllers
         [HttpDelete("stores/{id}")]
         public async Task<IActionResult> DeleteStore(Guid id)
         {
-            if (!IsAdminAuthorized())
-                return Unauthorized(new { message = "غير مصرح لك بالوصول إلى لوحة الإدارة العليا" });
+            var authError = EnsureAdminAccess();
+            if (authError != null) return authError;
 
             var store = await _db.Stores
                 .Include(s => s.Products)
@@ -557,8 +572,8 @@ namespace WatsStore.Api.Controllers
         [HttpPut("stores/{id}/plan")]
         public async Task<IActionResult> UpdateStorePlan(Guid id, [FromBody] UpdateStorePlanRequest request)
         {
-            if (!IsAdminAuthorized())
-                return Unauthorized(new { message = "غير مصرح لك بالوصول إلى لوحة الإدارة العليا" });
+            var authError = EnsureAdminAccess();
+            if (authError != null) return authError;
 
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -605,8 +620,8 @@ namespace WatsStore.Api.Controllers
         [HttpPost("stores/{id}/extend-trial")]
         public async Task<IActionResult> ExtendStoreTrial(Guid id, [FromBody] ExtendStoreTrialRequest request)
         {
-            if (!IsAdminAuthorized())
-                return Unauthorized(new { message = "غير مصرح لك بالوصول إلى لوحة الإدارة العليا" });
+            var authError = EnsureAdminAccess();
+            if (authError != null) return authError;
 
             var store = await _db.Stores.FirstOrDefaultAsync(s => s.Id == id);
             if (store == null)
@@ -638,8 +653,8 @@ namespace WatsStore.Api.Controllers
         [HttpGet("pricing")]
         public async Task<IActionResult> GetPricing()
         {
-            if (!IsAdminAuthorized())
-                return Unauthorized(new { message = "غير مصرح لك بالوصول إلى لوحة الإدارة العليا" });
+            var authError = EnsureAdminAccess();
+            if (authError != null) return authError;
 
             var settings = await _db.PlatformSettings.FirstOrDefaultAsync(p => p.Id == 1);
             if (settings == null)
@@ -688,8 +703,8 @@ namespace WatsStore.Api.Controllers
         [HttpPut("pricing")]
         public async Task<IActionResult> UpdatePricing([FromBody] UpdatePlatformSettingsRequest request)
         {
-            if (!IsAdminAuthorized())
-                return Unauthorized(new { message = "غير مصرح لك بالوصول إلى لوحة الإدارة العليا" });
+            var authError = EnsureAdminAccess();
+            if (authError != null) return authError;
 
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -763,8 +778,8 @@ namespace WatsStore.Api.Controllers
         [HttpGet("plans")]
         public async Task<IActionResult> GetPlans()
         {
-            if (!IsAdminAuthorized())
-                return Unauthorized(new { message = "غير مصرح لك بالوصول إلى لوحة الإدارة العليا" });
+            var authError = EnsureAdminAccess();
+            if (authError != null) return authError;
 
             var settings = await _db.PlatformSettings.FirstOrDefaultAsync(p => p.Id == 1)
                            ?? new PlatformSetting();
@@ -827,8 +842,8 @@ namespace WatsStore.Api.Controllers
         [HttpGet("subscriptions/pending")]
         public async Task<IActionResult> GetPendingSubscriptions()
         {
-            if (!IsAdminAuthorized())
-                return Unauthorized(new { message = "غير مصرح لك بالوصول إلى لوحة الإدارة العليا" });
+            var authError = EnsureAdminAccess();
+            if (authError != null) return authError;
 
             var requests = await _db.SubscriptionRequests
                 .Where(r => r.Status == "Pending")
@@ -842,8 +857,8 @@ namespace WatsStore.Api.Controllers
         [HttpGet("subscriptions")]
         public async Task<IActionResult> GetAllSubscriptions([FromQuery] string? status)
         {
-            if (!IsAdminAuthorized())
-                return Unauthorized(new { message = "غير مصرح لك بالوصول إلى لوحة الإدارة العليا" });
+            var authError = EnsureAdminAccess();
+            if (authError != null) return authError;
 
             var query = _db.SubscriptionRequests.AsQueryable();
             if (!string.IsNullOrWhiteSpace(status))
@@ -862,8 +877,8 @@ namespace WatsStore.Api.Controllers
         [HttpPatch("subscriptions/{id}/approve")]
         public async Task<IActionResult> ApproveSubscription(Guid id)
         {
-            if (!IsAdminAuthorized())
-                return Unauthorized(new { message = "غير مصرح لك بالوصول إلى لوحة الإدارة العليا" });
+            var authError = EnsureAdminAccess();
+            if (authError != null) return authError;
 
             var sub = await _db.SubscriptionRequests
                 .Include(r => r.Store)
@@ -909,8 +924,8 @@ namespace WatsStore.Api.Controllers
         [HttpPatch("subscriptions/{id}/reject")]
         public async Task<IActionResult> RejectSubscription(Guid id, [FromBody] RejectSubscriptionRequest req)
         {
-            if (!IsAdminAuthorized())
-                return Unauthorized(new { message = "غير مصرح لك بالوصول إلى لوحة الإدارة العليا" });
+            var authError = EnsureAdminAccess();
+            if (authError != null) return authError;
 
             var sub = await _db.SubscriptionRequests.FirstOrDefaultAsync(r => r.Id == id);
             if (sub == null)

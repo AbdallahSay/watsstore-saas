@@ -46,7 +46,7 @@ export default function DashboardLayout({
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const token = localStorage.getItem('watsstore_token');
+    const token = localStorage.getItem('watsstore_merchant_token') || localStorage.getItem('watsstore_token');
     const storedUser = localStorage.getItem('watsstore_user');
 
     if (!token || !storedUser) {
@@ -80,6 +80,7 @@ export default function DashboardLayout({
   }, [router]);
 
   const handleLogout = () => {
+    localStorage.removeItem('watsstore_merchant_token');
     localStorage.removeItem('watsstore_token');
     localStorage.removeItem('watsstore_user');
     router.push('/login');

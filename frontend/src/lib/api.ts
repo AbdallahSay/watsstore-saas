@@ -27,16 +27,45 @@ import {
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://watsstore.runasp.net/api';
 
 async function handleResponseError(res: Response): Promise<never> {
-  // 401 Unauthorized handling: Auto-logout & redirect to login if merchant session expired
+  // 401 Unauthorized handling: Auto-logout & redirect with strict session isolation
   if (res.status === 401) {
     if (typeof window !== 'undefined') {
-      localStorage.removeItem('watsstore_token');
-      localStorage.removeItem('watsstore_user');
-      if (window.location.pathname.startsWith('/dashboard')) {
-        window.location.href = '/login?session_expired=1';
+      const isCurrentAdmin = window.location.pathname.startsWith('/admin') || res.url.includes('/api/admin');
+      if (isCurrentAdmin) {
+        localStorage.removeItem('watsstore_admin_token');
+        localStorage.removeItem('watsstore_admin_user');
+        if (window.location.pathname !== '/admin/login' && window.location.pathname.startsWith('/admin')) {
+          window.location.href = '/admin?session_expired=1';
+        }
+      } else {
+        localStorage.removeItem('watsstore_merchant_token');
+        localStorage.removeItem('watsstore_token');
+        localStorage.removeItem('watsstore_user');
+        if (window.location.pathname.startsWith('/dashboard')) {
+          window.location.href = '/login?session_expired=1';
+        }
       }
     }
-    throw new Error('انتهت صلاحية الجلسة، يرجى تسجيل الدخول مجدداً.');
+    let authMsg = 'انتهت صلاحية الجلسة، يرجى تسجيل الدخول مجدداً.';
+    try {
+      const errorData = await res.json();
+      if (errorData?.message) authMsg = errorData.message;
+    } catch {
+      // fallback
+    }
+    throw new Error(authMsg);
+  }
+
+  // 403 Forbidden handling: RBAC & Tenant Isolation / Quota limits
+  if (res.status === 403) {
+    let forbiddenMsg = 'غير مصرح لك بتنفيذ هذه العملية.';
+    try {
+      const errorData = await res.json();
+      if (errorData?.message) forbiddenMsg = errorData.message;
+    } catch {
+      // fallback
+    }
+    throw new Error(forbiddenMsg);
   }
 
   // 429 Too Many Requests handling: Rate limit protection

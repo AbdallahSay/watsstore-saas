@@ -83,8 +83,9 @@ export default function RegisterPage() {
         });
       }
 
-      // Store credentials in localStorage
+      // Store credentials in localStorage (isolated merchant session)
       localStorage.setItem('watsstore_token', res.token);
+      localStorage.setItem('watsstore_merchant_token', res.token);
       localStorage.setItem('watsstore_user', JSON.stringify(res));
 
       await Swal.fire({
