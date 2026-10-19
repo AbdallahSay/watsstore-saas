@@ -185,6 +185,7 @@ namespace WatsStore.Api.Controllers
         }
 
         [HttpPost("{slug}/apply-coupon")]
+        [HttpPost("{slug}/coupons/validate")]
         [EnableRateLimiting("sensitive-policy")]
         public async Task<IActionResult> ApplyCoupon(string slug, [FromBody] ApplyCouponRequest request)
         {

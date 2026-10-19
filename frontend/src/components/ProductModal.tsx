@@ -51,7 +51,14 @@ export default function ProductModal({
 
   if (!isOpen || !product) return null;
 
+  const isOutOfStock = product.isAvailable === false;
+
   const handleConfirm = () => {
+    if (isOutOfStock) {
+      setValidationError('نعتذر، هذا المنتج غير متوفر حالياً في المخزون');
+      return;
+    }
+
     // Validate that all variant groups have a selection
     for (const group of variantGroups) {
       if (!selectedVariants[group.name]) {
@@ -67,13 +74,13 @@ export default function ProductModal({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fadeIn">
       <div 
-        className="bg-white rounded-3xl max-w-lg w-full max-h-[90vh] overflow-y-auto shadow-2xl relative border border-slate-100 flex flex-col"
+        className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 rounded-3xl max-w-lg w-full max-h-[90vh] overflow-y-auto shadow-2xl relative border border-slate-100 dark:border-slate-800 flex flex-col"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Close Button */}
         <button
           onClick={onClose}
-          className="absolute top-4 left-4 z-10 w-9 h-9 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center transition-colors"
+          className="absolute top-4 left-4 z-10 w-9 h-9 rounded-full bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 flex items-center justify-center transition-colors"
           aria-label="إغلاق"
         >
           <X className="w-5 h-5" />
@@ -97,11 +104,11 @@ export default function ProductModal({
 
         <div className="p-6 flex-1 flex flex-col gap-5">
           <div>
-            <h3 className="text-xl font-bold text-slate-900 leading-tight mb-2">
+            <h3 className="text-xl font-bold text-slate-900 dark:text-white leading-tight mb-2">
               {product.name}
             </h3>
             {product.description && (
-              <p className="text-sm text-slate-600 leading-relaxed">
+              <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
                 {product.description}
               </p>
             )}
@@ -109,7 +116,7 @@ export default function ProductModal({
 
           {/* Pricing */}
           <div className="flex items-baseline gap-3">
-            <span className="text-2xl font-black text-emerald-600">
+            <span className="text-2xl font-black text-emerald-600 dark:text-emerald-400">
               {product.price.toFixed(2)} {currency}
             </span>
             {product.compareAtPrice && product.compareAtPrice > product.price && (
@@ -119,13 +126,20 @@ export default function ProductModal({
             )}
           </div>
 
+          {/* Out of Stock Notice */}
+          {isOutOfStock && (
+            <div className="p-3.5 bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 text-xs font-bold rounded-xl border border-rose-200 dark:border-rose-800 flex items-center gap-2">
+              <span>⚠️ هذا المنتج غير متوفر حالياً في المخزون ولا يمكن إضافته للسلة.</span>
+            </div>
+          )}
+
           {/* Variants Selection */}
           {variantGroups.length > 0 && (
-            <div className="space-y-4 pt-2 border-t border-slate-100">
+            <div className="space-y-4 pt-2 border-t border-slate-100 dark:border-slate-800">
               {variantGroups.map((group) => (
                 <div key={group.name} className="space-y-2">
-                  <label className="text-xs font-bold text-slate-700 block">
-                    {group.name}: <span className="text-emerald-600">{selectedVariants[group.name]}</span>
+                  <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block">
+                    {group.name}: <span className="text-emerald-600 dark:text-emerald-400">{selectedVariants[group.name]}</span>
                   </label>
                   <div className="flex flex-wrap gap-2">
                     {group.options.map((option) => {
@@ -144,7 +158,7 @@ export default function ProductModal({
                           className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all flex items-center gap-1.5 border ${
                             isSelected
                               ? 'bg-emerald-600 text-white border-emerald-600 shadow-sm shadow-emerald-600/30 ring-2 ring-emerald-600/20'
-                              : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
+                              : 'bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-200 border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700'
                           }`}
                         >
                           {isSelected && <Check className="w-3.5 h-3.5" />}
@@ -159,30 +173,32 @@ export default function ProductModal({
           )}
 
           {validationError && (
-            <p className="text-xs text-rose-600 font-bold bg-rose-50 p-2.5 rounded-lg border border-rose-200">
+            <p className="text-xs text-rose-600 font-bold bg-rose-50 dark:bg-rose-950/40 p-2.5 rounded-lg border border-rose-200 dark:border-rose-800">
               {validationError}
             </p>
           )}
 
           {/* Quantity Selector */}
-          <div className="pt-2 border-t border-slate-100 flex items-center justify-between">
-            <span className="text-sm font-bold text-slate-800">الكمية:</span>
-            <div className="flex items-center gap-3 bg-slate-100 rounded-xl p-1 border border-slate-200">
+          <div className="pt-2 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
+            <span className="text-sm font-bold text-slate-800 dark:text-slate-200">الكمية:</span>
+            <div className="flex items-center gap-3 bg-slate-100 dark:bg-slate-800 rounded-xl p-1 border border-slate-200 dark:border-slate-700">
               <button
                 type="button"
+                disabled={isOutOfStock}
                 onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-                className="w-8 h-8 rounded-lg bg-white text-slate-700 flex items-center justify-center hover:bg-slate-200 font-bold"
+                className="w-8 h-8 rounded-lg bg-white dark:bg-slate-700 text-slate-700 dark:text-slate-200 flex items-center justify-center hover:bg-slate-200 dark:hover:bg-slate-600 font-bold disabled:opacity-40"
                 aria-label="إنقاص الكمية"
               >
                 <Minus className="w-4 h-4" />
               </button>
-              <span className="w-8 text-center font-black text-slate-900 text-base">
+              <span className="w-8 text-center font-black text-slate-900 dark:text-white text-base">
                 {quantity}
               </span>
               <button
                 type="button"
+                disabled={isOutOfStock}
                 onClick={() => setQuantity((q) => q + 1)}
-                className="w-8 h-8 rounded-lg bg-white text-slate-700 flex items-center justify-center hover:bg-slate-200 font-bold"
+                className="w-8 h-8 rounded-lg bg-white dark:bg-slate-700 text-slate-700 dark:text-slate-200 flex items-center justify-center hover:bg-slate-200 dark:hover:bg-slate-600 font-bold disabled:opacity-40"
                 aria-label="زيادة الكمية"
               >
                 <Plus className="w-4 h-4" />
@@ -193,11 +209,20 @@ export default function ProductModal({
           {/* Add to Cart Submit Button */}
           <button
             type="button"
+            disabled={isOutOfStock}
             onClick={handleConfirm}
-            className="w-full mt-2 py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-2xl shadow-lg shadow-emerald-600/25 flex items-center justify-center gap-2 transition-all active:scale-[0.98]"
+            className={`w-full mt-2 py-3.5 font-bold rounded-2xl shadow-lg flex items-center justify-center gap-2 transition-all ${
+              isOutOfStock
+                ? 'bg-slate-300 dark:bg-slate-700 text-slate-500 cursor-not-allowed opacity-60'
+                : 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-emerald-600/25 active:scale-[0.98]'
+            }`}
           >
             <ShoppingBag className="w-5 h-5" />
-            <span>إضافة إلى السلة ({(product.price * quantity).toFixed(2)} {currency})</span>
+            <span>
+              {isOutOfStock
+                ? 'المنتج غير متوفر حالياً'
+                : `إضافة إلى السلة (${(product.price * quantity).toFixed(2)} ${currency})`}
+            </span>
           </button>
         </div>
       </div>
