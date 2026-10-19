@@ -554,6 +554,7 @@ namespace WatsStore.Api.Controllers
         }
 
         [HttpPatch("stores/{id}/plan")]
+        [HttpPut("stores/{id}/plan")]
         public async Task<IActionResult> UpdateStorePlan(Guid id, [FromBody] UpdateStorePlanRequest request)
         {
             if (!IsAdminAuthorized())

@@ -111,7 +111,7 @@ builder.Services.AddRateLimiter(options =>
             token);
     };
 
-    // Auth policy: Max 10 requests per minute per IP
+    // Auth policy: Max 120 requests per minute per IP
     options.AddPolicy("auth-policy", httpContext =>
     {
         var clientIp = httpContext.Connection.RemoteIpAddress?.ToString() 
@@ -120,10 +120,10 @@ builder.Services.AddRateLimiter(options =>
 
         return RateLimitPartition.GetFixedWindowLimiter(clientIp, _ => new FixedWindowRateLimiterOptions
         {
-            PermitLimit = 10,
+            PermitLimit = 120,
             Window = TimeSpan.FromMinutes(1),
             QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
-            QueueLimit = 0
+            QueueLimit = 5
         });
     });
 

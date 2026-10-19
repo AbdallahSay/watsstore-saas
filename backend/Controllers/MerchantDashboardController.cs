@@ -380,7 +380,21 @@ namespace WatsStore.Api.Controllers
             _db.Products.Add(product);
             await _db.SaveChangesAsync();
 
-            return Ok(product);
+            return Ok(new ProductDto
+            {
+                Id = product.Id,
+                Name = product.Name,
+                Slug = product.Slug,
+                CategoryId = product.CategoryId,
+                Description = product.Description,
+                Price = product.Price,
+                CompareAtPrice = product.CompareAtPrice,
+                ImageUrl = product.ImageUrl,
+                VariantsJson = product.VariantsJson,
+                IsAvailable = product.IsAvailable,
+                SortOrder = product.SortOrder,
+                CreatedAt = product.CreatedAt
+            });
         }
 
         [HttpPatch("products/{id:guid}/availability")]
@@ -452,7 +466,21 @@ namespace WatsStore.Api.Controllers
 
             await _db.SaveChangesAsync();
 
-            return Ok(product);
+            return Ok(new ProductDto
+            {
+                Id = product.Id,
+                Name = product.Name,
+                Slug = product.Slug,
+                CategoryId = product.CategoryId,
+                Description = product.Description,
+                Price = product.Price,
+                CompareAtPrice = product.CompareAtPrice,
+                ImageUrl = product.ImageUrl,
+                VariantsJson = product.VariantsJson,
+                IsAvailable = product.IsAvailable,
+                SortOrder = product.SortOrder,
+                CreatedAt = product.CreatedAt
+            });
         }
 
         [HttpDelete("products/{id:guid}")]
