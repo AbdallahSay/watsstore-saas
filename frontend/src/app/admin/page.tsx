@@ -48,6 +48,7 @@ import {
   Plus,
   Smartphone
 } from 'lucide-react';
+import ThemeLanguageBar from '@/components/ThemeLanguageBar';
 import { api } from '@/lib/api';
 import { 
   AdminPlatformStats, 
@@ -1349,6 +1350,9 @@ export default function SuperAdminPage() {
         </div>
 
         <div className="flex items-center gap-3">
+          {/* Theme & 7-Language Bar */}
+          <ThemeLanguageBar variant="admin" />
+
           {/* Live Status indicator */}
           <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-slate-950/80 border border-slate-800 rounded-full text-xs">
             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />

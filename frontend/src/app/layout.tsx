@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { Cairo } from 'next/font/google';
 import './globals.css';
 import MetaPixel from '@/components/MetaPixel';
+import AppProviders from '@/context/AppProviders';
 
 const cairo = Cairo({
   subsets: ['arabic', 'latin'],
@@ -46,14 +47,37 @@ export default function RootLayout({
   const platformPixelId = process.env.NEXT_PUBLIC_PLATFORM_META_PIXEL_ID;
 
   return (
-    <html lang="ar" dir="rtl" className={cairo.variable}>
+    <html lang="ar" dir="rtl" className={cairo.variable} suppressHydrationWarning>
       <head>
         <link rel="icon" href="/favicon.ico" sizes="any" />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                try {
+                  var theme = localStorage.getItem('watsstore_theme');
+                  var supportDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+                  if (theme === 'dark' || (!theme && supportDark)) {
+                    document.documentElement.classList.add('dark');
+                  } else {
+                    document.documentElement.classList.remove('dark');
+                  }
+                  var lang = localStorage.getItem('watsstore_lang') || 'ar';
+                  var dir = lang === 'ar' ? 'rtl' : 'ltr';
+                  document.documentElement.lang = lang;
+                  document.documentElement.dir = dir;
+                } catch (e) {}
+              })();
+            `,
+          }}
+        />
       </head>
-      <body className="min-h-screen bg-slate-50 flex flex-col font-cairo">
-        {/* Dual Meta Pixel: Platform SaaS Owner Pixel */}
-        {platformPixelId && <MetaPixel pixelId={platformPixelId} />}
-        {children}
+      <body className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col font-cairo transition-colors duration-200">
+        <AppProviders>
+          {/* Dual Meta Pixel: Platform SaaS Owner Pixel */}
+          {platformPixelId && <MetaPixel pixelId={platformPixelId} />}
+          {children}
+        </AppProviders>
       </body>
     </html>
   );

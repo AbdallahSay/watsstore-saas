@@ -12,7 +12,6 @@ import {
   ExternalLink, 
   LogOut, 
   User, 
-  ShieldCheck,
   Receipt,
   Star,
   Tag,
@@ -27,6 +26,8 @@ import {
 } from 'lucide-react';
 import { api } from '@/lib/api';
 import { platformConfig } from '@/config/platformConfig';
+import ThemeLanguageBar from '@/components/ThemeLanguageBar';
+import { useLanguage } from '@/context/LanguageContext';
 
 export default function DashboardLayout({
   children,
@@ -35,6 +36,7 @@ export default function DashboardLayout({
 }) {
   const router = useRouter();
   const pathname = usePathname();
+  const { t } = useLanguage();
   const [user, setUser] = useState<any>(null);
   const [trialInfo, setTrialInfo] = useState<{
     isTrialExpired: boolean;
@@ -88,40 +90,46 @@ export default function DashboardLayout({
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+      <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex items-center justify-center">
         <div className="flex flex-col items-center gap-3">
           <div className="w-10 h-10 border-4 border-emerald-600 border-t-transparent rounded-full animate-spin" />
-          <span className="text-sm font-bold text-slate-600">جاري تحميل لوحة التحكم...</span>
+          <span className="text-sm font-bold text-slate-600 dark:text-slate-300">
+            {t('dash.merchant_panel', undefined, 'جاري تحميل لوحة التحكم...')}
+          </span>
         </div>
       </div>
     );
   }
 
   const navLinks = [
-    { name: 'نظرة عامة للمتجر', href: '/dashboard', icon: LayoutDashboard },
-    { name: 'الطلبات والمبيعات', href: '/dashboard/orders', icon: Receipt },
-    { name: 'الإحصائيات والتقارير', href: '/dashboard/analytics', icon: BarChart3 },
-    { name: 'المنتجات والكتالوج', href: '/dashboard/products', icon: ShoppingBag },
-    { name: 'الأقسام والتصنيفات', href: '/dashboard/categories', icon: FolderTree },
-    { name: 'آراء العملاء والتقييمات', href: '/dashboard/reviews', icon: Star },
-    { name: 'الخصومات وكوبونات التخفيض', href: '/dashboard/coupons', icon: Tag },
-    { name: 'الفواتير والاشتراك', href: '/dashboard/billing', icon: CreditCard },
-    { name: 'إعدادات المتجر والدفع', href: '/dashboard/settings', icon: Settings },
+    { name: t('dash.overview', undefined, 'نظرة عامة للمتجر'), href: '/dashboard', icon: LayoutDashboard },
+    { name: t('dash.orders', undefined, 'الطلبات والمبيعات'), href: '/dashboard/orders', icon: Receipt },
+    { name: t('dash.analytics', undefined, 'الإحصائيات والتقارير'), href: '/dashboard/analytics', icon: BarChart3 },
+    { name: t('dash.products', undefined, 'المنتجات والكتالوج'), href: '/dashboard/products', icon: ShoppingBag },
+    { name: t('dash.categories', undefined, 'الأقسام والتصنيفات'), href: '/dashboard/categories', icon: FolderTree },
+    { name: t('dash.reviews', undefined, 'آراء العملاء والتقييمات'), href: '/dashboard/reviews', icon: Star },
+    { name: t('dash.coupons', undefined, 'الخصومات وكوبونات التخفيض'), href: '/dashboard/coupons', icon: Tag },
+    { name: t('dash.billing', undefined, 'الفواتير والاشتراك'), href: '/dashboard/billing', icon: CreditCard },
+    { name: t('dash.settings', undefined, 'إعدادات المتجر والدفع'), href: '/dashboard/settings', icon: Settings },
   ];
 
   return (
-    <div className="min-h-screen bg-slate-100 flex flex-col md:flex-row">
+    <div className="min-h-screen bg-slate-100 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col md:flex-row transition-colors duration-200">
       {/* Sidebar for Desktop */}
-      <aside className="hidden md:flex w-64 bg-slate-900 text-slate-300 flex-col justify-between shrink-0 border-l border-slate-800">
+      <aside className="hidden md:flex w-64 bg-slate-900 text-slate-300 flex-col justify-between shrink-0 border-r md:border-r-0 md:border-inline-end border-slate-800">
         <div>
           {/* Brand */}
-          <div className="p-6 border-b border-slate-800 flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-emerald-500 flex items-center justify-center text-white font-bold shadow-md">
-              <StoreIcon className="w-5 h-5" />
-            </div>
-            <div>
-              <span className="text-lg font-black text-white block">WatsStore</span>
-              <span className="text-[11px] text-emerald-400 font-bold block -mt-0.5">لوحة تحكم التاجر</span>
+          <div className="p-6 border-b border-slate-800 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-2xl bg-emerald-500 flex items-center justify-center text-white font-bold shadow-md">
+                <StoreIcon className="w-5 h-5" />
+              </div>
+              <div>
+                <span className="text-lg font-black text-white block">WatsStore</span>
+                <span className="text-[11px] text-emerald-400 font-bold block -mt-0.5">
+                  {t('dash.merchant_panel', undefined, 'لوحة تحكم التاجر')}
+                </span>
+              </div>
             </div>
           </div>
 
@@ -149,7 +157,7 @@ export default function DashboardLayout({
                 target="_blank"
                 className="text-xs text-emerald-400 hover:text-emerald-300 flex items-center gap-1 font-semibold pt-1 border-t border-slate-700/60"
               >
-                <span>معاينة المتجر الحي</span>
+                <span>{t('dash.view_store', undefined, 'معاينة المتجر الحي')}</span>
                 <ExternalLink className="w-3.5 h-3.5" />
               </Link>
             </div>
@@ -170,17 +178,25 @@ export default function DashboardLayout({
                       : 'text-slate-400 hover:bg-slate-800 hover:text-white'
                   }`}
                 >
-                  <Icon className="w-4 h-4" />
-                  <span>{link.name}</span>
+                  <Icon className="w-4 h-4 shrink-0" />
+                  <span className="truncate">{link.name}</span>
                 </Link>
               );
             })}
           </nav>
         </div>
 
-        {/* User Info & Logout */}
+        {/* User Info, Theme/Language & Logout */}
         <div className="p-4 border-t border-slate-800 space-y-3">
-          <div className="flex items-center gap-2.5 px-2">
+          {/* Quick Theme & Language switch in sidebar */}
+          <div className="px-1 flex items-center justify-between pb-1">
+            <span className="text-[11px] font-bold text-slate-400">
+              {t('lang.select', undefined, 'اللغة والمظهر')}
+            </span>
+            <ThemeLanguageBar variant="dashboard" />
+          </div>
+
+          <div className="flex items-center gap-2.5 px-2 pt-2 border-t border-slate-800/80">
             <div className="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center text-slate-300 font-bold text-xs">
               <User className="w-4 h-4" />
             </div>
@@ -195,7 +211,7 @@ export default function DashboardLayout({
             className="w-full py-2.5 px-3 rounded-xl bg-slate-800/80 hover:bg-rose-950/40 text-slate-400 hover:text-rose-400 text-xs font-bold flex items-center justify-center gap-2 transition-colors border border-slate-700/50"
           >
             <LogOut className="w-4 h-4" />
-            <span>تسجيل الخروج</span>
+            <span>{t('dash.logout', undefined, 'تسجيل الخروج')}</span>
           </button>
         </div>
       </aside>
@@ -209,13 +225,16 @@ export default function DashboardLayout({
           <span className="font-bold text-base">WatsStore</span>
         </div>
 
-        <button
-          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          className="p-2 text-slate-300 hover:text-white"
-          aria-label="القائمة"
-        >
-          {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-        </button>
+        <div className="flex items-center gap-2">
+          <ThemeLanguageBar variant="compact" />
+          <button
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            className="p-2 text-slate-300 hover:text-white"
+            aria-label="القائمة"
+          >
+            {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+          </button>
+        </div>
       </header>
 
       {/* Mobile Menu Drawer */}
@@ -248,7 +267,7 @@ export default function DashboardLayout({
                 target="_blank"
                 className="text-xs text-emerald-400 font-bold flex items-center gap-1"
               >
-                <span>معاينة المتجر</span>
+                <span>{t('dash.view_store', undefined, 'معاينة المتجر')}</span>
                 <ExternalLink className="w-3.5 h-3.5" />
               </Link>
             )}
@@ -258,7 +277,7 @@ export default function DashboardLayout({
               className="text-xs text-rose-400 font-bold flex items-center gap-1"
             >
               <LogOut className="w-3.5 h-3.5" />
-              <span>خروج</span>
+              <span>{t('dash.logout', undefined, 'خروج')}</span>
             </button>
           </div>
         </div>
@@ -266,6 +285,16 @@ export default function DashboardLayout({
 
       {/* Main Content Body */}
       <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
+        {/* Desktop Top Bar */}
+        <div className="hidden md:flex items-center justify-between px-5 py-3 mb-6 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm transition-colors">
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-bold text-slate-500 dark:text-slate-400">
+              {user?.storeName ? `${user.storeName} • ` : ''}{t('dash.merchant_panel', undefined, 'لوحة تحكم التاجر')}
+            </span>
+          </div>
+          <ThemeLanguageBar variant="dashboard" />
+        </div>
+
         {/* Trial Countdown or Expiration Sticky Banner */}
         {trialInfo && trialInfo.isTrialExpired ? (
           <div className="mb-6 p-4 rounded-2xl bg-gradient-to-r from-rose-600 via-rose-700 to-red-800 text-white shadow-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border border-rose-400">
@@ -274,7 +303,9 @@ export default function DashboardLayout({
                 <AlertTriangle className="w-6 h-6 text-white" />
               </div>
               <div>
-                <h4 className="font-black text-sm sm:text-base">⛔ انتهت فترتك التجريبية المجانية (14 يوماً)</h4>
+                <h4 className="font-black text-sm sm:text-base">
+                  ⛔ {t('dash.trial_expired', undefined, 'انتهت فترتك التجريبية المجانية (14 يوماً)')}
+                </h4>
                 <p className="text-xs text-rose-100 mt-0.5">
                   تم إيقاف استقبال الطلبات وإضافة أو تعديل المنتجات مؤقتاً. لتفعيل متجرك فوراً وفتح المميزات غير المحدودة، يرجى الترقية إلى باقة Pro أو VIP.
                 </p>
@@ -289,25 +320,25 @@ export default function DashboardLayout({
               className="px-5 py-3 rounded-xl bg-white text-rose-700 hover:bg-rose-50 font-black text-xs shrink-0 shadow-lg transition-all hover:scale-105 flex items-center gap-2"
             >
               <Sparkles className="w-4 h-4 text-amber-500" />
-              <span>ترقية الباقة وتفعيل المتجر فوراً</span>
+              <span>{t('dash.upgrade_now', undefined, 'ترقية الباقة وتفعيل المتجر فوراً')}</span>
             </a>
           </div>
         ) : trialInfo && trialInfo.planType === 'Free' ? (
-          <div className="mb-6 p-4 rounded-2xl bg-gradient-to-r from-amber-500/10 via-emerald-500/10 to-teal-500/10 border border-emerald-500/30 text-slate-800 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-sm">
+          <div className="mb-6 p-4 rounded-2xl bg-gradient-to-r from-amber-500/10 via-emerald-500/10 to-teal-500/10 border border-emerald-500/30 dark:border-emerald-500/20 text-slate-800 dark:text-slate-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-sm">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-2xl bg-emerald-600 text-white flex items-center justify-center shrink-0 shadow-md shadow-emerald-600/20">
                 <Clock className="w-5 h-5" />
               </div>
               <div>
                 <div className="flex items-center gap-2 flex-wrap">
-                  <span className="font-extrabold text-xs sm:text-sm text-slate-900">
-                    ⏳ متبقي في فترتك التجريبية المجانية: {trialInfo.remainingDays} {trialInfo.remainingDays === 1 ? 'يوم واحد' : trialInfo.remainingDays === 2 ? 'يومان' : 'أيام'}
+                  <span className="font-extrabold text-xs sm:text-sm text-slate-900 dark:text-white">
+                    ⏳ {t('dash.trial_days', { days: trialInfo.remainingDays }, `متبقي في فترتك التجريبية المجانية: ${trialInfo.remainingDays} أيام`)}
                   </span>
-                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-300">
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 dark:bg-amber-950/80 text-amber-800 dark:text-amber-300 border border-amber-300 dark:border-amber-700">
                     14-Day Free Trial
                   </span>
                 </div>
-                <p className="text-[11px] text-slate-600 mt-0.5">
+                <p className="text-[11px] text-slate-600 dark:text-slate-400 mt-0.5">
                   فترة تجربة مجانية تشمل حتى 10 منتجات وكوبون خصم واحد. رقِّ إلى باقة Pro أو VIP للحصول على وصف الذكاء الاصطناعي وتقارير Excel ومنتجات غير محدودة!
                 </p>
               </div>
