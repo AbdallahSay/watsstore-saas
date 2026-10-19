@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Product, ProductVariantGroup } from '../types';
-import { X, Plus, Minus, ShoppingBag, Check } from 'lucide-react';
+import { X, Plus, Minus, ShoppingBag, Check, ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface ProductModalProps {
   product: Product | null;
@@ -23,10 +23,12 @@ export default function ProductModal({
   const [selectedVariants, setSelectedVariants] = useState<Record<string, string>>({});
   const [variantGroups, setVariantGroups] = useState<ProductVariantGroup[]>([]);
   const [validationError, setValidationError] = useState<string | null>(null);
+  const [activeImageIndex, setActiveImageIndex] = useState(0);
 
   useEffect(() => {
     if (product) {
       setQuantity(1);
+      setActiveImageIndex(0);
       setValidationError(null);
       let groups: ProductVariantGroup[] = [];
       if (product.variantsJson) {
@@ -83,6 +85,19 @@ export default function ProductModal({
     onClose();
   };
 
+  const galleryImages = (product?.images && Array.isArray(product.images) && product.images.length > 0)
+    ? product.images
+    : product?.imagesJson
+    ? (() => {
+        try {
+          const parsed = JSON.parse(product.imagesJson);
+          return Array.isArray(parsed) && parsed.length > 0 ? parsed.filter(Boolean) : (product?.imageUrl ? [product.imageUrl] : []);
+        } catch {
+          return product?.imageUrl ? [product.imageUrl] : [];
+        }
+      })()
+    : product?.imageUrl ? [product.imageUrl] : [];
+
   return (
     <div 
       className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fadeIn"
@@ -101,18 +116,90 @@ export default function ProductModal({
           <X className="w-5 h-5" />
         </button>
 
-        {/* Product Image */}
-        {product.imageUrl && (
-          <div className="relative w-full h-64 bg-slate-100 overflow-hidden">
-            <img
-              src={product.imageUrl}
-              alt={product.name}
-              className="w-full h-full object-cover"
-            />
-            {product.compareAtPrice && product.compareAtPrice > product.price && (
-              <span className="absolute top-4 right-4 bg-rose-600 text-white text-xs font-black px-3 py-1.5 rounded-full shadow-md">
-                خصم {Math.round(((product.compareAtPrice - product.price) / product.compareAtPrice) * 100)}%
-              </span>
+        {/* Interactive Gallery Carousel */}
+        {galleryImages.length > 0 && (
+          <div className="relative w-full bg-slate-100 dark:bg-slate-800">
+            {/* Main Active Image Box */}
+            <div className="relative w-full h-64 sm:h-72 overflow-hidden bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
+              <img
+                key={activeImageIndex}
+                src={galleryImages[activeImageIndex] || product.imageUrl || ''}
+                alt={`${product.name} - صورة ${activeImageIndex + 1}`}
+                className="w-full h-full object-cover transition-all duration-300 animate-fadeIn"
+              />
+
+              {/* Discount Badge */}
+              {product.compareAtPrice && product.compareAtPrice > product.price && (
+                <span className="absolute top-4 right-4 bg-rose-600 text-white text-xs font-black px-3 py-1.5 rounded-full shadow-md z-10">
+                  خصم {Math.round(((product.compareAtPrice - product.price) / product.compareAtPrice) * 100)}%
+                </span>
+              )}
+
+              {/* Image Counter Badge */}
+              {galleryImages.length > 1 && (
+                <span className="absolute bottom-3 left-3 bg-black/60 backdrop-blur-sm text-white text-xs font-bold font-mono px-2.5 py-1 rounded-full z-10 flex items-center gap-1 shadow">
+                  <span>{activeImageIndex + 1}</span>
+                  <span>/</span>
+                  <span>{galleryImages.length}</span>
+                </span>
+              )}
+
+              {/* Prev / Next Controls */}
+              {galleryImages.length > 1 && (
+                <div className="absolute inset-x-2 top-1/2 -translate-y-1/2 flex items-center justify-between pointer-events-none z-10">
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setActiveImageIndex((prev) => (prev - 1 + galleryImages.length) % galleryImages.length);
+                    }}
+                    className="pointer-events-auto w-9 h-9 min-w-[36px] min-h-[36px] rounded-full bg-black/40 hover:bg-black/70 text-white backdrop-blur-sm flex items-center justify-center transition-all shadow-md active:scale-95"
+                    aria-label="الصورة السابقة"
+                  >
+                    <ChevronRight className="w-5 h-5" />
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setActiveImageIndex((prev) => (prev + 1) % galleryImages.length);
+                    }}
+                    className="pointer-events-auto w-9 h-9 min-w-[36px] min-h-[36px] rounded-full bg-black/40 hover:bg-black/70 text-white backdrop-blur-sm flex items-center justify-center transition-all shadow-md active:scale-95"
+                    aria-label="الصورة التالية"
+                  >
+                    <ChevronLeft className="w-5 h-5" />
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {/* Horizontal Thumbnail Previews Strip */}
+            {galleryImages.length > 1 && (
+              <div className="flex items-center gap-2 overflow-x-auto p-2.5 px-4 bg-slate-50 dark:bg-slate-900 border-b border-slate-100 dark:border-slate-800 scrollbar-none">
+                {galleryImages.map((imgUrl, idx) => {
+                  const isActive = idx === activeImageIndex;
+                  return (
+                    <button
+                      key={idx}
+                      type="button"
+                      onClick={() => setActiveImageIndex(idx)}
+                      className={`relative w-14 h-14 sm:w-16 sm:h-16 rounded-xl overflow-hidden shrink-0 transition-all ${
+                        isActive
+                          ? 'ring-2 ring-emerald-500 scale-105 shadow-md border-transparent'
+                          : 'opacity-60 hover:opacity-100 border border-slate-200 dark:border-slate-700'
+                      }`}
+                      aria-label={`عرض صورة ${idx + 1}`}
+                    >
+                      <img
+                        src={imgUrl}
+                        alt={`Thumbnail ${idx + 1}`}
+                        className="w-full h-full object-cover"
+                      />
+                    </button>
+                  );
+                })}
+              </div>
             )}
           </div>
         )}

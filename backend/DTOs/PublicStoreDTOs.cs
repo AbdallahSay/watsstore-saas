@@ -52,6 +52,8 @@ namespace WatsStore.Api.DTOs
         public decimal Price { get; set; }
         public decimal? CompareAtPrice { get; set; }
         public string? ImageUrl { get; set; }
+        public string? ImagesJson { get; set; }
+        public List<string> Images { get; set; } = new();
         public string? VariantsJson { get; set; }
         public bool IsAvailable { get; set; }
         public int SortOrder { get; set; }

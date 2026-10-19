@@ -139,6 +139,8 @@ namespace WatsStore.Api.Controllers
                     Price = p.Price,
                     CompareAtPrice = p.CompareAtPrice,
                     ImageUrl = p.ImageUrl,
+                    ImagesJson = p.ImagesJson,
+                    Images = ProductImageHelper.ExtractProductImages(p.ImagesJson, p.ImageUrl),
                     VariantsJson = p.VariantsJson,
                     IsAvailable = p.IsAvailable,
                     SortOrder = p.SortOrder

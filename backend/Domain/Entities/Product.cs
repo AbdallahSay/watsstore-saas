@@ -13,6 +13,7 @@ namespace WatsStore.Api.Domain.Entities
         public decimal Price { get; set; }
         public decimal? CompareAtPrice { get; set; }
         public string? ImageUrl { get; set; }
+        public string? ImagesJson { get; set; } // JSON array of image URLs: ["/uploads/img1.jpg", "/uploads/img2.jpg"]
         public string? VariantsJson { get; set; } // e.g. [{"name":"المقاس","options":["M","L","XL"]}]
         public bool IsAvailable { get; set; } = true;
         public int SortOrder { get; set; } = 0;

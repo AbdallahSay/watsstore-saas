@@ -19,7 +19,9 @@ import {
   Crown,
   Sparkles,
   ToggleLeft,
-  ToggleRight
+  ToggleRight,
+  Star,
+  Images
 } from 'lucide-react';
 import { platformConfig } from '@/config/platformConfig';
 
@@ -43,9 +45,13 @@ export default function DashboardProductsPage() {
   const [formDescription, setFormDescription] = useState('');
   const [formIsAvailable, setFormIsAvailable] = useState(true);
   
-  // File upload state
+  // File & Multi-Image upload state
+  const [formImages, setFormImages] = useState<string[]>([]);
+  const [isDragging, setIsDragging] = useState(false);
   const [isUploadingImage, setIsUploadingImage] = useState(false);
+  const [isUploadingImages, setIsUploadingImages] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const multiFileInputRef = useRef<HTMLInputElement>(null);
 
   // Interactive Variant Builder State
   const [variantGroups, setVariantGroups] = useState<{ name: string; optionsText: string }[]>([]);
@@ -158,6 +164,7 @@ export default function DashboardProductsPage() {
     setFormPrice('');
     setFormCompareAtPrice('');
     setFormImageUrl('');
+    setFormImages([]);
     setFormDescription('');
     setFormIsAvailable(true);
     setVariantGroups([]);
@@ -173,6 +180,24 @@ export default function DashboardProductsPage() {
     setFormImageUrl(product.imageUrl || '');
     setFormDescription(product.description || '');
     setFormIsAvailable(product.isAvailable);
+
+    // Extract product gallery images with fallback
+    let imgs: string[] = [];
+    if (product.images && Array.isArray(product.images) && product.images.length > 0) {
+      imgs = [...product.images];
+    } else if (product.imagesJson) {
+      try {
+        const parsed = JSON.parse(product.imagesJson);
+        if (Array.isArray(parsed)) imgs = parsed.filter(Boolean);
+      } catch {}
+    }
+    if (imgs.length === 0 && product.imageUrl) {
+      imgs = [product.imageUrl];
+    }
+    setFormImages(imgs);
+    if (!product.imageUrl && imgs.length > 0) {
+      setFormImageUrl(imgs[0]);
+    }
 
     // Parse variants
     if (product.variantsJson) {
@@ -202,6 +227,7 @@ export default function DashboardProductsPage() {
     try {
       const res = await api.uploadImage(token, file);
       setFormImageUrl(res.imageUrl);
+      setFormImages((prev) => (prev.includes(res.imageUrl) ? prev : [res.imageUrl, ...prev]));
       Swal.fire({
         icon: 'success',
         title: 'تم رفع صورة المنتج بنجاح! 📸',
@@ -217,6 +243,113 @@ export default function DashboardProductsPage() {
     } finally {
       setIsUploadingImage(false);
     }
+  };
+
+  const handleMultiImageUpload = async (files: FileList | File[]) => {
+    const token = localStorage.getItem('watsstore_token');
+    if (!token) return;
+
+    const fileArray = Array.from(files);
+    if (fileArray.length === 0) return;
+
+    if (formImages.length + fileArray.length > 8) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'الحد الأقصى للصور (8 صور) 📸',
+        text: `يمكنك إضافة حتى 8 صور كحد أقصى لكل منتج. متبقي لديك مساحة لـ ${Math.max(0, 8 - formImages.length)} صورة.`,
+        confirmButtonColor: '#10B981',
+      });
+      return;
+    }
+
+    setIsUploadingImages(true);
+    try {
+      const res = await api.uploadMultipleImages(token, fileArray);
+      if (res?.imageUrls && res.imageUrls.length > 0) {
+        setFormImages((prev) => {
+          const combined = [...prev, ...res.imageUrls];
+          if (!formImageUrl && combined.length > 0) {
+            setFormImageUrl(combined[0]);
+          }
+          return combined;
+        });
+        const toast = Swal.mixin({
+          toast: true,
+          position: 'top-end',
+          showConfirmButton: false,
+          timer: 2000,
+        });
+        toast.fire({
+          icon: 'success',
+          title: `تم رفع ${res.count || res.imageUrls.length} صور بنجاح! 📸`,
+        });
+      }
+    } catch (err: any) {
+      Swal.fire({
+        icon: 'error',
+        title: 'فشل في رفع الصور',
+        text: err.message || 'يرجى اختيار صور بصيغة JPG أو PNG أو WebP وبحجم أقل من 5 ميجابايت',
+      });
+    } finally {
+      setIsUploadingImages(false);
+      if (multiFileInputRef.current) {
+        multiFileInputRef.current.value = '';
+      }
+    }
+  };
+
+  const handleAddImageUrl = (urlToAdd: string) => {
+    if (!urlToAdd.trim()) return;
+    const trimmed = urlToAdd.trim();
+    if (formImages.includes(trimmed)) {
+      Swal.fire({
+        icon: 'info',
+        title: 'الصورة مضافة بالفعل',
+        timer: 1500,
+        showConfirmButton: false,
+      });
+      return;
+    }
+    if (formImages.length >= 8) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'الحد الأقصى للصور 8 صور',
+        confirmButtonColor: '#10B981',
+      });
+      return;
+    }
+    setFormImages((prev) => [...prev, trimmed]);
+    if (!formImageUrl) setFormImageUrl(trimmed);
+  };
+
+  const handleRemoveImage = (indexToRemove: number) => {
+    setFormImages((prev) => {
+      const updated = prev.filter((_, i) => i !== indexToRemove);
+      if (formImageUrl === prev[indexToRemove]) {
+        setFormImageUrl(updated[0] || '');
+      }
+      return updated;
+    });
+  };
+
+  const handleSetPrimaryImage = (indexToPrimary: number) => {
+    setFormImages((prev) => {
+      const selected = prev[indexToPrimary];
+      const remaining = prev.filter((_, i) => i !== indexToPrimary);
+      const updated = [selected, ...remaining];
+      setFormImageUrl(selected);
+      return updated;
+    });
+    const toast = Swal.mixin({
+      toast: true,
+      position: 'top-end',
+      showConfirmButton: false,
+      timer: 1500,
+    });
+    toast.fire({
+      icon: 'success',
+      title: 'تم تعيين الصورة الرئيسية للمنتج ⭐',
+    });
   };
 
   const handleAddVariantGroup = () => {
@@ -435,12 +568,17 @@ export default function DashboardProductsPage() {
 
     const variantsJson = cleanVariants.length > 0 ? JSON.stringify(cleanVariants) : null;
 
+    const primaryImage = formImages.length > 0 ? formImages[0] : (formImageUrl.trim() ? formImageUrl.trim() : null);
+    const allImages = formImages.length > 0 ? formImages : (primaryImage ? [primaryImage] : []);
+
     const payload = {
       name: formName.trim(),
       categoryId: formCategoryId === '' ? null : Number(formCategoryId),
       price: Number(formPrice),
       compareAtPrice: formCompareAtPrice === '' ? null : Number(formCompareAtPrice),
-      imageUrl: formImageUrl.trim() ? formImageUrl.trim() : null,
+      imageUrl: primaryImage,
+      images: allImages,
+      imagesJson: allImages.length > 0 ? JSON.stringify(allImages) : null,
       description: formDescription.trim() ? formDescription.trim() : null,
       variantsJson,
       isAvailable: formIsAvailable,
@@ -772,70 +910,176 @@ export default function DashboardProductsPage() {
                 />
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">القسم / التصنيف</label>
-                  <select
-                    value={formCategoryId}
-                    onChange={(e) => setFormCategoryId(e.target.value === '' ? '' : Number(e.target.value))}
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 font-medium text-sm focus:outline-none focus:border-emerald-500 bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
-                  >
-                    <option value="" className="bg-white dark:bg-slate-800 text-slate-900 dark:text-white">-- بدون قسم --</option>
-                    {categories.map((c) => (
-                      <option key={c.id} value={c.id} className="bg-white dark:bg-slate-800 text-slate-900 dark:text-white">
-                        {c.name}
-                      </option>
-                    ))}
-                  </select>
+              <div>
+                <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">القسم / التصنيف</label>
+                <select
+                  value={formCategoryId}
+                  onChange={(e) => setFormCategoryId(e.target.value === '' ? '' : Number(e.target.value))}
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 font-medium text-sm focus:outline-none focus:border-emerald-500 bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
+                >
+                  <option value="" className="bg-white dark:bg-slate-800 text-slate-900 dark:text-white">-- بدون قسم --</option>
+                  {categories.map((c) => (
+                    <option key={c.id} value={c.id} className="bg-white dark:bg-slate-800 text-slate-900 dark:text-white">
+                      {c.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Multi-Image Gallery Dropzone & Uploader */}
+              <div className="space-y-2.5 p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700">
+                <div className="flex items-center justify-between">
+                  <label className="font-bold text-slate-800 dark:text-slate-200 text-sm flex items-center gap-1.5">
+                    <Images className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                    <span>معرض صور المنتج (حتى 8 صور)</span>
+                  </label>
+                  <span className="text-[11px] font-bold font-mono px-2 py-0.5 rounded-full bg-slate-200/80 dark:bg-slate-700 text-slate-700 dark:text-slate-300">
+                    {formImages.length} / 8 صور
+                  </span>
                 </div>
 
-                {/* Direct Image Upload & URL */}
-                <div>
-                  <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">صورة المنتج</label>
-                  <div className="flex items-center gap-2">
-                    <input
-                      type="text"
-                      value={formImageUrl}
-                      onChange={(e) => setFormImageUrl(e.target.value)}
-                      placeholder="رابط الصورة أو ارفعها..."
-                      className="flex-1 px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-medium text-xs focus:outline-none focus:border-emerald-500"
-                    />
-                    <input
-                      type="file"
-                      ref={fileInputRef}
-                      accept="image/png,image/jpeg,image/webp"
-                      className="hidden"
-                      onChange={(e) => {
-                        const file = e.target.files?.[0];
-                        if (file) handleImageFileUpload(file);
-                      }}
-                    />
-                    <button
-                      type="button"
-                      disabled={isUploadingImage}
-                      onClick={() => fileInputRef.current?.click()}
-                      className="px-2.5 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold text-[11px] rounded-xl flex items-center gap-1 border border-slate-200 dark:border-slate-700 whitespace-nowrap transition-colors"
-                      title="رفع صورة من جهازك"
-                    >
-                      {isUploadingImage ? (
-                        <Loader2 className="w-3.5 h-3.5 animate-spin text-emerald-600 dark:text-emerald-400" />
-                      ) : (
-                        <Upload className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
-                      )}
-                      <span>رفع</span>
-                    </button>
-                  </div>
-                  {formImageUrl && (
-                    <div className="flex items-center gap-2 mt-1.5">
-                      <img
-                        src={formImageUrl}
-                        alt="Product Preview"
-                        className="w-8 h-8 rounded-lg object-cover border border-slate-200 dark:border-slate-700"
-                      />
-                      <span className="text-[10px] text-slate-400">معاينة الصورة الحالية</span>
+                {/* Dropzone */}
+                <div
+                  onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
+                  onDragLeave={() => setIsDragging(false)}
+                  onDrop={(e) => {
+                    e.preventDefault();
+                    setIsDragging(false);
+                    if (e.dataTransfer.files) {
+                      handleMultiImageUpload(e.dataTransfer.files);
+                    }
+                  }}
+                  onClick={() => multiFileInputRef.current?.click()}
+                  className={`border-2 border-dashed rounded-2xl p-4 sm:p-5 text-center cursor-pointer transition-all ${
+                    isDragging
+                      ? 'border-emerald-500 bg-emerald-50/60 dark:bg-emerald-950/40 ring-2 ring-emerald-500/20'
+                      : 'border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800/80 hover:border-emerald-500'
+                  }`}
+                >
+                  <input
+                    type="file"
+                    ref={multiFileInputRef}
+                    multiple
+                    accept="image/png,image/jpeg,image/webp"
+                    className="hidden"
+                    onChange={(e) => {
+                      if (e.target.files) {
+                        handleMultiImageUpload(e.target.files);
+                      }
+                    }}
+                  />
+
+                  {isUploadingImages ? (
+                    <div className="py-3 flex flex-col items-center justify-center gap-2">
+                      <Loader2 className="w-7 h-7 animate-spin text-emerald-600 dark:text-emerald-400" />
+                      <span className="text-xs font-bold text-slate-700 dark:text-slate-300">جاري رفع ومعالجة الصور المحددة...</span>
+                    </div>
+                  ) : (
+                    <div className="flex flex-col items-center justify-center gap-1.5">
+                      <div className="w-10 h-10 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
+                        <Upload className="w-5 h-5" />
+                      </div>
+                      <p className="text-xs sm:text-sm font-bold text-slate-800 dark:text-slate-200">
+                        اسحب وأفلت الصور هنا، أو <span className="text-emerald-600 dark:text-emerald-400 underline font-extrabold">اضغط لاختيار عدة صور دفعة واحدة</span>
+                      </p>
+                      <p className="text-[11px] text-slate-400 dark:text-slate-500">
+                        صيغ JPG, PNG, WEBP (حتى 5 ميجابايت لكل صورة)
+                      </p>
                     </div>
                   )}
                 </div>
+
+                {/* Manual URL Input Bar */}
+                <div className="flex items-center gap-2">
+                  <input
+                    type="text"
+                    value={formImageUrl}
+                    onChange={(e) => setFormImageUrl(e.target.value)}
+                    placeholder="أو ألصق رابط صورة مباشر هنا ثم اضغط إضافة..."
+                    className="flex-1 px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-medium text-xs focus:outline-none focus:border-emerald-500"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (formImageUrl.trim()) {
+                        handleAddImageUrl(formImageUrl.trim());
+                      }
+                    }}
+                    className="px-3 py-2 min-h-[38px] bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 text-slate-800 dark:text-slate-100 font-bold text-xs rounded-xl border border-slate-300 dark:border-slate-600 transition-colors whitespace-nowrap"
+                  >
+                    + إضافة للمعرض
+                  </button>
+                </div>
+
+                {/* Thumbnail Previews & Management Grid */}
+                {formImages.length > 0 && (
+                  <div className="space-y-1.5 pt-1">
+                    <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400 block">
+                      الصور المرفوعة (الصورة الأولى معلمة كـ <strong className="text-emerald-600 dark:text-emerald-400">الرئيسية ⭐</strong>):
+                    </span>
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+                      {formImages.map((imgUrl, index) => {
+                        const isPrimary = index === 0;
+                        return (
+                          <div
+                            key={index}
+                            className={`relative rounded-xl overflow-hidden border transition-all ${
+                              isPrimary
+                                ? 'border-emerald-500 ring-2 ring-emerald-500/40 bg-emerald-500/5'
+                                : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600 bg-white dark:bg-slate-800'
+                            }`}
+                          >
+                            <div className="aspect-square relative w-full overflow-hidden bg-slate-100 dark:bg-slate-800">
+                              <img
+                                src={imgUrl}
+                                alt={`Product image ${index + 1}`}
+                                className="w-full h-full object-cover"
+                              />
+                              {isPrimary ? (
+                                <span className="absolute top-1.5 right-1.5 bg-emerald-600 text-white text-[10px] font-black px-2 py-0.5 rounded-md shadow flex items-center gap-1">
+                                  <Star className="w-3 h-3 fill-amber-300 stroke-none" />
+                                  <span>الرئيسية</span>
+                                </span>
+                              ) : (
+                                <span className="absolute top-1.5 right-1.5 bg-black/60 backdrop-blur-sm text-white text-[10px] font-bold px-1.5 py-0.5 rounded">
+                                  #{index + 1}
+                                </span>
+                              )}
+                            </div>
+
+                            <div className="p-1.5 bg-white dark:bg-slate-900 flex items-center justify-between gap-1 border-t border-slate-100 dark:border-slate-800">
+                              {!isPrimary ? (
+                                <button
+                                  type="button"
+                                  onClick={() => handleSetPrimaryImage(index)}
+                                  className="text-[10px] font-bold text-slate-600 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 flex items-center gap-1 transition-colors"
+                                  title="تعيين كصورة رئيسية للمنتج"
+                                >
+                                  <Star className="w-3 h-3 text-amber-500" />
+                                  <span>اجعلها رئيسية</span>
+                                </button>
+                              ) : (
+                                <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-0.5">
+                                  <Check className="w-3 h-3" />
+                                  <span>الواجهة</span>
+                                </span>
+                              )}
+
+                              <button
+                                type="button"
+                                onClick={() => handleRemoveImage(index)}
+                                className="w-6 h-6 rounded-md hover:bg-rose-500/10 text-slate-400 hover:text-rose-500 flex items-center justify-center transition-colors shrink-0"
+                                title="حذف الصورة من المعرض"
+                              >
+                                <X className="w-3.5 h-3.5" />
+                              </button>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

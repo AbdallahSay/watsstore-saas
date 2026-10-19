@@ -104,6 +104,8 @@ namespace WatsStore.Api.DTOs
 
         public decimal? CompareAtPrice { get; set; }
         public string? ImageUrl { get; set; }
+        public string? ImagesJson { get; set; }
+        public List<string>? Images { get; set; }
         public string? VariantsJson { get; set; } // e.g. [{"name":"المقاس","options":["M","L","XL"]}]
         public bool IsAvailable { get; set; } = true;
         public int SortOrder { get; set; } = 0;
@@ -120,6 +122,8 @@ namespace WatsStore.Api.DTOs
         public decimal Price { get; set; }
         public decimal? CompareAtPrice { get; set; }
         public string? ImageUrl { get; set; }
+        public string? ImagesJson { get; set; }
+        public List<string> Images { get; set; } = new();
         public string? VariantsJson { get; set; }
         public bool IsAvailable { get; set; }
         public int SortOrder { get; set; }

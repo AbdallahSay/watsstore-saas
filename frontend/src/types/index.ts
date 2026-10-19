@@ -12,6 +12,8 @@ export interface Product {
   price: number;
   compareAtPrice?: number | null;
   imageUrl?: string | null;
+  imagesJson?: string | null;
+  images?: string[];
   variantsJson?: string | null;
   isAvailable: boolean;
   sortOrder: number;

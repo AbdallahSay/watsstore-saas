@@ -333,6 +333,7 @@ using (var scope = app.Services.CreateScope())
                     ALTER TABLE ""Stores"" ADD COLUMN IF NOT EXISTS ""AiGenerationsCount"" INT NOT NULL DEFAULT 0;
                     ALTER TABLE ""Stores"" ADD COLUMN IF NOT EXISTS ""AiQuotaResetDate"" TIMESTAMP WITH TIME ZONE NULL;
                     ALTER TABLE ""WhatsAppOrders"" ADD COLUMN IF NOT EXISTS ""PaymentMethod"" VARCHAR(50) NOT NULL DEFAULT 'الدفع عند الاستلام';
+                    ALTER TABLE ""Products"" ADD COLUMN IF NOT EXISTS ""ImagesJson"" TEXT NULL;
 
                     CREATE TABLE IF NOT EXISTS ""StoreReviews"" (
                         ""Id"" UUID NOT NULL PRIMARY KEY,
@@ -440,6 +441,8 @@ using (var scope = app.Services.CreateScope())
                         ALTER TABLE Stores ADD AiQuotaResetDate DATETIME2 NULL;
                     IF COL_LENGTH('WhatsAppOrders', 'PaymentMethod') IS NULL 
                         ALTER TABLE WhatsAppOrders ADD PaymentMethod NVARCHAR(50) NOT NULL CONSTRAINT DF_WhatsAppOrders_PaymentMethod DEFAULT N'الدفع عند الاستلام';
+                    IF COL_LENGTH('Products', 'ImagesJson') IS NULL 
+                        ALTER TABLE Products ADD ImagesJson NVARCHAR(MAX) NULL;
 
                     IF NOT EXISTS (SELECT * FROM sys.tables WHERE name = 'StoreReviews')
                     BEGIN

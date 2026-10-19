@@ -287,6 +287,35 @@ export const api = {
     return res.json();
   },
 
+  async uploadMultipleImages(
+    token: string,
+    files: File[]
+  ): Promise<{ imageUrls: string[]; images: { imageUrl: string; relativeUrl: string; fileName: string; size: number }[]; count: number; message: string }> {
+    const formData = new FormData();
+    files.forEach((file) => {
+      formData.append('files', file);
+    });
+
+    let res: Response;
+    try {
+      res = await fetch(`${API_BASE_URL}/merchant/products/upload-images`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: formData,
+      });
+    } catch {
+      throw new Error('فشل رفع الصور بسبب مشكلة في الاتصال بالشبكة.');
+    }
+
+    if (!res.ok) {
+      await handleResponseError(res);
+    }
+
+    return res.json();
+  },
+
   async getOrders(token: string, page = 1, pageSize = 50): Promise<{ total: number; page: number; pageSize: number; orders: any[] }> {
     return fetchJson<{ total: number; page: number; pageSize: number; orders: any[] }>(
       `${API_BASE_URL}/merchant/orders?page=${page}&pageSize=${pageSize}`,

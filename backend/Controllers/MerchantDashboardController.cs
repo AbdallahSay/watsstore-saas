@@ -336,28 +336,48 @@ namespace WatsStore.Api.Controllers
         public async Task<IActionResult> GetProducts()
         {
             var storeId = GetAuthenticatedStoreId();
-            var products = await _db.Products
+            var rawProducts = await _db.Products
                 .Include(p => p.Category)
                 .Where(p => p.StoreId == storeId)
                 .OrderBy(p => p.SortOrder)
                 .ThenByDescending(p => p.CreatedAt)
-                .Select(p => new ProductDto
+                .Select(p => new
                 {
-                    Id = p.Id,
-                    Name = p.Name,
-                    Slug = p.Slug,
-                    CategoryId = p.CategoryId,
+                    p.Id,
+                    p.Name,
+                    p.Slug,
+                    p.CategoryId,
                     CategoryName = p.Category != null ? p.Category.Name : null,
-                    Description = p.Description,
-                    Price = p.Price,
-                    CompareAtPrice = p.CompareAtPrice,
-                    ImageUrl = p.ImageUrl,
-                    VariantsJson = p.VariantsJson,
-                    IsAvailable = p.IsAvailable,
-                    SortOrder = p.SortOrder,
-                    CreatedAt = p.CreatedAt
+                    p.Description,
+                    p.Price,
+                    p.CompareAtPrice,
+                    p.ImageUrl,
+                    p.ImagesJson,
+                    p.VariantsJson,
+                    p.IsAvailable,
+                    p.SortOrder,
+                    p.CreatedAt
                 })
                 .ToListAsync();
+
+            var products = rawProducts.Select(p => new ProductDto
+            {
+                Id = p.Id,
+                Name = p.Name,
+                Slug = p.Slug,
+                CategoryId = p.CategoryId,
+                CategoryName = p.CategoryName,
+                Description = p.Description,
+                Price = p.Price,
+                CompareAtPrice = p.CompareAtPrice,
+                ImageUrl = p.ImageUrl,
+                ImagesJson = p.ImagesJson,
+                Images = ProductImageHelper.ExtractProductImages(p.ImagesJson, p.ImageUrl),
+                VariantsJson = p.VariantsJson,
+                IsAvailable = p.IsAvailable,
+                SortOrder = p.SortOrder,
+                CreatedAt = p.CreatedAt
+            }).ToList();
 
             return Ok(products);
         }
@@ -419,6 +439,8 @@ namespace WatsStore.Api.Controllers
             var baseSlug = SlugGenerator.GenerateSlug(request.Name);
             var slug = $"{baseSlug}-{Guid.NewGuid():N}"[..Math.Min(80, baseSlug.Length + 9)];
 
+            var (primaryImg, imagesJson, imagesList) = ProductImageHelper.ResolveProductImages(request.ImageUrl, request.ImagesJson, request.Images);
+
             var product = new Product
             {
                 Id = Guid.NewGuid(),
@@ -429,7 +451,8 @@ namespace WatsStore.Api.Controllers
                 Description = request.Description,
                 Price = request.Price,
                 CompareAtPrice = request.CompareAtPrice,
-                ImageUrl = request.ImageUrl,
+                ImageUrl = primaryImg,
+                ImagesJson = imagesJson,
                 VariantsJson = request.VariantsJson,
                 IsAvailable = request.IsAvailable,
                 SortOrder = request.SortOrder,
@@ -449,6 +472,8 @@ namespace WatsStore.Api.Controllers
                 Price = product.Price,
                 CompareAtPrice = product.CompareAtPrice,
                 ImageUrl = product.ImageUrl,
+                ImagesJson = product.ImagesJson,
+                Images = imagesList,
                 VariantsJson = product.VariantsJson,
                 IsAvailable = product.IsAvailable,
                 SortOrder = product.SortOrder,
@@ -460,30 +485,14 @@ namespace WatsStore.Api.Controllers
         public async Task<IActionResult> GetProductById(Guid id)
         {
             var storeId = GetAuthenticatedStoreId();
-            var product = await _db.Products
-                .Include(p => p.Category)
-                .Where(p => p.Id == id && p.StoreId == storeId)
-                .Select(p => new ProductDto
-                {
-                    Id = p.Id,
-                    Name = p.Name,
-                    Slug = p.Slug,
-                    CategoryId = p.CategoryId,
-                    CategoryName = p.Category != null ? p.Category.Name : null,
-                    Description = p.Description,
-                    Price = p.Price,
-                    CompareAtPrice = p.CompareAtPrice,
-                    ImageUrl = p.ImageUrl,
-                    VariantsJson = p.VariantsJson,
-                    IsAvailable = p.IsAvailable,
-                    SortOrder = p.SortOrder,
-                    CreatedAt = p.CreatedAt
-                })
+            var p = await _db.Products
+                .Include(prod => prod.Category)
+                .Where(prod => prod.Id == id && prod.StoreId == storeId)
                 .FirstOrDefaultAsync();
 
-            if (product == null)
+            if (p == null)
             {
-                var existsInDb = await _db.Products.AnyAsync(p => p.Id == id);
+                var existsInDb = await _db.Products.AnyAsync(prod => prod.Id == id);
                 if (existsInDb)
                 {
                     return StatusCode(StatusCodes.Status403Forbidden, new { message = "غير مصرح لك بالاطلاع على منتج يتبع متجراً آخر." });
@@ -491,7 +500,26 @@ namespace WatsStore.Api.Controllers
                 return NotFound(new { message = "المنتج غير موجود" });
             }
 
-            return Ok(product);
+            var productDto = new ProductDto
+            {
+                Id = p.Id,
+                Name = p.Name,
+                Slug = p.Slug,
+                CategoryId = p.CategoryId,
+                CategoryName = p.Category != null ? p.Category.Name : null,
+                Description = p.Description,
+                Price = p.Price,
+                CompareAtPrice = p.CompareAtPrice,
+                ImageUrl = p.ImageUrl,
+                ImagesJson = p.ImagesJson,
+                Images = ProductImageHelper.ExtractProductImages(p.ImagesJson, p.ImageUrl),
+                VariantsJson = p.VariantsJson,
+                IsAvailable = p.IsAvailable,
+                SortOrder = p.SortOrder,
+                CreatedAt = p.CreatedAt
+            };
+
+            return Ok(productDto);
         }
 
         [HttpPatch("products/{id:guid}/availability")]
@@ -565,12 +593,15 @@ namespace WatsStore.Api.Controllers
                     return BadRequest(new { message = "القسم المحدد غير موجود" });
             }
 
+            var (primaryImg, imagesJson, imagesList) = ProductImageHelper.ResolveProductImages(request.ImageUrl, request.ImagesJson, request.Images);
+
             product.Name = request.Name.Trim();
             product.CategoryId = request.CategoryId;
             product.Description = request.Description;
             product.Price = request.Price;
             product.CompareAtPrice = request.CompareAtPrice;
-            product.ImageUrl = request.ImageUrl;
+            product.ImageUrl = primaryImg;
+            product.ImagesJson = imagesJson;
             product.VariantsJson = request.VariantsJson;
             product.IsAvailable = request.IsAvailable;
             product.SortOrder = request.SortOrder;
@@ -587,6 +618,8 @@ namespace WatsStore.Api.Controllers
                 Price = product.Price,
                 CompareAtPrice = product.CompareAtPrice,
                 ImageUrl = product.ImageUrl,
+                ImagesJson = product.ImagesJson,
+                Images = imagesList,
                 VariantsJson = product.VariantsJson,
                 IsAvailable = product.IsAvailable,
                 SortOrder = product.SortOrder,
