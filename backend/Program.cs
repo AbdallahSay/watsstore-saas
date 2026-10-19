@@ -401,10 +401,23 @@ using (var scope = app.Services.CreateScope())
                         ""ReviewedAt"" TIMESTAMP WITH TIME ZONE NULL
                     );
                     ALTER TABLE ""SubscriptionRequests"" ADD COLUMN IF NOT EXISTS ""SenderIdentifier"" VARCHAR(100) NULL;
+                    ALTER TABLE ""SubscriptionRequests"" ADD COLUMN IF NOT EXISTS ""DestinationAccount"" VARCHAR(100) NULL;
                     CREATE INDEX IF NOT EXISTS ""IX_SubscriptionRequests_StoreId_Status"" ON ""SubscriptionRequests"" (""StoreId"", ""Status"");
                     CREATE INDEX IF NOT EXISTS ""IX_SubscriptionRequests_CreatedAt"" ON ""SubscriptionRequests"" (""CreatedAt"");
+
+                    CREATE TABLE IF NOT EXISTS ""PaymentGateways"" (
+                        ""Id"" SERIAL PRIMARY KEY,
+                        ""GatewayKey"" VARCHAR(50) NOT NULL UNIQUE,
+                        ""DisplayName"" VARCHAR(150) NOT NULL,
+                        ""IsEnabled"" BOOLEAN NOT NULL DEFAULT TRUE,
+                        ""Instructions"" TEXT NOT NULL DEFAULT '',
+                        ""AccountsJson"" TEXT NOT NULL DEFAULT '[]',
+                        ""SortOrder"" INT NOT NULL DEFAULT 0,
+                        ""UpdatedAt"" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
+                    );
+                    CREATE INDEX IF NOT EXISTS ""IX_PaymentGateways_IsEnabled_SortOrder"" ON ""PaymentGateways"" (""IsEnabled"", ""SortOrder"");
                 ");
-                logger.LogInformation("PostgreSQL database columns & StoreReviews/StoreCoupons/SuperAdmins/PlatformSettings/SubscriptionRequests tables verified/applied successfully.");
+                logger.LogInformation("PostgreSQL database columns & StoreReviews/StoreCoupons/SuperAdmins/PlatformSettings/SubscriptionRequests/PaymentGateways tables verified/applied successfully.");
             }
             else
             {
@@ -525,8 +538,26 @@ using (var scope = app.Services.CreateScope())
 
                     IF COL_LENGTH('SubscriptionRequests', 'SenderIdentifier') IS NULL 
                         ALTER TABLE SubscriptionRequests ADD SenderIdentifier NVARCHAR(100) NULL;
+
+                    IF COL_LENGTH('SubscriptionRequests', 'DestinationAccount') IS NULL 
+                        ALTER TABLE SubscriptionRequests ADD DestinationAccount NVARCHAR(100) NULL;
+
+                    IF NOT EXISTS (SELECT * FROM sys.tables WHERE name = 'PaymentGateways')
+                    BEGIN
+                        CREATE TABLE PaymentGateways (
+                            Id INT IDENTITY(1,1) NOT NULL PRIMARY KEY,
+                            GatewayKey NVARCHAR(50) NOT NULL UNIQUE,
+                            DisplayName NVARCHAR(150) NOT NULL,
+                            IsEnabled BIT NOT NULL DEFAULT 1,
+                            Instructions NVARCHAR(MAX) NOT NULL DEFAULT '',
+                            AccountsJson NVARCHAR(MAX) NOT NULL DEFAULT '[]',
+                            SortOrder INT NOT NULL DEFAULT 0,
+                            UpdatedAt DATETIME2 NOT NULL DEFAULT GETUTCDATE()
+                        );
+                        CREATE INDEX IX_PaymentGateways_IsEnabled_SortOrder ON PaymentGateways (IsEnabled, SortOrder);
+                    END
                 ");
-                logger.LogInformation("SQL Server database column migrations & StoreReviews/StoreCoupons/SuperAdmins/PlatformSettings/SubscriptionRequests tables checked and applied successfully.");
+                logger.LogInformation("SQL Server database column migrations & StoreReviews/StoreCoupons/SuperAdmins/PlatformSettings/SubscriptionRequests/PaymentGateways tables checked and applied successfully.");
             }
         }
         catch (Exception colEx)
@@ -594,6 +625,71 @@ using (var scope = app.Services.CreateScope())
         catch (Exception settingsEx)
         {
             logger.LogWarning(settingsEx, "PlatformSettings seeding skipped or failed.");
+        }
+
+        // Auto-seed default PaymentGateways (VodafoneCash, InstaPay, OnlineCard)
+        try
+        {
+            if (!await db.PaymentGateways.AnyAsync())
+            {
+                var defaultGateways = new List<PaymentGatewaySetting>
+                {
+                    new PaymentGatewaySetting
+                    {
+                        GatewayKey = "VodafoneCash",
+                        DisplayName = "فودافون كاش والمحافظ الإلكترونية",
+                        IsEnabled = true,
+                        SortOrder = 1,
+                        Instructions = "حول قيمة الاشتراك المطلوبة إلى أي من أرقام فودافون كاش الموضحة أدناه، ثم أدخل رقم هاتفك المحول منه ورقم العملية (Transaction ID) لتأكيد الترقية فوراً.",
+                        AccountsJson = System.Text.Json.JsonSerializer.Serialize(new List<GatewayAccountItem>
+                        {
+                            new GatewayAccountItem
+                            {
+                                AccountNumber = "01027150123",
+                                AccountName = "محفظة فودافون كاش الرسمية - WatsStore",
+                                IsActive = true
+                            }
+                        }),
+                        UpdatedAt = DateTime.UtcNow
+                    },
+                    new PaymentGatewaySetting
+                    {
+                        GatewayKey = "InstaPay",
+                        DisplayName = "تحويل إنستاباي (InstaPay IPN)",
+                        IsEnabled = true,
+                        SortOrder = 2,
+                        Instructions = "حول قيمة الاشتراك عبر تطبيق إنستاباي إلى عنوان الدفع اللحظي (IPA) أو رقم الحساب الموضح أدناه، ثم اكتب اسم الحساب ورقم المعاملة لتأكيد اشتراكك.",
+                        AccountsJson = System.Text.Json.JsonSerializer.Serialize(new List<GatewayAccountItem>
+                        {
+                            new GatewayAccountItem
+                            {
+                                AccountNumber = "watsstore@instapay",
+                                AccountName = "عنوان الدفع اللحظي (IPA) - WatsStore",
+                                IsActive = true
+                            }
+                        }),
+                        UpdatedAt = DateTime.UtcNow
+                    },
+                    new PaymentGatewaySetting
+                    {
+                        GatewayKey = "OnlineCard",
+                        DisplayName = "الدفع بالبطاقات البنكية (Visa / MasterCard)",
+                        IsEnabled = false,
+                        SortOrder = 3,
+                        Instructions = "بوابة الدفع الإلكتروني المباشر بالبطاقات البنكية قيد الربط والتفعيل التجاري.",
+                        AccountsJson = "[]",
+                        UpdatedAt = DateTime.UtcNow
+                    }
+                };
+
+                db.PaymentGateways.AddRange(defaultGateways);
+                await db.SaveChangesAsync();
+                logger.LogInformation("Default payment gateways seeded successfully.");
+            }
+        }
+        catch (Exception gwEx)
+        {
+            logger.LogWarning(gwEx, "Payment gateways seeding skipped or failed.");
         }
 
         if (!await db.Stores.AnyAsync(s => s.Slug == "al-amal-fashion"))

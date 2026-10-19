@@ -18,6 +18,7 @@ namespace WatsStore.Api.Domain.Entities
         public decimal Amount { get; set; }
 
         public string PaymentMethod { get; set; } = "VodafoneCash"; // VodafoneCash, InstaPay, OnlineCard
+        public string? DestinationAccount { get; set; } // The target wallet/account selected by merchant
         public string? SenderIdentifier { get; set; } // Sender phone or InstaPay address
         public string TransactionId { get; set; } = string.Empty;
         public string? Notes { get; set; }

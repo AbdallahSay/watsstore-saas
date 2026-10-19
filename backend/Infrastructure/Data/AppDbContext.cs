@@ -18,6 +18,7 @@ namespace WatsStore.Api.Infrastructure.Data
         public DbSet<SuperAdmin> SuperAdmins => Set<SuperAdmin>();
         public DbSet<PlatformSetting> PlatformSettings => Set<PlatformSetting>();
         public DbSet<SubscriptionRequest> SubscriptionRequests => Set<SubscriptionRequest>();
+        public DbSet<PaymentGatewaySetting> PaymentGateways => Set<PaymentGatewaySetting>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -176,6 +177,7 @@ namespace WatsStore.Api.Infrastructure.Data
                 entity.Property(r => r.PlanType).HasMaxLength(20).IsRequired();
                 entity.Property(r => r.BillingCycle).HasMaxLength(20).IsRequired();
                 entity.Property(r => r.PaymentMethod).HasMaxLength(50).IsRequired();
+                entity.Property(r => r.DestinationAccount).HasMaxLength(100);
                 entity.Property(r => r.TransactionId).HasMaxLength(100).IsRequired();
                 entity.Property(r => r.Status).HasMaxLength(20).HasDefaultValue("Pending");
                 entity.Property(r => r.Amount).HasPrecision(10, 2);
@@ -187,6 +189,20 @@ namespace WatsStore.Api.Infrastructure.Data
 
                 entity.HasIndex(r => new { r.StoreId, r.Status });
                 entity.HasIndex(r => r.CreatedAt);
+            });
+
+            // PaymentGatewaySetting Configuration
+            modelBuilder.Entity<PaymentGatewaySetting>(entity =>
+            {
+                entity.HasKey(g => g.Id);
+                entity.Property(g => g.GatewayKey).HasMaxLength(50).IsRequired();
+                entity.Property(g => g.DisplayName).HasMaxLength(150).IsRequired();
+                entity.Property(g => g.IsEnabled).HasDefaultValue(true);
+                entity.Property(g => g.Instructions).HasMaxLength(2000);
+                entity.Property(g => g.SortOrder).HasDefaultValue(0);
+
+                entity.HasIndex(g => g.GatewayKey).IsUnique();
+                entity.HasIndex(g => new { g.IsEnabled, g.SortOrder });
             });
         }
     }

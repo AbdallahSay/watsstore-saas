@@ -65,6 +65,30 @@ namespace WatsStore.Api.Controllers
             int aiLimit = store.GetAiGenerationsLimit();
             int aiRemaining = Math.Max(0, aiLimit - store.AiGenerationsCount);
 
+            var activeGateways = await _db.PaymentGateways
+                .Where(g => g.IsEnabled)
+                .OrderBy(g => g.SortOrder)
+                .ThenBy(g => g.Id)
+                .ToListAsync();
+
+            var gatewayDtos = activeGateways.Select(g => new PaymentGatewayDto
+            {
+                Id = g.Id,
+                GatewayKey = g.GatewayKey,
+                DisplayName = g.DisplayName,
+                IsEnabled = g.IsEnabled,
+                Instructions = g.Instructions,
+                SortOrder = g.SortOrder,
+                Accounts = g.GetAccounts().Where(a => a.IsActive).Select(a => new GatewayAccountItemDto
+                {
+                    AccountNumber = a.AccountNumber,
+                    AccountName = a.AccountName,
+                    IsActive = a.IsActive,
+                    QrCodeUrl = a.QrCodeUrl
+                }).ToList(),
+                UpdatedAt = g.UpdatedAt
+            }).ToList();
+
             var response = new MerchantBillingStatusDto
             {
                 StoreId = store.Id,
@@ -81,10 +105,42 @@ namespace WatsStore.Api.Controllers
                 ActivePendingRequest = pendingRequest == null ? null : MapToDto(pendingRequest),
                 InvoiceHistory = requests.Select(MapToDto).ToList(),
                 VodafoneCashWallet = string.IsNullOrWhiteSpace(settings.VodafoneCashWallet) ? "01027150123" : settings.VodafoneCashWallet,
-                InstaPayHandle = string.IsNullOrWhiteSpace(settings.InstaPayHandle) ? "watsstore@instapay" : settings.InstaPayHandle
+                InstaPayHandle = string.IsNullOrWhiteSpace(settings.InstaPayHandle) ? "watsstore@instapay" : settings.InstaPayHandle,
+                ActivePaymentGateways = gatewayDtos
             };
 
             return Ok(response);
+        }
+
+        [HttpGet("gateways")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetActiveGateways()
+        {
+            var activeGateways = await _db.PaymentGateways
+                .Where(g => g.IsEnabled)
+                .OrderBy(g => g.SortOrder)
+                .ThenBy(g => g.Id)
+                .ToListAsync();
+
+            var dtos = activeGateways.Select(g => new PaymentGatewayDto
+            {
+                Id = g.Id,
+                GatewayKey = g.GatewayKey,
+                DisplayName = g.DisplayName,
+                IsEnabled = g.IsEnabled,
+                Instructions = g.Instructions,
+                SortOrder = g.SortOrder,
+                Accounts = g.GetAccounts().Where(a => a.IsActive).Select(a => new GatewayAccountItemDto
+                {
+                    AccountNumber = a.AccountNumber,
+                    AccountName = a.AccountName,
+                    IsActive = a.IsActive,
+                    QrCodeUrl = a.QrCodeUrl
+                }).ToList(),
+                UpdatedAt = g.UpdatedAt
+            }).ToList();
+
+            return Ok(dtos);
         }
 
         [HttpPost("upgrade-request")]
@@ -128,19 +184,29 @@ namespace WatsStore.Api.Controllers
             }
             string cycle = string.Equals(request.BillingCycle, "Annual", StringComparison.OrdinalIgnoreCase) ? "Annual" : "Monthly";
 
-            // 4. Strict Payment Method validation
-            string[] validMethods = { "VodafoneCash", "InstaPay", "OnlineCard" };
-            if (!validMethods.Any(m => string.Equals(m, request.PaymentMethod, StringComparison.OrdinalIgnoreCase)))
-            {
-                return BadRequest(new { message = "وسيلة الدفع غير صالحة. الوسائل المعتمدة هي VodafoneCash و InstaPay و OnlineCard." });
-            }
-            string paymentMethod = validMethods.First(m => string.Equals(m, request.PaymentMethod, StringComparison.OrdinalIgnoreCase));
+            // 4. Dynamic Payment Method validation from enabled gateways
+            var activeGatewayKeys = await _db.PaymentGateways
+                .Where(g => g.IsEnabled)
+                .Select(g => g.GatewayKey)
+                .ToListAsync();
 
-            // 5. Anti-Fraud & Transaction ID validation (trimmed, alphanumeric/digits, 6 to 30 chars, no script tags)
-            string transactionId = request.TransactionId?.Trim() ?? string.Empty;
-            if (string.IsNullOrWhiteSpace(transactionId) || transactionId.Length < 6 || transactionId.Length > 30 || !Regex.IsMatch(transactionId, @"^[a-zA-Z0-9_\-\.]{6,30}$"))
+            if (!activeGatewayKeys.Any())
             {
-                return BadRequest(new { message = "رقم العملية غير صالح. يجب أن يتكون من 6 إلى 30 حرفاً أو رقماً إنجليزياً بدون مسافات أو رموز خاصة." });
+                activeGatewayKeys = new List<string> { "VodafoneCash", "InstaPay", "OnlineCard" };
+            }
+
+            var matchedMethod = activeGatewayKeys.FirstOrDefault(m => string.Equals(m, request.PaymentMethod, StringComparison.OrdinalIgnoreCase));
+            if (matchedMethod == null)
+            {
+                return BadRequest(new { message = "وسيلة الدفع غير صالحة أو تم إيقافها حالياً من قبل الإدارة. يرجى اختيار إحدى الوسائل المتاحة." });
+            }
+            string paymentMethod = matchedMethod;
+
+            // 5. Anti-Fraud & Transaction ID validation (trimmed, alphanumeric/digits, 6 to 50 chars, no script tags)
+            string transactionId = request.TransactionId?.Trim() ?? string.Empty;
+            if (string.IsNullOrWhiteSpace(transactionId) || transactionId.Length < 6 || transactionId.Length > 50 || !Regex.IsMatch(transactionId, @"^[a-zA-Z0-9_\-\.]{6,50}$"))
+            {
+                return BadRequest(new { message = "رقم العملية غير صالح. يجب أن يتكون من 6 إلى 50 حرفاً أو رقماً إنجليزياً بدون مسافات أو رموز خاصة." });
             }
 
             // 6. Anti-Fraud: Enforce Unique Transaction ID across all Pending or Approved requests
@@ -151,11 +217,17 @@ namespace WatsStore.Api.Controllers
                 return BadRequest(new { message = "رقم العملية مسجل مسبقاً في النظام" });
             }
 
-            // 7. Sanitize SenderIdentifier
+            // 7. Sanitize SenderIdentifier & DestinationAccount
             string? senderIdentifier = Sanitizer.Sanitize(request.SenderIdentifier?.Trim(), 100);
             if (string.IsNullOrWhiteSpace(senderIdentifier))
             {
                 senderIdentifier = null;
+            }
+
+            string? destinationAccount = Sanitizer.Sanitize(request.DestinationAccount?.Trim(), 100);
+            if (string.IsNullOrWhiteSpace(destinationAccount))
+            {
+                destinationAccount = null;
             }
 
             // 8. Strict Server-Side Price Calculation (ignoring any client-sent price)
@@ -181,6 +253,7 @@ namespace WatsStore.Api.Controllers
                 BillingCycle = cycle,
                 Amount = amount,
                 PaymentMethod = paymentMethod,
+                DestinationAccount = destinationAccount,
                 SenderIdentifier = senderIdentifier,
                 TransactionId = transactionId,
                 Notes = Sanitizer.Sanitize(request.Notes?.Trim(), 500),
@@ -198,6 +271,8 @@ namespace WatsStore.Api.Controllers
                 requestId = subRequest.Id,
                 planType = targetPlan,
                 amount = amount,
+                paymentMethod = paymentMethod,
+                destinationAccount = destinationAccount,
                 senderIdentifier = senderIdentifier,
                 transactionId = transactionId
             });
@@ -312,6 +387,7 @@ namespace WatsStore.Api.Controllers
                 BillingCycle = r.BillingCycle,
                 Amount = r.Amount,
                 PaymentMethod = r.PaymentMethod,
+                DestinationAccount = r.DestinationAccount,
                 SenderIdentifier = r.SenderIdentifier,
                 TransactionId = r.TransactionId,
                 Notes = r.Notes,

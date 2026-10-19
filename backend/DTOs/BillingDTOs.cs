@@ -25,6 +25,45 @@ namespace WatsStore.Api.DTOs
         public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
     }
 
+    public class GatewayAccountItemDto
+    {
+        public string AccountNumber { get; set; } = string.Empty;
+        public string AccountName { get; set; } = string.Empty;
+        public bool IsActive { get; set; } = true;
+        public string? QrCodeUrl { get; set; }
+    }
+
+    public class PaymentGatewayDto
+    {
+        public int Id { get; set; }
+        public string GatewayKey { get; set; } = string.Empty;
+        public string DisplayName { get; set; } = string.Empty;
+        public bool IsEnabled { get; set; }
+        public string Instructions { get; set; } = string.Empty;
+        public int SortOrder { get; set; }
+        public List<GatewayAccountItemDto> Accounts { get; set; } = new();
+        public DateTime UpdatedAt { get; set; }
+    }
+
+    public class UpdateSinglePaymentGatewayRequest
+    {
+        [Required(ErrorMessage = "مفتاح وسيلة الدفع مطلوب")]
+        public string GatewayKey { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "اسم وسيلة الدفع مطلوب")]
+        public string DisplayName { get; set; } = string.Empty;
+
+        public bool IsEnabled { get; set; } = true;
+        public string Instructions { get; set; } = string.Empty;
+        public int SortOrder { get; set; } = 0;
+        public List<GatewayAccountItemDto> Accounts { get; set; } = new();
+    }
+
+    public class UpdatePaymentGatewaysRequest
+    {
+        public List<UpdateSinglePaymentGatewayRequest> Gateways { get; set; } = new();
+    }
+
     public class MerchantUpgradeRequest
     {
         [Required(ErrorMessage = "يرجى تحديد نوع الباقة (Pro أو VIP)")]
@@ -35,13 +74,16 @@ namespace WatsStore.Api.DTOs
         [RegularExpression("^(Monthly|Annual)$", ErrorMessage = "دورة الفوترة غير صالحة. يرجى اختيار Monthly أو Annual.")]
         public string BillingCycle { get; set; } = "Monthly";
 
-        [Required(ErrorMessage = "يرجى تحديد وسيلة الدفع (VodafoneCash أو InstaPay أو OnlineCard)")]
-        [RegularExpression("^(VodafoneCash|InstaPay|OnlineCard)$", ErrorMessage = "وسيلة الدفع غير صالحة. الوسائل المعتمدة هي VodafoneCash و InstaPay و OnlineCard.")]
+        [Required(ErrorMessage = "يرجى تحديد وسيلة الدفع")]
+        [MaxLength(50, ErrorMessage = "اسم وسيلة الدفع يجب ألا يتجاوز 50 حرفاً")]
         public string PaymentMethod { get; set; } = "VodafoneCash";
+
+        [MaxLength(100, ErrorMessage = "رقم الحساب المحول إليه يجب ألا يتجاوز 100 حرف")]
+        public string? DestinationAccount { get; set; }
 
         [Required(AllowEmptyStrings = false, ErrorMessage = "يرجى إدخال رقم العملية أو الحوالة التأكيدية")]
         [MinLength(6, ErrorMessage = "رقم العملية التأكيدي يجب أن يكون 6 أحرف أو أرقام على الأقل")]
-        [MaxLength(30, ErrorMessage = "رقم العملية التأكيدي يجب ألا يتجاوز 30 حرفاً")]
+        [MaxLength(50, ErrorMessage = "رقم العملية التأكيدي يجب ألا يتجاوز 50 حرفاً")]
         public string TransactionId { get; set; } = string.Empty;
 
         [MaxLength(100, ErrorMessage = "رقم المحفظة أو حساب المحول منه يجب ألا يتجاوز 100 حرف")]
@@ -61,6 +103,7 @@ namespace WatsStore.Api.DTOs
         public string BillingCycle { get; set; } = "Monthly";
         public decimal Amount { get; set; }
         public string PaymentMethod { get; set; } = "VodafoneCash";
+        public string? DestinationAccount { get; set; }
         public string? SenderIdentifier { get; set; }
         public string TransactionId { get; set; } = string.Empty;
         public string? Notes { get; set; }
@@ -87,6 +130,7 @@ namespace WatsStore.Api.DTOs
         public List<SubscriptionRequestDto> InvoiceHistory { get; set; } = new();
         public string VodafoneCashWallet { get; set; } = "01027150123";
         public string InstaPayHandle { get; set; } = "watsstore@instapay";
+        public List<PaymentGatewayDto> ActivePaymentGateways { get; set; } = new();
     }
 
     public class RejectSubscriptionRequest

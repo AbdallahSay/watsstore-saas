@@ -21,7 +21,8 @@ import {
   PlatformPricingSettings,
   AllPlansResponse,
   SubscriptionRequestItem,
-  MerchantBillingStatus
+  MerchantBillingStatus,
+  PaymentGatewayItem
 } from '../types';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://watsstore.runasp.net/api';
@@ -545,7 +546,13 @@ export const api = {
     });
   },
 
-  async submitMerchantUpgradeRequest(token: string, data: { planType: string; billingCycle: string; paymentMethod: string; senderIdentifier?: string; transactionId: string; notes?: string }): Promise<any> {
+  async getMerchantPaymentGateways(token?: string): Promise<PaymentGatewayItem[]> {
+    const headers: Record<string, string> = {};
+    if (token) headers['Authorization'] = `Bearer ${token}`;
+    return fetchJson<PaymentGatewayItem[]>(`${API_BASE_URL}/merchant/billing/gateways`, { headers });
+  },
+
+  async submitMerchantUpgradeRequest(token: string, data: { planType: string; billingCycle: string; paymentMethod: string; destinationAccount?: string; senderIdentifier?: string; transactionId: string; notes?: string }): Promise<any> {
     return fetchJson<any>(`${API_BASE_URL}/merchant/billing/upgrade-request`, {
       method: 'POST',
       headers: {
@@ -561,6 +568,27 @@ export const api = {
       headers: {
         Authorization: `Bearer ${token}`
       }
+    });
+  },
+
+  // Admin Payment Gateways
+  async getAdminPaymentGateways(token: string): Promise<PaymentGatewayItem[]> {
+    return fetchJson<PaymentGatewayItem[]>(`${API_BASE_URL}/admin/payment-gateways`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'X-Admin-Key': token.startsWith('WatsStore_') ? token : '',
+      }
+    });
+  },
+
+  async updateAdminPaymentGateways(token: string, gateways: PaymentGatewayItem[]): Promise<{ message: string; gateways: PaymentGatewayItem[] }> {
+    return fetchJson<{ message: string; gateways: PaymentGatewayItem[] }>(`${API_BASE_URL}/admin/payment-gateways`, {
+      method: 'PUT',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'X-Admin-Key': token.startsWith('WatsStore_') ? token : '',
+      },
+      body: JSON.stringify({ gateways }),
     });
   },
 

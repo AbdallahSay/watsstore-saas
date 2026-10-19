@@ -27,10 +27,17 @@ import {
   Ban,
   ChevronRight,
   ChevronLeft,
-  Info
+  Info,
+  Wallet
 } from 'lucide-react';
 import { api } from '@/lib/api';
-import { MerchantBillingStatus, SubscriptionRequestItem, PlatformPricingSettings } from '@/types';
+import { 
+  MerchantBillingStatus, 
+  SubscriptionRequestItem, 
+  PlatformPricingSettings,
+  PaymentGatewayItem,
+  GatewayAccountItem
+} from '@/types';
 
 export default function MerchantBillingPage() {
   const [token, setToken] = useState<string | null>(null);
@@ -44,7 +51,9 @@ export default function MerchantBillingPage() {
   // Upgrade Plan selection states
   const [billingCycle, setBillingCycle] = useState<'Monthly' | 'Annual'>('Annual');
   const [selectedPlan, setSelectedPlan] = useState<'Pro' | 'VIP'>('Pro');
-  const [paymentMethod, setPaymentMethod] = useState<'VodafoneCash' | 'InstaPay' | 'OnlineCard'>('VodafoneCash');
+  const [paymentMethod, setPaymentMethod] = useState<string>('VodafoneCash');
+  const [destinationAccount, setDestinationAccount] = useState<string>('');
+  const [destinationAccountName, setDestinationAccountName] = useState<string>('');
   const [senderIdentifier, setSenderIdentifier] = useState('');
   const [transactionId, setTransactionId] = useState('');
   const [notes, setNotes] = useState('');
@@ -88,10 +97,74 @@ export default function MerchantBillingPage() {
     }
   }, [loadBillingData]);
 
-  const copyToClipboard = (text: string, type: string) => {
+  // Synchronize dynamic payment gateways
+  const dynamicGateways: PaymentGatewayItem[] = (status?.activePaymentGateways && status.activePaymentGateways.length > 0)
+    ? status.activePaymentGateways.filter(g => g.isEnabled)
+    : [
+        {
+          id: 1,
+          gatewayKey: 'VodafoneCash',
+          displayName: 'فودافون كاش (Vodafone Cash)',
+          isEnabled: true,
+          instructions: 'افتح تطبيق Ana Vodafone أو اطلب كود التحويل المباشر للمحفظة المحددة.',
+          sortOrder: 1,
+          accounts: [
+            {
+              accountNumber: status?.vodafoneCashWallet || pricing?.vodafoneCashWallet || '01027150123',
+              accountName: 'شركة مسار تك',
+              isActive: true
+            }
+          ]
+        },
+        {
+          id: 2,
+          gatewayKey: 'InstaPay',
+          displayName: 'إنستاباي (InstaPay IPN)',
+          isEnabled: true,
+          instructions: 'افتح تطبيق InstaPay واختر إرسال نقود إلى عنوان دفع (IPA) أو رقم هاتف.',
+          sortOrder: 2,
+          accounts: [
+            {
+              accountNumber: status?.instaPayHandle || pricing?.instaPayHandle || 'watsstore@instapay',
+              accountName: 'شركة مسار تك - WatsStore',
+              isActive: true
+            }
+          ]
+        }
+      ];
+
+  // Auto-select valid payment method if current is not in active gateways
+  useEffect(() => {
+    if (dynamicGateways.length > 0) {
+      const isCurrentValid = dynamicGateways.some(g => g.gatewayKey === paymentMethod);
+      if (!isCurrentValid) {
+        setPaymentMethod(dynamicGateways[0].gatewayKey);
+      }
+    }
+  }, [dynamicGateways, paymentMethod]);
+
+  // Auto-select destination account for selected gateway
+  useEffect(() => {
+    const currentGw = dynamicGateways.find(g => g.gatewayKey === paymentMethod) || dynamicGateways[0];
+    if (currentGw) {
+      const activeAccs = (currentGw.accounts || []).filter(a => a.isActive !== false);
+      if (activeAccs.length > 0) {
+        const isCurrentAccValid = activeAccs.some(a => a.accountNumber === destinationAccount);
+        if (!isCurrentAccValid) {
+          setDestinationAccount(activeAccs[0].accountNumber);
+          setDestinationAccountName(activeAccs[0].accountName || '');
+        }
+      } else {
+        setDestinationAccount('');
+        setDestinationAccountName('');
+      }
+    }
+  }, [dynamicGateways, paymentMethod, destinationAccount]);
+
+  const copyToClipboard = (text: string, label: string) => {
     if (typeof navigator !== 'undefined' && navigator.clipboard) {
       navigator.clipboard.writeText(text);
-      setIsCopied(type);
+      setIsCopied(text);
       setTimeout(() => setIsCopied(null), 2500);
 
       const toast = Swal.mixin({
@@ -104,7 +177,7 @@ export default function MerchantBillingPage() {
       });
       toast.fire({
         icon: 'success',
-        title: `تم نسخ ${type === 'vodafone' ? 'رقم محفظة فودافون كاش' : 'عنوان إنستاباي'} بنجاح!`,
+        title: `تم نسخ ${label} بنجاح!`,
       });
     }
   };
@@ -156,6 +229,7 @@ export default function MerchantBillingPage() {
         planType: selectedPlan,
         billingCycle,
         paymentMethod,
+        destinationAccount: destinationAccount.trim() || undefined,
         senderIdentifier: senderIdentifier.trim() || undefined,
         transactionId: trimmedTx,
         notes: notes.trim() || undefined
@@ -358,7 +432,7 @@ export default function MerchantBillingPage() {
           </div>
 
           {/* Detailed Metadata Pill Bar */}
-          <div className="bg-white/80 border border-amber-200 rounded-2xl p-4 grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+          <div className="bg-white/80 border border-amber-200 rounded-2xl p-4 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 text-xs">
             <div>
               <span className="text-[11px] text-slate-500 block">طريقة الدفع المحول بها</span>
               <span className="font-bold text-slate-900">
@@ -381,6 +455,14 @@ export default function MerchantBillingPage() {
                 {status.activePendingRequest.senderIdentifier || 'غير مسجل'}
               </span>
             </div>
+            {status.activePendingRequest.destinationAccount && (
+              <div>
+                <span className="text-[11px] text-slate-500 block">الحساب المحول إليه</span>
+                <span className="font-mono font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 inline-block">
+                  {status.activePendingRequest.destinationAccount}
+                </span>
+              </div>
+            )}
           </div>
         </div>
       )}
@@ -776,96 +858,163 @@ export default function MerchantBillingPage() {
                 </div>
               </div>
 
-              {/* Payment Method Selector Tabs */}
+              {/* Dynamic Payment Method Selector Tabs */}
               <div className="space-y-3">
                 <label className="text-xs font-bold text-slate-300 block">اختر وسيلة الدفع للتحويل:</label>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  {/* 1. Vodafone Cash */}
-                  <button
-                    type="button"
-                    onClick={() => setPaymentMethod('VodafoneCash')}
-                    className={`p-4 rounded-2xl border-2 text-right transition-all flex flex-col justify-between gap-2 ${
-                      paymentMethod === 'VodafoneCash'
-                        ? 'border-rose-500 bg-rose-500/10 text-white shadow-md'
-                        : 'border-slate-800 bg-slate-950 hover:border-slate-700 text-slate-400'
-                    }`}
-                  >
-                    <div className="flex items-center justify-between">
-                      <span className="font-bold text-sm text-white">فودافون كاش (Vodafone Cash)</span>
-                      <Smartphone className="w-5 h-5 text-rose-500" />
-                    </div>
-                    <span className="text-[11px] text-slate-400">تحويل كاش فوري عبر محفظة الهاتف المحمول</span>
-                  </button>
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+                  {dynamicGateways.map((gw) => {
+                    const isVodafone = gw.gatewayKey === 'VodafoneCash';
+                    const isInstapay = gw.gatewayKey === 'InstaPay';
+                    const isCard = gw.gatewayKey === 'OnlineCard';
+                    const isSelected = paymentMethod === gw.gatewayKey;
 
-                  {/* 2. InstaPay */}
-                  <button
-                    type="button"
-                    onClick={() => setPaymentMethod('InstaPay')}
-                    className={`p-4 rounded-2xl border-2 text-right transition-all flex flex-col justify-between gap-2 ${
-                      paymentMethod === 'InstaPay'
-                        ? 'border-purple-500 bg-purple-500/10 text-white shadow-md'
-                        : 'border-slate-800 bg-slate-950 hover:border-slate-700 text-slate-400'
-                    }`}
-                  >
-                    <div className="flex items-center justify-between">
-                      <span className="font-bold text-sm text-white">إنستاباي (InstaPay IPN)</span>
-                      <Building2 className="w-5 h-5 text-purple-400" />
-                    </div>
-                    <span className="text-[11px] text-slate-400">تحويل بنكي لحظي عبر المعرف أو الرقم البنكي</span>
-                  </button>
+                    return (
+                      <button
+                        key={gw.gatewayKey}
+                        type="button"
+                        onClick={() => {
+                          setPaymentMethod(gw.gatewayKey);
+                          const firstAcc = (gw.accounts || []).find((a) => a.isActive !== false);
+                          if (firstAcc) {
+                            setDestinationAccount(firstAcc.accountNumber);
+                            setDestinationAccountName(firstAcc.accountName || '');
+                          }
+                        }}
+                        className={`p-4 rounded-2xl border-2 text-right transition-all flex flex-col justify-between gap-2 ${
+                          isSelected
+                            ? isVodafone
+                              ? 'border-rose-500 bg-rose-500/10 text-white shadow-md'
+                              : isInstapay
+                              ? 'border-purple-500 bg-purple-500/10 text-white shadow-md'
+                              : 'border-emerald-500 bg-emerald-500/10 text-white shadow-md'
+                            : 'border-slate-800 bg-slate-950 hover:border-slate-700 text-slate-400'
+                        }`}
+                      >
+                        <div className="flex items-center justify-between">
+                          <span className="font-bold text-sm text-white">{gw.displayName}</span>
+                          {isVodafone && <Smartphone className="w-5 h-5 text-rose-500" />}
+                          {isInstapay && <Building2 className="w-5 h-5 text-purple-400" />}
+                          {isCard && <CreditCard className="w-5 h-5 text-emerald-400" />}
+                          {!isVodafone && !isInstapay && !isCard && <Wallet className="w-5 h-5 text-emerald-400" />}
+                        </div>
+                        <span className="text-[11px] text-slate-400">
+                          {isVodafone && 'تحويل كاش فوري عبر محفظة الهاتف المحمول'}
+                          {isInstapay && 'تحويل بنكي لحظي عبر المعرف أو الحساب'}
+                          {isCard && 'دفع إلكتروني آمن'}
+                          {!isVodafone && !isInstapay && !isCard && 'تحويل مباشر للحساب'}
+                        </span>
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
 
               {/* Dynamic Account Info Cards with 1-click copy */}
-              {paymentMethod === 'VodafoneCash' && (
-                <div className="bg-slate-950 border border-slate-800 rounded-2xl p-5 space-y-4">
-                  <span className="text-xs font-bold text-rose-400 block">تعليمات التحويل عبر فودافون كاش:</span>
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-slate-900 p-4 rounded-xl border border-slate-800">
-                    <div className="space-y-0.5">
-                      <span className="text-[11px] text-slate-400 block">رقم محفظة فودافون كاش المعتمد للمنصة:</span>
-                      <span className="text-xl font-black font-mono text-white tracking-wider">{vodafoneWallet}</span>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => copyToClipboard(vodafoneWallet, 'vodafone')}
-                      className="px-4 py-2 bg-rose-600 hover:bg-rose-500 text-white rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-all self-start sm:self-auto"
-                    >
-                      <Copy className="w-3.5 h-3.5" />
-                      <span>{isCopied === 'vodafone' ? 'تم النسخ!' : 'نسخ رقم المحفظة'}</span>
-                    </button>
-                  </div>
-                  <div className="text-xs text-slate-400 space-y-1.5">
-                    <p>1. افتح تطبيق Ana Vodafone أو اطلب الكود: <code className="text-rose-400 font-mono font-bold">*9*7*{vodafoneWallet}*{currentAmount}#</code></p>
-                    <p>2. حول المبلغ المطلوب بدقة: <strong className="text-white font-mono">{currentAmount} ج.م</strong></p>
-                    <p>3. اضغط على المتابعة لإدخال رقم العملية والمحفظة المحول منها.</p>
-                  </div>
-                </div>
-              )}
+              {(() => {
+                const selectedGw = dynamicGateways.find((g) => g.gatewayKey === paymentMethod) || dynamicGateways[0];
+                const activeAccs = (selectedGw?.accounts || []).filter((a) => a.isActive !== false);
+                const isVodafone = selectedGw?.gatewayKey === 'VodafoneCash';
+                const isInstapay = selectedGw?.gatewayKey === 'InstaPay';
 
-              {paymentMethod === 'InstaPay' && (
-                <div className="bg-slate-950 border border-slate-800 rounded-2xl p-5 space-y-4">
-                  <span className="text-xs font-bold text-purple-400 block">تعليمات التحويل عبر تطبيق إنستاباي (InstaPay IPN):</span>
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-slate-900 p-4 rounded-xl border border-slate-800">
-                    <div className="space-y-0.5">
-                      <span className="text-[11px] text-slate-400 block">عنوان الدفع اللحظي IPN المعتمد للمنصة:</span>
-                      <span className="text-xl font-black font-mono text-white tracking-wider">{instapayHandle}</span>
+                return (
+                  <div className="bg-slate-950 border border-slate-800 rounded-2xl p-5 sm:p-6 space-y-5">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                      <span className={`text-xs font-bold ${isVodafone ? 'text-rose-400' : isInstapay ? 'text-purple-400' : 'text-emerald-400'}`}>
+                        تعليمات وأرقام التحويل المعتمدة لـ {selectedGw?.displayName}:
+                      </span>
+                      {activeAccs.length > 1 && (
+                        <span className="text-[11px] text-slate-400 bg-slate-900 border border-slate-800 px-2.5 py-0.5 rounded-full font-bold">
+                          انقر على الرقم لاختياره للحوالة
+                        </span>
+                      )}
                     </div>
-                    <button
-                      type="button"
-                      onClick={() => copyToClipboard(instapayHandle, 'instapay')}
-                      className="px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-all self-start sm:self-auto"
-                    >
-                      <Copy className="w-3.5 h-3.5" />
-                      <span>{isCopied === 'instapay' ? 'تم النسخ!' : 'نسخ المعرف'}</span>
-                    </button>
+
+                    {/* Account selection cards */}
+                    {activeAccs.length === 0 ? (
+                      <div className="p-4 bg-slate-900 rounded-xl text-center text-xs text-slate-400">
+                        لا توجد أرقام مسجلة حالياً لهذه الوسيلة، يرجى التواصل مع الدعم الفني.
+                      </div>
+                    ) : (
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        {activeAccs.map((acc, idx) => {
+                          const isAccSelected = destinationAccount === acc.accountNumber;
+                          return (
+                            <div
+                              key={idx}
+                              onClick={() => {
+                                setDestinationAccount(acc.accountNumber);
+                                setDestinationAccountName(acc.accountName || '');
+                              }}
+                              className={`cursor-pointer p-4 rounded-xl border-2 transition-all flex flex-col justify-between gap-3 ${
+                                isAccSelected
+                                  ? isVodafone
+                                    ? 'border-rose-500 bg-rose-500/10 shadow-md ring-1 ring-rose-500/30'
+                                    : isInstapay
+                                    ? 'border-purple-500 bg-purple-500/10 shadow-md ring-1 ring-purple-500/30'
+                                    : 'border-emerald-500 bg-emerald-500/10 shadow-md ring-1 ring-emerald-500/30'
+                                  : 'border-slate-800 bg-slate-900/60 hover:border-slate-700'
+                              }`}
+                            >
+                              <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-2">
+                                  <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-black ${
+                                    isAccSelected
+                                      ? isVodafone ? 'bg-rose-500 text-white' : isInstapay ? 'bg-purple-500 text-white' : 'bg-emerald-500 text-slate-950'
+                                      : 'bg-slate-800 text-slate-400'
+                                  }`}>
+                                    {isAccSelected ? '✓' : idx + 1}
+                                  </span>
+                                  <span className="text-xs font-bold text-white">
+                                    {acc.accountName || (isVodafone ? 'محفظة كاش معتمدة' : isInstapay ? 'معرف إنستاباي' : 'حساب معتمد')}
+                                  </span>
+                                </div>
+
+                                <button
+                                  type="button"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    copyToClipboard(acc.accountNumber, isVodafone ? 'رقم محفظة فودافون كاش' : isInstapay ? 'عنوان إنستاباي' : 'رقم الحساب');
+                                  }}
+                                  className={`px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1 transition-all ${
+                                    isVodafone
+                                      ? 'bg-rose-600 hover:bg-rose-500 text-white'
+                                      : isInstapay
+                                      ? 'bg-purple-600 hover:bg-purple-500 text-white'
+                                      : 'bg-emerald-600 hover:bg-emerald-500 text-white'
+                                  }`}
+                                >
+                                  <Copy className="w-3 h-3" />
+                                  <span>{isCopied === acc.accountNumber ? 'تم النسخ!' : 'نسخ'}</span>
+                                </button>
+                              </div>
+
+                              <div className="font-mono text-base sm:text-lg font-black text-white tracking-wider text-left bg-slate-950/70 p-2.5 rounded-lg border border-slate-800/80">
+                                {acc.accountNumber}
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+
+                    {/* Instructions */}
+                    <div className="text-xs text-slate-300 space-y-2 bg-slate-900/60 p-4 rounded-xl border border-slate-800">
+                      {selectedGw?.instructions ? (
+                        <p className="leading-relaxed whitespace-pre-line">{selectedGw.instructions}</p>
+                      ) : (
+                        <p className="leading-relaxed">
+                          {isVodafone && `افتح تطبيق Ana Vodafone أو اطلب كود التحويل المباشر: *9*7*${destinationAccount || vodafoneWallet}*${currentAmount}#`}
+                          {isInstapay && `افتح تطبيق InstaPay واختر إرسال نقود إلى العنوان أو الرقم: ${destinationAccount || instapayHandle}`}
+                        </p>
+                      )}
+                      <div className="pt-2 border-t border-slate-800/80 flex items-center justify-between text-slate-400">
+                        <span>المبلغ الدقيق المطلوب تحويله:</span>
+                        <strong className="text-emerald-400 font-mono text-sm">{currentAmount} ج.م</strong>
+                      </div>
+                    </div>
                   </div>
-                  <div className="text-xs text-slate-400 space-y-1.5">
-                    <p>1. افتح تطبيق InstaPay واختر &quot;إرسال نقود&quot; إلى عنوان دفع (IPA) أو رقم هاتف.</p>
-                    <p>2. حول المبلغ المطلوب بدقة: <strong className="text-white font-mono">{currentAmount} ج.م</strong></p>
-                    <p>3. انسخ الرقم المرجعي للعملية (Reference No) والمتابعة للخطوة الأخيرة.</p>
-                  </div>
-                </div>
-              )}
+                );
+              })()}
             </div>
 
             <div className="flex items-center justify-between pt-4">
@@ -912,7 +1061,7 @@ export default function MerchantBillingPage() {
               </div>
 
               {/* Order Summary Recap Box */}
-              <div className="bg-slate-950 p-4 rounded-2xl border border-slate-800 grid grid-cols-2 sm:grid-cols-3 gap-3 text-xs">
+              <div className="bg-slate-950 p-4 rounded-2xl border border-slate-800 grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
                 <div>
                   <span className="text-[11px] text-slate-400 block">الباقة المحددة</span>
                   <span className="font-bold text-white">{selectedPlan === 'VIP' ? 'كبار التجار (VIP 👑)' : 'المحترفين (Pro ⭐)'}</span>
@@ -923,7 +1072,16 @@ export default function MerchantBillingPage() {
                 </div>
                 <div>
                   <span className="text-[11px] text-slate-400 block">وسيلة الدفع</span>
-                  <span className="font-bold text-emerald-400">{paymentMethod === 'VodafoneCash' ? 'فودافون كاش' : 'إنستاباي (InstaPay)'}</span>
+                  <span className="font-bold text-emerald-400">
+                    {dynamicGateways.find((g) => g.gatewayKey === paymentMethod)?.displayName || paymentMethod}
+                  </span>
+                </div>
+                <div>
+                  <span className="text-[11px] text-slate-400 block">الحساب المحول إليه</span>
+                  <span className="font-mono font-bold text-white">
+                    {destinationAccount || 'الافتراضي'}
+                    {destinationAccountName ? ` (${destinationAccountName})` : ''}
+                  </span>
                 </div>
               </div>
 

@@ -43,10 +43,20 @@ import {
   Sliders,
   CreditCard,
   UserCheck,
-  Copy
+  Copy,
+  Wallet,
+  Plus,
+  Smartphone
 } from 'lucide-react';
 import { api } from '@/lib/api';
-import { AdminPlatformStats, AdminStoreSummary, PlatformPricingSettings, SubscriptionRequestItem } from '@/types';
+import { 
+  AdminPlatformStats, 
+  AdminStoreSummary, 
+  PlatformPricingSettings, 
+  SubscriptionRequestItem, 
+  PaymentGatewayItem, 
+  GatewayAccountItem 
+} from '@/types';
 
 export default function SuperAdminPage() {
   const [token, setToken] = useState<string | null>(null);
@@ -54,7 +64,7 @@ export default function SuperAdminPage() {
   const [isInitializing, setIsInitializing] = useState(true);
 
   // Active View Tab in Dashboard
-  const [activeTab, setActiveTab] = useState<'stores' | 'subscriptions' | 'pricing' | 'settings'>('stores');
+  const [activeTab, setActiveTab] = useState<'stores' | 'subscriptions' | 'pricing' | 'gateways' | 'settings'>('stores');
 
   // Subscriptions Management States
   const [pendingSubscriptions, setPendingSubscriptions] = useState<SubscriptionRequestItem[]>([]);
@@ -80,6 +90,12 @@ export default function SuperAdminPage() {
   const [isSavingPricing, setIsSavingPricing] = useState(false);
   const [pricingSuccessMsg, setPricingSuccessMsg] = useState<string | null>(null);
   const [pricingErrorMsg, setPricingErrorMsg] = useState<string | null>(null);
+
+  // Payment Gateways & Multi-Account States
+  const [paymentGateways, setPaymentGateways] = useState<PaymentGatewayItem[]>([]);
+  const [isSavingGateways, setIsSavingGateways] = useState(false);
+  const [gatewaysSuccessMsg, setGatewaysSuccessMsg] = useState<string | null>(null);
+  const [gatewaysErrorMsg, setGatewaysErrorMsg] = useState<string | null>(null);
 
   // Login Form States
   const [loginMethod, setLoginMethod] = useState<'key' | 'credentials'>('key');
@@ -135,7 +151,7 @@ export default function SuperAdminPage() {
   const loadDashboardData = useCallback(async (activeToken: string) => {
     setIsLoadingData(true);
     try {
-      const [statsRes, storesRes, pricingRes, pendingSubsRes] = await Promise.all([
+      const [statsRes, storesRes, pricingRes, pendingSubsRes, gatewaysRes] = await Promise.all([
         api.getAdminPlatformStats(activeToken),
         api.getAdminStores(activeToken),
         api.getAdminPricing(activeToken).catch((err) => {
@@ -145,6 +161,10 @@ export default function SuperAdminPage() {
         api.getAdminPendingSubscriptions(activeToken).catch((err) => {
           console.warn('Could not load pending subscriptions:', err);
           return [];
+        }),
+        api.getAdminPaymentGateways(activeToken).catch((err) => {
+          console.warn('Could not load admin payment gateways:', err);
+          return [];
         })
       ]);
       setStats(statsRes);
@@ -153,6 +173,9 @@ export default function SuperAdminPage() {
         setPricingSettings(pricingRes);
       }
       setPendingSubscriptions(pendingSubsRes || []);
+      if (gatewaysRes && Array.isArray(gatewaysRes)) {
+        setPaymentGateways(gatewaysRes);
+      }
     } catch (err: any) {
       console.error('Failed to load admin data:', err);
       if (err.message && err.message.includes('401')) {
@@ -314,6 +337,90 @@ export default function SuperAdminPage() {
       });
     } finally {
       setIsSavingPricing(false);
+    }
+  };
+
+  // Payment Gateways Management Handlers
+  const handleGatewayToggle = (gatewayKey: string, isEnabled: boolean) => {
+    setPaymentGateways(prev => prev.map(g => g.gatewayKey === gatewayKey ? { ...g, isEnabled } : g));
+  };
+
+  const handleGatewayFieldChange = (gatewayKey: string, field: 'displayName' | 'instructions', value: string) => {
+    setPaymentGateways(prev => prev.map(g => g.gatewayKey === gatewayKey ? { ...g, [field]: value } : g));
+  };
+
+  const handleAddAccount = (gatewayKey: string) => {
+    setPaymentGateways(prev => prev.map(g => {
+      if (g.gatewayKey === gatewayKey) {
+        const currentAccounts = Array.isArray(g.accounts) ? [...g.accounts] : [];
+        currentAccounts.push({
+          accountNumber: '',
+          accountName: '',
+          isActive: true
+        });
+        return { ...g, accounts: currentAccounts };
+      }
+      return g;
+    }));
+  };
+
+  const handleRemoveAccount = (gatewayKey: string, index: number) => {
+    setPaymentGateways(prev => prev.map(g => {
+      if (g.gatewayKey === gatewayKey) {
+        const currentAccounts = Array.isArray(g.accounts) ? [...g.accounts] : [];
+        currentAccounts.splice(index, 1);
+        return { ...g, accounts: currentAccounts };
+      }
+      return g;
+    }));
+  };
+
+  const handleAccountChange = (gatewayKey: string, index: number, field: keyof GatewayAccountItem, value: any) => {
+    setPaymentGateways(prev => prev.map(g => {
+      if (g.gatewayKey === gatewayKey) {
+        const currentAccounts = Array.isArray(g.accounts) ? [...g.accounts] : [];
+        if (currentAccounts[index]) {
+          currentAccounts[index] = { ...currentAccounts[index], [field]: value };
+        }
+        return { ...g, accounts: currentAccounts };
+      }
+      return g;
+    }));
+  };
+
+  const handleSavePaymentGateways = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!token) return;
+    setIsSavingGateways(true);
+    setGatewaysSuccessMsg(null);
+    setGatewaysErrorMsg(null);
+
+    try {
+      const res = await api.updateAdminPaymentGateways(token, paymentGateways);
+      setPaymentGateways(res.gateways);
+      setGatewaysSuccessMsg(res.message || 'تم تحديث وسائل الدفع وحسابات التحويل بنجاح!');
+      Swal.fire({
+        icon: 'success',
+        title: 'تم تحديث وسائل الدفع بنجاح! 💳',
+        text: 'تم حفظ وتطبيق التغييرات لجميع وسائل الدفع والمحافظ وحسابات التحويل.',
+        timer: 2000,
+        showConfirmButton: false,
+        background: '#0f172a',
+        color: '#f8fafc',
+      });
+      loadDashboardData(token);
+    } catch (err: any) {
+      setGatewaysErrorMsg(err.message || 'فشل تحديث وسائل الدفع');
+      Swal.fire({
+        icon: 'error',
+        title: 'خطأ في التحديث',
+        text: err.message || 'حدث خطأ أثناء حفظ وسائل الدفع والمحافظ',
+        confirmButtonColor: '#10B981',
+        background: '#0f172a',
+        color: '#f8fafc',
+      });
+    } finally {
+      setIsSavingGateways(false);
     }
   };
 
@@ -1161,6 +1268,17 @@ export default function SuperAdminPage() {
             <span>إدارة الأسعار والباقات</span>
           </button>
           <button
+            onClick={() => setActiveTab('gateways')}
+            className={`px-3.5 py-1.5 text-xs font-bold rounded-lg transition-all flex items-center gap-1.5 ${
+              activeTab === 'gateways'
+                ? 'bg-emerald-500 text-slate-950 font-black shadow-sm'
+                : 'text-slate-400 hover:text-white'
+            }`}
+          >
+            <Wallet className="w-3.5 h-3.5" />
+            <span>وسائل الدفع والمحافظ</span>
+          </button>
+          <button
             onClick={() => setActiveTab('settings')}
             className={`px-3.5 py-1.5 text-xs font-bold rounded-lg transition-all flex items-center gap-1.5 ${
               activeTab === 'settings'
@@ -1203,54 +1321,65 @@ export default function SuperAdminPage() {
 
       {/* Mobile Tab Switcher */}
       <div className="md:hidden px-4 pt-4">
-        <div className="grid grid-cols-4 gap-1 bg-slate-900 border border-slate-800 p-1 rounded-xl">
+        <div className="grid grid-cols-5 gap-1 bg-slate-900 border border-slate-800 p-1 rounded-xl">
           <button
             onClick={() => setActiveTab('stores')}
-            className={`py-2 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-1 ${
+            className={`py-2 text-[11px] font-bold rounded-lg transition-all flex items-center justify-center gap-1 ${
               activeTab === 'stores'
                 ? 'bg-emerald-500 text-slate-950 font-black'
                 : 'text-slate-400 hover:text-white'
             }`}
           >
-            <StoreIcon className="w-3.5 h-3.5" />
+            <StoreIcon className="w-3 h-3" />
             <span>المتاجر</span>
           </button>
           <button
             onClick={() => setActiveTab('subscriptions')}
-            className={`py-2 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-1 relative ${
+            className={`py-2 text-[11px] font-bold rounded-lg transition-all flex items-center justify-center gap-1 relative ${
               activeTab === 'subscriptions'
                 ? 'bg-emerald-500 text-slate-950 font-black'
                 : 'text-slate-400 hover:text-white'
             }`}
           >
-            <CreditCard className="w-3.5 h-3.5" />
-            <span>الاشتراكات</span>
+            <CreditCard className="w-3 h-3" />
+            <span>الاشتراك</span>
             {pendingSubscriptions.length > 0 && (
-              <span className="w-3.5 h-3.5 rounded-full bg-amber-500 text-slate-950 text-[9px] font-black flex items-center justify-center">
+              <span className="w-3 h-3 rounded-full bg-amber-500 text-slate-950 text-[8px] font-black flex items-center justify-center">
                 {pendingSubscriptions.length}
               </span>
             )}
           </button>
           <button
             onClick={() => setActiveTab('pricing')}
-            className={`py-2 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-1 ${
+            className={`py-2 text-[11px] font-bold rounded-lg transition-all flex items-center justify-center gap-1 ${
               activeTab === 'pricing'
                 ? 'bg-emerald-500 text-slate-950 font-black'
                 : 'text-slate-400 hover:text-white'
             }`}
           >
-            <DollarSign className="w-3.5 h-3.5" />
+            <DollarSign className="w-3 h-3" />
             <span>الأسعار</span>
           </button>
           <button
+            onClick={() => setActiveTab('gateways')}
+            className={`py-2 text-[11px] font-bold rounded-lg transition-all flex items-center justify-center gap-1 ${
+              activeTab === 'gateways'
+                ? 'bg-emerald-500 text-slate-950 font-black'
+                : 'text-slate-400 hover:text-white'
+            }`}
+          >
+            <Wallet className="w-3 h-3" />
+            <span>المحافظ</span>
+          </button>
+          <button
             onClick={() => setActiveTab('settings')}
-            className={`py-2 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-1 ${
+            className={`py-2 text-[11px] font-bold rounded-lg transition-all flex items-center justify-center gap-1 ${
               activeTab === 'settings'
                 ? 'bg-emerald-500 text-slate-950 font-black'
                 : 'text-slate-400 hover:text-white'
             }`}
           >
-            <Key className="w-3.5 h-3.5" />
+            <Key className="w-3 h-3" />
             <span>الحساب</span>
           </button>
         </div>
@@ -1478,8 +1607,13 @@ export default function SuperAdminPage() {
                               <span className="px-2 py-0.5 rounded-lg bg-slate-800 text-slate-300 font-bold text-[11px] inline-block">
                                 {sub.paymentMethod === 'VodafoneCash' ? 'فودافون كاش' : sub.paymentMethod === 'InstaPay' ? 'إنستاباي' : sub.paymentMethod}
                               </span>
+                              {sub.destinationAccount && (
+                                <span className="text-[10px] text-emerald-400 block font-mono" title="الحساب المحول إليه">
+                                  إلى: <strong className="text-emerald-300">{sub.destinationAccount}</strong>
+                                </span>
+                              )}
                               {sub.senderIdentifier && (
-                                <span className="text-[10px] text-slate-400 block font-mono">
+                                <span className="text-[10px] text-slate-400 block font-mono" title="المحول منه">
                                   من: <strong className="text-slate-200">{sub.senderIdentifier}</strong>
                                 </span>
                               )}
@@ -1932,6 +2066,267 @@ export default function SuperAdminPage() {
                       <>
                         <Save className="w-4 h-4" />
                         <span>حفظ وتطبيق تغييرات الأسعار فوراً</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        ) : activeTab === 'gateways' ? (
+          /* Payment Gateways & Wallets Multi-Account Control Panel */
+          <div className="max-w-5xl mx-auto space-y-8">
+            <div className="bg-slate-900/70 border border-slate-800 rounded-3xl p-6 sm:p-8 space-y-8 shadow-xl">
+              {/* Header */}
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-6">
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-emerald-500 to-teal-400 text-slate-950 flex items-center justify-center shadow-lg shadow-emerald-500/20">
+                    <Wallet className="w-6 h-6" />
+                  </div>
+                  <div>
+                    <h2 className="text-xl font-black text-white">إدارة وسائل الدفع والمحافظ وحسابات التحويل (Multi-Account Gateways)</h2>
+                    <p className="text-xs text-slate-400">
+                      تفعيل وتعطيل وسائل الدفع، تعديل التعليمات، وإضافة عدة أرقام ومحافظ لاستقبال الحوالات من التجار.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <span className="text-[11px] px-3 py-1 bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 rounded-full font-bold">
+                    ديناميكي بالكامل ⚡
+                  </span>
+                </div>
+              </div>
+
+              {gatewaysErrorMsg && (
+                <div className="p-3.5 bg-rose-500/10 border border-rose-500/20 rounded-xl text-rose-400 text-xs flex items-center gap-2">
+                  <AlertTriangle className="w-4 h-4 shrink-0 text-rose-400" />
+                  <span>{gatewaysErrorMsg}</span>
+                </div>
+              )}
+
+              {gatewaysSuccessMsg && (
+                <div className="p-3.5 bg-emerald-500/10 border border-emerald-500/20 rounded-xl text-emerald-400 text-xs flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-400" />
+                  <span>{gatewaysSuccessMsg}</span>
+                </div>
+              )}
+
+              <form onSubmit={handleSavePaymentGateways} className="space-y-8">
+                {paymentGateways.length === 0 ? (
+                  <div className="text-center py-12 bg-slate-950/40 border border-slate-800 rounded-2xl space-y-3">
+                    <p className="text-sm text-slate-400">لم يتم العثور على وسائل دفع مسجلة.</p>
+                    <button
+                      type="button"
+                      onClick={() => token && loadDashboardData(token)}
+                      className="px-4 py-2 bg-emerald-500 text-slate-950 font-bold rounded-xl text-xs hover:bg-emerald-400 transition-colors"
+                    >
+                      إعادة تحميل البيانات 🔄
+                    </button>
+                  </div>
+                ) : (
+                  <div className="space-y-6">
+                    {paymentGateways.map((gw) => {
+                      const isVodafone = gw.gatewayKey === 'VodafoneCash';
+                      const isInstapay = gw.gatewayKey === 'InstaPay';
+                      const isCard = gw.gatewayKey === 'OnlineCard';
+                      const accounts = Array.isArray(gw.accounts) ? gw.accounts : [];
+
+                      return (
+                        <div 
+                          key={gw.gatewayKey}
+                          className={`bg-slate-950/60 border rounded-2xl p-5 sm:p-6 space-y-6 transition-all ${
+                            gw.isEnabled 
+                              ? 'border-slate-800 hover:border-slate-700' 
+                              : 'border-slate-800/50 opacity-60'
+                          }`}
+                        >
+                          {/* Gateway Header: Toggle & Title */}
+                          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800/80 pb-4">
+                            <div className="flex items-center gap-3">
+                              <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-bold ${
+                                isVodafone 
+                                  ? 'bg-rose-500/20 text-rose-400 border border-rose-500/30' 
+                                  : isInstapay 
+                                    ? 'bg-purple-500/20 text-purple-400 border border-purple-500/30' 
+                                    : 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
+                              }`}>
+                                {isVodafone && <Smartphone className="w-5 h-5 text-rose-400" />}
+                                {isInstapay && <Building2 className="w-5 h-5 text-purple-400" />}
+                                {isCard && <CreditCard className="w-5 h-5 text-emerald-400" />}
+                                {!isVodafone && !isInstapay && !isCard && <Wallet className="w-5 h-5" />}
+                              </div>
+                              <div>
+                                <div className="flex items-center gap-2">
+                                  <h3 className="text-base font-black text-white">{gw.displayName}</h3>
+                                  <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-md bg-slate-800 text-slate-400">
+                                    {gw.gatewayKey}
+                                  </span>
+                                </div>
+                                <p className="text-xs text-slate-400 mt-0.5">
+                                  {isVodafone && 'محفظة الهاتف المحمول (فودافون، أورنج، اتصالات، وي كاش)'}
+                                  {isInstapay && 'شبكة المدفوعات اللحظية المصرية (InstaPay IPN)'}
+                                  {isCard && 'بوابة الدفع الإلكتروني بالبطاقات البنكية'}
+                                </p>
+                              </div>
+                            </div>
+
+                            {/* ON/OFF Switch */}
+                            <label className="relative inline-flex items-center cursor-pointer select-none self-start sm:self-auto">
+                              <input
+                                type="checkbox"
+                                checked={gw.isEnabled}
+                                onChange={(e) => handleGatewayToggle(gw.gatewayKey, e.target.checked)}
+                                className="sr-only peer"
+                              />
+                              <div className="w-11 h-6 bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500"></div>
+                              <span className={`ms-3 text-xs font-bold ${gw.isEnabled ? 'text-emerald-400' : 'text-slate-500'}`}>
+                                {gw.isEnabled ? 'مفعل ومتاح للتجار ✅' : 'معطل ومخفي ⛔'}
+                              </span>
+                            </label>
+                          </div>
+
+                          {/* Gateway Config Fields */}
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                              <label className="text-xs font-bold text-slate-300 block mb-1.5">
+                                الاسم الظاهر للتاجر (Display Name)
+                              </label>
+                              <input
+                                type="text"
+                                value={gw.displayName}
+                                onChange={(e) => handleGatewayFieldChange(gw.gatewayKey, 'displayName', e.target.value)}
+                                className="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 text-xs text-slate-100 focus:outline-none focus:border-emerald-500"
+                                required
+                              />
+                            </div>
+
+                            <div>
+                              <label className="text-xs font-bold text-slate-300 block mb-1.5">
+                                تعليمات التحويل الظاهرة للتاجر (Instructions)
+                              </label>
+                              <textarea
+                                rows={2}
+                                value={gw.instructions || ''}
+                                onChange={(e) => handleGatewayFieldChange(gw.gatewayKey, 'instructions', e.target.value)}
+                                placeholder="تعليمات التحويل والخطوات التي يتبعها التاجر..."
+                                className="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2 text-xs text-slate-100 focus:outline-none focus:border-emerald-500 resize-none"
+                              />
+                            </div>
+                          </div>
+
+                          {/* Multi-Account Repeater Section */}
+                          <div className="space-y-3 pt-2 border-t border-slate-800/80">
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-2">
+                                <span className="text-xs font-bold text-slate-300">
+                                  الأرقام والحسابات المعتمدة للاستقبال
+                                </span>
+                                <span className="px-2 py-0.5 rounded-full bg-slate-800 text-emerald-400 text-[10px] font-mono font-bold">
+                                  {accounts.length} حساب
+                                </span>
+                              </div>
+
+                              <button
+                                type="button"
+                                onClick={() => handleAddAccount(gw.gatewayKey)}
+                                className="px-3 py-1.5 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 rounded-lg text-xs font-bold transition-all flex items-center gap-1"
+                              >
+                                <Plus className="w-3.5 h-3.5" />
+                                <span>إضافة رقم / حساب جديد</span>
+                              </button>
+                            </div>
+
+                            {accounts.length === 0 ? (
+                              <div className="text-center py-4 bg-slate-900/40 border border-dashed border-slate-800 rounded-xl text-xs text-slate-500">
+                                لا توجد أرقام مسجلة حالياً لهذه الوسيلة. انقر على &quot;إضافة رقم / حساب جديد&quot; لإضافة أول حساب.
+                              </div>
+                            ) : (
+                              <div className="space-y-2.5">
+                                {accounts.map((acc, idx) => (
+                                  <div 
+                                    key={idx}
+                                    className="bg-slate-900/80 border border-slate-800/90 rounded-xl p-3 flex flex-col sm:flex-row sm:items-center gap-3 text-xs"
+                                  >
+                                    <span className="w-6 h-6 rounded-lg bg-slate-800 text-slate-400 flex items-center justify-center font-mono font-bold text-[11px] shrink-0">
+                                      {idx + 1}
+                                    </span>
+
+                                    <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                      <div>
+                                        <input
+                                          type="text"
+                                          placeholder={isVodafone ? "رقم المحفظة (مثال: 01027150123)" : isInstapay ? "عنوان الدفع اللحظي (مثال: watsstore@instapay)" : "رقم الحساب / المعرف"}
+                                          value={acc.accountNumber}
+                                          onChange={(e) => handleAccountChange(gw.gatewayKey, idx, 'accountNumber', e.target.value)}
+                                          className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-1.5 text-xs text-slate-100 font-mono focus:outline-none focus:border-emerald-500"
+                                          required
+                                        />
+                                      </div>
+                                      <div>
+                                        <input
+                                          type="text"
+                                          placeholder="اسم صاحب الحساب أو الشركة (مثال: شركة مسار تك)"
+                                          value={acc.accountName || ''}
+                                          onChange={(e) => handleAccountChange(gw.gatewayKey, idx, 'accountName', e.target.value)}
+                                          className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-1.5 text-xs text-slate-100 focus:outline-none focus:border-emerald-500"
+                                        />
+                                      </div>
+                                    </div>
+
+                                    <div className="flex items-center justify-between sm:justify-end gap-3 pt-2 sm:pt-0 border-t sm:border-t-0 border-slate-800/60">
+                                      <label className="flex items-center gap-1.5 cursor-pointer select-none">
+                                        <input
+                                          type="checkbox"
+                                          checked={acc.isActive !== false}
+                                          onChange={(e) => handleAccountChange(gw.gatewayKey, idx, 'isActive', e.target.checked)}
+                                          className="w-4 h-4 rounded text-emerald-500 focus:ring-emerald-500 bg-slate-950 border-slate-800"
+                                        />
+                                        <span className={`text-[11px] font-bold ${acc.isActive !== false ? 'text-emerald-400' : 'text-slate-500'}`}>
+                                          {acc.isActive !== false ? 'نشط' : 'معطل'}
+                                        </span>
+                                      </label>
+
+                                      <button
+                                        type="button"
+                                        onClick={() => handleRemoveAccount(gw.gatewayKey, idx)}
+                                        className="p-1.5 text-rose-400 hover:text-rose-300 hover:bg-rose-500/10 rounded-lg transition-colors"
+                                        title="حذف هذا الرقم"
+                                      >
+                                        <Trash2 className="w-4 h-4" />
+                                      </button>
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+
+                {/* Save Button */}
+                <div className="pt-4 border-t border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4">
+                  <p className="text-xs text-slate-400">
+                    ملاحظة: تنعكس التغييرات فوراً في صفحة ترقية باقات التجار (<span className="text-emerald-400 font-mono">/dashboard/billing</span>) وسيظهر للتجار الأرقام المفعلة فقط للاختيار والنسخ بنقرة واحدة.
+                  </p>
+
+                  <button
+                    type="submit"
+                    disabled={isSavingGateways || paymentGateways.length === 0}
+                    className="w-full sm:w-auto px-8 py-3.5 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-black rounded-xl text-sm transition-all shadow-lg shadow-emerald-500/20 disabled:opacity-50 flex items-center justify-center gap-2"
+                  >
+                    {isSavingGateways ? (
+                      <>
+                        <div className="w-4 h-4 border-2 border-slate-950 border-t-transparent rounded-full animate-spin" />
+                        <span>جاري حفظ وتطبيق وسائل الدفع...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Save className="w-4 h-4" />
+                        <span>حفظ وتحديث وسائل الدفع والمحافظ فوراً 💾</span>
                       </>
                     )}
                   </button>

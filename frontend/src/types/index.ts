@@ -374,6 +374,7 @@ export interface SubscriptionRequestItem {
   billingCycle: string;
   amount: number;
   paymentMethod: string;
+  destinationAccount?: string | null;
   senderIdentifier?: string | null;
   transactionId: string;
   notes?: string | null;
@@ -381,6 +382,24 @@ export interface SubscriptionRequestItem {
   adminNotes?: string | null;
   createdAt: string;
   reviewedAt?: string | null;
+}
+
+export interface GatewayAccountItem {
+  accountNumber: string;
+  accountName: string;
+  isActive: boolean;
+  qrCodeUrl?: string | null;
+}
+
+export interface PaymentGatewayItem {
+  id?: number;
+  gatewayKey: string;
+  displayName: string;
+  isEnabled: boolean;
+  instructions: string;
+  sortOrder?: number;
+  accounts: GatewayAccountItem[];
+  updatedAt?: string;
 }
 
 export interface MerchantBillingStatus {
@@ -399,6 +418,7 @@ export interface MerchantBillingStatus {
   invoiceHistory: SubscriptionRequestItem[];
   vodafoneCashWallet: string;
   instaPayHandle: string;
+  activePaymentGateways?: PaymentGatewayItem[];
 }
 
 

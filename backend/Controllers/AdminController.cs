@@ -839,6 +839,113 @@ namespace WatsStore.Api.Controllers
             return await UpdatePricing(request);
         }
 
+        [HttpGet("payment-gateways")]
+        public async Task<IActionResult> GetPaymentGateways()
+        {
+            var authError = EnsureAdminAccess();
+            if (authError != null) return authError;
+
+            var gateways = await _db.PaymentGateways
+                .OrderBy(g => g.SortOrder)
+                .ThenBy(g => g.Id)
+                .ToListAsync();
+
+            var dtos = gateways.Select(g => new PaymentGatewayDto
+            {
+                Id = g.Id,
+                GatewayKey = g.GatewayKey,
+                DisplayName = g.DisplayName,
+                IsEnabled = g.IsEnabled,
+                Instructions = g.Instructions,
+                SortOrder = g.SortOrder,
+                Accounts = g.GetAccounts().Select(a => new GatewayAccountItemDto
+                {
+                    AccountNumber = a.AccountNumber,
+                    AccountName = a.AccountName,
+                    IsActive = a.IsActive,
+                    QrCodeUrl = a.QrCodeUrl
+                }).ToList(),
+                UpdatedAt = g.UpdatedAt
+            }).ToList();
+
+            return Ok(dtos);
+        }
+
+        [HttpPut("payment-gateways")]
+        public async Task<IActionResult> UpdatePaymentGateways([FromBody] UpdatePaymentGatewaysRequest request)
+        {
+            var authError = EnsureAdminAccess();
+            if (authError != null) return authError;
+
+            if (!ModelState.IsValid || request?.Gateways == null)
+                return BadRequest(ModelState);
+
+            var existingGateways = await _db.PaymentGateways.ToListAsync();
+            var existingDict = existingGateways.ToDictionary(g => g.GatewayKey, StringComparer.OrdinalIgnoreCase);
+
+            foreach (var reqGw in request.Gateways)
+            {
+                if (string.IsNullOrWhiteSpace(reqGw.GatewayKey)) continue;
+
+                var cleanAccounts = reqGw.Accounts?
+                    .Where(a => !string.IsNullOrWhiteSpace(a.AccountNumber))
+                    .Select(a => new GatewayAccountItem
+                    {
+                        AccountNumber = a.AccountNumber.Trim(),
+                        AccountName = (a.AccountName ?? string.Empty).Trim(),
+                        IsActive = a.IsActive,
+                        QrCodeUrl = a.QrCodeUrl
+                    }).ToList() ?? new List<GatewayAccountItem>();
+
+                if (existingDict.TryGetValue(reqGw.GatewayKey, out var gw))
+                {
+                    gw.DisplayName = reqGw.DisplayName.Trim();
+                    gw.IsEnabled = reqGw.IsEnabled;
+                    gw.Instructions = reqGw.Instructions ?? string.Empty;
+                    gw.SortOrder = reqGw.SortOrder;
+                    gw.SetAccounts(cleanAccounts);
+                    gw.UpdatedAt = DateTime.UtcNow;
+                }
+                else
+                {
+                    var newGw = new PaymentGatewaySetting
+                    {
+                        GatewayKey = reqGw.GatewayKey.Trim(),
+                        DisplayName = reqGw.DisplayName.Trim(),
+                        IsEnabled = reqGw.IsEnabled,
+                        Instructions = reqGw.Instructions ?? string.Empty,
+                        SortOrder = reqGw.SortOrder,
+                        UpdatedAt = DateTime.UtcNow
+                    };
+                    newGw.SetAccounts(cleanAccounts);
+                    _db.PaymentGateways.Add(newGw);
+                }
+            }
+
+            // Also synchronize PlatformSettings wallet/handle for backward compatibility
+            var settings = await _db.PlatformSettings.FirstOrDefaultAsync(p => p.Id == 1);
+            if (settings != null)
+            {
+                var vfGw = request.Gateways.FirstOrDefault(g => string.Equals(g.GatewayKey, "VodafoneCash", StringComparison.OrdinalIgnoreCase));
+                var activeVf = vfGw?.Accounts?.FirstOrDefault(a => a.IsActive && !string.IsNullOrWhiteSpace(a.AccountNumber));
+                if (activeVf != null)
+                {
+                    settings.VodafoneCashWallet = activeVf.AccountNumber.Trim();
+                }
+
+                var ipnGw = request.Gateways.FirstOrDefault(g => string.Equals(g.GatewayKey, "InstaPay", StringComparison.OrdinalIgnoreCase));
+                var activeIpn = ipnGw?.Accounts?.FirstOrDefault(a => a.IsActive && !string.IsNullOrWhiteSpace(a.AccountNumber));
+                if (activeIpn != null)
+                {
+                    settings.InstaPayHandle = activeIpn.AccountNumber.Trim();
+                }
+            }
+
+            await _db.SaveChangesAsync();
+
+            return await GetPaymentGateways();
+        }
+
         [HttpGet("subscriptions/pending")]
         public async Task<IActionResult> GetPendingSubscriptions()
         {
@@ -966,6 +1073,7 @@ namespace WatsStore.Api.Controllers
                 BillingCycle = r.BillingCycle,
                 Amount = r.Amount,
                 PaymentMethod = r.PaymentMethod,
+                DestinationAccount = r.DestinationAccount,
                 SenderIdentifier = r.SenderIdentifier,
                 TransactionId = r.TransactionId,
                 Notes = r.Notes,
