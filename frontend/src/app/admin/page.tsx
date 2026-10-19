@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, Component, ErrorInfo, ReactNode } from 'react';
 import Link from 'next/link';
 import Swal from 'sweetalert2';
 import { 
@@ -58,6 +58,61 @@ import {
   GatewayAccountItem 
 } from '@/types';
 
+interface AdminTabErrorBoundaryProps {
+  children: ReactNode;
+  fallbackTitle?: string;
+  onReset?: () => void;
+}
+
+interface AdminTabErrorBoundaryState {
+  hasError: boolean;
+  error: Error | null;
+}
+
+class AdminTabErrorBoundary extends Component<AdminTabErrorBoundaryProps, AdminTabErrorBoundaryState> {
+  constructor(props: AdminTabErrorBoundaryProps) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
+
+  static getDerivedStateFromError(error: Error): AdminTabErrorBoundaryState {
+    return { hasError: true, error };
+  }
+
+  componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+    console.error('AdminTabErrorBoundary caught an error:', error, errorInfo);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="p-8 my-4 bg-slate-900 border border-rose-500/30 rounded-2xl text-center space-y-4">
+          <div className="w-12 h-12 rounded-full bg-rose-500/10 text-rose-400 flex items-center justify-center mx-auto">
+            <AlertTriangle className="w-6 h-6" />
+          </div>
+          <h3 className="text-base font-bold text-white">
+            {this.props.fallbackTitle || 'حدث خطأ غير متوقع أثناء عرض هذا التبويب'}
+          </h3>
+          <p className="text-xs text-slate-400 max-w-md mx-auto">
+            {this.state.error?.message || 'يرجى إعادة المحاولة أو التحقق من البيانات المسجلة.'}
+          </p>
+          <button
+            type="button"
+            onClick={() => {
+              this.setState({ hasError: false, error: null });
+              this.props.onReset?.();
+            }}
+            className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold rounded-xl border border-slate-700 transition-colors"
+          >
+            إعادة المحاولة 🔄
+          </button>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
+
 export default function SuperAdminPage() {
   const [token, setToken] = useState<string | null>(null);
   const [adminUser, setAdminUser] = useState<any>(null);
@@ -96,6 +151,10 @@ export default function SuperAdminPage() {
   const [isSavingGateways, setIsSavingGateways] = useState(false);
   const [gatewaysSuccessMsg, setGatewaysSuccessMsg] = useState<string | null>(null);
   const [gatewaysErrorMsg, setGatewaysErrorMsg] = useState<string | null>(null);
+
+  // Safe Array Wrappers to prevent runtime rendering exceptions
+  const safePendingSubscriptions = Array.isArray(pendingSubscriptions) ? pendingSubscriptions : [];
+  const safePaymentGateways = Array.isArray(paymentGateways) ? paymentGateways : [];
 
   // Login Form States
   const [loginMethod, setLoginMethod] = useState<'key' | 'credentials'>('key');
@@ -172,10 +231,8 @@ export default function SuperAdminPage() {
       if (pricingRes) {
         setPricingSettings(pricingRes);
       }
-      setPendingSubscriptions(pendingSubsRes || []);
-      if (gatewaysRes && Array.isArray(gatewaysRes)) {
-        setPaymentGateways(gatewaysRes);
-      }
+      setPendingSubscriptions(Array.isArray(pendingSubsRes) ? pendingSubsRes : []);
+      setPaymentGateways(Array.isArray(gatewaysRes) ? gatewaysRes : []);
     } catch (err: any) {
       console.error('Failed to load admin data:', err);
       if (err.message && err.message.includes('401')) {
@@ -1250,9 +1307,9 @@ export default function SuperAdminPage() {
           >
             <CreditCard className="w-3.5 h-3.5" />
             <span>طلبات الاشتراك</span>
-            {pendingSubscriptions.length > 0 && (
+            {safePendingSubscriptions.length > 0 && (
               <span className="w-4 h-4 rounded-full bg-amber-500 text-slate-950 text-[10px] font-black flex items-center justify-center animate-pulse">
-                {pendingSubscriptions.length}
+                {safePendingSubscriptions.length}
               </span>
             )}
           </button>
@@ -1343,9 +1400,9 @@ export default function SuperAdminPage() {
           >
             <CreditCard className="w-3 h-3" />
             <span>الاشتراك</span>
-            {pendingSubscriptions.length > 0 && (
+            {safePendingSubscriptions.length > 0 && (
               <span className="w-3 h-3 rounded-full bg-amber-500 text-slate-950 text-[8px] font-black flex items-center justify-center">
-                {pendingSubscriptions.length}
+                {safePendingSubscriptions.length}
               </span>
             )}
           </button>
@@ -1388,8 +1445,9 @@ export default function SuperAdminPage() {
       {/* Main Container */}
       <main className="max-w-7xl mx-auto px-4 sm:px-8 pt-8 space-y-8">
         {activeTab === 'settings' ? (
-          /* Account Settings & Password Change Tab */
-          <div className="max-w-2xl mx-auto space-y-6">
+          <AdminTabErrorBoundary fallbackTitle="حدث خطأ في عرض إعدادات الحساب">
+            {/* Account Settings & Password Change Tab */}
+            <div className="max-w-2xl mx-auto space-y-6">
             <div className="bg-slate-900/70 border border-slate-800 rounded-3xl p-6 sm:p-8 space-y-6 shadow-xl">
               {/* Header */}
               <div className="flex items-center gap-3 border-b border-slate-800 pb-5">
@@ -1506,199 +1564,222 @@ export default function SuperAdminPage() {
               </form>
             </div>
           </div>
-        ) : activeTab === 'subscriptions' ? (
-          /* Subscription Requests Tab */
-          <div className="max-w-6xl mx-auto space-y-6">
-            <div className="bg-slate-900/70 border border-slate-800 rounded-3xl p-6 sm:p-8 space-y-6 shadow-xl">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-5">
-                <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-amber-500 to-orange-400 text-slate-950 flex items-center justify-center shadow-lg shadow-amber-500/20">
-                    <CreditCard className="w-6 h-6" />
-                  </div>
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <h2 className="text-xl font-black text-white">إدارة طلبات الاشتراك والترقية</h2>
-                      {pendingSubscriptions.length > 0 && (
-                        <span className="px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-400 border border-amber-500/30 text-xs font-black">
-                          {pendingSubscriptions.length} طلبات معلقة
-                        </span>
-                      )}
+        </AdminTabErrorBoundary>
+      ) : activeTab === 'subscriptions' ? (
+          <AdminTabErrorBoundary fallbackTitle="حدث خطأ في عرض طلبات الاشتراك" onReset={() => token && loadDashboardData(token)}>
+            {/* Subscription Requests Tab */}
+            <div className="max-w-6xl mx-auto space-y-6">
+              <div className="bg-slate-900/70 border border-slate-800 rounded-3xl p-6 sm:p-8 space-y-6 shadow-xl">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-5">
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-amber-500 to-orange-400 text-slate-950 flex items-center justify-center shadow-lg shadow-amber-500/20">
+                      <CreditCard className="w-6 h-6" />
                     </div>
-                    <p className="text-xs text-slate-400">
-                      مراجعة إيصالات التحويل عبر فودافون كاش وإنستاباي وتفعيل باقات التجار فورياً.
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <h2 className="text-xl font-black text-white">إدارة طلبات الاشتراك والترقية</h2>
+                        {safePendingSubscriptions.length > 0 && (
+                          <span className="px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-400 border border-amber-500/30 text-xs font-black">
+                            {safePendingSubscriptions.length} طلبات معلقة
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-xs text-slate-400">
+                        مراجعة إيصالات التحويل عبر فودافون كاش وإنستاباي وتفعيل باقات التجار فورياً.
+                      </p>
+                    </div>
+                  </div>
+
+                  <button
+                    onClick={() => token && loadDashboardData(token)}
+                    disabled={isLoadingData}
+                    className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-bold border border-slate-700 flex items-center gap-2 self-start sm:self-auto"
+                  >
+                    <RefreshCw className={`w-3.5 h-3.5 ${isLoadingData ? 'animate-spin' : ''}`} />
+                    <span>تحديث الطلبات</span>
+                  </button>
+                </div>
+
+                {safePendingSubscriptions.length === 0 ? (
+                  <div className="p-12 text-center bg-slate-950/60 border border-slate-800 rounded-2xl space-y-3">
+                    <div className="w-12 h-12 rounded-full bg-emerald-500/10 text-emerald-400 flex items-center justify-center mx-auto">
+                      <CheckCircle2 className="w-6 h-6" />
+                    </div>
+                    <h3 className="text-base font-bold text-white">لا توجد أي طلبات اشتراك معلقة حالياً</h3>
+                    <p className="text-xs text-slate-400 max-w-md mx-auto">
+                      جميع طلبات الترقية والتحويلات تمت مراجعتها وتفعيلها بنجاح. ستظهر هنا الطلبات الجديدة فور إرسالها من التجار.
                     </p>
                   </div>
-                </div>
-
-                <button
-                  onClick={() => token && loadDashboardData(token)}
-                  disabled={isLoadingData}
-                  className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-bold border border-slate-700 flex items-center gap-2 self-start sm:self-auto"
-                >
-                  <RefreshCw className={`w-3.5 h-3.5 ${isLoadingData ? 'animate-spin' : ''}`} />
-                  <span>تحديث الطلبات</span>
-                </button>
-              </div>
-
-              {pendingSubscriptions.length === 0 ? (
-                <div className="p-12 text-center bg-slate-950/60 border border-slate-800 rounded-2xl space-y-3">
-                  <div className="w-12 h-12 rounded-full bg-emerald-500/10 text-emerald-400 flex items-center justify-center mx-auto">
-                    <CheckCircle2 className="w-6 h-6" />
-                  </div>
-                  <h3 className="text-base font-bold text-white">لا توجد أي طلبات اشتراك معلقة حالياً</h3>
-                  <p className="text-xs text-slate-400 max-w-md mx-auto">
-                    جميع طلبات الترقية والتحويلات تمت مراجعتها وتفعيلها بنجاح. ستظهر هنا الطلبات الجديدة فور إرسالها من التجار.
-                  </p>
-                </div>
-              ) : (
-                <div className="overflow-x-auto">
-                  <table className="w-full text-right text-xs">
-                    <thead className="bg-slate-950/80 text-slate-400 border-b border-slate-800">
-                      <tr>
-                        <th className="py-3.5 px-4 font-bold">المتجر والتاجر</th>
-                        <th className="py-3.5 px-4 font-bold">الباقة المطلوبة</th>
-                        <th className="py-3.5 px-4 font-bold">المبلغ</th>
-                        <th className="py-3.5 px-4 font-bold">طريقة الدفع</th>
-                        <th className="py-3.5 px-4 font-bold">رقم العملية / الحوالة</th>
-                        <th className="py-3.5 px-4 font-bold">تاريخ الإرسال</th>
-                        <th className="py-3.5 px-4 font-bold text-center">إجراءات المراجعة</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-800/60">
-                      {pendingSubscriptions.map((sub) => (
-                        <tr key={sub.id} className="hover:bg-slate-800/40 transition-colors">
-                          <td className="py-3.5 px-4">
-                            <div className="space-y-0.5">
-                              <span className="font-bold text-white block text-sm">{sub.storeName}</span>
-                              <span className="text-[11px] text-slate-400 block font-mono">{sub.merchantEmail}</span>
-                              <a
-                                href={`https://wa.me/${sub.merchantPhone.replace(/[^0-9]/g, '')}`}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="text-[11px] text-emerald-400 hover:underline inline-flex items-center gap-1 font-mono"
-                              >
-                                <span>واتساب: {sub.merchantPhone}</span>
-                                <ExternalLink className="w-3 h-3" />
-                              </a>
-                            </div>
-                          </td>
-
-                          <td className="py-3.5 px-4">
-                            <div className="space-y-0.5">
-                              <span className={`inline-block px-2.5 py-0.5 rounded-full text-xs font-black ${
-                                sub.planType === 'VIP' 
-                                  ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30' 
-                                  : 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
-                              }`}>
-                                {sub.planType === 'VIP' ? 'VIP 👑' : 'Pro ⭐'}
-                              </span>
-                              <span className="text-[11px] text-slate-400 block">
-                                {sub.billingCycle === 'Annual' ? 'دفع سنوي (365 يوم)' : 'دفع شهري (30 يوم)'}
-                              </span>
-                            </div>
-                          </td>
-
-                          <td className="py-3.5 px-4">
-                            <span className="text-sm font-black text-white font-mono">{sub.amount} ج.م</span>
-                          </td>
-
-                          <td className="py-3.5 px-4">
-                            <div className="space-y-1">
-                              <span className="px-2 py-0.5 rounded-lg bg-slate-800 text-slate-300 font-bold text-[11px] inline-block">
-                                {sub.paymentMethod === 'VodafoneCash' ? 'فودافون كاش' : sub.paymentMethod === 'InstaPay' ? 'إنستاباي' : sub.paymentMethod}
-                              </span>
-                              {sub.destinationAccount && (
-                                <span className="text-[10px] text-emerald-400 block font-mono" title="الحساب المحول إليه">
-                                  إلى: <strong className="text-emerald-300">{sub.destinationAccount}</strong>
-                                </span>
-                              )}
-                              {sub.senderIdentifier && (
-                                <span className="text-[10px] text-slate-400 block font-mono" title="المحول منه">
-                                  من: <strong className="text-slate-200">{sub.senderIdentifier}</strong>
-                                </span>
-                              )}
-                            </div>
-                          </td>
-
-                          <td className="py-3.5 px-4">
-                            <div className="space-y-1">
-                              <div className="flex items-center justify-between gap-1 bg-slate-950 px-2 py-1 rounded border border-slate-800 max-w-[170px]">
-                                <code className="text-amber-400 font-mono font-bold text-[11px] truncate" title={sub.transactionId}>
-                                  {sub.transactionId}
-                                </code>
-                                <button
-                                  type="button"
-                                  onClick={() => {
-                                    if (typeof navigator !== 'undefined' && navigator.clipboard) {
-                                      navigator.clipboard.writeText(sub.transactionId);
-                                      const toast = Swal.mixin({
-                                        toast: true,
-                                        position: 'top-end',
-                                        showConfirmButton: false,
-                                        timer: 1500,
-                                        background: '#0f172a',
-                                        color: '#f8fafc',
-                                      });
-                                      toast.fire({
-                                        icon: 'success',
-                                        title: 'تم نسخ رقم العملية!',
-                                      });
-                                    }
-                                  }}
-                                  className="p-1 text-slate-400 hover:text-emerald-400 transition-colors shrink-0"
-                                  title="نسخ رقم العملية"
-                                >
-                                  <Copy className="w-3 h-3" />
-                                </button>
-                              </div>
-                              {sub.notes && (
-                                <span className="text-[10px] text-slate-400 block italic max-w-[170px] truncate" title={sub.notes}>
-                                  ملاحظة: {sub.notes}
-                                </span>
-                              )}
-                            </div>
-                          </td>
-
-                          <td className="py-3.5 px-4 font-mono text-slate-400">
-                            {new Date(sub.createdAt).toLocaleDateString('ar-EG', { dateStyle: 'short', timeStyle: 'short' })}
-                          </td>
-
-                          <td className="py-3.5 px-4 text-center">
-                            <div className="flex items-center justify-center gap-1.5">
-                              <button
-                                onClick={() => handleApproveSubscription(sub)}
-                                disabled={isProcessingSubId === sub.id}
-                                className="px-3 py-1.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black rounded-xl text-xs transition-all shadow-sm flex items-center gap-1 disabled:opacity-50"
-                                title="قبول الحوالة وترقية المتجر فوراً"
-                              >
-                                {isProcessingSubId === sub.id ? (
-                                  <div className="w-3.5 h-3.5 border-2 border-slate-950 border-t-transparent rounded-full animate-spin" />
-                                ) : (
-                                  <Check className="w-3.5 h-3.5" />
-                                )}
-                                <span>قبول وترقية</span>
-                              </button>
-
-                              <button
-                                onClick={() => handleRejectSubscription(sub)}
-                                disabled={isProcessingSubId === sub.id}
-                                className="px-2.5 py-1.5 bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 font-bold rounded-xl text-xs transition-all disabled:opacity-50"
-                                title="رفض الطلب"
-                              >
-                                <XCircle className="w-3.5 h-3.5" />
-                              </button>
-                            </div>
-                          </td>
+                ) : (
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-right text-xs">
+                      <thead className="bg-slate-950/80 text-slate-400 border-b border-slate-800">
+                        <tr>
+                          <th className="py-3.5 px-4 font-bold">المتجر والتاجر</th>
+                          <th className="py-3.5 px-4 font-bold">الباقة المطلوبة</th>
+                          <th className="py-3.5 px-4 font-bold">المبلغ</th>
+                          <th className="py-3.5 px-4 font-bold">طريقة الدفع</th>
+                          <th className="py-3.5 px-4 font-bold">رقم العملية / الحوالة</th>
+                          <th className="py-3.5 px-4 font-bold">تاريخ الإرسال</th>
+                          <th className="py-3.5 px-4 font-bold text-center">إجراءات المراجعة</th>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              )}
+                      </thead>
+                      <tbody className="divide-y divide-slate-800/60">
+                        {safePendingSubscriptions.map((sub) => {
+                          const cleanPhone = String(sub?.merchantPhone || '').replace(/[^0-9]/g, '');
+                          let formattedDate = 'غير محدد';
+                          if (sub?.createdAt) {
+                            try {
+                              const d = new Date(sub.createdAt);
+                              if (!isNaN(d.getTime())) {
+                                formattedDate = d.toLocaleDateString('ar-EG', { dateStyle: 'short', timeStyle: 'short' });
+                              }
+                            } catch {
+                              formattedDate = 'غير محدد';
+                            }
+                          }
+
+                          return (
+                            <tr key={sub.id} className="hover:bg-slate-800/40 transition-colors">
+                              <td className="py-3.5 px-4">
+                                <div className="space-y-0.5">
+                                  <span className="font-bold text-white block text-sm">{sub?.storeName || 'متجر غير معروف'}</span>
+                                  <span className="text-[11px] text-slate-400 block font-mono">{sub?.merchantEmail || 'بدون بريد'}</span>
+                                  {sub?.merchantPhone ? (
+                                    <a
+                                      href={`https://wa.me/${cleanPhone}`}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="text-[11px] text-emerald-400 hover:underline inline-flex items-center gap-1 font-mono"
+                                    >
+                                      <span>واتساب: {sub.merchantPhone}</span>
+                                      <ExternalLink className="w-3 h-3" />
+                                    </a>
+                                  ) : (
+                                    <span className="text-[11px] text-slate-500 font-mono">لا يوجد هاتف</span>
+                                  )}
+                                </div>
+                              </td>
+
+                              <td className="py-3.5 px-4">
+                                <div className="space-y-0.5">
+                                  <span className={`inline-block px-2.5 py-0.5 rounded-full text-xs font-black ${
+                                    sub?.planType === 'VIP' 
+                                      ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30' 
+                                      : 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
+                                  }`}>
+                                    {sub?.planType === 'VIP' ? 'VIP 👑' : 'Pro ⭐'}
+                                  </span>
+                                  <span className="text-[11px] text-slate-400 block">
+                                    {sub?.billingCycle === 'Annual' ? 'دفع سنوي (365 يوم)' : 'دفع شهري (30 يوم)'}
+                                  </span>
+                                </div>
+                              </td>
+
+                              <td className="py-3.5 px-4">
+                                <span className="text-sm font-black text-white font-mono">{sub?.amount ?? 0} ج.م</span>
+                              </td>
+
+                              <td className="py-3.5 px-4">
+                                <div className="space-y-1">
+                                  <span className="px-2 py-0.5 rounded-lg bg-slate-800 text-slate-300 font-bold text-[11px] inline-block">
+                                    {sub?.paymentMethod === 'VodafoneCash' ? 'فودافون كاش' : sub?.paymentMethod === 'InstaPay' ? 'إنستاباي' : (sub?.paymentMethod || 'أخرى')}
+                                  </span>
+                                  {sub?.destinationAccount && (
+                                    <span className="text-[10px] text-emerald-400 block font-mono" title="الحساب المحول إليه">
+                                      إلى: <strong className="text-emerald-300">{sub.destinationAccount}</strong>
+                                    </span>
+                                  )}
+                                  {sub?.senderIdentifier && (
+                                    <span className="text-[10px] text-slate-400 block font-mono" title="المحول منه">
+                                      من: <strong className="text-slate-200">{sub.senderIdentifier}</strong>
+                                    </span>
+                                  )}
+                                </div>
+                              </td>
+
+                              <td className="py-3.5 px-4">
+                                <div className="space-y-1">
+                                  <div className="flex items-center justify-between gap-1 bg-slate-950 px-2 py-1 rounded border border-slate-800 max-w-[170px]">
+                                    <code className="text-amber-400 font-mono font-bold text-[11px] truncate" title={sub?.transactionId || ''}>
+                                      {sub?.transactionId || 'غير متوفر'}
+                                    </code>
+                                    <button
+                                      type="button"
+                                      onClick={() => {
+                                        if (typeof navigator !== 'undefined' && navigator.clipboard && sub?.transactionId) {
+                                          navigator.clipboard.writeText(sub.transactionId);
+                                          const toast = Swal.mixin({
+                                            toast: true,
+                                            position: 'top-end',
+                                            showConfirmButton: false,
+                                            timer: 1500,
+                                            background: '#0f172a',
+                                            color: '#f8fafc',
+                                          });
+                                          toast.fire({
+                                            icon: 'success',
+                                            title: 'تم نسخ رقم العملية!',
+                                          });
+                                        }
+                                      }}
+                                      className="p-1 text-slate-400 hover:text-emerald-400 transition-colors shrink-0"
+                                      title="نسخ رقم العملية"
+                                    >
+                                      <Copy className="w-3 h-3" />
+                                    </button>
+                                  </div>
+                                  {sub?.notes && (
+                                    <span className="text-[10px] text-slate-400 block italic max-w-[170px] truncate" title={sub.notes}>
+                                      ملاحظة: {sub.notes}
+                                    </span>
+                                  )}
+                                </div>
+                              </td>
+
+                              <td className="py-3.5 px-4 font-mono text-slate-400">
+                                {formattedDate}
+                              </td>
+
+                              <td className="py-3.5 px-4 text-center">
+                                <div className="flex items-center justify-center gap-1.5">
+                                  <button
+                                    onClick={() => handleApproveSubscription(sub)}
+                                    disabled={isProcessingSubId === sub.id}
+                                    className="px-3 py-1.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black rounded-xl text-xs transition-all shadow-sm flex items-center gap-1 disabled:opacity-50"
+                                    title="قبول الحوالة وترقية المتجر فوراً"
+                                  >
+                                    {isProcessingSubId === sub.id ? (
+                                      <div className="w-3.5 h-3.5 border-2 border-slate-950 border-t-transparent rounded-full animate-spin" />
+                                    ) : (
+                                      <Check className="w-3.5 h-3.5" />
+                                    )}
+                                    <span>قبول وترقية</span>
+                                  </button>
+
+                                  <button
+                                    onClick={() => handleRejectSubscription(sub)}
+                                    disabled={isProcessingSubId === sub.id}
+                                    className="px-2.5 py-1.5 bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 font-bold rounded-xl text-xs transition-all disabled:opacity-50"
+                                    title="رفض الطلب"
+                                  >
+                                    <XCircle className="w-3.5 h-3.5" />
+                                  </button>
+                                </div>
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
             </div>
-          </div>
+          </AdminTabErrorBoundary>
         ) : activeTab === 'pricing' ? (
-          /* Pricing & Plans Control Panel Tab */
+          <AdminTabErrorBoundary fallbackTitle="حدث خطأ في عرض إعدادات الأسعار والباقات" onReset={() => token && loadDashboardData(token)}>
+            {/* Pricing & Plans Control Panel Tab */}
           <div className="max-w-5xl mx-auto space-y-8">
             <div className="bg-slate-900/70 border border-slate-800 rounded-3xl p-6 sm:p-8 space-y-8 shadow-xl">
               {/* Header */}
@@ -2073,270 +2154,274 @@ export default function SuperAdminPage() {
               </form>
             </div>
           </div>
-        ) : activeTab === 'gateways' ? (
-          /* Payment Gateways & Wallets Multi-Account Control Panel */
-          <div className="max-w-5xl mx-auto space-y-8">
-            <div className="bg-slate-900/70 border border-slate-800 rounded-3xl p-6 sm:p-8 space-y-8 shadow-xl">
-              {/* Header */}
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-6">
-                <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-emerald-500 to-teal-400 text-slate-950 flex items-center justify-center shadow-lg shadow-emerald-500/20">
-                    <Wallet className="w-6 h-6" />
+        </AdminTabErrorBoundary>
+      ) : activeTab === 'gateways' ? (
+          <AdminTabErrorBoundary fallbackTitle="حدث خطأ في عرض وسائل الدفع والمحافظ" onReset={() => token && loadDashboardData(token)}>
+            {/* Payment Gateways & Wallets Multi-Account Control Panel */}
+            <div className="max-w-5xl mx-auto space-y-8">
+              <div className="bg-slate-900/70 border border-slate-800 rounded-3xl p-6 sm:p-8 space-y-8 shadow-xl">
+                {/* Header */}
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-6">
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-emerald-500 to-teal-400 text-slate-950 flex items-center justify-center shadow-lg shadow-emerald-500/20">
+                      <Wallet className="w-6 h-6" />
+                    </div>
+                    <div>
+                      <h2 className="text-xl font-black text-white">إدارة وسائل الدفع والمحافظ وحسابات التحويل (Multi-Account Gateways)</h2>
+                      <p className="text-xs text-slate-400">
+                        تفعيل وتعطيل وسائل الدفع، تعديل التعليمات، وإضافة عدة أرقام ومحافظ لاستقبال الحوالات من التجار.
+                      </p>
+                    </div>
                   </div>
-                  <div>
-                    <h2 className="text-xl font-black text-white">إدارة وسائل الدفع والمحافظ وحسابات التحويل (Multi-Account Gateways)</h2>
-                    <p className="text-xs text-slate-400">
-                      تفعيل وتعطيل وسائل الدفع، تعديل التعليمات، وإضافة عدة أرقام ومحافظ لاستقبال الحوالات من التجار.
-                    </p>
+
+                  <div className="flex items-center gap-2">
+                    <span className="text-[11px] px-3 py-1 bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 rounded-full font-bold">
+                      ديناميكي بالكامل ⚡
+                    </span>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2">
-                  <span className="text-[11px] px-3 py-1 bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 rounded-full font-bold">
-                    ديناميكي بالكامل ⚡
-                  </span>
-                </div>
-              </div>
-
-              {gatewaysErrorMsg && (
-                <div className="p-3.5 bg-rose-500/10 border border-rose-500/20 rounded-xl text-rose-400 text-xs flex items-center gap-2">
-                  <AlertTriangle className="w-4 h-4 shrink-0 text-rose-400" />
-                  <span>{gatewaysErrorMsg}</span>
-                </div>
-              )}
-
-              {gatewaysSuccessMsg && (
-                <div className="p-3.5 bg-emerald-500/10 border border-emerald-500/20 rounded-xl text-emerald-400 text-xs flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-400" />
-                  <span>{gatewaysSuccessMsg}</span>
-                </div>
-              )}
-
-              <form onSubmit={handleSavePaymentGateways} className="space-y-8">
-                {paymentGateways.length === 0 ? (
-                  <div className="text-center py-12 bg-slate-950/40 border border-slate-800 rounded-2xl space-y-3">
-                    <p className="text-sm text-slate-400">لم يتم العثور على وسائل دفع مسجلة.</p>
-                    <button
-                      type="button"
-                      onClick={() => token && loadDashboardData(token)}
-                      className="px-4 py-2 bg-emerald-500 text-slate-950 font-bold rounded-xl text-xs hover:bg-emerald-400 transition-colors"
-                    >
-                      إعادة تحميل البيانات 🔄
-                    </button>
-                  </div>
-                ) : (
-                  <div className="space-y-6">
-                    {paymentGateways.map((gw) => {
-                      const isVodafone = gw.gatewayKey === 'VodafoneCash';
-                      const isInstapay = gw.gatewayKey === 'InstaPay';
-                      const isCard = gw.gatewayKey === 'OnlineCard';
-                      const accounts = Array.isArray(gw.accounts) ? gw.accounts : [];
-
-                      return (
-                        <div 
-                          key={gw.gatewayKey}
-                          className={`bg-slate-950/60 border rounded-2xl p-5 sm:p-6 space-y-6 transition-all ${
-                            gw.isEnabled 
-                              ? 'border-slate-800 hover:border-slate-700' 
-                              : 'border-slate-800/50 opacity-60'
-                          }`}
-                        >
-                          {/* Gateway Header: Toggle & Title */}
-                          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800/80 pb-4">
-                            <div className="flex items-center gap-3">
-                              <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-bold ${
-                                isVodafone 
-                                  ? 'bg-rose-500/20 text-rose-400 border border-rose-500/30' 
-                                  : isInstapay 
-                                    ? 'bg-purple-500/20 text-purple-400 border border-purple-500/30' 
-                                    : 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
-                              }`}>
-                                {isVodafone && <Smartphone className="w-5 h-5 text-rose-400" />}
-                                {isInstapay && <Building2 className="w-5 h-5 text-purple-400" />}
-                                {isCard && <CreditCard className="w-5 h-5 text-emerald-400" />}
-                                {!isVodafone && !isInstapay && !isCard && <Wallet className="w-5 h-5" />}
-                              </div>
-                              <div>
-                                <div className="flex items-center gap-2">
-                                  <h3 className="text-base font-black text-white">{gw.displayName}</h3>
-                                  <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-md bg-slate-800 text-slate-400">
-                                    {gw.gatewayKey}
-                                  </span>
-                                </div>
-                                <p className="text-xs text-slate-400 mt-0.5">
-                                  {isVodafone && 'محفظة الهاتف المحمول (فودافون، أورنج، اتصالات، وي كاش)'}
-                                  {isInstapay && 'شبكة المدفوعات اللحظية المصرية (InstaPay IPN)'}
-                                  {isCard && 'بوابة الدفع الإلكتروني بالبطاقات البنكية'}
-                                </p>
-                              </div>
-                            </div>
-
-                            {/* ON/OFF Switch */}
-                            <label className="relative inline-flex items-center cursor-pointer select-none self-start sm:self-auto">
-                              <input
-                                type="checkbox"
-                                checked={gw.isEnabled}
-                                onChange={(e) => handleGatewayToggle(gw.gatewayKey, e.target.checked)}
-                                className="sr-only peer"
-                              />
-                              <div className="w-11 h-6 bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500"></div>
-                              <span className={`ms-3 text-xs font-bold ${gw.isEnabled ? 'text-emerald-400' : 'text-slate-500'}`}>
-                                {gw.isEnabled ? 'مفعل ومتاح للتجار ✅' : 'معطل ومخفي ⛔'}
-                              </span>
-                            </label>
-                          </div>
-
-                          {/* Gateway Config Fields */}
-                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <div>
-                              <label className="text-xs font-bold text-slate-300 block mb-1.5">
-                                الاسم الظاهر للتاجر (Display Name)
-                              </label>
-                              <input
-                                type="text"
-                                value={gw.displayName}
-                                onChange={(e) => handleGatewayFieldChange(gw.gatewayKey, 'displayName', e.target.value)}
-                                className="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 text-xs text-slate-100 focus:outline-none focus:border-emerald-500"
-                                required
-                              />
-                            </div>
-
-                            <div>
-                              <label className="text-xs font-bold text-slate-300 block mb-1.5">
-                                تعليمات التحويل الظاهرة للتاجر (Instructions)
-                              </label>
-                              <textarea
-                                rows={2}
-                                value={gw.instructions || ''}
-                                onChange={(e) => handleGatewayFieldChange(gw.gatewayKey, 'instructions', e.target.value)}
-                                placeholder="تعليمات التحويل والخطوات التي يتبعها التاجر..."
-                                className="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2 text-xs text-slate-100 focus:outline-none focus:border-emerald-500 resize-none"
-                              />
-                            </div>
-                          </div>
-
-                          {/* Multi-Account Repeater Section */}
-                          <div className="space-y-3 pt-2 border-t border-slate-800/80">
-                            <div className="flex items-center justify-between">
-                              <div className="flex items-center gap-2">
-                                <span className="text-xs font-bold text-slate-300">
-                                  الأرقام والحسابات المعتمدة للاستقبال
-                                </span>
-                                <span className="px-2 py-0.5 rounded-full bg-slate-800 text-emerald-400 text-[10px] font-mono font-bold">
-                                  {accounts.length} حساب
-                                </span>
-                              </div>
-
-                              <button
-                                type="button"
-                                onClick={() => handleAddAccount(gw.gatewayKey)}
-                                className="px-3 py-1.5 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 rounded-lg text-xs font-bold transition-all flex items-center gap-1"
-                              >
-                                <Plus className="w-3.5 h-3.5" />
-                                <span>إضافة رقم / حساب جديد</span>
-                              </button>
-                            </div>
-
-                            {accounts.length === 0 ? (
-                              <div className="text-center py-4 bg-slate-900/40 border border-dashed border-slate-800 rounded-xl text-xs text-slate-500">
-                                لا توجد أرقام مسجلة حالياً لهذه الوسيلة. انقر على &quot;إضافة رقم / حساب جديد&quot; لإضافة أول حساب.
-                              </div>
-                            ) : (
-                              <div className="space-y-2.5">
-                                {accounts.map((acc, idx) => (
-                                  <div 
-                                    key={idx}
-                                    className="bg-slate-900/80 border border-slate-800/90 rounded-xl p-3 flex flex-col sm:flex-row sm:items-center gap-3 text-xs"
-                                  >
-                                    <span className="w-6 h-6 rounded-lg bg-slate-800 text-slate-400 flex items-center justify-center font-mono font-bold text-[11px] shrink-0">
-                                      {idx + 1}
-                                    </span>
-
-                                    <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-2">
-                                      <div>
-                                        <input
-                                          type="text"
-                                          placeholder={isVodafone ? "رقم المحفظة (مثال: 01027150123)" : isInstapay ? "عنوان الدفع اللحظي (مثال: watsstore@instapay)" : "رقم الحساب / المعرف"}
-                                          value={acc.accountNumber}
-                                          onChange={(e) => handleAccountChange(gw.gatewayKey, idx, 'accountNumber', e.target.value)}
-                                          className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-1.5 text-xs text-slate-100 font-mono focus:outline-none focus:border-emerald-500"
-                                          required
-                                        />
-                                      </div>
-                                      <div>
-                                        <input
-                                          type="text"
-                                          placeholder="اسم صاحب الحساب أو الشركة (مثال: شركة مسار تك)"
-                                          value={acc.accountName || ''}
-                                          onChange={(e) => handleAccountChange(gw.gatewayKey, idx, 'accountName', e.target.value)}
-                                          className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-1.5 text-xs text-slate-100 focus:outline-none focus:border-emerald-500"
-                                        />
-                                      </div>
-                                    </div>
-
-                                    <div className="flex items-center justify-between sm:justify-end gap-3 pt-2 sm:pt-0 border-t sm:border-t-0 border-slate-800/60">
-                                      <label className="flex items-center gap-1.5 cursor-pointer select-none">
-                                        <input
-                                          type="checkbox"
-                                          checked={acc.isActive !== false}
-                                          onChange={(e) => handleAccountChange(gw.gatewayKey, idx, 'isActive', e.target.checked)}
-                                          className="w-4 h-4 rounded text-emerald-500 focus:ring-emerald-500 bg-slate-950 border-slate-800"
-                                        />
-                                        <span className={`text-[11px] font-bold ${acc.isActive !== false ? 'text-emerald-400' : 'text-slate-500'}`}>
-                                          {acc.isActive !== false ? 'نشط' : 'معطل'}
-                                        </span>
-                                      </label>
-
-                                      <button
-                                        type="button"
-                                        onClick={() => handleRemoveAccount(gw.gatewayKey, idx)}
-                                        className="p-1.5 text-rose-400 hover:text-rose-300 hover:bg-rose-500/10 rounded-lg transition-colors"
-                                        title="حذف هذا الرقم"
-                                      >
-                                        <Trash2 className="w-4 h-4" />
-                                      </button>
-                                    </div>
-                                  </div>
-                                ))}
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                      );
-                    })}
+                {gatewaysErrorMsg && (
+                  <div className="p-3.5 bg-rose-500/10 border border-rose-500/20 rounded-xl text-rose-400 text-xs flex items-center gap-2">
+                    <AlertTriangle className="w-4 h-4 shrink-0 text-rose-400" />
+                    <span>{gatewaysErrorMsg}</span>
                   </div>
                 )}
 
-                {/* Save Button */}
-                <div className="pt-4 border-t border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4">
-                  <p className="text-xs text-slate-400">
-                    ملاحظة: تنعكس التغييرات فوراً في صفحة ترقية باقات التجار (<span className="text-emerald-400 font-mono">/dashboard/billing</span>) وسيظهر للتجار الأرقام المفعلة فقط للاختيار والنسخ بنقرة واحدة.
-                  </p>
+                {gatewaysSuccessMsg && (
+                  <div className="p-3.5 bg-emerald-500/10 border border-emerald-500/20 rounded-xl text-emerald-400 text-xs flex items-center gap-2">
+                    <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-400" />
+                    <span>{gatewaysSuccessMsg}</span>
+                  </div>
+                )}
 
-                  <button
-                    type="submit"
-                    disabled={isSavingGateways || paymentGateways.length === 0}
-                    className="w-full sm:w-auto px-8 py-3.5 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-black rounded-xl text-sm transition-all shadow-lg shadow-emerald-500/20 disabled:opacity-50 flex items-center justify-center gap-2"
-                  >
-                    {isSavingGateways ? (
-                      <>
-                        <div className="w-4 h-4 border-2 border-slate-950 border-t-transparent rounded-full animate-spin" />
-                        <span>جاري حفظ وتطبيق وسائل الدفع...</span>
-                      </>
-                    ) : (
-                      <>
-                        <Save className="w-4 h-4" />
-                        <span>حفظ وتحديث وسائل الدفع والمحافظ فوراً 💾</span>
-                      </>
-                    )}
-                  </button>
-                </div>
-              </form>
+                <form onSubmit={handleSavePaymentGateways} className="space-y-8">
+                  {safePaymentGateways.length === 0 ? (
+                    <div className="text-center py-12 bg-slate-950/40 border border-slate-800 rounded-2xl space-y-3">
+                      <p className="text-sm text-slate-400">لم يتم العثور على وسائل دفع مسجلة.</p>
+                      <button
+                        type="button"
+                        onClick={() => token && loadDashboardData(token)}
+                        className="px-4 py-2 bg-emerald-500 text-slate-950 font-bold rounded-xl text-xs hover:bg-emerald-400 transition-colors"
+                      >
+                        إعادة تحميل البيانات 🔄
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="space-y-6">
+                      {safePaymentGateways.map((gw) => {
+                        const isVodafone = gw.gatewayKey === 'VodafoneCash';
+                        const isInstapay = gw.gatewayKey === 'InstaPay';
+                        const isCard = gw.gatewayKey === 'OnlineCard';
+                        const accounts = Array.isArray(gw.accounts) ? gw.accounts : [];
+
+                        return (
+                          <div 
+                            key={gw.gatewayKey}
+                            className={`bg-slate-950/60 border rounded-2xl p-5 sm:p-6 space-y-6 transition-all ${
+                              gw.isEnabled 
+                                ? 'border-slate-800 hover:border-slate-700' 
+                                : 'border-slate-800/50 opacity-60'
+                            }`}
+                          >
+                            {/* Gateway Header: Toggle & Title */}
+                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800/80 pb-4">
+                              <div className="flex items-center gap-3">
+                                <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-bold ${
+                                  isVodafone 
+                                    ? 'bg-rose-500/20 text-rose-400 border border-rose-500/30' 
+                                    : isInstapay 
+                                      ? 'bg-purple-500/20 text-purple-400 border border-purple-500/30' 
+                                      : 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
+                                }`}>
+                                  {isVodafone && <Smartphone className="w-5 h-5 text-rose-400" />}
+                                  {isInstapay && <Building2 className="w-5 h-5 text-purple-400" />}
+                                  {isCard && <CreditCard className="w-5 h-5 text-emerald-400" />}
+                                  {!isVodafone && !isInstapay && !isCard && <Wallet className="w-5 h-5" />}
+                                </div>
+                                <div>
+                                  <div className="flex items-center gap-2">
+                                    <h3 className="text-base font-black text-white">{gw.displayName}</h3>
+                                    <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-md bg-slate-800 text-slate-400">
+                                      {gw.gatewayKey}
+                                    </span>
+                                  </div>
+                                  <p className="text-xs text-slate-400 mt-0.5">
+                                    {isVodafone && 'محفظة الهاتف المحمول (فودافون، أورنج، اتصالات، وي كاش)'}
+                                    {isInstapay && 'شبكة المدفوعات اللحظية المصرية (InstaPay IPN)'}
+                                    {isCard && 'بوابة الدفع الإلكتروني بالبطاقات البنكية'}
+                                  </p>
+                                </div>
+                              </div>
+
+                              {/* ON/OFF Switch */}
+                              <label className="relative inline-flex items-center cursor-pointer select-none self-start sm:self-auto">
+                                <input
+                                  type="checkbox"
+                                  checked={gw.isEnabled}
+                                  onChange={(e) => handleGatewayToggle(gw.gatewayKey, e.target.checked)}
+                                  className="sr-only peer"
+                                />
+                                <div className="w-11 h-6 bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500"></div>
+                                <span className={`ms-3 text-xs font-bold ${gw.isEnabled ? 'text-emerald-400' : 'text-slate-500'}`}>
+                                  {gw.isEnabled ? 'مفعل ومتاح للتجار ✅' : 'معطل ومخفي ⛔'}
+                                </span>
+                              </label>
+                            </div>
+
+                            {/* Gateway Config Fields */}
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                              <div>
+                                <label className="text-xs font-bold text-slate-300 block mb-1.5">
+                                  الاسم الظاهر للتاجر (Display Name)
+                                </label>
+                                <input
+                                  type="text"
+                                  value={gw.displayName}
+                                  onChange={(e) => handleGatewayFieldChange(gw.gatewayKey, 'displayName', e.target.value)}
+                                  className="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 text-xs text-slate-100 focus:outline-none focus:border-emerald-500"
+                                  required
+                                />
+                              </div>
+
+                              <div>
+                                <label className="text-xs font-bold text-slate-300 block mb-1.5">
+                                  تعليمات التحويل الظاهرة للتاجر (Instructions)
+                                </label>
+                                <textarea
+                                  rows={2}
+                                  value={gw.instructions || ''}
+                                  onChange={(e) => handleGatewayFieldChange(gw.gatewayKey, 'instructions', e.target.value)}
+                                  placeholder="تعليمات التحويل والخطوات التي يتبعها التاجر..."
+                                  className="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2 text-xs text-slate-100 focus:outline-none focus:border-emerald-500 resize-none"
+                                />
+                              </div>
+                            </div>
+
+                            {/* Multi-Account Repeater Section */}
+                            <div className="space-y-3 pt-2 border-t border-slate-800/80">
+                              <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-2">
+                                  <span className="text-xs font-bold text-slate-300">
+                                    الأرقام والحسابات المعتمدة للاستقبال
+                                  </span>
+                                  <span className="px-2 py-0.5 rounded-full bg-slate-800 text-emerald-400 text-[10px] font-mono font-bold">
+                                    {accounts.length} حساب
+                                  </span>
+                                </div>
+
+                                <button
+                                  type="button"
+                                  onClick={() => handleAddAccount(gw.gatewayKey)}
+                                  className="px-3 py-1.5 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 rounded-lg text-xs font-bold transition-all flex items-center gap-1"
+                                >
+                                  <Plus className="w-3.5 h-3.5" />
+                                  <span>إضافة رقم / حساب جديد</span>
+                                </button>
+                              </div>
+
+                              {accounts.length === 0 ? (
+                                <div className="text-center py-4 bg-slate-900/40 border border-dashed border-slate-800 rounded-xl text-xs text-slate-500">
+                                  لا توجد أرقام مسجلة حالياً لهذه الوسيلة. انقر على &quot;إضافة رقم / حساب جديد&quot; لإضافة أول حساب.
+                                </div>
+                              ) : (
+                                <div className="space-y-2.5">
+                                  {accounts.map((acc, idx) => (
+                                    <div 
+                                      key={idx}
+                                      className="bg-slate-900/80 border border-slate-800/90 rounded-xl p-3 flex flex-col sm:flex-row sm:items-center gap-3 text-xs"
+                                    >
+                                      <span className="w-6 h-6 rounded-lg bg-slate-800 text-slate-400 flex items-center justify-center font-mono font-bold text-[11px] shrink-0">
+                                        {idx + 1}
+                                      </span>
+
+                                      <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                        <div>
+                                          <input
+                                            type="text"
+                                            placeholder={isVodafone ? "رقم المحفظة (مثال: 01027150123)" : isInstapay ? "عنوان الدفع اللحظي (مثال: watsstore@instapay)" : "رقم الحساب / المعرف"}
+                                            value={acc.accountNumber || ''}
+                                            onChange={(e) => handleAccountChange(gw.gatewayKey, idx, 'accountNumber', e.target.value)}
+                                            className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-1.5 text-xs text-slate-100 font-mono focus:outline-none focus:border-emerald-500"
+                                            required
+                                          />
+                                        </div>
+                                        <div>
+                                          <input
+                                            type="text"
+                                            placeholder="اسم صاحب الحساب أو الشركة (مثال: شركة مسار تك)"
+                                            value={acc.accountName || ''}
+                                            onChange={(e) => handleAccountChange(gw.gatewayKey, idx, 'accountName', e.target.value)}
+                                            className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-1.5 text-xs text-slate-100 focus:outline-none focus:border-emerald-500"
+                                          />
+                                        </div>
+                                      </div>
+
+                                      <div className="flex items-center justify-between sm:justify-end gap-3 pt-2 sm:pt-0 border-t sm:border-t-0 border-slate-800/60">
+                                        <label className="flex items-center gap-1.5 cursor-pointer select-none">
+                                          <input
+                                            type="checkbox"
+                                            checked={acc.isActive !== false}
+                                            onChange={(e) => handleAccountChange(gw.gatewayKey, idx, 'isActive', e.target.checked)}
+                                            className="w-4 h-4 rounded text-emerald-500 focus:ring-emerald-500 bg-slate-950 border-slate-800"
+                                          />
+                                          <span className={`text-[11px] font-bold ${acc.isActive !== false ? 'text-emerald-400' : 'text-slate-500'}`}>
+                                            {acc.isActive !== false ? 'نشط' : 'معطل'}
+                                          </span>
+                                        </label>
+
+                                        <button
+                                          type="button"
+                                          onClick={() => handleRemoveAccount(gw.gatewayKey, idx)}
+                                          className="p-1.5 text-rose-400 hover:text-rose-300 hover:bg-rose-500/10 rounded-lg transition-colors"
+                                          title="حذف هذا الرقم"
+                                        >
+                                          <Trash2 className="w-4 h-4" />
+                                        </button>
+                                      </div>
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+
+                  {/* Save Button */}
+                  <div className="pt-4 border-t border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <p className="text-xs text-slate-400">
+                      ملاحظة: تنعكس التغييرات فوراً في صفحة ترقية باقات التجار (<span className="text-emerald-400 font-mono">/dashboard/billing</span>) وسيظهر للتجار الأرقام المفعلة فقط للاختيار والنسخ بنقرة واحدة.
+                    </p>
+
+                    <button
+                      type="submit"
+                      disabled={isSavingGateways || safePaymentGateways.length === 0}
+                      className="w-full sm:w-auto px-8 py-3.5 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-black rounded-xl text-sm transition-all shadow-lg shadow-emerald-500/20 disabled:opacity-50 flex items-center justify-center gap-2"
+                    >
+                      {isSavingGateways ? (
+                        <>
+                          <div className="w-4 h-4 border-2 border-slate-950 border-t-transparent rounded-full animate-spin" />
+                          <span>جاري حفظ وتطبيق وسائل الدفع...</span>
+                        </>
+                      ) : (
+                        <>
+                          <Save className="w-4 h-4" />
+                          <span>حفظ وتحديث وسائل الدفع والمحافظ فوراً 💾</span>
+                        </>
+                      )}
+                    </button>
+                  </div>
+                </form>
+              </div>
             </div>
-          </div>
+          </AdminTabErrorBoundary>
         ) : (
-          /* Stores & Analytics Tab (Original View) */
-          <>
+          <AdminTabErrorBoundary fallbackTitle="حدث خطأ في عرض قائمة المتاجر والإحصائيات" onReset={() => token && loadDashboardData(token)}>
+            {/* Stores & Analytics Tab (Original View) */}
+            <>
             {/* Welcome Banner */}
             <div className="bg-gradient-to-r from-emerald-950/40 via-slate-900 to-slate-900 border border-emerald-500/20 rounded-2xl p-6 sm:p-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
               <div className="space-y-1">
@@ -2812,7 +2897,8 @@ export default function SuperAdminPage() {
               </div>
             </div>
           </>
-        )}
+        </AdminTabErrorBoundary>
+      )}
       </main>
     </div>
   );

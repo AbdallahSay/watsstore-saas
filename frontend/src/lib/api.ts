@@ -547,9 +547,17 @@ export const api = {
   },
 
   async getMerchantPaymentGateways(token?: string): Promise<PaymentGatewayItem[]> {
-    const headers: Record<string, string> = {};
-    if (token) headers['Authorization'] = `Bearer ${token}`;
-    return fetchJson<PaymentGatewayItem[]>(`${API_BASE_URL}/merchant/billing/gateways`, { headers });
+    try {
+      const headers: Record<string, string> = {};
+      if (token) headers['Authorization'] = `Bearer ${token}`;
+      const res = await fetchJson<any>(`${API_BASE_URL}/merchant/billing/gateways`, { headers });
+      if (Array.isArray(res)) return res;
+      if (res && Array.isArray(res.gateways)) return res.gateways;
+      return [];
+    } catch (err) {
+      console.warn('Failed to fetch merchant payment gateways:', err);
+      return [];
+    }
   },
 
   async submitMerchantUpgradeRequest(token: string, data: { planType: string; billingCycle: string; paymentMethod: string; destinationAccount?: string; senderIdentifier?: string; transactionId: string; notes?: string }): Promise<any> {
@@ -573,12 +581,20 @@ export const api = {
 
   // Admin Payment Gateways
   async getAdminPaymentGateways(token: string): Promise<PaymentGatewayItem[]> {
-    return fetchJson<PaymentGatewayItem[]>(`${API_BASE_URL}/admin/payment-gateways`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'X-Admin-Key': token.startsWith('WatsStore_') ? token : '',
-      }
-    });
+    try {
+      const res = await fetchJson<any>(`${API_BASE_URL}/admin/payment-gateways`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'X-Admin-Key': token.startsWith('WatsStore_') ? token : '',
+        }
+      });
+      if (Array.isArray(res)) return res;
+      if (res && Array.isArray(res.gateways)) return res.gateways;
+      return [];
+    } catch (err) {
+      console.warn('Failed to fetch admin payment gateways:', err);
+      return [];
+    }
   },
 
   async updateAdminPaymentGateways(token: string, gateways: PaymentGatewayItem[]): Promise<{ message: string; gateways: PaymentGatewayItem[] }> {
@@ -615,22 +631,38 @@ export const api = {
 
   // Admin Subscription Requests
   async getAdminPendingSubscriptions(token: string): Promise<SubscriptionRequestItem[]> {
-    return fetchJson<SubscriptionRequestItem[]>(`${API_BASE_URL}/admin/subscriptions/pending`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'X-Admin-Key': token.startsWith('WatsStore_') ? token : '',
-      }
-    });
+    try {
+      const res = await fetchJson<any>(`${API_BASE_URL}/admin/subscriptions/pending`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'X-Admin-Key': token.startsWith('WatsStore_') ? token : '',
+        }
+      });
+      if (Array.isArray(res)) return res;
+      if (res && Array.isArray(res.requests)) return res.requests;
+      return [];
+    } catch (err) {
+      console.warn('Failed to fetch admin pending subscriptions:', err);
+      return [];
+    }
   },
 
   async getAdminAllSubscriptions(token: string, status?: string): Promise<SubscriptionRequestItem[]> {
-    const url = status ? `${API_BASE_URL}/admin/subscriptions?status=${encodeURIComponent(status)}` : `${API_BASE_URL}/admin/subscriptions`;
-    return fetchJson<SubscriptionRequestItem[]>(url, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'X-Admin-Key': token.startsWith('WatsStore_') ? token : '',
-      }
-    });
+    try {
+      const url = status ? `${API_BASE_URL}/admin/subscriptions?status=${encodeURIComponent(status)}` : `${API_BASE_URL}/admin/subscriptions`;
+      const res = await fetchJson<any>(url, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'X-Admin-Key': token.startsWith('WatsStore_') ? token : '',
+        }
+      });
+      if (Array.isArray(res)) return res;
+      if (res && Array.isArray(res.subscriptions)) return res.subscriptions;
+      return [];
+    } catch (err) {
+      console.warn('Failed to fetch admin all subscriptions:', err);
+      return [];
+    }
   },
 
   async approveAdminSubscription(token: string, id: string): Promise<{ message: string; request: SubscriptionRequestItem }> {
