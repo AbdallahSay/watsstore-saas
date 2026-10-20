@@ -5,11 +5,9 @@ import Link from 'next/link';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { 
-  ShoppingBag, 
   MessageCircle, 
   Zap, 
   TrendingUp, 
-  ShieldCheck, 
   CheckCircle2, 
   ArrowLeft, 
   Sparkles, 
@@ -33,7 +31,7 @@ export default function HomePage() {
     vipMonthlyPrice: 599,
     vipAnnualPrice: 4999,
     isLaunchDiscountBannerActive: true,
-    launchDiscountText: "🔥 عرض الإطلاق التجاري: احصل على خصم إضافي عند الاشتراك السنوي اليوم!",
+    launchDiscountText: '',
   });
   const [showBanner, setShowBanner] = useState(true);
 
@@ -48,15 +46,17 @@ export default function HomePage() {
   }, []);
 
   return (
-    <>
+    <div dir={dir} className="min-h-screen flex flex-col bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 transition-colors duration-200">
       {/* Top Urgency & Scarcity Marketing Banner */}
       {showBanner && pricing.isLaunchDiscountBannerActive && (
         <div className="bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 text-white px-4 py-2.5 text-xs sm:text-sm font-black shadow-md flex items-center justify-between relative z-50 animate-fadeIn">
           <div className="flex-1 flex items-center justify-center gap-2 flex-wrap">
             <Sparkles className="w-4 h-4 text-amber-300 animate-spin" />
-            <span>{pricing.launchDiscountText || "🔥 عرض الإطلاق التجاري: احصل على خصم إضافي عند الاشتراك السنوي اليوم!"}</span>
+            <span>
+              {pricing.launchDiscountText || t('home.banner_text', undefined, '🔥 عرض الإطلاق التجاري: احصل على خصم إضافي عند الاشتراك السنوي اليوم!')}
+            </span>
             <a href="#pricing" className="underline mr-2 text-amber-200 hover:text-white font-black transition-colors">
-              اختر باقتك وسجل الآن ←
+              {t('home.banner_cta', undefined, 'اختر باقتك وسجل الآن ←')}
             </a>
           </div>
           <button
@@ -123,7 +123,7 @@ export default function HomePage() {
               <span className="bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 bg-clip-text text-transparent">
                 {t('hero.title_gradient', undefined, 'متجر إلكتروني ذكي')}
               </span>{' '}
-              يبيع على مدار الساعة
+              {dir === 'rtl' ? 'يبيع على مدار الساعة' : 'that sells 24/7'}
             </h1>
 
             <p className="mt-6 text-lg sm:text-xl text-slate-600 dark:text-slate-300 max-w-2xl mx-auto leading-relaxed">
@@ -158,11 +158,11 @@ export default function HomePage() {
               </div>
               <div className="flex items-center gap-2">
                 <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-                <span>متوافق 100% مع الجوال والموبايل</span>
+                <span>{t('home.trust_mobile', undefined, 'متوافق 100% مع الجوال والموبايل')}</span>
               </div>
               <div className="flex items-center gap-2">
                 <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-                <span>ربط مباشر لبيكسل ميتا (Facebook & Instagram Ads)</span>
+                <span>{t('home.trust_pixel', undefined, 'ربط مباشر لبيكسل ميتا (Facebook & Instagram Ads)')}</span>
               </div>
             </div>
           </div>
@@ -173,10 +173,10 @@ export default function HomePage() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center max-w-3xl mx-auto mb-16">
               <h2 className="text-xs sm:text-sm font-bold text-emerald-600 dark:text-emerald-400 tracking-wider uppercase mb-2">
-                لماذا يفضل تجار مصر WatsStore؟
+                {t('home.why_watsstore', undefined, 'لماذا يفضل تجار مصر WatsStore؟')}
               </h2>
               <p className="text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white leading-tight">
-                كل ما تحتاجه لمضاعفة مبيعاتك عبر واتساب بدون تعقيدات المتاجر التقليدية
+                {t('home.features_headline', undefined, 'كل ما تحتاجه لمضاعفة مبيعاتك عبر واتساب بدون تعقيدات المتاجر التقليدية')}
               </p>
             </div>
 
@@ -186,9 +186,11 @@ export default function HomePage() {
                 <div className="w-12 h-12 rounded-2xl bg-emerald-600 text-white flex items-center justify-center shadow-md shadow-emerald-500/20">
                   <MessageCircle className="w-6 h-6" />
                 </div>
-                <h3 className="text-xl font-bold text-slate-900 dark:text-white">طلبات منظمة على الواتساب</h3>
+                <h3 className="text-xl font-bold text-slate-900 dark:text-white">
+                  {t('home.feat1_title', undefined, 'طلبات منظمة على الواتساب')}
+                </h3>
                 <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
-                  وداعاً لرسائل &quot;بكام ده؟&quot; العشوائية. يستلم التاجر رسالة مفصلة برقم الطلب، أصناف المنتجات، المقاسات، الألوان، العنوان بالتفصيل، والإجمالي المستحق.
+                  {t('home.feat1_desc', undefined, 'وداعاً لرسائل "بكام ده؟" العشوائية. يستلم التاجر رسالة مفصلة برقم الطلب، أصناف المنتجات، المقاسات، الألوان، العنوان بالتفصيل، والإجمالي المستحق.')}
                 </p>
               </div>
 
@@ -197,9 +199,11 @@ export default function HomePage() {
                 <div className="w-12 h-12 rounded-2xl bg-emerald-600 text-white flex items-center justify-center shadow-md shadow-emerald-500/20">
                   <BarChart3 className="w-6 h-6" />
                 </div>
-                <h3 className="text-xl font-bold text-slate-900 dark:text-white">ربط Meta Pixel المزدوج</h3>
+                <h3 className="text-xl font-bold text-slate-900 dark:text-white">
+                  {t('home.feat2_title', undefined, 'ربط Meta Pixel المزدوج')}
+                </h3>
                 <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
-                  تتبع دقيق لإعلانات فيسبوك وإنستغرام عبر تفعيل أحداث ViewContent وAddToCart وPurchase لحظة إتمام الطلب، لتحسين حملاتك الإعلانية بأعلى عائد ROAS.
+                  {t('home.feat2_desc', undefined, 'تتبع دقيق لإعلانات فيسبوك وإنستغرام عبر تفعيل أحداث ViewContent وAddToCart وPurchase لحظة إتمام الطلب، لتحسين حملاتك بأعلى عائد ROAS.')}
                 </p>
               </div>
 
@@ -208,9 +212,11 @@ export default function HomePage() {
                 <div className="w-12 h-12 rounded-2xl bg-emerald-600 text-white flex items-center justify-center shadow-md shadow-emerald-500/20">
                   <Search className="w-6 h-6" />
                 </div>
-                <h3 className="text-xl font-bold text-slate-900 dark:text-white">SEO محلي ومحافظات مصر</h3>
+                <h3 className="text-xl font-bold text-slate-900 dark:text-white">
+                  {t('home.feat3_title', undefined, 'SEO محلي ومحافظات مصر')}
+                </h3>
                 <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
-                  تهيئة تلقائية لنتائج بحث جوجل (SSR + JSON-LD Schema + خريطة موقع Sitemap) وظهور قوي في دليل المتاجر حسب محافظتك (القاهرة، الفيوم، الجيزة، الإسكندرية...).
+                  {t('home.feat3_desc', undefined, 'تهيئة تلقائية لنتائج بحث جوجل (SSR + JSON-LD Schema) وظهور قوي في دليل المتاجر حسب محافظتك (القاهرة، الفيوم، الجيزة، الإسكندرية...).')}
                 </p>
               </div>
 
@@ -219,9 +225,11 @@ export default function HomePage() {
                 <div className="w-12 h-12 rounded-2xl bg-emerald-600 text-white flex items-center justify-center shadow-md shadow-emerald-500/20">
                   <Zap className="w-6 h-6" />
                 </div>
-                <h3 className="text-xl font-bold text-slate-900 dark:text-white">سرعة فائقة وخفة</h3>
+                <h3 className="text-xl font-bold text-slate-900 dark:text-white">
+                  {t('home.feat4_title', undefined, 'سرعة فائقة وخفة')}
+                </h3>
                 <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
-                  واجهة عصرية بتصميم Next.js فائق الخفة يفتح فوراً لعميلك حتى مع باقات الإنترنت الضعيفة، لتقليل نسبة الارتداد وزيادة معدل التحويل.
+                  {t('home.feat4_desc', undefined, 'واجهة عصرية بتصميم Next.js فائق الخفة يفتح فوراً لعميلك حتى مع باقات الإنترنت الضعيفة، لتقليل نسبة الارتداد وزيادة معدل التحويل.')}
                 </p>
               </div>
 
@@ -230,9 +238,11 @@ export default function HomePage() {
                 <div className="w-12 h-12 rounded-2xl bg-emerald-600 text-white flex items-center justify-center shadow-md shadow-emerald-500/20">
                   <Smartphone className="w-6 h-6" />
                 </div>
-                <h3 className="text-xl font-bold text-slate-900 dark:text-white">رمز QR دائم وقصير</h3>
+                <h3 className="text-xl font-bold text-slate-900 dark:text-white">
+                  {t('home.feat5_title', undefined, 'رمز QR دائم وقصير')}
+                </h3>
                 <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
-                  احصل على رابط قصير ورمز QR خاص بمتجرك لا يتغير لطباعته على الأكياس، كروت العمل، أو واجهة المحل ليدخل الزبون للمنيو مباشرة.
+                  {t('home.feat5_desc', undefined, 'احصل على رابط قصير ورمز QR خاص بمتجرك لا يتغير لطباعته على الأكياس، كروت العمل، أو واجهة المحل ليدخل الزبون للمنيو مباشرة.')}
                 </p>
               </div>
 
@@ -241,9 +251,11 @@ export default function HomePage() {
                 <div className="w-12 h-12 rounded-2xl bg-emerald-600 text-white flex items-center justify-center shadow-md shadow-emerald-500/20">
                   <TrendingUp className="w-6 h-6" />
                 </div>
-                <h3 className="text-xl font-bold text-slate-900 dark:text-white">إحصائيات وأرشفة كاملة</h3>
+                <h3 className="text-xl font-bold text-slate-900 dark:text-white">
+                  {t('home.feat6_title', undefined, 'إحصائيات وأرشفة كاملة')}
+                </h3>
                 <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
-                  لوحة تحكم سهلة تسجل جميع طلباتك في قاعدة بيانات SQL مع إجمالي الإيرادات وسجل تفصيلي ببيانات العملاء لإعادة استهدافهم لاحقاً.
+                  {t('home.feat6_desc', undefined, 'لوحة تحكم سهلة تسجل جميع طلباتك في قاعدة بيانات SQL مع إجمالي الإيرادات وسجل تفصيلي ببيانات العملاء لإعادة استهدافهم لاحقاً.')}
                 </p>
               </div>
             </div>
@@ -255,16 +267,16 @@ export default function HomePage() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center max-w-3xl mx-auto mb-12">
               <h2 className="text-xs sm:text-sm font-bold text-emerald-600 dark:text-emerald-400 tracking-wider uppercase mb-2">
-                باقات تناسب جميع أحجام الأنشطة
+                {t('home.pricing_tag', undefined, 'باقات تناسب جميع أحجام الأنشطة')}
               </h2>
               <p className="text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white leading-tight">
-                اختر الباقة المناسبة لمشروعك وابدأ بدون أي التزامات
+                {t('home.pricing_title', undefined, 'اختر الباقة المناسبة لمشروعك وابدأ بدون أي التزامات')}
               </p>
               <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-2">
-                جميع الباقات تشمل تجربة مجانية كاملة 14 يوماً بدون الحاجة لبطاقة بنكية
+                {t('home.pricing_sub', undefined, 'جميع الباقات تشمل تجربة مجانية كاملة 14 يوماً بدون الحاجة لبطاقة بنكية')}
               </p>
 
-              {/* Billing Cycle Switcher with Psychological Savings */}
+              {/* Billing Cycle Switcher */}
               <div className="mt-8 inline-flex items-center gap-2 p-1.5 bg-slate-200/80 dark:bg-slate-800 rounded-2xl border border-slate-300 dark:border-slate-700 shadow-inner">
                 <button
                   type="button"
@@ -275,7 +287,7 @@ export default function HomePage() {
                       : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
                   }`}
                 >
-                  الاشتراك الشهري
+                  {t('home.pricing_monthly', undefined, 'الاشتراك الشهري')}
                 </button>
                 <button
                   type="button"
@@ -286,11 +298,11 @@ export default function HomePage() {
                       : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
                   }`}
                 >
-                  <span>الاشتراك السنوي</span>
+                  <span>{t('home.pricing_annual', undefined, 'الاشتراك السنوي')}</span>
                   <span className={`px-2 py-0.5 rounded-full text-[10px] font-black tracking-tight ${
                     billingCycle === 'annual' ? 'bg-amber-400 text-slate-950' : 'bg-emerald-100 text-emerald-800'
                   }`}>
-                    وفر حتى 30% 🎁
+                    {t('home.pricing_save30', undefined, 'وفر حتى 30% 🎁')}
                   </span>
                 </button>
               </div>
@@ -300,45 +312,53 @@ export default function HomePage() {
               {/* FREE TRIAL */}
               <div className="bg-white dark:bg-slate-900 rounded-3xl p-8 border border-slate-200/80 dark:border-slate-800 shadow-sm flex flex-col justify-between hover:shadow-md transition-shadow">
                 <div>
-                  <h3 className="text-xl font-bold text-slate-900 dark:text-white">تجربة مجانية (14 يوماً)</h3>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">جرب المنصة بكامل خصائصها قبل الاشتراك</p>
+                  <h3 className="text-xl font-bold text-slate-900 dark:text-white">
+                    {t('home.plan_free_title', undefined, 'تجربة مجانية (14 يوماً)')}
+                  </h3>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                    {t('home.plan_free_sub', undefined, 'جرب المنصة بكامل خصائصها قبل الاشتراك')}
+                  </p>
                   
                   <div className="mt-6 mb-8">
                     <div className="flex items-baseline gap-1">
                       <span className="text-4xl font-black text-slate-900 dark:text-white">0</span>
-                      <span className="text-sm font-bold text-slate-600 dark:text-slate-400">ج.م / لمدة 14 يوماً</span>
+                      <span className="text-sm font-bold text-slate-600 dark:text-slate-400">
+                        {t('home.plan_free_period', undefined, 'ج.م / لمدة 14 يوماً')}
+                      </span>
                     </div>
-                    <p className="text-[11px] text-slate-400 mt-1">بدون بطاقة ائتمان أو عمولات مخفية</p>
+                    <p className="text-[11px] text-slate-400 mt-1">
+                      {t('home.plan_free_no_card', undefined, 'بدون بطاقة ائتمان أو عمولات مخفية')}
+                    </p>
                   </div>
 
                   <ul className="space-y-3.5 text-sm text-slate-600 dark:text-slate-300 border-t border-slate-100 dark:border-slate-800 pt-6">
                     <li className="flex items-center gap-2.5">
                       <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                      <span>حتى 10 منتجات خلال فترة التجربة</span>
+                      <span>{t('home.plan_free_feat1', undefined, 'حتى 10 منتجات خلال فترة التجربة')}</span>
                     </li>
                     <li className="flex items-center gap-2.5">
                       <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                      <span>كوبون خصم واحد نشط لمتجرك</span>
+                      <span>{t('home.plan_free_feat2', undefined, 'كوبون خصم واحد نشط لمتجرك')}</span>
                     </li>
-                    <li className="flex items-center gap-2.5 text-slate-400">
+                    <li className="flex items-center gap-2.5 text-slate-400 dark:text-slate-500">
                       <span className="text-xs">🔒</span>
-                      <span className="line-through">كتابة الوصف بالذكاء الاصطناعي (متاح في Pro)</span>
+                      <span className="line-through">{dir === 'rtl' ? 'كتابة الوصف بالذكاء الاصطناعي (متاح في Pro)' : 'AI Descriptions (Available in Pro)'}</span>
                     </li>
-                    <li className="flex items-center gap-2.5 text-slate-400">
+                    <li className="flex items-center gap-2.5 text-slate-400 dark:text-slate-500">
                       <span className="text-xs">🔒</span>
-                      <span className="line-through">تصدير تقارير الطلبات إلى Excel (متاح في Pro)</span>
+                      <span className="line-through">{dir === 'rtl' ? 'تصدير تقارير الطلبات إلى Excel (متاح في Pro)' : 'Excel Reports Export (Available in Pro)'}</span>
                     </li>
                     <li className="flex items-center gap-2.5">
                       <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                      <span>طلبات واستفسارات غير محدودة عبر الواتساب</span>
+                      <span>{t('home.plan_free_feat3', undefined, 'طلبات واستفسارات غير محدودة عبر الواتساب')}</span>
                     </li>
                     <li className="flex items-center gap-2.5">
                       <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                      <span>دعم متغيرات المنتجات والمحافظ الإلكترونية</span>
+                      <span>{t('home.plan_free_feat4', undefined, 'دعم متغيرات المنتجات والمحافظ الإلكترونية')}</span>
                     </li>
                     <li className="flex items-center gap-2.5">
                       <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                      <span>رابط ورمز QR دائم لمتجرك ومطبوعاتك</span>
+                      <span>{t('home.plan_free_feat5', undefined, 'رابط ورمز QR دائم لمتجرك ومطبوعاتك')}</span>
                     </li>
                   </ul>
                 </div>
@@ -347,35 +367,41 @@ export default function HomePage() {
                   href="/register"
                   className="mt-8 w-full py-3.5 rounded-2xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-bold text-sm text-center transition-colors block"
                 >
-                  ابدأ تجربتك المجانية (14 يوماً)
+                  {t('home.cta_button', undefined, 'ابدأ تجربتك المجانية (14 يوماً)')}
                 </Link>
               </div>
 
-              {/* PRO PLAN (DECOY & HERO POPULAR) */}
+              {/* PRO PLAN */}
               <div className="bg-white dark:bg-slate-900 rounded-3xl p-8 border-2 border-emerald-500 shadow-2xl relative ring-4 ring-emerald-500/10 flex flex-col justify-between transform md:-translate-y-2 transition-all">
                 <div className="absolute -top-4 inset-x-0 flex justify-center">
                   <span className="bg-gradient-to-r from-emerald-600 to-teal-600 text-white text-xs font-black px-4 py-1.5 rounded-full shadow-lg flex items-center gap-1.5 border border-emerald-300/40 tracking-wide">
                     <Sparkles className="w-3.5 h-3.5 text-amber-300" />
-                    <span>الأكثر طلباً للتجار ⭐ (أفضل قيمة واستثمار)</span>
+                    <span>{t('home.plan_pro_badge', undefined, 'الأكثر طلباً للتجار ⭐ (أفضل قيمة واستثمار)')}</span>
                   </span>
                 </div>
 
                 <div>
-                  <h3 className="text-xl font-bold text-slate-900 dark:text-white mt-2">باقة المحترفين Pro</h3>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">للمتاجر الراغبة في التوسع ومضاعفة المبيعات</p>
+                  <h3 className="text-xl font-bold text-slate-900 dark:text-white mt-2">
+                    {t('home.plan_pro_title', undefined, 'باقة المحترفين Pro')}
+                  </h3>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                    {t('home.plan_pro_sub', undefined, 'للمتاجر الراغبة في التوسع ومضاعفة المبيعات')}
+                  </p>
                   
                   {billingCycle === 'annual' ? (
                     <div className="mt-6 mb-8">
                       <div className="flex items-baseline gap-1.5">
                         <span className="text-4xl font-black text-emerald-600">{pricing.proAnnualPrice.toLocaleString()}</span>
-                        <span className="text-sm font-bold text-slate-600 dark:text-slate-400">ج.م / سنوياً</span>
+                        <span className="text-sm font-bold text-slate-600 dark:text-slate-400">
+                          {dir === 'rtl' ? 'ج.م / سنوياً' : 'EGP / Year'}
+                        </span>
                       </div>
                       <div className="mt-1 flex items-center gap-2 flex-wrap">
-                        <span className="text-xs font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200">
-                          وفر 1,089 ج.م (شهران مجاناً) 🎁
+                        <span className="text-xs font-bold text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/60 px-2 py-0.5 rounded-md border border-emerald-200 dark:border-emerald-800">
+                          {dir === 'rtl' ? 'وفر 1,089 ج.م (شهران مجاناً) 🎁' : 'Save 1,089 EGP (2 Months Free) 🎁'}
                         </span>
-                        <span className="text-[11px] text-slate-500 font-semibold">
-                          بدلاً من {pricing.proMonthlyPrice} ج.م شهرياً (~{Math.round(pricing.proAnnualPrice / 12)} ج.م/شهرياً)
+                        <span className="text-[11px] text-slate-500 dark:text-slate-400 font-semibold">
+                          ~{Math.round(pricing.proAnnualPrice / 12)} {dir === 'rtl' ? 'ج.م/شهرياً' : 'EGP/mo'}
                         </span>
                       </div>
                     </div>
@@ -383,40 +409,52 @@ export default function HomePage() {
                     <div className="mt-6 mb-8">
                       <div className="flex items-baseline gap-1.5">
                         <span className="text-4xl font-black text-emerald-600">{pricing.proMonthlyPrice}</span>
-                        <span className="text-sm font-bold text-slate-600">ج.م / شهرياً</span>
+                        <span className="text-sm font-bold text-slate-600 dark:text-slate-400">
+                          {dir === 'rtl' ? 'ج.م / شهرياً' : 'EGP / Month'}
+                        </span>
                       </div>
-                      <p className="text-[11px] text-slate-400 mt-1">تجديد شهري مرن، يمكنك الإلغاء بأي وقت</p>
+                      <p className="text-[11px] text-slate-400 mt-1">
+                        {dir === 'rtl' ? 'تجديد شهري مرن، يمكنك الإلغاء بأي وقت' : 'Flexible monthly renewal, cancel anytime'}
+                      </p>
                     </div>
                   )}
 
-                  <ul className="space-y-3.5 text-sm text-slate-700 border-t border-slate-100 pt-6">
+                  <ul className="space-y-3.5 text-sm text-slate-700 dark:text-slate-300 border-t border-slate-100 dark:border-slate-800 pt-6">
                     <li className="flex items-center gap-2.5">
                       <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                      <span className="font-bold text-emerald-800">حتى 100 منتج و 15 كوبون خصم نشط</span>
+                      <span className="font-bold text-emerald-800 dark:text-emerald-300">
+                        {t('home.plan_pro_feat1', undefined, 'حتى 100 منتج و 15 كوبون خصم نشط')}
+                      </span>
                     </li>
                     <li className="flex items-center gap-2.5">
                       <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                      <span className="font-bold text-emerald-700">✨ 15 وصف بالذكاء الاصطناعي شهرياً 🤖</span>
+                      <span className="font-bold text-emerald-700 dark:text-emerald-400">
+                        {t('home.plan_pro_feat2', undefined, '✨ 15 وصف بالذكاء الاصطناعي شهرياً 🤖')}
+                      </span>
                     </li>
                     <li className="flex items-center gap-2.5">
                       <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                      <span className="font-bold text-emerald-700">📊 تصدير الطلبات وتقارير المبيعات لـ Excel</span>
+                      <span className="font-bold text-emerald-700 dark:text-emerald-400">
+                        {t('home.plan_pro_feat3', undefined, '📊 تصدير الطلبات وتقارير المبيعات لـ Excel')}
+                      </span>
                     </li>
                     <li className="flex items-center gap-2.5">
                       <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                      <span className="font-bold text-emerald-700">تفعيل Meta Pixel لتتبع إعلانات فيسبوك وإنستغرام</span>
+                      <span className="font-bold text-emerald-700 dark:text-emerald-400">
+                        {t('home.plan_pro_feat4', undefined, 'تفعيل Meta Pixel لتتبع إعلانات فيسبوك وإنستغرام')}
+                      </span>
                     </li>
                     <li className="flex items-center gap-2.5">
                       <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                      <span>إزالة شارة المنصة بالكامل لعلامة تجارية خاصة</span>
+                      <span>{t('home.plan_pro_feat5', undefined, 'إزالة شارة المنصة بالكامل لعلامة تجارية خاصة')}</span>
                     </li>
                     <li className="flex items-center gap-2.5">
                       <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                      <span>لوحة تحكم إحصائيات المبيعات والمنتجات الأكثر طلباً</span>
+                      <span>{t('home.plan_pro_feat6', undefined, 'لوحة تحكم إحصائيات المبيعات والمنتجات الأكثر طلباً')}</span>
                     </li>
                     <li className="flex items-center gap-2.5">
                       <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                      <span>دعم فني وتدريب سريع ومباشر على الواتساب</span>
+                      <span>{t('home.plan_pro_feat7', undefined, 'دعم فني وتدريب سريع ومباشر على الواتساب')}</span>
                     </li>
                   </ul>
                 </div>
@@ -425,28 +463,34 @@ export default function HomePage() {
                   href="/register"
                   className="mt-8 w-full py-3.5 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-sm text-center shadow-lg shadow-emerald-600/25 transition-all hover:scale-[1.02] block"
                 >
-                  اشترك في باقة Pro {billingCycle === 'annual' ? `(${pricing.proAnnualPrice.toLocaleString()} ج.م/سنوياً)` : `(${pricing.proMonthlyPrice} ج.م/شهرياً)`}
+                  {dir === 'rtl' ? 'اشترك في باقة Pro الآن' : 'Subscribe to Pro Now'}
                 </Link>
               </div>
 
               {/* VIP PLAN */}
               <div className="bg-white dark:bg-slate-900 rounded-3xl p-8 border border-slate-200/80 dark:border-slate-800 shadow-sm flex flex-col justify-between hover:shadow-md transition-shadow">
                 <div>
-                  <h3 className="text-xl font-bold text-slate-900 dark:text-white">باقة كبار التجار VIP 👑</h3>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">للعلامات التجارية الكبرى والمتاجر الرائدة</p>
+                  <h3 className="text-xl font-bold text-slate-900 dark:text-white">
+                    {t('home.plan_vip_title', undefined, 'باقة كبار التجار VIP 👑')}
+                  </h3>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                    {t('home.plan_vip_sub', undefined, 'للعلامات التجارية الكبرى والمتاجر الرائدة')}
+                  </p>
                   
                   {billingCycle === 'annual' ? (
                     <div className="mt-6 mb-8">
                       <div className="flex items-baseline gap-1.5">
                         <span className="text-4xl font-black text-slate-900 dark:text-white">{pricing.vipAnnualPrice.toLocaleString()}</span>
-                        <span className="text-sm font-bold text-slate-600 dark:text-slate-400">ج.م / سنوياً</span>
+                        <span className="text-sm font-bold text-slate-600 dark:text-slate-400">
+                          {dir === 'rtl' ? 'ج.م / سنوياً' : 'EGP / Year'}
+                        </span>
                       </div>
                       <div className="mt-1 flex items-center gap-2 flex-wrap">
                         <span className="text-xs font-bold text-amber-800 bg-amber-50 dark:bg-amber-950/60 dark:text-amber-300 px-2 py-0.5 rounded-md border border-amber-200 dark:border-amber-800">
-                          وفر 2,189 ج.م سنوياً 👑
+                          {dir === 'rtl' ? 'وفر 2,189 ج.م سنوياً 👑' : 'Save 2,189 EGP/yr 👑'}
                         </span>
                         <span className="text-[11px] text-slate-500 dark:text-slate-400 font-semibold">
-                          بدلاً من {pricing.vipMonthlyPrice} ج.م شهرياً (~{Math.round(pricing.vipAnnualPrice / 12)} ج.م/شهرياً)
+                          ~{Math.round(pricing.vipAnnualPrice / 12)} {dir === 'rtl' ? 'ج.م/شهرياً' : 'EGP/mo'}
                         </span>
                       </div>
                     </div>
@@ -454,45 +498,57 @@ export default function HomePage() {
                     <div className="mt-6 mb-8">
                       <div className="flex items-baseline gap-1.5">
                         <span className="text-4xl font-black text-slate-900 dark:text-white">{pricing.vipMonthlyPrice}</span>
-                        <span className="text-sm font-bold text-slate-600 dark:text-slate-400">ج.م / شهرياً</span>
+                        <span className="text-sm font-bold text-slate-600 dark:text-slate-400">
+                          {dir === 'rtl' ? 'ج.م / شهرياً' : 'EGP / Month'}
+                        </span>
                       </div>
-                      <p className="text-[11px] text-slate-400 mt-1">شامل كافة مميزات المنصة والدعم المخصص</p>
+                      <p className="text-[11px] text-slate-400 mt-1">
+                        {dir === 'rtl' ? 'شامل كافة مميزات المنصة والدعم المخصص' : 'All platform features & priority support'}
+                      </p>
                     </div>
                   )}
 
                   <ul className="space-y-3.5 text-sm text-slate-600 dark:text-slate-300 border-t border-slate-100 dark:border-slate-800 pt-6">
                     <li className="flex items-center gap-2.5">
                       <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                      <span className="font-bold text-slate-900 dark:text-white">منتجات غير محدودة وكوبونات غير محدودة 🚀</span>
+                      <span className="font-bold text-slate-900 dark:text-white">
+                        {t('home.plan_vip_feat1', undefined, 'منتجات غير محدودة وكوبونات غير محدودة 🚀')}
+                      </span>
                     </li>
                     <li className="flex items-center gap-2.5">
                       <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                      <span className="font-bold text-emerald-700">💎 150 وصفاً ذكياً بالذكاء الاصطناعي شهرياً</span>
+                      <span className="font-bold text-emerald-700 dark:text-emerald-400">
+                        {t('home.plan_vip_feat2', undefined, '💎 150 وصفاً ذكياً بالذكاء الاصطناعي شهرياً')}
+                      </span>
                     </li>
                     <li className="flex items-center gap-2.5">
                       <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                      <span className="font-bold text-emerald-700">📊 تصدير الطلبات وتقارير المبيعات لـ Excel</span>
+                      <span className="font-bold text-emerald-700 dark:text-emerald-400">
+                        {t('home.plan_vip_feat3', undefined, '📊 تصدير الطلبات وتقارير المبيعات لـ Excel')}
+                      </span>
                     </li>
                     <li className="flex items-center gap-2.5">
                       <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                      <span className="font-bold">دعم النطاق الخاص الكامل (Custom Domain)</span>
+                      <span className="font-bold text-slate-900 dark:text-white">
+                        {t('home.plan_vip_feat4', undefined, 'دعم النطاق الخاص الكامل (Custom Domain)')}
+                      </span>
                     </li>
                     <li className="flex items-center gap-2.5">
                       <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                      <span>جميع مميزات باقة Pro بالكامل</span>
+                      <span>{t('home.plan_vip_feat5', undefined, 'جميع مميزات باقة Pro بالكامل')}</span>
                     </li>
                     <li className="flex items-center gap-2.5">
                       <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                      <span>مدير حساب مخصص وأولوية قصوى في الدعم الفني</span>
+                      <span>{t('home.plan_vip_feat6', undefined, 'مدير حساب مخصص وأولوية قصوى في الدعم الفني')}</span>
                     </li>
                   </ul>
                 </div>
 
                 <Link
                   href="/register"
-                  className="mt-8 w-full py-3.5 rounded-2xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-sm text-center transition-colors block"
+                  className="mt-8 w-full py-3.5 rounded-2xl bg-slate-900 hover:bg-slate-800 dark:bg-emerald-600 dark:hover:bg-emerald-700 text-white font-bold text-sm text-center transition-colors block shadow-md"
                 >
-                  انضم إلى باقة VIP {billingCycle === 'annual' ? `(${pricing.vipAnnualPrice.toLocaleString()} ج.م/سنوياً)` : `(${pricing.vipMonthlyPrice} ج.م/شهرياً)`}
+                  {dir === 'rtl' ? 'انضم إلى باقة VIP' : 'Join VIP Plan'}
                 </Link>
               </div>
             </div>
@@ -503,18 +559,18 @@ export default function HomePage() {
         <section className="py-16 bg-gradient-to-r from-emerald-600 to-teal-700 text-white">
           <div className="max-w-5xl mx-auto px-4 text-center space-y-6">
             <h2 className="text-3xl sm:text-4xl font-black">
-              جاهز لتجربة أسرع متجر واتساب في مصر؟
+              {t('home.cta_title', undefined, 'جاهز لتجربة أسرع متجر واتساب في مصر؟')}
             </h2>
             <p className="text-base sm:text-lg text-emerald-100 max-w-xl mx-auto">
-              سجل متجرك الآن في دقيقتين وابدأ تجربة مجانية كاملة لمدة 14 يوماً بدون بطاقة بنكية.
+              {t('home.cta_sub', undefined, 'سجل متجرك الآن في دقيقتين وابدأ تجربة مجانية كاملة لمدة 14 يوماً بدون بطاقة بنكية.')}
             </p>
             <div>
               <Link
                 href="/register"
                 className="inline-flex items-center gap-3 px-8 py-4 bg-white text-emerald-700 hover:bg-emerald-50 font-black text-base rounded-2xl shadow-xl transition-all hover:scale-105"
               >
-                <span>ابدأ تجربتك المجانية (14 يوماً)</span>
-                <ArrowLeft className="w-5 h-5" />
+                <span>{t('home.cta_button', undefined, 'ابدأ تجربتك المجانية (14 يوماً)')}</span>
+                <ArrowIcon className="w-5 h-5" />
               </Link>
             </div>
           </div>
@@ -522,6 +578,6 @@ export default function HomePage() {
       </main>
 
       <Footer />
-    </>
+    </div>
   );
 }

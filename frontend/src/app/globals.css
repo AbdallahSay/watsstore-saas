@@ -322,6 +322,26 @@ button, a, input, select, textarea, [role="button"] {
   }
 }
 
+/* =========================================================================
+   Global Table & Input Element Contrast (Light & Dark)
+   ========================================================================= */
+table {
+  border-collapse: collapse;
+}
+
+.dark th {
+  color: #cbd5e1;
+}
+
+.dark td {
+  color: #f1f5f9;
+}
+
+.dark input:not([type="checkbox"]):not([type="radio"]):not([type="submit"]):not([type="button"]):not([type="reset"]),
+.dark textarea {
+  color-scheme: dark;
+}
+
 .pb-safe {
   padding-bottom: max(1rem, env(safe-area-inset-bottom, 1rem));
 }

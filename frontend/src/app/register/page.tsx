@@ -15,11 +15,14 @@ import {
   MapPin, 
   Tag, 
   ArrowLeft, 
+  ArrowRight,
   AlertCircle,
-  Sparkles,
-  Home
+  Home,
+  Eye,
+  EyeOff
 } from 'lucide-react';
 import ThemeLanguageBar from '@/components/ThemeLanguageBar';
+import { useLanguage } from '@/context/LanguageContext';
 
 const EGYPT_CITIES = [
   'الفيوم',
@@ -55,6 +58,10 @@ const BUSINESS_CATEGORIES = [
 
 export default function RegisterPage() {
   const router = useRouter();
+  const { t, dir } = useLanguage();
+  const ArrowIcon = dir === 'rtl' ? ArrowLeft : ArrowRight;
+  const isRtl = dir === 'rtl';
+
   const [formData, setFormData] = useState({
     ownerName: '',
     email: '',
@@ -65,6 +72,7 @@ export default function RegisterPage() {
     city: 'الفيوم',
   });
 
+  const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
@@ -92,29 +100,29 @@ export default function RegisterPage() {
 
       await Swal.fire({
         icon: 'success',
-        title: 'مبروك! تم إنشاء متجرك بنجاح 🎉',
+        title: t('auth.register_success', undefined, 'مبروك! تم إنشاء متجرك بنجاح 🎉'),
         html: `
-          <div style="direction: rtl; text-align: right;">
-            <p><strong>اسم المتجر:</strong> ${res.storeName}</p>
-            <p><strong>رابط متجرك:</strong> /s/${res.slug}</p>
-            <p><strong>رمز QR الدائم:</strong> /m/${res.publicCode}</p>
-            <p style="color: #059669; margin-top: 10px;">تم إضافة قسم تجريبي "الأكثر مبيعاً" تلقائياً لتبدأ فوراً بإضافة منتجاتك.</p>
+          <div style="direction: ${isRtl ? 'rtl' : 'ltr'}; text-align: ${isRtl ? 'right' : 'left'};">
+            <p><strong>${t('auth.store_name', undefined, 'اسم المتجر')}:</strong> ${res.storeName}</p>
+            <p><strong>${isRtl ? 'رابط متجرك:' : 'Store URL:'}</strong> /s/${res.slug}</p>
+            <p><strong>${isRtl ? 'رمز QR الدائم:' : 'Permanent QR:'}</strong> /m/${res.publicCode}</p>
+            <p style="color: #059669; margin-top: 10px;">${isRtl ? 'تم إضافة قسم تجريبي "الأكثر مبيعاً" تلقائياً لتبدأ فوراً بإضافة منتجاتك.' : 'A sample category has been created so you can start adding products right away.'}</p>
           </div>
         `,
-        confirmButtonText: 'الانتقال إلى لوحة التحكم 🚀',
+        confirmButtonText: t('auth.goto_dashboard', undefined, 'الانتقال إلى لوحة التحكم 🚀'),
         confirmButtonColor: '#10B981',
       });
 
       router.push('/dashboard');
     } catch (err: any) {
-      setErrorMsg(err.message || 'حدث خطأ أثناء إنشاء الحساب');
+      setErrorMsg(err.message || (isRtl ? 'حدث خطأ أثناء إنشاء الحساب' : 'An error occurred during registration'));
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8 relative transition-colors duration-200">
+    <div dir={dir} className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8 relative transition-colors duration-200">
       {/* Top Floating Utility Bar */}
       <div className="absolute top-4 left-4 right-4 flex items-center justify-between max-w-4xl mx-auto">
         <Link
@@ -122,7 +130,7 @@ export default function RegisterPage() {
           className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-slate-600 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-sm transition-colors"
         >
           <Home className="w-3.5 h-3.5" />
-          <span>الرئيسية</span>
+          <span>{t('nav.home', undefined, 'الرئيسية')}</span>
         </Link>
         <ThemeLanguageBar variant="navbar" />
       </div>
@@ -137,15 +145,15 @@ export default function RegisterPage() {
           </span>
         </Link>
         <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white">
-          ابدأ فترتك التجريبية المجانية (14 يوماً)
+          {t('auth.register_title', undefined, 'ابدأ فترتك التجريبية المجانية (14 يوماً)')}
         </h2>
         <p className="mt-1 text-xs text-emerald-600 dark:text-emerald-400 font-bold">
-          بدون بطاقة بنكية — تجربة كاملة لكافة المميزات لمدة أسبوعين
+          {t('auth.register_badge', undefined, 'بدون بطاقة بنكية — تجربة كاملة لكافة المميزات لمدة أسبوعين')}
         </p>
         <p className="mt-2 text-xs sm:text-sm text-slate-600 dark:text-slate-400">
-          لديك حساب بالفعل؟{' '}
+          {t('auth.already_have_account', undefined, 'لديك حساب بالفعل؟')}{' '}
           <Link href="/login" className="font-bold text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300">
-            تسجيل الدخول هنا
+            {t('auth.login_here', undefined, 'تسجيل الدخول هنا')}
           </Link>
         </p>
       </div>
@@ -163,34 +171,34 @@ export default function RegisterPage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
-                  اسم صاحب المتجر *
+                  {t('auth.owner_name', undefined, 'اسم صاحب المتجر *')}
                 </label>
                 <div className="relative">
-                  <User className="w-4 h-4 text-slate-400 absolute right-3.5 top-1/2 -translate-y-1/2" />
+                  <User className={`w-4 h-4 text-slate-400 absolute ${isRtl ? 'right-3.5' : 'left-3.5'} top-1/2 -translate-y-1/2`} />
                   <input
                     type="text"
                     required
                     value={formData.ownerName}
                     onChange={(e) => setFormData({ ...formData, ownerName: e.target.value })}
-                    placeholder="مثال: أحمد محمود"
-                    className="w-full pr-10 pl-3.5 py-3 rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500"
+                    placeholder={t('auth.owner_name_placeholder', undefined, 'مثال: أحمد محمود')}
+                    className={`w-full ${isRtl ? 'pr-10 pl-3.5' : 'pl-10 pr-3.5'} py-3 rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-colors`}
                   />
                 </div>
               </div>
 
               <div>
                 <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
-                  اسم المتجر / البراند *
+                  {t('auth.store_name', undefined, 'اسم المتجر / البراند *')}
                 </label>
                 <div className="relative">
-                  <StoreIcon className="w-4 h-4 text-slate-400 absolute right-3.5 top-1/2 -translate-y-1/2" />
+                  <StoreIcon className={`w-4 h-4 text-slate-400 absolute ${isRtl ? 'right-3.5' : 'left-3.5'} top-1/2 -translate-y-1/2`} />
                   <input
                     type="text"
                     required
                     value={formData.storeName}
                     onChange={(e) => setFormData({ ...formData, storeName: e.target.value })}
-                    placeholder="مثال: براند الأناقة"
-                    className="w-full pr-10 pl-3.5 py-3 rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500"
+                    placeholder={t('auth.store_name_placeholder', undefined, 'مثال: براند الأناقة')}
+                    className={`w-full ${isRtl ? 'pr-10 pl-3.5' : 'pl-10 pr-3.5'} py-3 rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-colors`}
                   />
                 </div>
               </div>
@@ -199,53 +207,61 @@ export default function RegisterPage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
-                  البريد الإلكتروني *
+                  {t('auth.email', undefined, 'البريد الإلكتروني *')}
                 </label>
                 <div className="relative">
-                  <Mail className="w-4 h-4 text-slate-400 absolute right-3.5 top-1/2 -translate-y-1/2" />
+                  <Mail className={`w-4 h-4 text-slate-400 absolute ${isRtl ? 'right-3.5' : 'left-3.5'} top-1/2 -translate-y-1/2`} />
                   <input
                     type="email"
                     required
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                     placeholder="merchant@example.com"
-                    className="w-full pr-10 pl-3.5 py-3 rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500"
+                    className={`w-full ${isRtl ? 'pr-10 pl-3.5' : 'pl-10 pr-3.5'} py-3 rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-colors`}
                   />
                 </div>
               </div>
 
               <div>
                 <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
-                  كلمة المرور *
+                  {t('auth.password', undefined, 'كلمة المرور *')}
                 </label>
                 <div className="relative">
-                  <Lock className="w-4 h-4 text-slate-400 absolute right-3.5 top-1/2 -translate-y-1/2" />
+                  <Lock className={`w-4 h-4 text-slate-400 absolute ${isRtl ? 'right-3.5' : 'left-3.5'} top-1/2 -translate-y-1/2`} />
                   <input
-                    type="password"
+                    type={showPassword ? 'text' : 'password'}
                     required
                     minLength={6}
                     value={formData.password}
                     onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                    placeholder="6 أحرف على الأقل"
-                    className="w-full pr-10 pl-3.5 py-3 rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500"
+                    placeholder={t('auth.password_min', undefined, '6 أحرف على الأقل')}
+                    className={`w-full ${isRtl ? 'pr-10 pl-10' : 'pl-10 pr-10'} py-3 rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-colors`}
                   />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className={`absolute ${isRtl ? 'left-3.5' : 'right-3.5'} top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-1`}
+                    aria-label={showPassword ? 'Hide password' : 'Show password'}
+                  >
+                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
                 </div>
               </div>
             </div>
 
             <div>
               <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
-                رقم الواتساب لاستقبال الطلبات *
+                {t('auth.whatsapp', undefined, 'رقم الواتساب لاستقبال الطلبات *')}
               </label>
               <div className="relative">
-                <Phone className="w-4 h-4 text-slate-400 absolute right-3.5 top-1/2 -translate-y-1/2" />
+                <Phone className={`w-4 h-4 text-slate-400 absolute ${isRtl ? 'right-3.5' : 'left-3.5'} top-1/2 -translate-y-1/2`} />
                 <input
                   type="tel"
                   required
                   value={formData.whatsAppNumber}
                   onChange={(e) => setFormData({ ...formData, whatsAppNumber: e.target.value })}
-                  placeholder="مثال: 01012345678 أو 201012345678"
-                  className="w-full pr-10 pl-3.5 py-3 rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500"
+                  placeholder={t('auth.whatsapp_placeholder', undefined, 'مثال: 01012345678 أو 201012345678')}
+                  className={`w-full ${isRtl ? 'pr-10 pl-3.5' : 'pl-10 pr-3.5'} py-3 rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-colors`}
                 />
               </div>
             </div>
@@ -253,14 +269,14 @@ export default function RegisterPage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
-                  المحافظة / المدينة *
+                  {t('auth.city', undefined, 'المحافظة / المدينة *')}
                 </label>
                 <div className="relative">
-                  <MapPin className="w-4 h-4 text-slate-400 absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                  <MapPin className={`w-4 h-4 text-slate-400 absolute ${isRtl ? 'right-3.5' : 'left-3.5'} top-1/2 -translate-y-1/2 pointer-events-none`} />
                   <select
                     value={formData.city}
                     onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-                    className="w-full pr-10 pl-3.5 py-3 rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-sm font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500"
+                    className={`w-full ${isRtl ? 'pr-10 pl-3.5' : 'pl-10 pr-3.5'} py-3 rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-sm font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-colors`}
                   >
                     {EGYPT_CITIES.map((c) => (
                       <option key={c} value={c} className="bg-white dark:bg-slate-800 text-slate-900 dark:text-white">
@@ -273,14 +289,14 @@ export default function RegisterPage() {
 
               <div>
                 <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
-                  نوع النشاط التجاري *
+                  {t('auth.category', undefined, 'نوع النشاط التجاري *')}
                 </label>
                 <div className="relative">
-                  <Tag className="w-4 h-4 text-slate-400 absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                  <Tag className={`w-4 h-4 text-slate-400 absolute ${isRtl ? 'right-3.5' : 'left-3.5'} top-1/2 -translate-y-1/2 pointer-events-none`} />
                   <select
                     value={formData.businessCategory}
                     onChange={(e) => setFormData({ ...formData, businessCategory: e.target.value })}
-                    className="w-full pr-10 pl-3.5 py-3 rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-sm font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500"
+                    className={`w-full ${isRtl ? 'pr-10 pl-3.5' : 'pl-10 pr-3.5'} py-3 rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-sm font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-colors`}
                   >
                     {BUSINESS_CATEGORIES.map((b) => (
                       <option key={b} value={b} className="bg-white dark:bg-slate-800 text-slate-900 dark:text-white">
@@ -298,8 +314,8 @@ export default function RegisterPage() {
                 disabled={isLoading}
                 className="w-full py-4 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white font-extrabold text-sm rounded-2xl shadow-lg shadow-emerald-600/25 flex items-center justify-center gap-2 transition-all hover:scale-[1.01] active:scale-[0.99]"
               >
-                <span>{isLoading ? 'جاري إنشاء المتجر...' : 'بدء التجربة المجانية (14 يوماً) 🚀'}</span>
-                <ArrowLeft className="w-4 h-4" />
+                <span>{isLoading ? t('auth.registering', undefined, 'جاري إنشاء المتجر...') : t('auth.register_button', undefined, 'بدء التجربة المجانية (14 يوماً) 🚀')}</span>
+                <ArrowIcon className="w-4 h-4" />
               </button>
             </div>
           </form>
@@ -308,4 +324,3 @@ export default function RegisterPage() {
     </div>
   );
 }
-

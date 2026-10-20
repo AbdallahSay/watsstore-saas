@@ -12,16 +12,19 @@ import {
   AlertCircle, 
   Sparkles,
   LogIn,
-  Home
+  Home,
+  Eye,
+  EyeOff
 } from 'lucide-react';
 import ThemeLanguageBar from '@/components/ThemeLanguageBar';
 import { useLanguage } from '@/context/LanguageContext';
 
 export default function LoginPage() {
   const router = useRouter();
-  const { t } = useLanguage();
+  const { t, dir } = useLanguage();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
@@ -40,15 +43,15 @@ export default function LoginPage() {
 
       await Swal.fire({
         icon: 'success',
-        title: 'أهلاً بك مجدداً! 👋',
-        text: `تم تسجيل الدخول إلى متجر ${res.storeName} بنجاح.`,
+        title: t('auth.login_success_title', undefined, 'أهلاً بك مجدداً! 👋'),
+        text: t('auth.login_success_text', { storeName: res.storeName }, `تم تسجيل الدخول إلى متجر ${res.storeName} بنجاح.`),
         timer: 1500,
         showConfirmButton: false,
       });
 
       router.push('/dashboard');
     } catch (err: any) {
-      setErrorMsg(err.message || 'بيانات الدخول غير صحيحة');
+      setErrorMsg(err.message || t('auth.login_invalid', undefined, 'بيانات الدخول غير صحيحة'));
     } finally {
       setIsLoading(false);
     }
@@ -60,8 +63,10 @@ export default function LoginPage() {
     setErrorMsg(null);
   };
 
+  const isRtl = dir === 'rtl';
+
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col justify-center py-12 sm:px-6 lg:px-8 relative transition-colors duration-200">
+    <div dir={dir} className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col justify-center py-12 sm:px-6 lg:px-8 relative transition-colors duration-200">
       {/* Top Floating Utility Bar */}
       <div className="absolute top-4 left-4 right-4 flex items-center justify-between max-w-4xl mx-auto">
         <Link
@@ -84,12 +89,12 @@ export default function LoginPage() {
           </span>
         </Link>
         <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white">
-          {t('nav.login', undefined, 'تسجيل دخول التاجر')}
+          {t('auth.login_title', undefined, 'تسجيل دخول التاجر')}
         </h2>
         <p className="mt-2 text-xs sm:text-sm text-slate-600 dark:text-slate-400">
-          أو{' '}
+          {t('auth.login_sub', undefined, 'أو')}{' '}
           <Link href="/register" className="font-bold text-emerald-600 dark:text-emerald-400 hover:underline">
-            {t('nav.register', undefined, 'أنشئ متجراً جديداً مجاناً في دقيقتين')}
+            {t('auth.login_to_register', undefined, 'أنشئ متجراً جديداً مجاناً في دقيقتين')}
           </Link>
         </p>
       </div>
@@ -103,7 +108,7 @@ export default function LoginPage() {
             className="w-full py-2.5 px-4 bg-emerald-50 dark:bg-emerald-950/40 hover:bg-emerald-100 dark:hover:bg-emerald-900/50 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/60 rounded-2xl text-xs font-bold flex items-center justify-center gap-2 transition-colors"
           >
             <Sparkles className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-            <span>تجربة سريعة: ملء بيانات متجر العرض (Demo Store)</span>
+            <span>{t('auth.demo_fill', undefined, 'تجربة سريعة: ملء بيانات متجر العرض (Demo Store)')}</span>
           </button>
 
           {errorMsg && (
@@ -116,35 +121,43 @@ export default function LoginPage() {
           <form onSubmit={handleLogin} className="space-y-4">
             <div>
               <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
-                البريد الإلكتروني
+                {t('auth.email', undefined, 'البريد الإلكتروني')}
               </label>
               <div className="relative">
-                <Mail className="w-4 h-4 text-slate-400 absolute right-3.5 top-1/2 -translate-y-1/2" />
+                <Mail className={`w-4 h-4 text-slate-400 absolute ${isRtl ? 'right-3.5' : 'left-3.5'} top-1/2 -translate-y-1/2`} />
                 <input
                   type="email"
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="merchant@example.com"
-                  className="w-full pr-10 pl-3.5 py-3 rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-sm font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-colors"
+                  className={`w-full ${isRtl ? 'pr-10 pl-3.5' : 'pl-10 pr-3.5'} py-3 rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-colors`}
                 />
               </div>
             </div>
 
             <div>
               <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
-                كلمة المرور
+                {t('auth.password', undefined, 'كلمة المرور')}
               </label>
               <div className="relative">
-                <Lock className="w-4 h-4 text-slate-400 absolute right-3.5 top-1/2 -translate-y-1/2" />
+                <Lock className={`w-4 h-4 text-slate-400 absolute ${isRtl ? 'right-3.5' : 'left-3.5'} top-1/2 -translate-y-1/2`} />
                 <input
-                  type="password"
+                  type={showPassword ? 'text' : 'password'}
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
-                  className="w-full pr-10 pl-3.5 py-3 rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-sm font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-colors"
+                  className={`w-full ${isRtl ? 'pr-10 pl-10' : 'pl-10 pr-10'} py-3 rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-colors`}
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className={`absolute ${isRtl ? 'left-3.5' : 'right-3.5'} top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-1`}
+                  aria-label={showPassword ? 'Hide password' : 'Show password'}
+                >
+                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
               </div>
             </div>
 
@@ -154,7 +167,7 @@ export default function LoginPage() {
               className="w-full mt-2 py-3.5 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white font-extrabold text-sm rounded-2xl shadow-lg shadow-emerald-600/25 flex items-center justify-center gap-2 transition-all hover:scale-[1.01] active:scale-[0.99]"
             >
               <LogIn className="w-4 h-4" />
-              <span>{isLoading ? 'جاري التحقق...' : t('nav.login', undefined, 'دخول لوحة التحكم')}</span>
+              <span>{isLoading ? t('auth.logging_in', undefined, 'جاري التحقق...') : t('auth.login_button', undefined, 'دخول لوحة التحكم')}</span>
             </button>
           </form>
         </div>
