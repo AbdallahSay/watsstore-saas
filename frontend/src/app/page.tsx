@@ -20,6 +20,7 @@ import {
 } from 'lucide-react';
 import { api } from '@/lib/api';
 import { useLanguage } from '@/context/LanguageContext';
+import appSwal from '@/lib/sweetalert';
 
 export default function HomePage() {
   const { t, dir } = useLanguage();
@@ -45,6 +46,15 @@ export default function HomePage() {
       .catch((err) => console.warn('Using default pricing matrix fallback:', err));
   }, []);
 
+  const handleBannerClick = () => {
+    appSwal.fire({
+      icon: 'info',
+      title: t('home.banner_text', undefined, '🔥 عرض الإطلاق التجاري: احصل على خصم إضافي عند الاشتراك السنوي اليوم!'),
+      text: t('home.pricing_sub', undefined, 'جميع الباقات تشمل تجربة مجانية كاملة 14 يوماً بدون الحاجة لبطاقة بنكية'),
+      confirmButtonText: t('swal.ok', undefined, 'حسناً'),
+    });
+  };
+
   return (
     <div dir={dir} className="min-h-screen flex flex-col bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 transition-colors duration-200">
       {/* Top Urgency & Scarcity Marketing Banner */}
@@ -52,9 +62,13 @@ export default function HomePage() {
         <div className="bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 text-white px-4 py-2.5 text-xs sm:text-sm font-black shadow-md flex items-center justify-between relative z-50 animate-fadeIn">
           <div className="flex-1 flex items-center justify-center gap-2 flex-wrap">
             <Sparkles className="w-4 h-4 text-amber-300 animate-spin" />
-            <span>
+            <button
+              type="button"
+              onClick={handleBannerClick}
+              className="text-start hover:underline cursor-pointer"
+            >
               {pricing.launchDiscountText || t('home.banner_text', undefined, '🔥 عرض الإطلاق التجاري: احصل على خصم إضافي عند الاشتراك السنوي اليوم!')}
-            </span>
+            </button>
             <a href="#pricing" className="underline mr-2 text-amber-200 hover:text-white font-black transition-colors">
               {t('home.banner_cta', undefined, 'اختر باقتك وسجل الآن ←')}
             </a>
@@ -62,7 +76,7 @@ export default function HomePage() {
           <button
             onClick={() => setShowBanner(false)}
             className="text-white/80 hover:text-white p-1 rounded-lg hover:bg-white/10 transition-colors"
-            aria-label="إغلاق الإشعار"
+            aria-label={t('home.banner_close', undefined, 'إغلاق الإشعار')}
           >
             <X className="w-4 h-4" />
           </button>
@@ -123,7 +137,7 @@ export default function HomePage() {
               <span className="bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 bg-clip-text text-transparent">
                 {t('hero.title_gradient', undefined, 'متجر إلكتروني ذكي')}
               </span>{' '}
-              {dir === 'rtl' ? 'يبيع على مدار الساعة' : 'that sells 24/7'}
+              {t('hero.title_part2', undefined, 'يبيع على مدار الساعة')}
             </h1>
 
             <p className="mt-6 text-lg sm:text-xl text-slate-600 dark:text-slate-300 max-w-2xl mx-auto leading-relaxed">
@@ -342,11 +356,15 @@ export default function HomePage() {
                     </li>
                     <li className="flex items-center gap-2.5 text-slate-400 dark:text-slate-500">
                       <span className="text-xs">🔒</span>
-                      <span className="line-through">{dir === 'rtl' ? 'كتابة الوصف بالذكاء الاصطناعي (متاح في Pro)' : 'AI Descriptions (Available in Pro)'}</span>
+                      <span className="line-through">
+                        {t('home.plan_free_locked_ai', undefined, 'كتابة الوصف بالذكاء الاصطناعي (متاح في Pro)')}
+                      </span>
                     </li>
                     <li className="flex items-center gap-2.5 text-slate-400 dark:text-slate-500">
                       <span className="text-xs">🔒</span>
-                      <span className="line-through">{dir === 'rtl' ? 'تصدير تقارير الطلبات إلى Excel (متاح في Pro)' : 'Excel Reports Export (Available in Pro)'}</span>
+                      <span className="line-through">
+                        {t('home.plan_free_locked_excel', undefined, 'تصدير تقارير الطلبات إلى Excel (متاح في Pro)')}
+                      </span>
                     </li>
                     <li className="flex items-center gap-2.5">
                       <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
@@ -393,15 +411,15 @@ export default function HomePage() {
                       <div className="flex items-baseline gap-1.5">
                         <span className="text-4xl font-black text-emerald-600">{pricing.proAnnualPrice.toLocaleString()}</span>
                         <span className="text-sm font-bold text-slate-600 dark:text-slate-400">
-                          {dir === 'rtl' ? 'ج.م / سنوياً' : 'EGP / Year'}
+                          {t('home.per_year', undefined, 'ج.م / سنوياً')}
                         </span>
                       </div>
                       <div className="mt-1 flex items-center gap-2 flex-wrap">
                         <span className="text-xs font-bold text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/60 px-2 py-0.5 rounded-md border border-emerald-200 dark:border-emerald-800">
-                          {dir === 'rtl' ? 'وفر 1,089 ج.م (شهران مجاناً) 🎁' : 'Save 1,089 EGP (2 Months Free) 🎁'}
+                          {t('home.save_pro_annual', undefined, 'وفر 1,089 ج.م (شهران مجاناً) 🎁')}
                         </span>
                         <span className="text-[11px] text-slate-500 dark:text-slate-400 font-semibold">
-                          ~{Math.round(pricing.proAnnualPrice / 12)} {dir === 'rtl' ? 'ج.م/شهرياً' : 'EGP/mo'}
+                          {t('home.approx_per_month', { price: Math.round(pricing.proAnnualPrice / 12) }, `~${Math.round(pricing.proAnnualPrice / 12)} ج.م/شهرياً`)}
                         </span>
                       </div>
                     </div>
@@ -410,11 +428,11 @@ export default function HomePage() {
                       <div className="flex items-baseline gap-1.5">
                         <span className="text-4xl font-black text-emerald-600">{pricing.proMonthlyPrice}</span>
                         <span className="text-sm font-bold text-slate-600 dark:text-slate-400">
-                          {dir === 'rtl' ? 'ج.م / شهرياً' : 'EGP / Month'}
+                          {t('home.per_month', undefined, 'ج.م / شهرياً')}
                         </span>
                       </div>
                       <p className="text-[11px] text-slate-400 mt-1">
-                        {dir === 'rtl' ? 'تجديد شهري مرن، يمكنك الإلغاء بأي وقت' : 'Flexible monthly renewal, cancel anytime'}
+                        {t('home.flexible_monthly', undefined, 'تجديد شهري مرن، يمكنك الإلغاء بأي وقت')}
                       </p>
                     </div>
                   )}
@@ -463,7 +481,7 @@ export default function HomePage() {
                   href="/register"
                   className="mt-8 w-full py-3.5 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-sm text-center shadow-lg shadow-emerald-600/25 transition-all hover:scale-[1.02] block"
                 >
-                  {dir === 'rtl' ? 'اشترك في باقة Pro الآن' : 'Subscribe to Pro Now'}
+                  {t('home.subscribe_pro', undefined, 'اشترك في باقة Pro الآن')}
                 </Link>
               </div>
 
@@ -482,15 +500,15 @@ export default function HomePage() {
                       <div className="flex items-baseline gap-1.5">
                         <span className="text-4xl font-black text-slate-900 dark:text-white">{pricing.vipAnnualPrice.toLocaleString()}</span>
                         <span className="text-sm font-bold text-slate-600 dark:text-slate-400">
-                          {dir === 'rtl' ? 'ج.م / سنوياً' : 'EGP / Year'}
+                          {t('home.per_year', undefined, 'ج.م / سنوياً')}
                         </span>
                       </div>
                       <div className="mt-1 flex items-center gap-2 flex-wrap">
                         <span className="text-xs font-bold text-amber-800 bg-amber-50 dark:bg-amber-950/60 dark:text-amber-300 px-2 py-0.5 rounded-md border border-amber-200 dark:border-amber-800">
-                          {dir === 'rtl' ? 'وفر 2,189 ج.م سنوياً 👑' : 'Save 2,189 EGP/yr 👑'}
+                          {t('home.save_vip_annual', undefined, 'وفر 2,189 ج.م سنوياً 👑')}
                         </span>
                         <span className="text-[11px] text-slate-500 dark:text-slate-400 font-semibold">
-                          ~{Math.round(pricing.vipAnnualPrice / 12)} {dir === 'rtl' ? 'ج.م/شهرياً' : 'EGP/mo'}
+                          {t('home.approx_per_month', { price: Math.round(pricing.vipAnnualPrice / 12) }, `~${Math.round(pricing.vipAnnualPrice / 12)} ج.م/شهرياً`)}
                         </span>
                       </div>
                     </div>
@@ -499,11 +517,11 @@ export default function HomePage() {
                       <div className="flex items-baseline gap-1.5">
                         <span className="text-4xl font-black text-slate-900 dark:text-white">{pricing.vipMonthlyPrice}</span>
                         <span className="text-sm font-bold text-slate-600 dark:text-slate-400">
-                          {dir === 'rtl' ? 'ج.م / شهرياً' : 'EGP / Month'}
+                          {t('home.per_month', undefined, 'ج.م / شهرياً')}
                         </span>
                       </div>
                       <p className="text-[11px] text-slate-400 mt-1">
-                        {dir === 'rtl' ? 'شامل كافة مميزات المنصة والدعم المخصص' : 'All platform features & priority support'}
+                        {t('home.vip_flexible', undefined, 'شامل كافة مميزات المنصة والدعم المخصص')}
                       </p>
                     </div>
                   )}
@@ -548,7 +566,7 @@ export default function HomePage() {
                   href="/register"
                   className="mt-8 w-full py-3.5 rounded-2xl bg-slate-900 hover:bg-slate-800 dark:bg-emerald-600 dark:hover:bg-emerald-700 text-white font-bold text-sm text-center transition-colors block shadow-md"
                 >
-                  {dir === 'rtl' ? 'انضم إلى باقة VIP' : 'Join VIP Plan'}
+                  {t('home.subscribe_vip', undefined, 'انضم إلى باقة VIP الآن')}
                 </Link>
               </div>
             </div>
