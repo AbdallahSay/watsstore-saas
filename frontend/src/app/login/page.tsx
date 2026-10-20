@@ -1,5 +1,6 @@
 'use client';
 
+import { appSwal } from '@/lib/sweetalert';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -41,7 +42,7 @@ export default function LoginPage() {
       localStorage.setItem('watsstore_merchant_token', res.token);
       localStorage.setItem('watsstore_user', JSON.stringify(res));
 
-      await Swal.fire({
+      await appSwal.fire({
         icon: 'success',
         title: t('auth.login_success_title', undefined, 'أهلاً بك مجدداً! 👋'),
         text: t('auth.login_success_text', { storeName: res.storeName }, `تم تسجيل الدخول إلى متجر ${res.storeName} بنجاح.`),

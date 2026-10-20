@@ -2,7 +2,8 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
-import Swal from 'sweetalert2';
+import { appSwal } from '@/lib/sweetalert';
+import { useLanguage } from '@/context/LanguageContext';
 import { 
   CreditCard, 
   Crown, 
@@ -40,6 +41,7 @@ import {
 } from '@/types';
 
 export default function MerchantBillingPage() {
+  const { t, language, dir } = useLanguage();
   const [token, setToken] = useState<string | null>(null);
   const [status, setStatus] = useState<MerchantBillingStatus | null>(null);
   const [pricing, setPricing] = useState<PlatformPricingSettings | null>(null);
@@ -74,7 +76,7 @@ export default function MerchantBillingPage() {
       }
     } catch (err: any) {
       console.error('Failed to load billing status:', err);
-      Swal.fire({
+      appSwal.fire({
         icon: 'error',
         title: 'خطأ في جلب بيانات الفوترة',
         text: err.message || 'تعذر تحميل بيانات الاشتراك والفوترة',
@@ -88,7 +90,7 @@ export default function MerchantBillingPage() {
   }, []);
 
   useEffect(() => {
-    const savedToken = localStorage.getItem('watsstore_token');
+    const savedToken = (localStorage.getItem('watsstore_merchant_token') || localStorage.getItem('watsstore_token'));
     if (savedToken) {
       setToken(savedToken);
       loadBillingData(savedToken);
@@ -167,7 +169,7 @@ export default function MerchantBillingPage() {
       setIsCopied(text);
       setTimeout(() => setIsCopied(null), 2500);
 
-      const toast = Swal.mixin({
+      const toast = appSwal.mixin({
         toast: true,
         position: 'top-end',
         showConfirmButton: false,
@@ -187,7 +189,7 @@ export default function MerchantBillingPage() {
     if (!token) return;
 
     if (status?.activePendingRequest) {
-      Swal.fire({
+      appSwal.fire({
         icon: 'warning',
         title: 'لديك طلب قيد المراجعة بالفعل!',
         text: 'يوجد طلب ترقية سابق قيد المراجعة المالية. يمكنك انتظار تفعيله أو إلغاؤه لتقديم طلب جديد.',
@@ -200,7 +202,7 @@ export default function MerchantBillingPage() {
 
     const trimmedTx = transactionId.trim();
     if (!trimmedTx) {
-      Swal.fire({
+      appSwal.fire({
         icon: 'warning',
         title: 'رقم العملية مطلوب',
         text: 'يرجى إدخال رقم العملية أو كود الحوالة التأكيدي (من 6 إلى 30 حرف ورقم).',
@@ -212,7 +214,7 @@ export default function MerchantBillingPage() {
     }
 
     if (trimmedTx.length < 6 || trimmedTx.length > 30) {
-      Swal.fire({
+      appSwal.fire({
         icon: 'warning',
         title: 'صيغة رقم العملية غير صالحة',
         text: 'رقم العملية يجب أن يتراوح طوله بين 6 و 30 حرفاً أو رقماً.',
@@ -235,7 +237,7 @@ export default function MerchantBillingPage() {
         notes: notes.trim() || undefined
       });
 
-      Swal.fire({
+      appSwal.fire({
         icon: 'success',
         title: 'تم إرسال طلب الترقية بنجاح! ⏳',
         html: `تم تسجيل طلبك بنجاح وهو الآن <b>قيد المراجعة المالية</b> من قبل الإدارة.<br/><br/>رقم العملية: <code style="font-family: monospace; color: #10B981;">${trimmedTx}</code><br/>سيتم تفعيل باقة <b>${selectedPlan === 'VIP' ? 'VIP 👑' : 'Pro ⭐'}</b> فور مطابقة الإيصال خلال دقائق.`,
@@ -251,7 +253,7 @@ export default function MerchantBillingPage() {
       // Reload billing data
       await loadBillingData(token);
     } catch (err: any) {
-      Swal.fire({
+      appSwal.fire({
         icon: 'error',
         title: 'فشل إرسال الطلب',
         text: err.message || 'حدث خطأ أثناء تسجيل طلب الترقية',
@@ -267,7 +269,7 @@ export default function MerchantBillingPage() {
   const handleCancelPendingRequest = async () => {
     if (!token || !status?.activePendingRequest) return;
 
-    const confirm = await Swal.fire({
+    const confirm = await appSwal.fire({
       title: 'إلغاء طلب الترقية المعلق؟',
       html: `هل تريد إلغاء طلب الترقية الحالي لباقة <b>${status.activePendingRequest.planType}</b>؟<br/>ستتمكن فور الإلغاء من تقديم طلب جديد بوسيلة دفع أو باقة أخرى.`,
       icon: 'question',
@@ -285,7 +287,7 @@ export default function MerchantBillingPage() {
     setIsCancelling(true);
     try {
       const res = await api.cancelMerchantUpgradeRequest(token, status.activePendingRequest.id);
-      Swal.fire({
+      appSwal.fire({
         icon: 'success',
         title: 'تم إلغاء الطلب بنجاح',
         text: res.message || 'تم إلغاء طلب الاشتراك المعلق. يمكنك الآن تقديم طلب جديد.',
@@ -295,7 +297,7 @@ export default function MerchantBillingPage() {
       });
       await loadBillingData(token);
     } catch (err: any) {
-      Swal.fire({
+      appSwal.fire({
         icon: 'error',
         title: 'تعذر إلغاء الطلب',
         text: err.message || 'حدث خطأ أثناء إلغاء طلب الترقية',
@@ -354,7 +356,7 @@ export default function MerchantBillingPage() {
 
         <button
           onClick={() => token && loadBillingData(token)}
-          className="p-2.5 bg-white hover:bg-slate-50 text-slate-600 rounded-xl border border-slate-200 text-xs font-bold flex items-center gap-1.5 self-start sm:self-auto shadow-sm"
+          className="p-2.5 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 rounded-xl border border-slate-200 dark:border-slate-700 text-xs font-bold flex items-center gap-1.5 self-start sm:self-auto shadow-sm"
         >
           <RefreshCw className="w-4 h-4 text-emerald-600" />
           <span>تحديث الحالة</span>
@@ -398,7 +400,7 @@ export default function MerchantBillingPage() {
           {/* 3-Stage Visual Stepper */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2">
             {/* Stage 1: Submitted */}
-            <div className="bg-white/80 border border-emerald-300 rounded-2xl p-4 flex items-center gap-3 shadow-sm">
+            <div className="bg-white/80 dark:bg-slate-800/80 border border-emerald-300 dark:border-emerald-700 rounded-2xl p-4 flex items-center gap-3 shadow-sm">
               <div className="w-9 h-9 rounded-xl bg-emerald-500 text-white flex items-center justify-center shrink-0">
                 <Check className="w-5 h-5 font-black" />
               </div>
@@ -420,7 +422,7 @@ export default function MerchantBillingPage() {
             </div>
 
             {/* Stage 3: Instant Activation */}
-            <div className="bg-white/50 border border-amber-200 rounded-2xl p-4 flex items-center gap-3 opacity-70">
+            <div className="bg-white/50 dark:bg-slate-800/50 border border-amber-200 dark:border-amber-700 rounded-2xl p-4 flex items-center gap-3 opacity-70">
               <div className="w-9 h-9 rounded-xl bg-slate-200 text-slate-600 flex items-center justify-center shrink-0">
                 <Zap className="w-5 h-5" />
               </div>
@@ -432,7 +434,7 @@ export default function MerchantBillingPage() {
           </div>
 
           {/* Detailed Metadata Pill Bar */}
-          <div className="bg-white/80 border border-amber-200 rounded-2xl p-4 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 text-xs">
+          <div className="bg-white/80 dark:bg-slate-800/80 border border-amber-200 dark:border-amber-700 rounded-2xl p-4 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 text-xs">
             <div>
               <span className="text-[11px] text-slate-500 block">طريقة الدفع المحول بها</span>
               <span className="font-bold text-slate-900">
@@ -469,7 +471,7 @@ export default function MerchantBillingPage() {
 
       {/* 2. Current Plan Overview Card */}
       {status && (
-        <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 shadow-sm space-y-6">
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 sm:p-8 shadow-sm space-y-6 transition-colors">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-5">
             <div className="flex items-center gap-3">
               <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 text-emerald-600 flex items-center justify-center font-bold">
@@ -572,7 +574,7 @@ export default function MerchantBillingPage() {
       )}
 
       {/* 3. 3-Step Guided Upgrade Wizard */}
-      <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 shadow-sm space-y-8">
+      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 sm:p-8 shadow-sm space-y-8 transition-colors">
         {/* Wizard Header & Stepper Tabs */}
         <div className="space-y-4">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-5">
@@ -648,7 +650,7 @@ export default function MerchantBillingPage() {
                   onClick={() => setBillingCycle('Monthly')}
                   className={`px-4 py-2 rounded-xl text-xs font-black transition-all ${
                     billingCycle === 'Monthly'
-                      ? 'bg-white text-slate-900 shadow-sm'
+                      ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-sm'
                       : 'text-slate-600 hover:text-slate-900'
                   }`}
                 >
@@ -678,7 +680,7 @@ export default function MerchantBillingPage() {
               {/* Card 1: Pro Plan */}
               <div 
                 onClick={() => setSelectedPlan('Pro')}
-                className={`cursor-pointer bg-white border-2 rounded-3xl p-6 sm:p-8 space-y-6 transition-all relative flex flex-col justify-between ${
+                className={`cursor-pointer bg-white dark:bg-slate-900 border-2 rounded-3xl p-6 sm:p-8 space-y-6 transition-all relative flex flex-col justify-between ${
                   selectedPlan === 'Pro' 
                     ? 'border-emerald-500 shadow-xl shadow-emerald-500/10 ring-2 ring-emerald-500/20 bg-emerald-50/20' 
                     : 'border-slate-200 hover:border-slate-300 shadow-sm'
@@ -1176,7 +1178,7 @@ export default function MerchantBillingPage() {
       </div>
 
       {/* 4. Invoices & Previous Requests History Table */}
-      <div className="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 shadow-sm space-y-4">
+      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 sm:p-8 shadow-sm space-y-4 transition-colors">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Receipt className="w-5 h-5 text-emerald-600" />

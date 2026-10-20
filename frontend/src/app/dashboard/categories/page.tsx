@@ -3,7 +3,8 @@
 import { useEffect, useState } from 'react';
 import { api } from '@/lib/api';
 import { Category } from '@/types';
-import Swal from 'sweetalert2';
+import { appSwal } from '@/lib/sweetalert';
+import { useLanguage } from '@/context/LanguageContext';
 import { 
   FolderTree, 
   Plus, 
@@ -14,6 +15,7 @@ import {
 } from 'lucide-react';
 
 export default function DashboardCategoriesPage() {
+  const { t, language, dir } = useLanguage();
   const [categories, setCategories] = useState<Category[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -24,14 +26,14 @@ export default function DashboardCategoriesPage() {
   const [isSaving, setIsSaving] = useState(false);
 
   const fetchCategories = async () => {
-    const token = localStorage.getItem('watsstore_token');
+    const token = (localStorage.getItem('watsstore_merchant_token') || localStorage.getItem('watsstore_token'));
     if (!token) return;
 
     try {
       const data = await api.getCategories(token);
       setCategories(data);
     } catch (err: any) {
-      Swal.fire({
+      appSwal.fire({
         icon: 'error',
         title: 'خطأ',
         text: err.message || 'فشل في تحميل الأقسام',
@@ -73,11 +75,11 @@ export default function DashboardCategoriesPage() {
 
   const handleSaveCategory = async (e: React.FormEvent) => {
     e.preventDefault();
-    const token = localStorage.getItem('watsstore_token');
+    const token = (localStorage.getItem('watsstore_merchant_token') || localStorage.getItem('watsstore_token'));
     if (!token) return;
 
     if (!formName.trim()) {
-      Swal.fire({ icon: 'warning', text: 'يرجى إدخال اسم القسم' });
+      appSwal.fire({ icon: 'warning', text: 'يرجى إدخال اسم القسم' });
       return;
     }
 
@@ -91,26 +93,26 @@ export default function DashboardCategoriesPage() {
 
       if (editingCategory) {
         await api.updateCategory(token, editingCategory.id, payload);
-        Swal.fire({ icon: 'success', title: 'تم تعديل القسم بنجاح', timer: 1200, showConfirmButton: false });
+        appSwal.fire({ icon: 'success', title: 'تم تعديل القسم بنجاح', timer: 1200, showConfirmButton: false });
       } else {
         await api.createCategory(token, payload);
-        Swal.fire({ icon: 'success', title: 'تم إنشاء القسم بنجاح', timer: 1200, showConfirmButton: false });
+        appSwal.fire({ icon: 'success', title: 'تم إنشاء القسم بنجاح', timer: 1200, showConfirmButton: false });
       }
 
       setIsModalOpen(false);
       fetchCategories();
     } catch (err: any) {
-      Swal.fire({ icon: 'error', title: 'خطأ', text: err.message || 'حدث خطأ أثناء الحفظ' });
+      appSwal.fire({ icon: 'error', title: 'خطأ', text: err.message || 'حدث خطأ أثناء الحفظ' });
     } finally {
       setIsSaving(false);
     }
   };
 
   const handleDeleteCategory = async (cat: Category) => {
-    const token = localStorage.getItem('watsstore_token');
+    const token = (localStorage.getItem('watsstore_merchant_token') || localStorage.getItem('watsstore_token'));
     if (!token) return;
 
-    const confirm = await Swal.fire({
+    const confirm = await appSwal.fire({
       title: 'هل تريد حذف هذا القسم؟',
       text: `سيتم حذف قسم "${cat.name}". لن يتم حذف المنتجات التابعة له بل ستصبح بدون قسم.`,
       icon: 'warning',
@@ -123,10 +125,10 @@ export default function DashboardCategoriesPage() {
     if (confirm.isConfirmed) {
       try {
         await api.deleteCategory(token, cat.id);
-        Swal.fire({ icon: 'success', title: 'تم الحذف بنجاح', timer: 1200, showConfirmButton: false });
+        appSwal.fire({ icon: 'success', title: 'تم الحذف بنجاح', timer: 1200, showConfirmButton: false });
         fetchCategories();
       } catch (err: any) {
-        Swal.fire({ icon: 'error', title: 'خطأ', text: err.message || 'فشل في حذف القسم' });
+        appSwal.fire({ icon: 'error', title: 'خطأ', text: err.message || 'فشل في حذف القسم' });
       }
     }
   };
@@ -135,8 +137,8 @@ export default function DashboardCategoriesPage() {
     <div className="space-y-6 max-w-5xl mx-auto">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-black text-slate-900">إدارة أقسام المتجر</h1>
-          <p className="text-xs text-slate-500 mt-1">
+          <h1 className="text-2xl font-black text-slate-900 dark:text-white">{t('categories.title', undefined, 'إدارة أقسام المتجر')}</h1>
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
             قسم منتجاتك إلى مجموعات واضحة (مثلاً: فساتين، عبايات، إكسسوارات) لتسهيل تصفح المتجر على العميل.
           </p>
         </div>
@@ -146,7 +148,7 @@ export default function DashboardCategoriesPage() {
           className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-bold rounded-2xl shadow-lg shadow-emerald-600/20 flex items-center gap-2 transition-all hover:scale-105"
         >
           <Plus className="w-4 h-4 stroke-[2.5]" />
-          <span>إضافة قسم جديد</span>
+          <span>{t('categories.add_new', undefined, 'إضافة قسم جديد')}</span>
         </button>
       </div>
 
@@ -155,11 +157,11 @@ export default function DashboardCategoriesPage() {
           <div className="w-8 h-8 border-4 border-emerald-600 border-t-transparent rounded-full animate-spin" />
         </div>
       ) : categories.length === 0 ? (
-        <div className="bg-white rounded-3xl p-16 text-center border border-slate-200/80 shadow-sm max-w-md mx-auto my-8 space-y-4">
-          <div className="w-16 h-16 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center mx-auto">
+        <div className="bg-white dark:bg-slate-900 rounded-3xl p-16 text-center border border-slate-200/80 dark:border-slate-800 shadow-sm max-w-md mx-auto my-8 space-y-4">
+          <div className="w-16 h-16 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-500 flex items-center justify-center mx-auto">
             <FolderTree className="w-8 h-8 stroke-1" />
           </div>
-          <h3 className="text-base font-bold text-slate-800">لا توجد أقسام مسجلة</h3>
+          <h3 className="text-base font-bold text-slate-800 dark:text-white">{t('categories.empty_title', undefined, 'لا توجد أقسام مسجلة')}</h3>
           <p className="text-xs text-slate-500">
             أضف قسماً لترتيب المنتجات داخل الكتالوج وعرض تبويبات التصفية.
           </p>
@@ -171,27 +173,27 @@ export default function DashboardCategoriesPage() {
           </button>
         </div>
       ) : (
-        <div className="bg-white rounded-3xl border border-slate-200/80 shadow-sm overflow-hidden">
+        <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-sm overflow-hidden">
           <table className="w-full text-right text-xs">
-            <thead className="bg-slate-50 border-b border-slate-200 text-slate-500 font-bold">
+            <thead className="bg-slate-50 dark:bg-slate-800/80 border-b border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 font-bold">
               <tr>
-                <th className="py-4 px-4">اسم القسم</th>
-                <th className="py-4 px-4">ترتيب الظهور</th>
-                <th className="py-4 px-4">عدد المنتجات</th>
-                <th className="py-4 px-4 text-center">الإجراءات</th>
+                <th className="py-4 px-4">{t('categories.th_name', undefined, 'اسم القسم')}</th>
+                <th className="py-4 px-4">{t('categories.th_sort', undefined, 'ترتيب الظهور')}</th>
+                <th className="py-4 px-4">{t('categories.th_count', undefined, 'عدد المنتجات')}</th>
+                <th className="py-4 px-4 text-center">{t('categories.th_actions', undefined, 'الإجراءات')}</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100 text-slate-700">
+            <tbody className="divide-y divide-slate-100 dark:divide-slate-800 text-slate-700 dark:text-slate-300">
               {categories.map((cat) => (
-                <tr key={cat.id} className="hover:bg-slate-50/80 transition-colors">
-                  <td className="py-3.5 px-4 font-bold text-slate-900 text-sm">
+                <tr key={cat.id} className="hover:bg-slate-50/80 dark:hover:bg-slate-800/50 transition-colors">
+                  <td className="py-3.5 px-4 font-bold text-slate-900 dark:text-white text-sm">
                     {cat.name}
                   </td>
-                  <td className="py-3.5 px-4 text-slate-600">
+                  <td className="py-3.5 px-4 text-slate-600 dark:text-slate-300">
                     #{cat.sortOrder}
                   </td>
                   <td className="py-3.5 px-4">
-                    <span className="bg-slate-100 text-slate-700 font-bold px-2 py-0.5 rounded-md text-[11px]">
+                    <span className="bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold px-2 py-0.5 rounded-md text-[11px]">
                       {cat.productCount || 0} منتج
                     </span>
                   </td>

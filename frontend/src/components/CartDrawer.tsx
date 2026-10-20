@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { Store, CartItem, ApplyCouponResponse } from '../types';
 import { api } from '../lib/api';
 import { pixel } from '../lib/pixel';
-import Swal from 'sweetalert2';
+import { appSwal } from '../lib/sweetalert';
 import { 
   X, 
   Trash2, 
@@ -95,7 +95,7 @@ export default function CartDrawer({
       });
       setAppliedCoupon(res);
       setCouponCodeInput(res.code);
-      Swal.fire({
+      appSwal.fire({
         toast: true,
         position: 'top-end',
         icon: 'success',
@@ -196,7 +196,7 @@ export default function CartDrawer({
       }
 
       // SweetAlert2 confirmation
-      await Swal.fire({
+      await appSwal.fire({
         title: 'تم تسجيل طلبك بنجاح! 🎉',
         html: `
           <div style="direction: rtl; text-align: right; font-family: inherit;">

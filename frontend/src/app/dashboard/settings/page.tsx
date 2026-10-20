@@ -1,5 +1,6 @@
 'use client';
 
+import { appSwal } from '@/lib/sweetalert';
 import { useEffect, useState, useRef } from 'react';
 import { api } from '@/lib/api';
 import Swal from 'sweetalert2';
@@ -116,7 +117,7 @@ export default function DashboardSettingsPage() {
           instaPayAddress: s.instaPayAddress || '',
         });
       } catch (err: any) {
-        Swal.fire({
+        appSwal.fire({
           icon: 'error',
           title: 'خطأ',
           text: err.message || 'فشل في تحميل الإعدادات',
@@ -144,7 +145,7 @@ export default function DashboardSettingsPage() {
         setFormData((prev) => ({ ...prev, coverUrl: res.imageUrl }));
       }
 
-      Swal.fire({
+      appSwal.fire({
         icon: 'success',
         title: 'تم رفع الصورة بنجاح! 📸',
         text: 'تم تحديث رابط الصورة، لا تنسَ الضغط على "حفظ التعديلات".',
@@ -152,7 +153,7 @@ export default function DashboardSettingsPage() {
         showConfirmButton: false,
       });
     } catch (err: any) {
-      Swal.fire({
+      appSwal.fire({
         icon: 'error',
         title: 'فشل رفع الصورة',
         text: err.message || 'يرجى التأكد من أن الصورة لا تتجاوز 5 ميجابايت وبصيغة JPG أو PNG أو WEBP',
@@ -187,7 +188,7 @@ export default function DashboardSettingsPage() {
         } catch {}
       }
 
-      Swal.fire({
+      appSwal.fire({
         icon: 'success',
         title: 'تم حفظ التعديلات بنجاح 🎉',
         text: 'تم تحديث بيانات المتجر والإعدادات ووسائل الدفع مباشرة.',
@@ -195,7 +196,7 @@ export default function DashboardSettingsPage() {
         showConfirmButton: false,
       });
     } catch (err: any) {
-      Swal.fire({
+      appSwal.fire({
         icon: 'error',
         title: 'خطأ',
         text: err.message || 'فشل في حفظ الإعدادات',

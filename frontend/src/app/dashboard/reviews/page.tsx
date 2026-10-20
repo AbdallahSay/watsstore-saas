@@ -3,7 +3,8 @@
 import { useEffect, useState } from 'react';
 import { api } from '@/lib/api';
 import { MerchantReview, MerchantReviewsResponse } from '@/types';
-import Swal from 'sweetalert2';
+import { appSwal } from '@/lib/sweetalert';
+import { useLanguage } from '@/context/LanguageContext';
 import { 
   Star, 
   CheckCircle2, 
@@ -22,6 +23,7 @@ import {
 } from 'lucide-react';
 
 export default function DashboardReviewsPage() {
+  const { t, language, dir } = useLanguage();
   const [reviewsData, setReviewsData] = useState<MerchantReviewsResponse>({
     totalCount: 0,
     approvedCount: 0,
@@ -35,14 +37,14 @@ export default function DashboardReviewsPage() {
   const [actionLoadingId, setActionLoadingId] = useState<string | null>(null);
 
   const fetchReviews = async () => {
-    const token = localStorage.getItem('watsstore_token');
+    const token = (localStorage.getItem('watsstore_merchant_token') || localStorage.getItem('watsstore_token'));
     if (!token) return;
 
     try {
       const data = await api.getMerchantReviews(token);
       setReviewsData(data);
     } catch (err: any) {
-      Swal.fire({
+      appSwal.fire({
         icon: 'error',
         title: 'خطأ',
         text: err.message || 'فشل في تحميل التقييمات',
@@ -57,7 +59,7 @@ export default function DashboardReviewsPage() {
   }, []);
 
   const handleToggleApproval = async (review: MerchantReview) => {
-    const token = localStorage.getItem('watsstore_token');
+    const token = (localStorage.getItem('watsstore_merchant_token') || localStorage.getItem('watsstore_token'));
     if (!token) return;
 
     const newStatus = !review.isApproved;
@@ -86,7 +88,7 @@ export default function DashboardReviewsPage() {
         };
       });
 
-      Swal.fire({
+      appSwal.fire({
         toast: true,
         position: 'top-end',
         showConfirmButton: false,
@@ -95,7 +97,7 @@ export default function DashboardReviewsPage() {
         title: newStatus ? 'تم اعتماد ونشر التقييم بنجاح' : 'تم إخفاء التقييم ونقله للمراجعة',
       });
     } catch (err: any) {
-      Swal.fire({
+      appSwal.fire({
         icon: 'error',
         title: 'خطأ',
         text: err.message || 'فشل في تعديل حالة التقييم',
@@ -106,10 +108,10 @@ export default function DashboardReviewsPage() {
   };
 
   const handleDeleteReview = async (review: MerchantReview) => {
-    const token = localStorage.getItem('watsstore_token');
+    const token = (localStorage.getItem('watsstore_merchant_token') || localStorage.getItem('watsstore_token'));
     if (!token) return;
 
-    const result = await Swal.fire({
+    const result = await appSwal.fire({
       title: 'هل أنت متأكد من الحذف؟',
       text: `سيتم حذف تقييم العميل "${review.customerName}" نهائياً ولا يمكن التراجع.`,
       icon: 'warning',
@@ -145,7 +147,7 @@ export default function DashboardReviewsPage() {
         };
       });
 
-      Swal.fire({
+      appSwal.fire({
         toast: true,
         position: 'top-end',
         showConfirmButton: false,
@@ -154,7 +156,7 @@ export default function DashboardReviewsPage() {
         title: 'تم حذف التقييم بنجاح',
       });
     } catch (err: any) {
-      Swal.fire({
+      appSwal.fire({
         icon: 'error',
         title: 'خطأ',
         text: err.message || 'فشل في حذف التقييم',
@@ -316,23 +318,23 @@ export default function DashboardReviewsPage() {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="ابحث باسم العميل أو كلمات من التقييم..."
-            className="w-full pr-10 pl-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500"
+            className="w-full pr-10 pl-4 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl text-xs font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500"
           />
         </div>
       </div>
 
       {/* Reviews List */}
       {isLoading ? (
-        <div className="bg-white rounded-3xl p-12 text-center border border-slate-200">
+        <div className="bg-white dark:bg-slate-900 rounded-3xl p-12 text-center border border-slate-200 dark:border-slate-800">
           <div className="w-10 h-10 border-4 border-emerald-600 border-t-transparent rounded-full animate-spin mx-auto mb-3" />
           <span className="text-sm font-bold text-slate-600">جاري تحميل آراء المشترين...</span>
         </div>
       ) : filteredReviews.length === 0 ? (
-        <div className="bg-white rounded-3xl p-12 text-center border border-slate-200 space-y-3">
-          <div className="w-16 h-16 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 mx-auto">
+        <div className="bg-white dark:bg-slate-900 rounded-3xl p-12 text-center border border-slate-200 dark:border-slate-800 space-y-3">
+          <div className="w-16 h-16 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-400 dark:text-slate-500 mx-auto">
             <MessageSquare className="w-8 h-8" />
           </div>
-          <h3 className="text-base font-bold text-slate-800">
+          <h3 className="text-base font-bold text-slate-800 dark:text-white">
             {searchQuery ? 'لا توجد نتائج مطابقة لبحثك' : 'لا توجد تقييمات في هذا التبويب'}
           </h3>
           <p className="text-xs text-slate-500 max-w-md mx-auto">
@@ -359,19 +361,19 @@ export default function DashboardReviewsPage() {
                 key={review.id}
                 className={`bg-white rounded-2xl p-5 border transition-all ${
                   review.isApproved 
-                    ? 'border-slate-200 shadow-xs' 
-                    : 'border-amber-200 bg-amber-50/20 shadow-xs'
+                    ? 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs' 
+                    : 'border-amber-200 dark:border-amber-900/60 bg-amber-50/20 dark:bg-amber-950/20 shadow-xs'
                 }`}
               >
                 <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                   {/* Customer Info & Stars */}
                   <div className="flex items-start gap-3.5">
-                    <div className="w-11 h-11 rounded-2xl bg-slate-100 text-slate-700 font-bold flex items-center justify-center shrink-0 border border-slate-200 text-sm">
+                    <div className="w-11 h-11 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 font-bold flex items-center justify-center shrink-0 border border-slate-200 dark:border-slate-700 text-sm">
                       {review.customerName.slice(0, 2)}
                     </div>
                     <div>
                       <div className="flex items-center gap-2">
-                        <h4 className="font-bold text-slate-900 text-sm">{review.customerName}</h4>
+                        <h4 className="font-bold text-slate-900 dark:text-white text-sm">{review.customerName}</h4>
                         {review.isApproved ? (
                           <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
                             <CheckCircle2 className="w-3 h-3 text-emerald-600" />
@@ -410,7 +412,7 @@ export default function DashboardReviewsPage() {
                       disabled={isProcessing}
                       className={`inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold transition-all ${
                         review.isApproved
-                          ? 'border border-slate-200 text-slate-700 hover:bg-slate-100'
+                          ? 'border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
                           : 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs'
                       } ${isProcessing ? 'opacity-50 cursor-not-allowed' : ''}`}
                     >
@@ -439,7 +441,7 @@ export default function DashboardReviewsPage() {
                 </div>
 
                 {/* Review Comment Box */}
-                <div className="mt-3.5 p-3.5 rounded-xl bg-slate-50 border border-slate-100 text-slate-700 text-xs sm:text-sm leading-relaxed">
+                <div className="mt-3.5 p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-700 text-slate-700 dark:text-slate-200 text-xs sm:text-sm leading-relaxed">
                   "{review.comment}"
                 </div>
               </div>

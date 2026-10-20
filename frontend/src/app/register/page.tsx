@@ -1,5 +1,6 @@
 'use client';
 
+import { appSwal } from '@/lib/sweetalert';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -98,7 +99,7 @@ export default function RegisterPage() {
       localStorage.setItem('watsstore_merchant_token', res.token);
       localStorage.setItem('watsstore_user', JSON.stringify(res));
 
-      await Swal.fire({
+      await appSwal.fire({
         icon: 'success',
         title: t('auth.register_success', undefined, 'مبروك! تم إنشاء متجرك بنجاح 🎉'),
         html: `

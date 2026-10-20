@@ -1,5 +1,6 @@
 'use client';
 
+import { appSwal } from '@/lib/sweetalert';
 import { useEffect, useState } from 'react';
 import { api } from '@/lib/api';
 import { MerchantAnalyticsResponse, DailySalesDataPoint } from '@/types';
@@ -41,7 +42,7 @@ export default function DashboardAnalyticsPage() {
       const data = await api.getMerchantAnalytics(token);
       setAnalytics(data);
     } catch (err: any) {
-      Swal.fire({
+      appSwal.fire({
         icon: 'error',
         title: 'خطأ',
         text: err.message || 'فشل في تحميل بيانات الإحصائيات',
@@ -62,7 +63,7 @@ export default function DashboardAnalyticsPage() {
     setIsExporting(true);
     try {
       await api.exportOrdersCsv(token);
-      Swal.fire({
+      appSwal.fire({
         toast: true,
         position: 'top-end',
         icon: 'success',
@@ -71,7 +72,7 @@ export default function DashboardAnalyticsPage() {
         timer: 3000,
       });
     } catch (err: any) {
-      Swal.fire({
+      appSwal.fire({
         icon: 'error',
         title: 'خطأ في التصدير',
         text: err.message || 'حدث خطأ أثناء تصدير ملف الإكسل',

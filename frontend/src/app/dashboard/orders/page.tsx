@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import { api } from '@/lib/api';
-import Swal from 'sweetalert2';
+import { appSwal } from '@/lib/sweetalert';
+import { useLanguage } from '@/context/LanguageContext';
 import { 
   Receipt, 
   Download, 
@@ -19,6 +20,7 @@ import {
 } from 'lucide-react';
 
 export default function MerchantOrdersPage() {
+  const { t, language, dir } = useLanguage();
   const [orders, setOrders] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isExporting, setIsExporting] = useState(false);
@@ -26,14 +28,14 @@ export default function MerchantOrdersPage() {
   const [paymentFilter, setPaymentFilter] = useState('ALL');
 
   const fetchOrders = async () => {
-    const token = localStorage.getItem('watsstore_token');
+    const token = (localStorage.getItem('watsstore_merchant_token') || localStorage.getItem('watsstore_token'));
     if (!token) return;
 
     try {
       const data = await api.getOrders(token, 1, 100);
       setOrders(data.orders || []);
     } catch (err: any) {
-      Swal.fire({
+      appSwal.fire({
         icon: 'error',
         title: 'خطأ',
         text: err.message || 'فشل في تحميل سجل الطلبات',
@@ -48,13 +50,13 @@ export default function MerchantOrdersPage() {
   }, []);
 
   const handleExportCsv = async () => {
-    const token = localStorage.getItem('watsstore_token');
+    const token = (localStorage.getItem('watsstore_merchant_token') || localStorage.getItem('watsstore_token'));
     if (!token) return;
 
     setIsExporting(true);
     try {
       await api.exportOrdersCsv(token);
-      const toast = Swal.mixin({
+      const toast = appSwal.mixin({
         toast: true,
         position: 'top-end',
         showConfirmButton: false,
@@ -65,7 +67,7 @@ export default function MerchantOrdersPage() {
         title: 'تم تصدير ملف الإكسل (CSV) بنجاح!',
       });
     } catch (err: any) {
-      Swal.fire({
+      appSwal.fire({
         icon: 'error',
         title: 'خطأ في التصدير',
         text: err.message || 'حدث خطأ أثناء تحميل ملف الإكسل',

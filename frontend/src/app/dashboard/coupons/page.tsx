@@ -3,7 +3,8 @@
 import { useEffect, useState } from 'react';
 import { api } from '@/lib/api';
 import { StoreCoupon } from '@/types';
-import Swal from 'sweetalert2';
+import { appSwal } from '@/lib/sweetalert';
+import { useLanguage } from '@/context/LanguageContext';
 import { 
   Tag, 
   CheckCircle2, 
@@ -23,6 +24,7 @@ import {
 } from 'lucide-react';
 
 export default function DashboardCouponsPage() {
+  const { t, language, dir } = useLanguage();
   const [coupons, setCoupons] = useState<StoreCoupon[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'all' | 'active' | 'inactive'>('all');
@@ -42,14 +44,14 @@ export default function DashboardCouponsPage() {
   const [formError, setFormError] = useState<string | null>(null);
 
   const fetchCoupons = async () => {
-    const token = localStorage.getItem('watsstore_token');
+    const token = (localStorage.getItem('watsstore_merchant_token') || localStorage.getItem('watsstore_token'));
     if (!token) return;
 
     try {
       const data = await api.getMerchantCoupons(token);
       setCoupons(data);
     } catch (err: any) {
-      Swal.fire({
+      appSwal.fire({
         icon: 'error',
         title: 'خطأ',
         text: err.message || 'فشل في تحميل كوبونات الخصم',
@@ -82,7 +84,7 @@ export default function DashboardCouponsPage() {
   };
 
   const handleToggleStatus = async (coupon: StoreCoupon) => {
-    const token = localStorage.getItem('watsstore_token');
+    const token = (localStorage.getItem('watsstore_merchant_token') || localStorage.getItem('watsstore_token'));
     if (!token) return;
 
     setActionLoadingId(coupon.id);
@@ -90,7 +92,7 @@ export default function DashboardCouponsPage() {
       const updated = await api.toggleCouponStatus(token, coupon.id);
       setCoupons(prev => prev.map(c => c.id === coupon.id ? { ...c, isActive: updated.isActive } : c));
 
-      Swal.fire({
+      appSwal.fire({
         toast: true,
         position: 'top-end',
         showConfirmButton: false,
@@ -99,7 +101,7 @@ export default function DashboardCouponsPage() {
         title: updated.isActive ? `تم تفعيل الكوبون ${coupon.code}` : `تم إيقاف الكوبون ${coupon.code}`,
       });
     } catch (err: any) {
-      Swal.fire({
+      appSwal.fire({
         icon: 'error',
         title: 'خطأ',
         text: err.message || 'فشل في تغيير حالة الكوبون',
@@ -110,10 +112,10 @@ export default function DashboardCouponsPage() {
   };
 
   const handleDeleteCoupon = async (coupon: StoreCoupon) => {
-    const token = localStorage.getItem('watsstore_token');
+    const token = (localStorage.getItem('watsstore_merchant_token') || localStorage.getItem('watsstore_token'));
     if (!token) return;
 
-    const result = await Swal.fire({
+    const result = await appSwal.fire({
       title: 'هل أنت متأكد من حذف الكوبون؟',
       text: `سيتم حذف الكود (${coupon.code}) ولن يتمكن العملاء من استخدامه مجدداً.`,
       icon: 'warning',
@@ -132,7 +134,7 @@ export default function DashboardCouponsPage() {
       await api.deleteMerchantCoupon(token, coupon.id);
       setCoupons(prev => prev.filter(c => c.id !== coupon.id));
 
-      Swal.fire({
+      appSwal.fire({
         icon: 'success',
         title: 'تم الحذف',
         text: 'تم حذف كوبون الخصم بنجاح',
@@ -140,7 +142,7 @@ export default function DashboardCouponsPage() {
         showConfirmButton: false,
       });
     } catch (err: any) {
-      Swal.fire({
+      appSwal.fire({
         icon: 'error',
         title: 'خطأ',
         text: err.message || 'فشل في حذف الكوبون',
@@ -171,7 +173,7 @@ export default function DashboardCouponsPage() {
       return;
     }
 
-    const token = localStorage.getItem('watsstore_token');
+    const token = (localStorage.getItem('watsstore_merchant_token') || localStorage.getItem('watsstore_token'));
     if (!token) return;
 
     setIsSubmitting(true);
@@ -195,7 +197,7 @@ export default function DashboardCouponsPage() {
       setFormExpiryDate('');
       setFormIsActive(true);
 
-      Swal.fire({
+      appSwal.fire({
         icon: 'success',
         title: 'تم إنشاء الكوبون بنجاح 🎉',
         text: `الكود ${newCoupon.code} أصبح متاحاً الآن لعملائك في المتجر`,
@@ -350,7 +352,7 @@ export default function DashboardCouponsPage() {
           <div className="w-16 h-16 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center mx-auto">
             <Tag className="w-8 h-8 stroke-1" />
           </div>
-          <h3 className="font-bold text-slate-800 text-base">لا توجد كوبونات خصم حالياً</h3>
+          <h3 className="font-bold text-slate-800 dark:text-white text-base">لا توجد كوبونات خصم حالياً</h3>
           <p className="text-xs text-slate-500 max-w-sm mx-auto">
             {searchQuery.trim()
               ? `لا توجد نتائج مطابقة لبحثك "${searchQuery}".`
@@ -367,10 +369,10 @@ export default function DashboardCouponsPage() {
           )}
         </div>
       ) : (
-        <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
+        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm">
           <div className="overflow-x-auto">
             <table className="w-full text-right text-xs">
-              <thead className="bg-slate-50 border-b border-slate-200 text-slate-600 font-bold">
+              <thead className="bg-slate-50 dark:bg-slate-800/80 border-b border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 font-bold">
                 <tr>
                   <th className="p-4">كود الخصم</th>
                   <th className="p-4">نوع وقيمة الخصم</th>
@@ -380,17 +382,17 @@ export default function DashboardCouponsPage() {
                   <th className="p-4 text-center">الإجراءات</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
+              <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                 {filteredCoupons.map((coupon) => {
                   const isExpired = coupon.expiryDate && new Date(coupon.expiryDate) < new Date();
                   const isMaxReached = coupon.usageLimit && coupon.timesUsed >= coupon.usageLimit;
 
                   return (
-                    <tr key={coupon.id} className="hover:bg-slate-50/70 transition-colors">
+                    <tr key={coupon.id} className="hover:bg-slate-50/70 dark:hover:bg-slate-800/50 transition-colors">
                       {/* Code */}
                       <td className="p-4">
                         <div className="flex items-center gap-2">
-                          <span className="font-mono font-black text-sm text-slate-900 bg-slate-100 px-2.5 py-1 rounded-lg border border-slate-200 tracking-wider">
+                          <span className="font-mono font-black text-sm text-slate-900 dark:text-white bg-slate-100 dark:bg-slate-800 px-2.5 py-1 rounded-lg border border-slate-200 dark:border-slate-700 tracking-wider">
                             {coupon.code}
                           </span>
                           <button
@@ -409,7 +411,7 @@ export default function DashboardCouponsPage() {
                       </td>
 
                       {/* Discount Value */}
-                      <td className="p-4 font-bold text-slate-800">
+                      <td className="p-4 font-bold text-slate-800 dark:text-slate-200">
                         {coupon.discountType === 'Percentage' ? (
                           <span className="inline-flex items-center gap-1 text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200">
                             <Percent className="w-3.5 h-3.5" />
@@ -426,7 +428,7 @@ export default function DashboardCouponsPage() {
                       {/* Usage */}
                       <td className="p-4">
                         <div className="space-y-0.5">
-                          <div className="font-bold text-slate-800">
+                          <div className="font-bold text-slate-800 dark:text-slate-200">
                             {coupon.timesUsed} {coupon.usageLimit ? `من ${coupon.usageLimit}` : 'استخدام'}
                           </div>
                           {coupon.usageLimit ? (
@@ -443,7 +445,7 @@ export default function DashboardCouponsPage() {
                       </td>
 
                       {/* Expiry */}
-                      <td className="p-4 text-slate-600">
+                      <td className="p-4 text-slate-600 dark:text-slate-400">
                         {coupon.expiryDate ? (
                           <div className="space-y-0.5">
                             <span className={`block font-medium ${isExpired ? 'text-rose-600 line-through' : 'text-slate-700'}`}>

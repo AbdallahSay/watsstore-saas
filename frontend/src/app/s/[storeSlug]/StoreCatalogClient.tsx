@@ -9,7 +9,7 @@ import ProductModal from '@/components/ProductModal';
 import CartDrawer from '@/components/CartDrawer';
 import { pixel } from '@/lib/pixel';
 import { api } from '@/lib/api';
-import Swal from 'sweetalert2';
+import { appSwal } from '@/lib/sweetalert';
 import { 
   Search, 
   MapPin, 
@@ -135,7 +135,7 @@ export default function StoreCatalogClient({ store }: StoreCatalogClientProps) {
     selectedVariants: Record<string, string>
   ) => {
     if (product.isAvailable === false) {
-      Swal.fire({
+      appSwal.fire({
         icon: 'warning',
         title: 'غير متوفر',
         text: 'نعتذر، هذا المنتج غير متوفر حالياً في المخزون.',
@@ -208,11 +208,11 @@ export default function StoreCatalogClient({ store }: StoreCatalogClientProps) {
   const handleSubmitReview = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!reviewName.trim()) {
-      Swal.fire({ icon: 'warning', title: 'تنبيه', text: 'يرجى كتابة اسمك الكريم' });
+      appSwal.fire({ icon: 'warning', title: 'تنبيه', text: 'يرجى كتابة اسمك الكريم' });
       return;
     }
     if (!reviewComment.trim()) {
-      Swal.fire({ icon: 'warning', title: 'تنبيه', text: 'يرجى كتابة نص رأيك وتجربتك' });
+      appSwal.fire({ icon: 'warning', title: 'تنبيه', text: 'يرجى كتابة نص رأيك وتجربتك' });
       return;
     }
 
@@ -229,7 +229,7 @@ export default function StoreCatalogClient({ store }: StoreCatalogClientProps) {
       setReviewComment('');
       setReviewRating(5);
 
-      Swal.fire({
+      appSwal.fire({
         icon: 'success',
         title: 'شكراً لتقييمك!',
         text: res.message || 'تم إرسال تقييمك بنجاح وسيظهر في صفحة المتجر بعد مراجعة المتجر.',
@@ -237,7 +237,7 @@ export default function StoreCatalogClient({ store }: StoreCatalogClientProps) {
         confirmButtonColor: '#10b981',
       });
     } catch (err: any) {
-      Swal.fire({
+      appSwal.fire({
         icon: 'error',
         title: 'خطأ',
         text: err.message || 'فشل في إرسال التقييم، يرجى المحاولة لاحقاً',

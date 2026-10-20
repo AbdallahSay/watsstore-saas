@@ -2,7 +2,8 @@
 
 import React, { useState, useEffect, useCallback, Component, ErrorInfo, ReactNode } from 'react';
 import Link from 'next/link';
-import Swal from 'sweetalert2';
+import { appSwal } from '@/lib/sweetalert';
+import { useLanguage } from '@/context/LanguageContext';
 import { 
   Store as StoreIcon, 
   Users, 
@@ -115,6 +116,7 @@ class AdminTabErrorBoundary extends Component<AdminTabErrorBoundaryProps, AdminT
 }
 
 export default function SuperAdminPage() {
+  const { t, language, dir } = useLanguage();
   const [token, setToken] = useState<string | null>(null);
   const [adminUser, setAdminUser] = useState<any>(null);
   const [isInitializing, setIsInitializing] = useState(true);
@@ -244,7 +246,7 @@ export default function SuperAdminPage() {
       console.error('Failed to load admin data:', err);
       if (err.message && err.message.includes('401')) {
         handleLogout();
-        Swal.fire({
+        appSwal.fire({
           icon: 'error',
           title: 'جلسة منتهية',
           text: 'انتهت صلاحية مفتاح الإدارة، يرجى تسجيل الدخول مجدداً.',
@@ -253,7 +255,7 @@ export default function SuperAdminPage() {
           color: '#f8fafc',
         });
       } else {
-        Swal.fire({
+        appSwal.fire({
           icon: 'error',
           title: 'خطأ في جلب البيانات',
           text: err.message || 'تعذر تحميل بيانات لوحة الإدارة',
@@ -296,7 +298,7 @@ export default function SuperAdminPage() {
         role: res.role
       }));
 
-      Swal.fire({
+      appSwal.fire({
         icon: 'success',
         title: 'مرحباً بك يا مدير المنصة!',
         text: 'تم تسجيل الدخول بنجاح إلى لوحة الإدارة العليا',
@@ -352,7 +354,7 @@ export default function SuperAdminPage() {
       setNewPassword('');
       setConfirmPassword('');
 
-      Swal.fire({
+      appSwal.fire({
         icon: 'success',
         title: 'تم تحديث كلمة المرور 🔒',
         text: res.message || 'تم تغيير كلمة مرور المسؤول العام بنجاح وحفظها في قاعدة البيانات.',
@@ -380,7 +382,7 @@ export default function SuperAdminPage() {
       const res = await api.updateAdminPricing(token, pricingSettings);
       setPricingSettings(res.settings);
       setPricingSuccessMsg(res.message || 'تم تحديث أسعار المنصة والباقات بنجاح!');
-      Swal.fire({
+      appSwal.fire({
         icon: 'success',
         title: 'تم حفظ وتحديث الأسعار! 💰',
         text: 'تم تحديث أسعار الباقات وحدود الاستخدام والبانر التسويقي بنجاح.',
@@ -391,7 +393,7 @@ export default function SuperAdminPage() {
       });
     } catch (err: any) {
       setPricingErrorMsg(err.message || 'فشل تحديث أسعار المنصة');
-      Swal.fire({
+      appSwal.fire({
         icon: 'error',
         title: 'خطأ في التحديث',
         text: err.message || 'حدث خطأ أثناء حفظ الأسعار',
@@ -463,7 +465,7 @@ export default function SuperAdminPage() {
       const res = await api.updateAdminPaymentGateways(token, paymentGateways);
       setPaymentGateways(res.gateways);
       setGatewaysSuccessMsg(res.message || 'تم تحديث وسائل الدفع وحسابات التحويل بنجاح!');
-      Swal.fire({
+      appSwal.fire({
         icon: 'success',
         title: 'تم تحديث وسائل الدفع بنجاح! 💳',
         text: 'تم حفظ وتطبيق التغييرات لجميع وسائل الدفع والمحافظ وحسابات التحويل.',
@@ -475,7 +477,7 @@ export default function SuperAdminPage() {
       loadDashboardData(token);
     } catch (err: any) {
       setGatewaysErrorMsg(err.message || 'فشل تحديث وسائل الدفع');
-      Swal.fire({
+      appSwal.fire({
         icon: 'error',
         title: 'خطأ في التحديث',
         text: err.message || 'حدث خطأ أثناء حفظ وسائل الدفع والمحافظ',
@@ -492,7 +494,7 @@ export default function SuperAdminPage() {
   const handleApproveSubscription = async (sub: SubscriptionRequestItem) => {
     if (!token) return;
 
-    const confirm = await Swal.fire({
+    const confirm = await appSwal.fire({
       title: 'تأكيد اعتماد الترقية والتفعيل؟',
       html: `هل قمت بمراجعة ومطابقة الحوالة لمتجر <b>${sub.storeName}</b>؟<br/>سيتم تفعيل باقة <b>${sub.planType}</b> (${sub.billingCycle === 'Annual' ? 'اشتراك سنوي 365 يوم' : 'اشتراك شهري 30 يوم'}) وتصفير كوتة الذكاء الاصطناعي فوراً.`,
       icon: 'question',
@@ -510,7 +512,7 @@ export default function SuperAdminPage() {
     setIsProcessingSubId(sub.id);
     try {
       const res = await api.approveAdminSubscription(token, sub.id);
-      Swal.fire({
+      appSwal.fire({
         icon: 'success',
         title: 'تم اعتماد الترقية بنجاح! 🎉',
         text: res.message || 'تمت ترقية المتجر وتفعيل الباقة فوراً.',
@@ -521,7 +523,7 @@ export default function SuperAdminPage() {
       });
       loadDashboardData(token);
     } catch (err: any) {
-      Swal.fire({
+      appSwal.fire({
         icon: 'error',
         title: 'فشل اعتماد الترقية',
         text: err.message || 'حدث خطأ أثناء اعتماد الطلب',
@@ -538,7 +540,7 @@ export default function SuperAdminPage() {
   const handleRejectSubscription = async (sub: SubscriptionRequestItem) => {
     if (!token) return;
 
-    const { value: reason } = await Swal.fire({
+    const { value: reason } = await appSwal.fire({
       title: 'رفض طلب الاشتراك',
       input: 'textarea',
       inputLabel: 'سبب الرفض (سيظهر في صفحة التاجر):',
@@ -557,7 +559,7 @@ export default function SuperAdminPage() {
     setIsProcessingSubId(sub.id);
     try {
       const res = await api.rejectAdminSubscription(token, sub.id, reason);
-      Swal.fire({
+      appSwal.fire({
         icon: 'info',
         title: 'تم رفض الطلب',
         text: res.message || 'تم رفض طلب الاشتراك وتسجيل الملاحظة للتاجر.',
@@ -568,7 +570,7 @@ export default function SuperAdminPage() {
       });
       loadDashboardData(token);
     } catch (err: any) {
-      Swal.fire({
+      appSwal.fire({
         icon: 'error',
         title: 'فشل الرفض',
         text: err.message || 'حدث خطأ أثناء رفض الطلب',
@@ -594,7 +596,7 @@ export default function SuperAdminPage() {
       setForgotStep(2);
       setForgotMessage(res.message);
 
-      Swal.fire({
+      appSwal.fire({
         icon: 'info',
         title: 'تم إنشاء رمز الاستعادة بنجاح',
         html: `
@@ -640,7 +642,7 @@ export default function SuperAdminPage() {
         newPassword: forgotNewPassword.trim(),
       });
 
-      Swal.fire({
+      appSwal.fire({
         icon: 'success',
         title: 'تمت إعادة تعيين كلمة المرور بنجاح! 🎉',
         text: res.message || 'تم تحديث كلمة المرور. يمكنك الآن تسجيل الدخول مباشرة.',
@@ -668,7 +670,7 @@ export default function SuperAdminPage() {
     if (!token) return;
 
     const actionText = store.isActive ? 'إيقاف هذا المتجر' : 'تفعيل هذا المتجر';
-    const confirmResult = await Swal.fire({
+    const confirmResult = await appSwal.fire({
       title: `هل أنت متأكد من ${actionText}؟`,
       text: `متجر "${store.storeName}" (${store.slug})`,
       icon: 'warning',
@@ -705,7 +707,7 @@ export default function SuperAdminPage() {
         });
       }
 
-      Swal.fire({
+      appSwal.fire({
         icon: 'success',
         title: 'تم التحديث بنجاح',
         text: res.message,
@@ -715,7 +717,7 @@ export default function SuperAdminPage() {
         color: '#f8fafc',
       });
     } catch (err: any) {
-      Swal.fire({
+      appSwal.fire({
         icon: 'error',
         title: 'خطأ أثناء تغيير الحالة',
         text: err.message || 'فشل تحديث حالة المتجر',
@@ -734,7 +736,7 @@ export default function SuperAdminPage() {
     const storeName = store.storeName;
     const storeId = store.id;
 
-    const confirmResult = await Swal.fire({
+    const confirmResult = await appSwal.fire({
       title: `⚠️ حذف نهائي لمتجر "${storeName}"؟`,
       html: `
         <div style="direction: rtl; text-align: right; font-size: 14px; line-height: 1.6;">
@@ -771,7 +773,7 @@ export default function SuperAdminPage() {
         });
       }
 
-      Swal.fire({
+      appSwal.fire({
         icon: 'success',
         title: 'تم حذف المتجر نهائياً',
         text: res.message || 'تمت إزالة المتجر وجميع بياناته بنجاح',
@@ -779,7 +781,7 @@ export default function SuperAdminPage() {
         color: '#f8fafc',
       });
     } catch (err: any) {
-      Swal.fire({
+      appSwal.fire({
         icon: 'error',
         title: 'فشل حذف المتجر',
         text: err.message || 'حدث خطأ أثناء محاولة حذف المتجر',
@@ -827,7 +829,7 @@ export default function SuperAdminPage() {
         return s;
       }));
 
-      Swal.fire({
+      appSwal.fire({
         icon: 'success',
         title: 'تم تحديث الباقة بنجاح 🎉',
         text: res.message,
@@ -839,7 +841,7 @@ export default function SuperAdminPage() {
 
       setStoreForPlanModal(null);
     } catch (err: any) {
-      Swal.fire({
+      appSwal.fire({
         icon: 'error',
         title: 'خطأ أثناء تحديث الباقة',
         text: err.message || 'فشل تحديث باقة المتجر',
@@ -873,7 +875,7 @@ export default function SuperAdminPage() {
         return s;
       }));
 
-      const toast = Swal.mixin({
+      const toast = appSwal.mixin({
         toast: true,
         position: 'top-end',
         showConfirmButton: false,
@@ -886,7 +888,7 @@ export default function SuperAdminPage() {
         title: `تم تغيير باقة "${store.storeName}" إلى ${res.planType} بنجاح 🎉`,
       });
     } catch (err: any) {
-      Swal.fire({
+      appSwal.fire({
         icon: 'error',
         title: 'خطأ أثناء تغيير الباقة',
         text: err.message || 'فشل تحديث باقة المتجر',
@@ -902,7 +904,7 @@ export default function SuperAdminPage() {
   const handleExtendTrial = async (store: AdminStoreSummary) => {
     if (!token) return;
 
-    const confirmResult = await Swal.fire({
+    const confirmResult = await appSwal.fire({
       title: `تمديد الفترة التجريبية لمتجر "${store.storeName}"؟`,
       text: 'سيتم إضافة 14 يوماً إضافية للتجربة المجانية وفتح كافة صلاحيات استقبال الطلبات للمتجر فوراً.',
       icon: 'info',
@@ -933,7 +935,7 @@ export default function SuperAdminPage() {
         return s;
       }));
 
-      Swal.fire({
+      appSwal.fire({
         icon: 'success',
         title: 'تم تمديد التجربة بنجاح ⏳',
         text: res.message,
@@ -943,7 +945,7 @@ export default function SuperAdminPage() {
         color: '#f8fafc',
       });
     } catch (err: any) {
-      Swal.fire({
+      appSwal.fire({
         icon: 'error',
         title: 'خطأ أثناء تمديد التجربة',
         text: err.message || 'فشل تمديد التجربة',
@@ -1715,7 +1717,7 @@ export default function SuperAdminPage() {
                                       onClick={() => {
                                         if (typeof navigator !== 'undefined' && navigator.clipboard && sub?.transactionId) {
                                           navigator.clipboard.writeText(sub.transactionId);
-                                          const toast = Swal.mixin({
+                                          const toast = appSwal.mixin({
                                             toast: true,
                                             position: 'top-end',
                                             showConfirmButton: false,

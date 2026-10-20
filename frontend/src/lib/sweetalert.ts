@@ -60,6 +60,13 @@ export const appSwal = {
     return Swal.mixin(getThemeSwalConfig()).fire(options);
   },
 
+  mixin: (options?: any) => {
+    return Swal.mixin({
+      ...getThemeSwalConfig(),
+      ...(options || {}),
+    });
+  },
+
   toast: (title: string, icon: 'success' | 'error' | 'warning' | 'info' = 'success', timer = 2500) => {
     const dark = isDarkMode();
     return Swal.fire({

@@ -36,7 +36,7 @@ export default function DashboardLayout({
 }) {
   const router = useRouter();
   const pathname = usePathname();
-  const { t } = useLanguage();
+  const { t, dir } = useLanguage();
   const [user, setUser] = useState<any>(null);
   const [trialInfo, setTrialInfo] = useState<{
     isTrialExpired: boolean;
@@ -126,7 +126,7 @@ export default function DashboardLayout({
   ];
 
   return (
-    <div className="min-h-screen bg-slate-100 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col md:flex-row transition-colors duration-200">
+    <div dir={dir} className="min-h-screen bg-slate-100 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col md:flex-row transition-colors duration-200">
       {/* Sidebar for Desktop */}
       <aside className="hidden md:flex w-64 bg-slate-900 text-slate-300 flex-col justify-between shrink-0 border-r md:border-r-0 md:border-inline-end border-slate-800">
         <div>
@@ -158,9 +158,9 @@ export default function DashboardLayout({
                     : 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30'
                 }`}>
                   {trialInfo?.isTrialExpired
-                    ? 'منتهي التجربة ⛔'
+                    ? t('dash.trial_expired_badge', undefined, 'منتهي التجربة ⛔')
                     : trialInfo?.planType === 'Free'
-                    ? `تجربة (${trialInfo.remainingDays} يوم)`
+                    ? t('dash.trial_badge', { days: trialInfo.remainingDays }, `تجربة (${trialInfo.remainingDays} يوم)`)
                     : `${trialInfo?.planType || user?.planType || 'Free'} 👑`}
                 </span>
               </div>
@@ -359,7 +359,7 @@ export default function DashboardLayout({
                   ⛔ {t('dash.trial_expired', undefined, 'انتهت فترتك التجريبية المجانية (14 يوماً)')}
                 </h4>
                 <p className="text-xs text-rose-100 mt-0.5">
-                  تم إيقاف استقبال الطلبات وإضافة أو تعديل المنتجات مؤقتاً. لتفعيل متجرك فوراً وفتح المميزات غير المحدودة، يرجى الترقية إلى باقة Pro أو VIP.
+                  {t('dash.trial_expired_desc', undefined, 'تم إيقاف استقبال الطلبات وإضافة أو تعديل المنتجات مؤقتاً. لتفعيل متجرك فوراً وفتح المميزات غير المحدودة، يرجى الترقية إلى باقة Pro أو VIP.')}
                 </p>
               </div>
             </div>
@@ -391,7 +391,7 @@ export default function DashboardLayout({
                   </span>
                 </div>
                 <p className="text-[11px] text-slate-600 dark:text-slate-400 mt-0.5">
-                  فترة تجربة مجانية تشمل حتى 10 منتجات وكوبون خصم واحد. رقِّ إلى باقة Pro أو VIP للحصول على وصف الذكاء الاصطناعي وتقارير Excel ومنتجات غير محدودة!
+                  {t('dash.trial_free_desc', undefined, 'فترة تجربة مجانية تشمل حتى 10 منتجات وكوبون خصم واحد. رقِّ إلى باقة Pro أو VIP للحصول على وصف الذكاء الاصطناعي وتقارير Excel ومنتجات غير محدودة!')}
                 </p>
               </div>
             </div>
@@ -404,7 +404,7 @@ export default function DashboardLayout({
               className="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shrink-0 shadow-md shadow-emerald-600/25 transition-all hover:scale-105 flex items-center gap-1.5"
             >
               <Crown className="w-4 h-4 text-amber-300" />
-              <span>ترقية الباقة عبر واتساب الإدارة</span>
+              <span>{t('dash.upgrade_whatsapp', undefined, 'ترقية الباقة عبر واتساب الإدارة')}</span>
             </a>
           </div>
         ) : null}

@@ -3,7 +3,8 @@
 import { useEffect, useState, useRef } from 'react';
 import { api } from '@/lib/api';
 import { Product, Category, ProductVariantGroup } from '@/types';
-import Swal from 'sweetalert2';
+import { appSwal } from '@/lib/sweetalert';
+import { useLanguage } from '@/context/LanguageContext';
 import { 
   ShoppingBag, 
   Plus, 
@@ -26,6 +27,7 @@ import {
 import { platformConfig } from '@/config/platformConfig';
 
 export default function DashboardProductsPage() {
+  const { t, language, dir } = useLanguage();
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -64,7 +66,7 @@ export default function DashboardProductsPage() {
   const [isGeneratingAi, setIsGeneratingAi] = useState(false);
 
   const fetchInitialData = async () => {
-    const token = localStorage.getItem('watsstore_token');
+    const token = (localStorage.getItem('watsstore_merchant_token') || localStorage.getItem('watsstore_token'));
     if (!token) return;
 
     try {
@@ -80,7 +82,7 @@ export default function DashboardProductsPage() {
       setAiGenerationsUsed(summary.aiGenerationsUsed ?? summary.storeInfo?.aiGenerationsUsed ?? 0);
       setAiGenerationsLimit(summary.aiGenerationsLimit ?? summary.storeInfo?.aiGenerationsLimit ?? (summary.storeInfo?.planType === 'Pro' ? 15 : summary.storeInfo?.planType === 'VIP' ? 150 : 0));
     } catch (err: any) {
-      Swal.fire({
+      appSwal.fire({
         icon: 'error',
         title: 'خطأ',
         text: err.message || 'فشل في تحميل المنتجات',
@@ -115,7 +117,7 @@ export default function DashboardProductsPage() {
 
   const openCreateModal = () => {
     if (planType === 'Free' && products.length >= 10) {
-      Swal.fire({
+      appSwal.fire({
         icon: 'warning',
         title: 'وصلت للحد الأقصى (10 منتجات) 🔒',
         html: `
@@ -137,7 +139,7 @@ export default function DashboardProductsPage() {
     }
 
     if (planType === 'Pro' && products.length >= 100) {
-      Swal.fire({
+      appSwal.fire({
         icon: 'warning',
         title: 'وصلت للحد الأقصى (100 منتج) 🔒',
         html: `
@@ -220,7 +222,7 @@ export default function DashboardProductsPage() {
   };
 
   const handleImageFileUpload = async (file: File) => {
-    const token = localStorage.getItem('watsstore_token');
+    const token = (localStorage.getItem('watsstore_merchant_token') || localStorage.getItem('watsstore_token'));
     if (!token) return;
 
     setIsUploadingImage(true);
@@ -228,14 +230,14 @@ export default function DashboardProductsPage() {
       const res = await api.uploadImage(token, file);
       setFormImageUrl(res.imageUrl);
       setFormImages((prev) => (prev.includes(res.imageUrl) ? prev : [res.imageUrl, ...prev]));
-      Swal.fire({
+      appSwal.fire({
         icon: 'success',
         title: 'تم رفع صورة المنتج بنجاح! 📸',
         timer: 1500,
         showConfirmButton: false,
       });
     } catch (err: any) {
-      Swal.fire({
+      appSwal.fire({
         icon: 'error',
         title: 'فشل في رفع الصورة',
         text: err.message || 'يرجى اختيار صورة بحجم أقل من 5 ميجابايت',
@@ -246,14 +248,14 @@ export default function DashboardProductsPage() {
   };
 
   const handleMultiImageUpload = async (files: FileList | File[]) => {
-    const token = localStorage.getItem('watsstore_token');
+    const token = (localStorage.getItem('watsstore_merchant_token') || localStorage.getItem('watsstore_token'));
     if (!token) return;
 
     const fileArray = Array.from(files);
     if (fileArray.length === 0) return;
 
     if (formImages.length + fileArray.length > 8) {
-      Swal.fire({
+      appSwal.fire({
         icon: 'warning',
         title: 'الحد الأقصى للصور (8 صور) 📸',
         text: `يمكنك إضافة حتى 8 صور كحد أقصى لكل منتج. متبقي لديك مساحة لـ ${Math.max(0, 8 - formImages.length)} صورة.`,
@@ -273,7 +275,7 @@ export default function DashboardProductsPage() {
           }
           return combined;
         });
-        const toast = Swal.mixin({
+        const toast = appSwal.mixin({
           toast: true,
           position: 'top-end',
           showConfirmButton: false,
@@ -285,7 +287,7 @@ export default function DashboardProductsPage() {
         });
       }
     } catch (err: any) {
-      Swal.fire({
+      appSwal.fire({
         icon: 'error',
         title: 'فشل في رفع الصور',
         text: err.message || 'يرجى اختيار صور بصيغة JPG أو PNG أو WebP وبحجم أقل من 5 ميجابايت',
@@ -302,7 +304,7 @@ export default function DashboardProductsPage() {
     if (!urlToAdd.trim()) return;
     const trimmed = urlToAdd.trim();
     if (formImages.includes(trimmed)) {
-      Swal.fire({
+      appSwal.fire({
         icon: 'info',
         title: 'الصورة مضافة بالفعل',
         timer: 1500,
@@ -311,7 +313,7 @@ export default function DashboardProductsPage() {
       return;
     }
     if (formImages.length >= 8) {
-      Swal.fire({
+      appSwal.fire({
         icon: 'warning',
         title: 'الحد الأقصى للصور 8 صور',
         confirmButtonColor: '#10B981',
@@ -340,7 +342,7 @@ export default function DashboardProductsPage() {
       setFormImageUrl(selected);
       return updated;
     });
-    const toast = Swal.mixin({
+    const toast = appSwal.mixin({
       toast: true,
       position: 'top-end',
       showConfirmButton: false,
@@ -362,7 +364,7 @@ export default function DashboardProductsPage() {
 
   const handleGenerateAiDescription = async () => {
     if (!formName.trim()) {
-      Swal.fire({
+      appSwal.fire({
         icon: 'warning',
         title: 'أدخل اسم المنتج أولاً',
         text: 'يرجى كتابة اسم المنتج لتتمكن أداة الذكاء الاصطناعي من صياغة الوصف التسويقي المناسب له.',
@@ -374,7 +376,7 @@ export default function DashboardProductsPage() {
 
     // Free plan strictly locked (0 AI quota)
     if (planType === 'Free') {
-      Swal.fire({
+      appSwal.fire({
         icon: 'info',
         title: 'ميزة الذكاء الاصطناعي مقفلة 🔒',
         html: `
@@ -404,7 +406,7 @@ export default function DashboardProductsPage() {
     const effectiveLimit = aiGenerationsLimit || (planType === 'Pro' ? 15 : planType === 'VIP' ? 150 : 0);
     if (effectiveLimit > 0 && aiGenerationsUsed >= effectiveLimit) {
       const isPro = planType === 'Pro';
-      Swal.fire({
+      appSwal.fire({
         icon: 'warning',
         title: 'نفد رصيد الذكاء الاصطناعي الشهري ⚠️',
         html: `
@@ -429,7 +431,7 @@ export default function DashboardProductsPage() {
       return;
     }
 
-    const token = localStorage.getItem('watsstore_token');
+    const token = (localStorage.getItem('watsstore_merchant_token') || localStorage.getItem('watsstore_token'));
     setIsGeneratingAi(true);
 
     try {
@@ -447,7 +449,7 @@ export default function DashboardProductsPage() {
           setAiGenerationsUsed(newUsed);
           setAiGenerationsLimit(newLimit);
 
-          Swal.fire({
+          appSwal.fire({
             icon: 'success',
             title: 'تم توليد الوصف بنجاح! ✨',
             html: `
@@ -473,7 +475,7 @@ export default function DashboardProductsPage() {
         errMsg.includes('403') ||
         errMsg.includes('Forbidden')
       ) {
-        Swal.fire({
+        appSwal.fire({
           icon: 'warning',
           title: 'تنبيه الباقة 🔒',
           text: errMsg,
@@ -491,7 +493,7 @@ export default function DashboardProductsPage() {
 
       const fallbackDesc = `✨ استمتع بأعلى مستويات الجودة والراحة مع ${formName.trim()} الفاخر.\n\n💎 أهم المميزات:\n• خامات ممتازة مختارة بعناية تدوم طويلاً وتمنحك أفضل أداء.\n• تصميم عصري وأنيق يلبي احتياجاتك واستخدامك اليومي.\n• متوفر بأعلى معايير الدقة والتشطيب الاحترافي.\n\n🚚 توصيل سريع لجميع المحافظات مع ضمان المعاينة قبل الاستلام!\n⚡ اطلب الآن عبر الواتساب واستفد من العرض الحصري!`;
       setFormDescription(fallbackDesc);
-      Swal.fire({
+      appSwal.fire({
         icon: 'success',
         title: 'تم توليد الوصف بنجاح! ✨',
         text: 'تمت كتابة وصف تسويقي احترافي للمنتج بنجاح.',
@@ -505,7 +507,7 @@ export default function DashboardProductsPage() {
 
   // 1-Click Availability Toggle
   const handleToggleAvailability = async (product: Product) => {
-    const token = localStorage.getItem('watsstore_token');
+    const token = (localStorage.getItem('watsstore_merchant_token') || localStorage.getItem('watsstore_token'));
     if (!token) return;
 
     setTogglingId(product.id);
@@ -519,7 +521,7 @@ export default function DashboardProductsPage() {
 
     try {
       const res = await api.toggleProductAvailability(token, product.id);
-      const toast = Swal.mixin({
+      const toast = appSwal.mixin({
         toast: true,
         position: 'top-end',
         showConfirmButton: false,
@@ -534,7 +536,7 @@ export default function DashboardProductsPage() {
       setProducts((prev) =>
         prev.map((p) => (p.id === product.id ? { ...p, isAvailable: prevStatus } : p))
       );
-      Swal.fire({
+      appSwal.fire({
         icon: 'error',
         title: 'خطأ',
         text: err.message || 'فشل في تحديث حالة التوفر',
@@ -546,11 +548,11 @@ export default function DashboardProductsPage() {
 
   const handleSaveProduct = async (e: React.FormEvent) => {
     e.preventDefault();
-    const token = localStorage.getItem('watsstore_token');
+    const token = (localStorage.getItem('watsstore_merchant_token') || localStorage.getItem('watsstore_token'));
     if (!token) return;
 
     if (!formName.trim() || formPrice === '') {
-      Swal.fire({ icon: 'warning', text: 'يرجى إدخال اسم المنتج وسعره بشكل صحيح' });
+      appSwal.fire({ icon: 'warning', text: 'يرجى إدخال اسم المنتج وسعره بشكل صحيح' });
       return;
     }
 
@@ -589,25 +591,25 @@ export default function DashboardProductsPage() {
     try {
       if (editingProduct) {
         await api.updateProduct(token, editingProduct.id, payload);
-        Swal.fire({ icon: 'success', title: 'تم تعديل المنتج بنجاح', timer: 1200, showConfirmButton: false });
+        appSwal.fire({ icon: 'success', title: 'تم تعديل المنتج بنجاح', timer: 1200, showConfirmButton: false });
       } else {
         await api.createProduct(token, payload);
-        Swal.fire({ icon: 'success', title: 'تم إضافة المنتج بنجاح', timer: 1200, showConfirmButton: false });
+        appSwal.fire({ icon: 'success', title: 'تم إضافة المنتج بنجاح', timer: 1200, showConfirmButton: false });
       }
       setIsModalOpen(false);
       fetchInitialData();
     } catch (err: any) {
-      Swal.fire({ icon: 'error', title: 'خطأ', text: err.message || 'حدث خطأ أثناء الحفظ' });
+      appSwal.fire({ icon: 'error', title: 'خطأ', text: err.message || 'حدث خطأ أثناء الحفظ' });
     } finally {
       setIsSaving(false);
     }
   };
 
   const handleDeleteProduct = async (product: Product) => {
-    const token = localStorage.getItem('watsstore_token');
+    const token = (localStorage.getItem('watsstore_merchant_token') || localStorage.getItem('watsstore_token'));
     if (!token) return;
 
-    const confirm = await Swal.fire({
+    const confirm = await appSwal.fire({
       title: 'هل أنت متأكد من حذف المنتج؟',
       text: `سيتم حذف "${product.name}" نهائياً من الكتالوج`,
       icon: 'warning',
@@ -620,10 +622,10 @@ export default function DashboardProductsPage() {
     if (confirm.isConfirmed) {
       try {
         await api.deleteProduct(token, product.id);
-        Swal.fire({ icon: 'success', title: 'تم الحذف بنجاح', timer: 1200, showConfirmButton: false });
+        appSwal.fire({ icon: 'success', title: 'تم الحذف بنجاح', timer: 1200, showConfirmButton: false });
         fetchInitialData();
       } catch (err: any) {
-        Swal.fire({ icon: 'error', title: 'خطأ', text: err.message || 'فشل في حذف المنتج' });
+        appSwal.fire({ icon: 'error', title: 'خطأ', text: err.message || 'فشل في حذف المنتج' });
       }
     }
   };
@@ -634,7 +636,7 @@ export default function DashboardProductsPage() {
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2.5">
-            <h1 className="text-2xl font-black text-slate-900">إدارة المنتجات والكتالوج</h1>
+            <h1 className="text-2xl font-black text-slate-900 dark:text-white">{t('products.title', undefined, 'إدارة المنتجات والكتالوج')}</h1>
             {planType === 'Free' ? (
               <span className="text-[11px] font-bold px-2.5 py-1 rounded-full bg-slate-100 text-slate-700 border border-slate-200">
                 منتجاتك: {products.length} / 10 (تجربة مجانية 14 يوماً)
@@ -651,7 +653,7 @@ export default function DashboardProductsPage() {
               </span>
             )}
           </div>
-          <p className="text-xs text-slate-500 mt-1">
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
             أضف منتجاتك وارفع صورها مباشرة، وحدد المقاسات والألوان، وتحكم في توفرها بضغطة زر واحدة.
           </p>
         </div>
@@ -682,7 +684,7 @@ export default function DashboardProductsPage() {
             className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-bold rounded-2xl shadow-lg shadow-emerald-600/20 flex items-center gap-2 transition-all hover:scale-105"
           >
             <Plus className="w-4 h-4 stroke-[2.5]" />
-            <span>إضافة منتج جديد</span>
+            <span>{t('products.add_new', undefined, 'إضافة منتج جديد')}</span>
           </button>
         </div>
       </div>
@@ -729,11 +731,11 @@ export default function DashboardProductsPage() {
           <div className="w-8 h-8 border-4 border-emerald-600 border-t-transparent rounded-full animate-spin" />
         </div>
       ) : products.length === 0 ? (
-        <div className="bg-white rounded-3xl p-16 text-center border border-slate-200/80 shadow-sm max-w-md mx-auto my-8 space-y-4">
-          <div className="w-16 h-16 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center mx-auto">
+        <div className="bg-white dark:bg-slate-900 rounded-3xl p-16 text-center border border-slate-200/80 dark:border-slate-800 shadow-sm max-w-md mx-auto my-8 space-y-4">
+          <div className="w-16 h-16 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-500 flex items-center justify-center mx-auto">
             <ShoppingBag className="w-8 h-8 stroke-1" />
           </div>
-          <h3 className="text-base font-bold text-slate-800">لا توجد منتجات حتى الآن</h3>
+          <h3 className="text-base font-bold text-slate-800 dark:text-white">{t('products.empty_title', undefined, 'لا توجد منتجات حتى الآن')}</h3>
           <p className="text-xs text-slate-500">
             ابدأ برفع أول منتج لمتجرك لتتمكن من إرسال رابط الكتالوج لزبائنك على الواتساب.
           </p>
@@ -745,20 +747,20 @@ export default function DashboardProductsPage() {
           </button>
         </div>
       ) : (
-        <div className="bg-white rounded-3xl border border-slate-200/80 shadow-sm overflow-hidden">
+        <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-sm overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-right text-xs">
-              <thead className="bg-slate-50 border-b border-slate-200 text-slate-500 font-bold">
+              <thead className="bg-slate-50 dark:bg-slate-800/80 border-b border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 font-bold">
                 <tr>
-                  <th className="py-4 px-4">الصورة والاسم</th>
-                  <th className="py-4 px-4">القسم</th>
-                  <th className="py-4 px-4">السعر</th>
-                  <th className="py-4 px-4">المتغيرات (المقاسات/الألوان)</th>
-                  <th className="py-4 px-4 text-center">حالة التوفر (تبديل فوري)</th>
-                  <th className="py-4 px-4 text-center">الإجراءات</th>
+                  <th className="py-4 px-4">{t('products.th_image_name', undefined, 'الصورة والاسم')}</th>
+                  <th className="py-4 px-4">{t('products.th_category', undefined, 'القسم')}</th>
+                  <th className="py-4 px-4">{t('products.th_price', undefined, 'السعر')}</th>
+                  <th className="py-4 px-4">{t('products.th_variants', undefined, 'المتغيرات (المقاسات/الألوان)')}</th>
+                  <th className="py-4 px-4 text-center">{t('products.th_availability', undefined, 'حالة التوفر (تبديل فوري)')}</th>
+                  <th className="py-4 px-4 text-center">{t('products.th_actions', undefined, 'الإجراءات')}</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100 text-slate-700">
+              <tbody className="divide-y divide-slate-100 dark:divide-slate-800 text-slate-700 dark:text-slate-300">
                 {products.map((product) => {
                   let variantCount = 0;
                   if (product.variantsJson) {
@@ -771,7 +773,7 @@ export default function DashboardProductsPage() {
                   const isToggling = togglingId === product.id;
 
                   return (
-                    <tr key={product.id} className="hover:bg-slate-50/80 transition-colors">
+                    <tr key={product.id} className="hover:bg-slate-50/80 dark:hover:bg-slate-800/50 transition-colors">
                       <td className="py-3 px-4">
                         <div className="flex items-center gap-3">
                           {product.imageUrl ? (
@@ -786,7 +788,7 @@ export default function DashboardProductsPage() {
                             </div>
                           )}
                           <div>
-                            <span className="font-bold text-slate-900 block text-sm">{product.name}</span>
+                            <span className="font-bold text-slate-900 dark:text-white block text-sm">{product.name}</span>
                             {product.description && (
                               <span className="text-[11px] text-slate-400 block max-w-xs truncate">
                                 {product.description}
@@ -796,12 +798,12 @@ export default function DashboardProductsPage() {
                         </div>
                       </td>
 
-                      <td className="py-3 px-4 text-slate-600 font-semibold">
+                      <td className="py-3 px-4 text-slate-600 dark:text-slate-300 font-semibold">
                         {categories.find((c) => c.id === product.categoryId)?.name || 'بدون قسم'}
                       </td>
 
                       <td className="py-3 px-4">
-                        <span className="font-black text-slate-900 text-sm">
+                        <span className="font-black text-slate-900 dark:text-white text-sm">
                           {product.price.toFixed(2)} ج.م
                         </span>
                         {product.compareAtPrice && (
