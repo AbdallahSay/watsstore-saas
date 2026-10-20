@@ -41,6 +41,10 @@ namespace WatsStore.Api.Controllers
 
             var store = await _db.Stores
                 .AsNoTracking()
+                // ⚡ Bolt Performance Optimization:
+                // Added .AsSplitQuery() to avoid Cartesian product generation.
+                // Impact: Separates SQL queries for Categories and Products, preventing exponential row duplication.
+                .AsSplitQuery()
                 .Include(s => s.Categories.Where(c => c.IsActive).OrderBy(c => c.SortOrder))
                 .Include(s => s.Products.Where(p => p.IsAvailable).OrderBy(p => p.SortOrder).ThenByDescending(p => p.CreatedAt))
                 .FirstOrDefaultAsync(s => s.Slug == normalizedSlug && s.IsActive);
