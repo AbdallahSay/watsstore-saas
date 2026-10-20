@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import { Store, Product, CartItem, StoreReview } from '@/types';
 import StoreNavbar from '@/components/StoreNavbar';
@@ -91,21 +91,29 @@ export default function StoreCatalogClient({ store }: StoreCatalogClientProps) {
     };
   }, [isReviewModalOpen]);
 
-  // Cart total calculations
-  const cartCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
-  const cartTotal = cartItems.reduce((sum, item) => sum + item.product.price * item.quantity, 0);
+  // Cart total calculations (memoized to prevent redundant iterations on re-render)
+  const cartCount = useMemo(() => cartItems.reduce((sum, item) => sum + item.quantity, 0), [cartItems]);
+  const cartTotal = useMemo(() => cartItems.reduce((sum, item) => sum + item.product.price * item.quantity, 0), [cartItems]);
 
-  // Filter products by category and search
-  const filteredProducts = store.products.filter((product) => {
-    const matchesCategory =
-      activeCategory === 'all' || product.categoryId === activeCategory;
-    const matchesSearch =
-      searchQuery.trim() === '' ||
-      product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (product.description &&
-        product.description.toLowerCase().includes(searchQuery.toLowerCase()));
-    return matchesCategory && matchesSearch;
-  });
+  // Filter products by category and search (memoized to prevent unnecessary O(n) filtering)
+  const filteredProducts = useMemo(() => {
+    // Hoist string manipulation out of the O(n) filter loop to avoid repeating it for every product
+    const normalizedSearch = searchQuery.trim().toLowerCase();
+
+    return store.products.filter((product) => {
+      const matchesCategory =
+        activeCategory === 'all' || product.categoryId === activeCategory;
+
+      if (!matchesCategory) return false;
+
+      if (normalizedSearch === '') return true;
+
+      return (
+        product.name.toLowerCase().includes(normalizedSearch) ||
+        (product.description && product.description.toLowerCase().includes(normalizedSearch))
+      );
+    });
+  }, [store.products, activeCategory, searchQuery]);
 
   const handleSelectProduct = (product: Product) => {
     // If product is out of stock, open modal in view-only disabled mode
