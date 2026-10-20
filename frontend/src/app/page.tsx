@@ -16,7 +16,9 @@ import {
   BarChart3,
   ExternalLink,
   X,
-  ArrowRight
+  ArrowRight,
+  ChevronDown,
+  HelpCircle
 } from 'lucide-react';
 import { api } from '@/lib/api';
 import { useLanguage } from '@/context/LanguageContext';
@@ -35,6 +37,14 @@ export default function HomePage() {
     launchDiscountText: '',
   });
   const [showBanner, setShowBanner] = useState(true);
+  const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(0);
+
+  const faqItems = [
+    { q: t('faq.q1', undefined, 'كيف يستقبل متجري الطلبات من الزبائن؟'), a: t('faq.a1', undefined, 'عندما يختار الزبون منتجاته ويحدد الكميات والمقاسات والعنوان، يضغط على "إتمام الطلب عبر واتساب"، فيتم إنشاء رسالة مرتبة تلقائياً بها فاتورة كاملة ومجموع الحساب ويتم تحويله مباشرة إلى محادثتك على الواتساب.') },
+    { q: t('faq.q2', undefined, 'هل أحتاج لبطاقة بنكية لبدء التجربة المجانية؟'), a: t('faq.a2', undefined, 'لا على الإطلاق! التسجيل مجاني تماماً لمدة 14 يوماً بدون الحاجة لأي بطاقة بنكية، وتستطيع تجربة كافة مميزات المنصة فوراً.') },
+    { q: t('faq.q3', undefined, 'هل يمكنني ربط إعلانات الفيسبوك وتتبع المبيعات بـ Meta Pixel؟'), a: t('faq.a3', undefined, 'نعم بكل تأكيد! باقة Pro وVIP توفر ربطاً متقدماً لبيكسل ميتا مع تتبع تلقائي لأحداث ViewContent وAddToCart وPurchase.') },
+    { q: t('faq.q4', undefined, 'ما الفرق بين الرابط المباشر والرمز الدائم QR؟'), a: t('faq.a4', undefined, 'الرابط المباشر يفتح متجرك عبر الويب، أما رمز QR فهو كود مختصر دائم يمكنك طباعته على الأكياس والفواتير ولن يتغير حتى لو قمت بتعديل اسم المتجر مستقبلاً.') },
+  ];
 
   useEffect(() => {
     api.getPublicPricing()
@@ -569,6 +579,55 @@ export default function HomePage() {
                   {t('home.subscribe_vip', undefined, 'انضم إلى باقة VIP الآن')}
                 </Link>
               </div>
+            </div>
+          </div>
+        </section>
+
+        {/* FAQ ACCORDION SECTION */}
+        <section id="faq" className="py-20 bg-white dark:bg-slate-900 border-t border-slate-200/80 dark:border-slate-800 transition-colors">
+          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center max-w-2xl mx-auto mb-12">
+              <div className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-100/70 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/60 px-3.5 py-1.5 rounded-full mb-3">
+                <HelpCircle className="w-3.5 h-3.5" />
+                <span>{t('faq.title', undefined, 'الأسئلة الشائعة والأكثر تكراراً')}</span>
+              </div>
+              <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white">
+                {t('faq.title', undefined, 'الأسئلة الشائعة')}
+              </h2>
+              <p className="mt-3 text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+                {t('faq.subtitle', undefined, 'كل ما تريد معرفته عن منصة WatsStore وكيفية بدء البيع عبر الواتساب في دقائق معدودة.')}
+              </p>
+            </div>
+
+            <div className="space-y-4">
+              {faqItems.map((item, index) => {
+                const isOpen = openFaqIndex === index;
+                return (
+                  <div
+                    key={index}
+                    className="border border-slate-200/80 dark:border-slate-800 rounded-2xl bg-slate-50 dark:bg-slate-800/50 overflow-hidden transition-all duration-200"
+                  >
+                    <button
+                      type="button"
+                      onClick={() => setOpenFaqIndex(isOpen ? null : index)}
+                      className="w-full p-5 text-start flex items-center justify-between gap-4 font-bold text-slate-900 dark:text-white hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors text-sm sm:text-base min-h-[52px]"
+                      aria-expanded={isOpen}
+                    >
+                      <span>{item.q}</span>
+                      <ChevronDown
+                        className={`w-5 h-5 text-slate-400 shrink-0 transition-transform duration-200 ${
+                          isOpen ? 'rotate-180 text-emerald-600 dark:text-emerald-400' : ''
+                        }`}
+                      />
+                    </button>
+                    {isOpen && (
+                      <div className="px-5 pb-5 pt-1 text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed border-t border-slate-200/40 dark:border-slate-700/40 animate-fadeIn">
+                        {item.a}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
             </div>
           </div>
         </section>

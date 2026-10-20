@@ -80,6 +80,15 @@ export default function RegisterPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg(null);
+
+    // Validate Egyptian mobile number format
+    const cleanPhone = formData.whatsAppNumber.replace(/[\s\-\+]/g, '');
+    const isEgyptianPhone = /^(01[0125]\d{8}|201[0125]\d{8})$/.test(cleanPhone);
+    if (!isEgyptianPhone) {
+      setErrorMsg(isRtl ? 'يرجى إدخال رقم هاتف مصري صحيح (مثال: 01012345678 أو 201012345678)' : 'Please enter a valid Egyptian mobile number (e.g., 01012345678)');
+      return;
+    }
+
     setIsLoading(true);
 
     try {
@@ -202,6 +211,14 @@ export default function RegisterPage() {
                     className={`w-full ${isRtl ? 'pr-10 pl-3.5' : 'pl-10 pr-3.5'} py-3 rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-colors`}
                   />
                 </div>
+                {formData.storeName && (
+                  <p className="mt-1.5 text-[11px] font-mono text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
+                    <span>{isRtl ? 'رابط متجرك المتوقع:' : 'Predicted URL:'}</span>
+                    <span className="font-bold underline" dir="ltr">
+                      watsstore.com/s/{encodeURIComponent(formData.storeName.trim().toLowerCase().replace(/\s+/g, '-'))}
+                    </span>
+                  </p>
+                )}
               </div>
             </div>
 

@@ -64,6 +64,16 @@ export default function LoginPage() {
     setErrorMsg(null);
   };
 
+  const handleForgotPassword = () => {
+    appSwal.fire({
+      icon: 'info',
+      title: t('auth.forgot_password_title', undefined, 'استعادة كلمة المرور'),
+      text: t('auth.forgot_password_desc', undefined, 'لاستعادة كلمة المرور أو إعادة تعيين حساب متجرك، تواصل فوراً مع فريق الدعم الفني عبر الواتساب: 01011653619'),
+      confirmButtonText: t('swal.ok', undefined, 'حسناً'),
+      confirmButtonColor: '#10B981',
+    });
+  };
+
   const isRtl = dir === 'rtl';
 
   return (
@@ -138,9 +148,18 @@ export default function LoginPage() {
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
-                {t('auth.password', undefined, 'كلمة المرور')}
-              </label>
+              <div className="flex items-center justify-between mb-1.5">
+                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300">
+                  {t('auth.password', undefined, 'كلمة المرور')}
+                </label>
+                <button
+                  type="button"
+                  onClick={handleForgotPassword}
+                  className="text-[11px] font-bold text-emerald-600 dark:text-emerald-400 hover:underline"
+                >
+                  {t('auth.forgot_password', undefined, 'هل نسيت كلمة المرور؟')}
+                </button>
+              </div>
               <div className="relative">
                 <Lock className={`w-4 h-4 text-slate-400 absolute ${isRtl ? 'right-3.5' : 'left-3.5'} top-1/2 -translate-y-1/2`} />
                 <input
