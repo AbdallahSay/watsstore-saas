@@ -537,6 +537,11 @@ namespace WatsStore.Api.Controllers
             if (authError != null) return authError;
 
             var store = await _db.Stores
+                // ⚡ Bolt Performance Optimization:
+                // Added .AsSplitQuery() to prevent EF Core Cartesian explosion.
+                // Impact: Drastically reduces data duplication when fetching multiple collection navigation properties
+                // (Products * Categories * Orders * Reviews * Coupons), improving memory usage and SQL latency.
+                .AsSplitQuery()
                 .Include(s => s.Products)
                 .Include(s => s.Categories)
                 .Include(s => s.Orders)
