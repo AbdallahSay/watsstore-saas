@@ -15,9 +15,11 @@ import {
   ExternalLink,
   Search,
   X,
-  RotateCcw
+  RotateCcw,
+  Truck
 } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
+import { useCurrency } from '@/context/CurrencyContext';
 
 interface DirectoryClientProps {
   stores: StoreDirectoryCard[];
@@ -35,6 +37,7 @@ export default function DirectoryClient({
   categories,
 }: DirectoryClientProps) {
   const { t, dir } = useLanguage();
+  const { format: formatCurrency, currency } = useCurrency();
   const ArrowIcon = dir === 'rtl' ? ArrowLeft : ArrowRight;
   const isRtl = dir === 'rtl';
 
@@ -358,7 +361,9 @@ export default function DirectoryClient({
                     <span className="text-xs text-slate-500 dark:text-slate-400">
                       {t('dir.delivery', undefined, 'التوصيل:')}{' '}
                       <strong className="text-slate-700 dark:text-slate-200 font-bold">
-                        {store.deliveryFee > 0 ? `${store.deliveryFee} ${store.currency}` : t('dir.free_delivery', undefined, 'مجاني')}
+                        {store.deliveryFee > 0
+                          ? formatCurrency(store.deliveryFee)
+                          : t('dir.free_delivery', undefined, 'مجاني')}
                       </strong>
                     </span>
 

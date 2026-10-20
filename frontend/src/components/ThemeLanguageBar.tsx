@@ -5,17 +5,20 @@ import { Sun, Moon, Check, ChevronDown, Globe } from 'lucide-react';
 import { useTheme } from '@/context/ThemeContext';
 import { useLanguage } from '@/context/LanguageContext';
 import { LANGUAGES, LanguageCode } from '@/i18n/languages';
+import CurrencySwitcher from '@/components/CurrencySwitcher';
 
 interface ThemeLanguageBarProps {
   variant?: 'navbar' | 'dashboard' | 'compact' | 'store' | 'admin';
   showLabels?: boolean;
   className?: string;
+  showCurrency?: boolean;
 }
 
 export default function ThemeLanguageBar({
   variant = 'navbar',
   showLabels = false,
   className = '',
+  showCurrency = true,
 }: ThemeLanguageBarProps) {
   const { theme, toggleTheme, isMounted: themeMounted } = useTheme();
   const { language, setLanguage, isMounted: langMounted, t } = useLanguage();
@@ -171,6 +174,11 @@ export default function ThemeLanguageBar({
           </div>
         )}
       </div>
+
+      {/* --- CURRENCY SWITCHER --- */}
+      {showCurrency && (
+        <CurrencySwitcher variant={variant === 'dashboard' || variant === 'admin' ? 'dashboard' : 'navbar'} />
+      )}
     </div>
   );
 }

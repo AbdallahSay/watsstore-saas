@@ -280,6 +280,8 @@ export const TRANSLATIONS: Record<LanguageCode, TranslationDictionary> = {
     'theme.light': 'فاتح',
     'theme.dark': 'داكن',
     'lang.select': 'اختر اللغة',
+    'currency.select': 'تحويل العملة',
+    'currency.note': 'الأسعار تقريبية للاستدلال فقط',
     'app.name': 'WatsStore',
     'app.by': 'بواسطة Masar Tech',
 
