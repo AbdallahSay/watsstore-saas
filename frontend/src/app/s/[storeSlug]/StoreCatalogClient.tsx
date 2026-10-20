@@ -125,21 +125,8 @@ export default function StoreCatalogClient({ store }: StoreCatalogClientProps) {
       });
     }
 
-    let hasVariants = false;
-    if (product.variantsJson) {
-      try {
-        const parsed = JSON.parse(product.variantsJson);
-        if (Array.isArray(parsed) && parsed.length > 0) hasVariants = true;
-      } catch {
-        hasVariants = false;
-      }
-    }
-
-    if (hasVariants) {
-      setModalProduct(product);
-    } else {
-      handleAddToCart(product, 1, {});
-    }
+    // Always open product modal to view full multi-image gallery, zoom, description, and options
+    setModalProduct(product);
   };
 
   const handleAddToCart = (
@@ -435,6 +422,7 @@ export default function StoreCatalogClient({ store }: StoreCatalogClientProps) {
                 currency={store.currency}
                 themeColor={store.themeColor}
                 onSelectProduct={handleSelectProduct}
+                onQuickAdd={(p) => handleAddToCart(p, 1, {})}
               />
             ))}
           </div>

@@ -1,13 +1,14 @@
 'use client';
 
 import { Product, ProductVariantGroup } from '../types';
-import { Plus, SlidersHorizontal, Image as ImageIcon } from 'lucide-react';
+import { Plus, SlidersHorizontal, Image as ImageIcon, Images } from 'lucide-react';
 
 interface ProductCardProps {
   product: Product;
   currency: string;
   themeColor?: string;
   onSelectProduct: (product: Product) => void;
+  onQuickAdd?: (product: Product) => void;
 }
 
 export default function ProductCard({
@@ -15,6 +16,7 @@ export default function ProductCard({
   currency,
   themeColor = '#10B981',
   onSelectProduct,
+  onQuickAdd,
 }: ProductCardProps) {
   let hasVariants = false;
   if (product.variantsJson) {
@@ -27,6 +29,19 @@ export default function ProductCard({
       hasVariants = false;
     }
   }
+
+  const galleryImagesCount = Array.isArray(product.images) && product.images.length > 1
+    ? product.images.length
+    : product.imagesJson
+    ? (() => {
+        try {
+          const parsed = JSON.parse(product.imagesJson);
+          return Array.isArray(parsed) && parsed.length > 1 ? parsed.length : 0;
+        } catch {
+          return 0;
+        }
+      })()
+    : 0;
 
   const discountPercent =
     product.compareAtPrice && product.compareAtPrice > product.price
@@ -69,6 +84,14 @@ export default function ProductCard({
           </span>
         ) : null}
 
+        {/* Gallery Badge */}
+        {galleryImagesCount > 1 && (
+          <span className="absolute bottom-3 left-3 bg-slate-900/80 backdrop-blur-md text-white text-[10px] font-bold px-2 py-1 rounded-lg flex items-center gap-1 shadow-sm">
+            <Images className="w-3 h-3 text-emerald-400" />
+            <span>{galleryImagesCount} صور</span>
+          </span>
+        )}
+
         {/* Variants badge */}
         {hasVariants && (
           <span className="absolute bottom-3 right-3 bg-slate-900/80 backdrop-blur-md text-white text-[10px] font-bold px-2 py-1 rounded-lg flex items-center gap-1 shadow-sm">
@@ -109,7 +132,13 @@ export default function ProductCard({
             onClick={(e) => {
               e.stopPropagation();
               if (!isOutOfStock) {
-                onSelectProduct(product);
+                if (hasVariants) {
+                  onSelectProduct(product);
+                } else if (onQuickAdd) {
+                  onQuickAdd(product);
+                } else {
+                  onSelectProduct(product);
+                }
               }
             }}
             style={{ backgroundColor: isOutOfStock ? undefined : themeColor }}
