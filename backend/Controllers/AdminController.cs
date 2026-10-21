@@ -536,12 +536,15 @@ namespace WatsStore.Api.Controllers
             var authError = EnsureAdminAccess();
             if (authError != null) return authError;
 
+            // Optimization: Use .AsSplitQuery() to prevent Cartesian explosion when fetching multiple collection navigation properties
+            // Impact: Significantly reduces database memory consumption and processing time by splitting the query into multiple smaller, more efficient SQL queries.
             var store = await _db.Stores
                 .Include(s => s.Products)
                 .Include(s => s.Categories)
                 .Include(s => s.Orders)
                 .Include(s => s.Reviews)
                 .Include(s => s.Coupons)
+                .AsSplitQuery()
                 .FirstOrDefaultAsync(s => s.Id == id);
 
             if (store == null)
