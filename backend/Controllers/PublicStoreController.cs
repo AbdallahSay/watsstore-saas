@@ -39,10 +39,13 @@ namespace WatsStore.Api.Controllers
 
             var normalizedSlug = slug.Trim().ToLowerInvariant();
 
+            // Optimization: Use .AsSplitQuery() to prevent Cartesian explosion when fetching multiple collection navigation properties
+            // Impact: Significantly reduces database memory consumption and processing time by splitting the query into multiple smaller, more efficient SQL queries.
             var store = await _db.Stores
                 .AsNoTracking()
                 .Include(s => s.Categories.Where(c => c.IsActive).OrderBy(c => c.SortOrder))
                 .Include(s => s.Products.Where(p => p.IsAvailable).OrderBy(p => p.SortOrder).ThenByDescending(p => p.CreatedAt))
+                .AsSplitQuery()
                 .FirstOrDefaultAsync(s => s.Slug == normalizedSlug && s.IsActive);
 
             if (store == null)
