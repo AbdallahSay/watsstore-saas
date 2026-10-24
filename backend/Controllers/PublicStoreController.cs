@@ -39,10 +39,14 @@ namespace WatsStore.Api.Controllers
 
             var normalizedSlug = slug.Trim().ToLowerInvariant();
 
+            // ⚡ Bolt Performance Optimization:
+            // Added .AsSplitQuery() to prevent Cartesian explosion when including multiple collection navigation properties.
+            // This ensures separate SQL queries are generated, preventing massive unoptimized joins from overwhelming the database on store load.
             var store = await _db.Stores
                 .AsNoTracking()
                 .Include(s => s.Categories.Where(c => c.IsActive).OrderBy(c => c.SortOrder))
                 .Include(s => s.Products.Where(p => p.IsAvailable).OrderBy(p => p.SortOrder).ThenByDescending(p => p.CreatedAt))
+                .AsSplitQuery()
                 .FirstOrDefaultAsync(s => s.Slug == normalizedSlug && s.IsActive);
 
             if (store == null)
