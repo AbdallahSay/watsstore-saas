@@ -43,6 +43,8 @@ namespace WatsStore.Api.Controllers
                 .AsNoTracking()
                 .Include(s => s.Categories.Where(c => c.IsActive).OrderBy(c => c.SortOrder))
                 .Include(s => s.Products.Where(p => p.IsAvailable).OrderBy(p => p.SortOrder).ThenByDescending(p => p.CreatedAt))
+                // BOLT OPTIMIZATION: Use AsSplitQuery to prevent Cartesian explosion when loading multiple collections
+                .AsSplitQuery()
                 .FirstOrDefaultAsync(s => s.Slug == normalizedSlug && s.IsActive);
 
             if (store == null)

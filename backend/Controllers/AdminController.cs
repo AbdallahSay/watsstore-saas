@@ -542,6 +542,8 @@ namespace WatsStore.Api.Controllers
                 .Include(s => s.Orders)
                 .Include(s => s.Reviews)
                 .Include(s => s.Coupons)
+                // BOLT OPTIMIZATION: Use AsSplitQuery to prevent Cartesian explosion when loading multiple collections
+                .AsSplitQuery()
                 .FirstOrDefaultAsync(s => s.Id == id);
 
             if (store == null)
