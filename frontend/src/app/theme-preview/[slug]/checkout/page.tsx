@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useParams, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { api } from '@/lib/api';
+import { readPreviewCart, clearPreviewCart, type PreviewCartLine } from '@/lib/preview-cart';
 import type { Store, Product, CreateOrderResponse } from '@/types';
 import { ShoppingBag, CheckCircle2, ArrowRight } from 'lucide-react';
 
@@ -11,6 +12,9 @@ export default function PreviewCheckoutPage() {
   const { slug } = useParams<{ slug: string }>();
   const search = useSearchParams();
   const productId = search.get('product');
+  const cartMode = search.get('cart') === '1';
+  const [cartLines, setCartLines] = useState<PreviewCartLine[]>([]);
+  useEffect(() => { if (slug && cartMode) setCartLines(readPreviewCart(slug)); }, [slug, cartMode]);
   const [store, setStore] = useState<Store | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -29,12 +33,13 @@ export default function PreviewCheckoutPage() {
   }, [slug]);
 
   const product: Product | undefined = store?.products.find(p => p.id === productId);
-  const price = product ? product.price * quantity : 0;
+  const cartProducts = cartMode ? cartLines.map(l => ({ line: l, product: store?.products.find(p => p.id === l.productId) })).filter((x): x is {line: PreviewCartLine; product: Product} => !!x.product && x.product.isAvailable && !x.product.variantsJson) : [];
+  const price = cartMode ? cartProducts.reduce((sum,x) => sum + x.line.quantity * x.product.price, 0) : (product ? product.price * quantity : 0);
   const estimatedDelivery = store?.deliveryFee ?? 0;
 
   async function submitOrder(e: React.FormEvent) {
     e.preventDefault();
-    if (!store || !product || sending || success || !product.isAvailable) return;
+    if (!store || sending || success || (cartMode ? cartProducts.length === 0 : !product?.isAvailable)) return;
     if (!/^01[0125][0-9]{8}$/.test(form.customerPhone.trim())) {
       setError('من فضلك أدخل رقم موبايل مصري صحيح مكون من 11 رقم.');
       return;
@@ -45,9 +50,10 @@ export default function PreviewCheckoutPage() {
       const result = await api.createWhatsAppOrder(store.slug, {
         ...form,
         paymentMethod: 'الدفع عند الاستلام',
-        items: [{ productId: product.id, quantity }],
+        items: cartMode ? cartProducts.map(x => ({ productId: x.product.id, quantity: x.line.quantity })) : [{ productId: product!.id, quantity }],
       });
       setSuccess(result);
+      if (cartMode) { clearPreviewCart(store.slug); setCartLines([]); }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'تعذر تسجيل الطلب. تأكد من الاتصال وحاول مرة أخرى.');
     } finally {
@@ -56,7 +62,7 @@ export default function PreviewCheckoutPage() {
   }
 
   if (loading) return <main dir="rtl" role="status" className="min-h-screen p-8 text-center">جاري تحميل الطلب...</main>;
-  if (!store || !product || !productId) return <main dir="rtl" className="min-h-screen p-8 text-center">
+  if (!store || (cartMode ? cartProducts.length === 0 : (!product || !productId))) return <main dir="rtl" className="min-h-screen p-8 text-center">
     <p role="alert">{error || 'المنتج غير موجود أو لم يعد متاحاً.'}</p>
     <Link className="underline" href={`/theme-preview/${encodeURIComponent(slug)}`}>الرجوع للمتجر</Link>
   </main>;
@@ -93,19 +99,22 @@ export default function PreviewCheckoutPage() {
             </label>
             <p className="text-sm text-slate-600">طريقة الدفع: <strong>الدفع عند الاستلام</strong></p>
             {error && <p role="alert" className="rounded-lg bg-red-50 p-3 text-sm text-red-700">{error}</p>}
-            <button disabled={sending || !product.isAvailable} type="submit" className="w-full min-h-12 rounded-xl bg-slate-900 text-white font-bold disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
-              {sending ? 'جاري تسجيل الطلب...' : !product.isAvailable ? 'المنتج غير متوفر' : 'تأكيد الطلب أونلاين'}
+            <button disabled={sending || (cartMode ? !cartProducts.length : !product?.isAvailable)} type="submit" className="w-full min-h-12 rounded-xl bg-slate-900 text-white font-bold disabled:opacity-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
+              {sending ? 'جاري تسجيل الطلب...' : (cartMode ? !cartProducts.length : !product?.isAvailable) ? 'المنتج غير متوفر' : 'تأكيد الطلب أونلاين'}
             </button>
           </form>
           <aside className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-6 lg:sticky lg:top-6">
             <h2 className="font-bold text-lg mb-5 flex items-center gap-2"><ShoppingBag size={20}/> ملخص الطلب</h2>
-            <div className="flex gap-3">
-              {product.imageUrl && <img src={product.imageUrl} alt="" className="w-20 h-24 object-cover rounded-lg"/>}
-              <div className="min-w-0"><p className="font-semibold">{product.name}</p><p className="text-sm text-slate-500">{product.price.toLocaleString('ar-EG')} {store.currency}</p></div>
+            {cartMode ? <div className="space-y-4">{cartProducts.map(({line,product: item}) => <div key={item.id} className="flex gap-3 border-b pb-3">
+              {item.imageUrl && <img src={item.imageUrl} alt="" className="w-16 h-20 object-cover rounded-lg"/>}
+              <div className="flex-1"><p className="font-semibold text-sm">{item.name}</p><p className="text-sm text-slate-500">{item.price.toLocaleString('ar-EG')} {store.currency} × {line.quantity}</p></div>
+            </div>)}</div> : <><div className="flex gap-3">
+              {product?.imageUrl && <img src={product.imageUrl} alt="" className="w-20 h-24 object-cover rounded-lg"/>}
+              <div className="min-w-0"><p className="font-semibold">{product?.name}</p><p className="text-sm text-slate-500">{product?.price.toLocaleString('ar-EG')} {store.currency}</p></div>
             </div>
             <label className="flex gap-3 items-center justify-between mt-6 text-sm font-semibold">الكمية
               <input type="number" min={1} max={99} value={quantity} onChange={e=>setQuantity(Math.max(1,Math.min(99,Math.floor(Number(e.target.value)||1))))} className="w-20 h-11 border border-slate-300 rounded-lg text-center" />
-            </label>
+            </label></>}
             <div className="border-t border-slate-200 mt-5 pt-4 text-sm space-y-3">
               <div className="flex justify-between"><span>المنتجات</span><span>{price.toLocaleString('ar-EG')} {store.currency}</span></div>
               <div className="flex justify-between"><span>التوصيل (تقديري)</span><span>{estimatedDelivery.toLocaleString('ar-EG')} {store.currency}</span></div>
