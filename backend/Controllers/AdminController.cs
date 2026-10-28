@@ -536,7 +536,11 @@ namespace WatsStore.Api.Controllers
             var authError = EnsureAdminAccess();
             if (authError != null) return authError;
 
+            // ⚡ Bolt Optimization: Using AsSplitQuery to prevent Cartesian explosion
+            // when loading multiple collections for cascading deletes.
+            // Expected Impact: Significantly reduces database memory and CPU usage for stores with many entities.
             var store = await _db.Stores
+                .AsSplitQuery()
                 .Include(s => s.Products)
                 .Include(s => s.Categories)
                 .Include(s => s.Orders)
