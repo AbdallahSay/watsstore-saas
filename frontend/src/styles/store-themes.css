@@ -1,0 +1,81 @@
+/*
+ * WatsStore storefront-only tokens.
+ * Import in the storefront route or storefront layout, NOT globally in the SaaS dashboard.
+ * Attach ws-storefront and the selected ws-theme--* class to its route wrapper.
+ * Checkout components use the shared --ws-checkout-* tokens across all three themes.
+ */
+.ws-storefront {
+  --ws-checkout-surface: #fff;
+  --ws-checkout-ink: #1c2421;
+  --ws-checkout-border: #d8ddd8;
+  --ws-checkout-success: #157347;
+  --ws-checkout-error: #b42318;
+  --ws-checkout-focus: #2563eb;
+  --ws-radius-control: 0.625rem;
+  --ws-touch-target: 44px;
+  background: var(--ws-bg);
+  color: var(--ws-fg);
+  font-family: var(--font-cairo), system-ui, sans-serif;
+  min-height: 100%;
+}
+.ws-theme--editorial {
+  --ws-bg: #f7f2ea;
+  --ws-fg: #27251f;
+  --ws-card: #ede5d9;
+  --ws-accent: #352e24;
+  --ws-accent-contrast: #fffaf3;
+  --ws-border: #cfc4b4;
+  --ws-muted: #6e6458;
+}
+.ws-theme--streetwear {
+  --ws-bg: #101010;
+  --ws-fg: #f8f7f3;
+  --ws-card: #242424;
+  --ws-accent: #fb5b16;
+  --ws-accent-contrast: #131313;
+  --ws-border: #4a4a4a;
+  --ws-muted: #c1c1c1;
+}
+.ws-theme--lifestyle {
+  --ws-bg: #f5efe5;
+  --ws-fg: #392d25;
+  --ws-card: #e8d9c6;
+  --ws-accent: #835139;
+  --ws-accent-contrast: #fff9f2;
+  --ws-border: #bda994;
+  --ws-muted: #67584a;
+}
+.ws-storefront .ws-product-card {
+  background: var(--ws-card);
+  color: var(--ws-fg);
+  border: 1px solid var(--ws-border);
+}
+.ws-storefront .ws-primary-action {
+  min-height: var(--ws-touch-target);
+  background: var(--ws-accent);
+  color: var(--ws-accent-contrast);
+  border-radius: var(--ws-radius-control);
+}
+.ws-storefront .ws-primary-action:focus-visible,
+.ws-storefront a:focus-visible {
+  outline: 3px solid var(--ws-checkout-focus);
+  outline-offset: 3px;
+}
+.ws-storefront .ws-checkout {
+  background: var(--ws-checkout-surface);
+  color: var(--ws-checkout-ink);
+}
+.ws-storefront .ws-checkout input,
+.ws-storefront .ws-checkout select,
+.ws-storefront .ws-checkout button {
+  min-height: var(--ws-touch-target);
+}
+@media (prefers-reduced-motion: reduce) {
+  .ws-storefront *,
+  .ws-storefront *::before,
+  .ws-storefront *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
