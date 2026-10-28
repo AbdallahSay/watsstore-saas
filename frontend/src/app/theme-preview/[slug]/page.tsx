@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useParams } from 'next/navigation';
 import { ArrowLeft, Search, ShoppingBag, SlidersHorizontal, ImageOff } from 'lucide-react';
 import { api } from '@/lib/api';
+import { addPreviewCartItem, readPreviewCart } from '@/lib/preview-cart';
 import type { Store, Product } from '@/types';
 import { getStoreTheme, STORE_THEME_IDS, STORE_THEMES, type StoreThemeId } from '@/lib/store-themes';
 import '@/styles/store-themes.css';
@@ -21,6 +22,8 @@ export default function StoreThemePreviewPage() {
   const [themeId, setThemeId] = useState<StoreThemeId>('editorial');
   const [categoryId, setCategoryId] = useState<number | 'all'>('all');
   const [search, setSearch] = useState('');
+  const [cartCount, setCartCount] = useState(0);
+  useEffect(() => { if (slug) setCartCount(readPreviewCart(slug).length); }, [slug]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   useEffect(() => {
@@ -66,7 +69,7 @@ export default function StoreThemePreviewPage() {
           <a href="#categories" className="hover:underline">الأقسام</a>
           <a href="#about" className="hover:underline">عن المتجر</a>
         </nav>
-        <span className="flex gap-3 items-center" aria-label="أدوات المتجر"><Search size={19} aria-hidden="true" /><ShoppingBag size={19} aria-hidden="true" /></span>
+        <a href={`/theme-preview/${encodeURIComponent(slug)}/checkout?cart=1`} className="flex gap-2 items-center min-h-11" aria-label={`سلة المشتريات ${cartCount} منتجات`}><ShoppingBag size={19} aria-hidden="true" /><span>{cartCount}</span></a>
       </header>
 
       <section className="relative overflow-hidden border-y" style={{borderColor:'var(--ws-border)',background:'var(--ws-card)'}}>
@@ -111,6 +114,7 @@ export default function StoreThemePreviewPage() {
               <h3 className="font-bold line-clamp-2 min-h-11">{p.name}</h3>
               <p className="font-bold mt-2" dir="auto">{p.price.toLocaleString('ar-EG')} {store.currency || 'EGP'}</p>
               {p.description && <p className="text-xs mt-2 line-clamp-2" style={{color:'var(--ws-muted)'}}>{p.description}</p>}
+              {p.isAvailable && !p.variantsJson && <button type="button" onClick={() => setCartCount(addPreviewCartItem(store.slug, p))} className="mt-3 min-h-11 w-full rounded-lg border font-bold text-xs sm:text-sm" style={{borderColor:'var(--ws-border)'}}>أضف إلى السلة</button>}
               {p.isAvailable && <a href={`/theme-preview/${encodeURIComponent(store.slug)}/checkout?product=${encodeURIComponent(p.id)}`} className="ws-primary-action mt-4 flex w-full items-center justify-center gap-2 px-3 py-2 text-center text-xs sm:text-sm font-bold">اطلب أونلاين <ShoppingBag size={16} aria-hidden="true"/></a>}
 
             </div>
