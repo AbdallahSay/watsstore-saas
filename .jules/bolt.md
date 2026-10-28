@@ -1,0 +1,3 @@
+## 2026-10-28 - [Backend Entity Framework Core Cartesian Explosion Optimization]
+**Learning:** In the Entity Framework Core implementation for this application, querying single entities with multiple collection navigation properties (like `Store` including `Categories`, `Products`, `Orders`, etc.) without explicit split queries results in a significant Cartesian explosion, leading to huge and inefficient SQL result sets that slow down both the database and network transfer.
+**Action:** Always use `.AsSplitQuery()` when including multiple collections in a single Entity Framework Core query to split the retrieval into multiple, more efficient SQL queries.
