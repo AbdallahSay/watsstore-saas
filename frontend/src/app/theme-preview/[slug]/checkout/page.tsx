@@ -62,7 +62,7 @@ export default function PreviewCheckoutPage() {
   }
 
   if (loading) return <main dir="rtl" role="status" className="min-h-screen p-8 text-center">جاري تحميل الطلب...</main>;
-  if (!store || (cartMode ? cartProducts.length === 0 : (!product || !productId))) return <main dir="rtl" className="min-h-screen p-8 text-center">
+  if (!store || (!success && (cartMode ? cartProducts.length === 0 : (!product || !productId)))) return <main dir="rtl" className="min-h-screen p-8 text-center">
     <p role="alert">{error || 'المنتج غير موجود أو لم يعد متاحاً.'}</p>
     <Link className="underline" href={`/theme-preview/${encodeURIComponent(slug)}`}>الرجوع للمتجر</Link>
   </main>;
