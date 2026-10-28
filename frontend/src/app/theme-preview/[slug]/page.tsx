@@ -111,6 +111,8 @@ export default function StoreThemePreviewPage() {
               <h3 className="font-bold line-clamp-2 min-h-11">{p.name}</h3>
               <p className="font-bold mt-2" dir="auto">{p.price.toLocaleString('ar-EG')} {store.currency || 'EGP'}</p>
               {p.description && <p className="text-xs mt-2 line-clamp-2" style={{color:'var(--ws-muted)'}}>{p.description}</p>}
+              {p.isAvailable && <a href={`/theme-preview/${encodeURIComponent(store.slug)}/checkout?product=${encodeURIComponent(p.id)}`} className="ws-primary-action mt-4 flex w-full items-center justify-center gap-2 px-3 py-2 text-center text-xs sm:text-sm font-bold">اطلب أونلاين <ShoppingBag size={16} aria-hidden="true"/></a>}
+
             </div>
           </article>)}
         </div> : <p className="rounded-lg border p-8 text-center" style={{borderColor:'var(--ws-border)'}}>لا توجد منتجات مطابقة للبحث.</p>}
