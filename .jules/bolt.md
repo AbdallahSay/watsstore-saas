@@ -1,0 +1,3 @@
+## 2024-05-15 - Prevent Cartesian explosion with .AsSplitQuery()
+**Learning:** In Entity Framework Core, eager loading multiple collections using `.Include()` on a single entity creates a massive SQL JOIN query, leading to a Cartesian explosion. This severely degrades database performance and increases memory consumption on both the database server and the backend application when fetching data with several child collections.
+**Action:** Always use `.AsSplitQuery()` when fetching entities with multiple collection navigation properties via Entity Framework Core to break the massive query into multiple smaller, efficient queries.
