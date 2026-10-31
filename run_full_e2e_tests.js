@@ -12,7 +12,7 @@ const path = require('path');
 
 const BACKEND_BASE = process.env.BACKEND_URL || 'https://watsstore.runasp.net';
 const FRONTEND_BASE = process.env.FRONTEND_URL || 'https://frontend-bay-ten-58.vercel.app';
-const ADMIN_SECRET_KEY = 'WatsStore_SuperAdmin_SecretKey_2026_Secure!';
+const ADMIN_SECRET_KEY = process.env.WATSSTORE_TEST_ADMIN_KEY;
 
 const runTimestamp = Date.now().toString().slice(-6);
 

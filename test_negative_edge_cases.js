@@ -48,7 +48,7 @@ async function runAdversarialTestSuite() {
   console.log('--- Step 0: Setup Super Admin Authentication ---');
   const adminLoginRes = await request('/api/admin/login', {
     method: 'POST',
-    body: JSON.stringify({ secretKey: 'WatsStore_SuperAdmin_SecretKey_2026_Secure!' }),
+    body: JSON.stringify({ secretKey: process.env.WATSSTORE_TEST_ADMIN_KEY }),
   });
   const adminToken = adminLoginRes.data?.token;
   if (!adminToken) {
@@ -104,7 +104,7 @@ async function runAdversarialTestSuite() {
     // Upgrade Store B to Pro so it can hold up to 20 coupons for negative testing
     await request(`/api/admin/stores/${storeBId}/plan`, {
       method: 'PATCH',
-      headers: { Authorization: `Bearer ${adminToken}`, 'X-Admin-Key': 'WatsStore_SuperAdmin_SecretKey_2026_Secure!' },
+      headers: { Authorization: `Bearer ${adminToken}`, 'X-Admin-Key': process.env.WATSSTORE_TEST_ADMIN_KEY },
       body: JSON.stringify({ plan: 'Pro' }),
     });
 
@@ -513,7 +513,7 @@ async function runAdversarialTestSuite() {
     // Suspend Store B via Admin
     await request(`/api/admin/stores/${storeBId}/toggle-status`, {
       method: 'PATCH',
-      headers: { Authorization: `Bearer ${adminToken}`, 'X-Admin-Key': 'WatsStore_SuperAdmin_SecretKey_2026_Secure!' },
+      headers: { Authorization: `Bearer ${adminToken}`, 'X-Admin-Key': process.env.WATSSTORE_TEST_ADMIN_KEY },
     });
 
     const suspendedOrderRes = await request(`/api/public/stores/${storeBSlug}/orders`, {
@@ -550,7 +550,7 @@ async function runAdversarialTestSuite() {
     // Reactivate Store B
     await request(`/api/admin/stores/${storeBId}/toggle-status`, {
       method: 'PATCH',
-      headers: { Authorization: `Bearer ${adminToken}`, 'X-Admin-Key': 'WatsStore_SuperAdmin_SecretKey_2026_Secure!' },
+      headers: { Authorization: `Bearer ${adminToken}`, 'X-Admin-Key': process.env.WATSSTORE_TEST_ADMIN_KEY },
     });
 
     // 2.6 Coupon Engine: Usage Limit Exceeded Torture Test
@@ -881,7 +881,7 @@ async function runAdversarialTestSuite() {
     if (storeAId) {
       const delA = await request(`/api/admin/stores/${storeAId}`, {
         method: 'DELETE',
-        headers: { Authorization: `Bearer ${adminToken}`, 'X-Admin-Key': 'WatsStore_SuperAdmin_SecretKey_2026_Secure!' },
+        headers: { Authorization: `Bearer ${adminToken}`, 'X-Admin-Key': process.env.WATSSTORE_TEST_ADMIN_KEY },
       });
       console.log(`Cleaned up Store A (${storeAId}): HTTP ${delA.status}`);
     }
@@ -889,7 +889,7 @@ async function runAdversarialTestSuite() {
     if (storeBId) {
       const delB = await request(`/api/admin/stores/${storeBId}`, {
         method: 'DELETE',
-        headers: { Authorization: `Bearer ${adminToken}`, 'X-Admin-Key': 'WatsStore_SuperAdmin_SecretKey_2026_Secure!' },
+        headers: { Authorization: `Bearer ${adminToken}`, 'X-Admin-Key': process.env.WATSSTORE_TEST_ADMIN_KEY },
       });
       console.log(`Cleaned up Store B (${storeBId}): HTTP ${delB.status}`);
     }

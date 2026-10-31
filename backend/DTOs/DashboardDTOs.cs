@@ -132,6 +132,13 @@ namespace WatsStore.Api.DTOs
 
     public class OrderDto
     {
+        public string Status { get; set; } = "Pending";
+        public string PaymentStatus { get; set; } = "Unpaid";
+        public decimal Subtotal { get; set; }
+        public decimal DiscountAmount { get; set; }
+        public decimal DeliveryFee { get; set; }
+        public string? TransferReference { get; set; }
+        public string? ShippingSummary { get; set; }
         public Guid Id { get; set; }
         public int OrderNumber { get; set; }
         public string CustomerName { get; set; } = string.Empty;

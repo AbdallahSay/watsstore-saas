@@ -48,7 +48,10 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 builder.Services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
 
 // 3. JWT Authentication
-var secretKey = builder.Configuration["Jwt:SecretKey"] ?? "WatsStore_Super_Secret_Key_For_Egypt_Merchants_2026_Secure_Key_Must_Be_Long_Enough!";
+var secretKey = builder.Configuration["Jwt:SecretKey"] ?? throw new InvalidOperationException("Jwt:SecretKey must be supplied through secure configuration.");
+if (string.IsNullOrWhiteSpace(secretKey) || Encoding.UTF8.GetByteCount(secretKey) < 32)
+    throw new InvalidOperationException("Configure a random JWT signing key of at least 32 bytes.");
+
 var issuer = builder.Configuration["Jwt:Issuer"] ?? "WatsStoreApi";
 var audience = builder.Configuration["Jwt:Audience"] ?? "WatsStoreClients";
 
@@ -77,13 +80,11 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowAll", policy =>
     {
         policy.SetIsOriginAllowed(origin =>
-                  string.IsNullOrEmpty(origin) ||
-                  origin.EndsWith(".vercel.app") ||
-                  origin.EndsWith("watsstore.com") ||
-                  origin.EndsWith("masartech.com") ||
-                  origin.EndsWith("watsstore.app") ||
-                  origin.StartsWith("http://localhost") ||
-                  origin.StartsWith("https://localhost"))
+                  Uri.TryCreate(origin, UriKind.Absolute, out var uri) &&
+                  (((builder.Environment.IsDevelopment() || builder.Environment.IsEnvironment("Testing")) && uri.IsLoopback) ||
+                   (uri.Scheme == "https" &&
+                    (new[] { "watsstore.com", "masartech.com", "watsstore.app" }.Any(domain => uri.Host == domain || uri.Host.EndsWith("." + domain, StringComparison.OrdinalIgnoreCase)) ||
+                     (builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? Array.Empty<string>()).Contains(origin, StringComparer.OrdinalIgnoreCase)))))
               .AllowAnyMethod()
               .AllowAnyHeader()
               .AllowCredentials();
@@ -113,20 +114,6 @@ builder.Services.AddRateLimiter(options =>
 
     string GetClientIp(HttpContext httpContext)
     {
-        var forwarded = httpContext.Request.Headers["X-Forwarded-For"].FirstOrDefault();
-        if (!string.IsNullOrWhiteSpace(forwarded))
-        {
-            var firstIp = forwarded.Split(',', StringSplitOptions.RemoveEmptyEntries)[0].Trim();
-            if (!string.IsNullOrWhiteSpace(firstIp))
-                return firstIp;
-        }
-
-        var realIp = httpContext.Request.Headers["X-Real-IP"].FirstOrDefault();
-        if (!string.IsNullOrWhiteSpace(realIp))
-        {
-            return realIp.Trim();
-        }
-
         return httpContext.Connection.RemoteIpAddress?.ToString() ?? "anonymous";
     }
 
@@ -261,9 +248,10 @@ app.Use(async (context, next) =>
             error = ex.Message
         }));
     }
-    catch (Exception)
+    catch (Exception ex)
     {
-        context.Response.StatusCode = StatusCodes.Status400BadRequest;
+        app.Logger.LogError(ex, "Unhandled request failure for {Path}", context.Request.Path);
+        context.Response.StatusCode = StatusCodes.Status500InternalServerError;
         context.Response.ContentType = "application/json; charset=utf-8";
         await context.Response.WriteAsync(System.Text.Json.JsonSerializer.Serialize(new
         {
@@ -308,9 +296,14 @@ app.MapControllers();
 
 // Health check and root probe endpoints for uptime monitoring and deployment verification
 app.MapGet("/", () => Results.Ok(new { status = "Online", service = "WatsStore SaaS API", version = "1.0", timestamp = DateTime.UtcNow }));
-app.MapGet("/health", () => Results.Ok(new { status = "Healthy", database = "Connected", timestamp = DateTime.UtcNow }));
+app.MapGet("/health", async (AppDbContext db) =>
+{
+    try { return await db.Database.CanConnectAsync() ? Results.Ok(new { status = "Healthy" }) : Results.StatusCode(503); }
+    catch { return Results.StatusCode(503); }
+});
 
 // Auto-Seeding Database & Column Migrations on Startup
+if (app.Environment.IsDevelopment() && builder.Configuration.GetValue<bool>("Database:BootstrapDevelopment"))
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
@@ -885,3 +878,5 @@ using (var scope = app.Services.CreateScope())
 }
 
 app.Run();
+
+public partial class Program { }

@@ -43,7 +43,7 @@ async function runPlanLimitsTortureSuite() {
   const adminLoginRes = await request('/api/admin/login', {
     method: 'POST',
     body: JSON.stringify({
-      secretKey: 'WatsStore_SuperAdmin_SecretKey_2026_Secure!',
+      secretKey: process.env.WATSSTORE_TEST_ADMIN_KEY,
     }),
   });
 

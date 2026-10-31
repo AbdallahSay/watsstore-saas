@@ -10,8 +10,8 @@
 
 const BACKEND_URL = process.env.TEST_BACKEND_URL || 'https://watsstore.runasp.net';
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'abdallahsay10@gmail.com';
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'Admin@WatsStore2026!';
-const ADMIN_SECRET = process.env.ADMIN_SECRET || 'WatsStore_SuperAdmin_SecretKey_2026_Secure!';
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || process.env.WATSSTORE_TEST_ADMIN_PASSWORD;
+const ADMIN_SECRET = process.env.ADMIN_SECRET || process.env.WATSSTORE_TEST_ADMIN_KEY;
 
 const results = {
   total: 0,

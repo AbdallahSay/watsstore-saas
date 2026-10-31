@@ -10,7 +10,8 @@ export const size = {
 
 export const contentType = 'image/png';
 
-export default async function Image({ params }: { params: { storeSlug: string } }) {
+export default async function Image({ params: pendingParams }: { params: Promise<{ storeSlug: string }> }) {
+  const params = await pendingParams;
   const storeSlug = params?.storeSlug || '';
   const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://watsstore.runasp.net/api';
 

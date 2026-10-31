@@ -9,13 +9,13 @@ interface MetaPixelProps {
 
 export default function MetaPixel({ pixelId }: MetaPixelProps) {
   useEffect(() => {
-    if (pixelId && typeof window !== 'undefined' && window.fbq) {
+    if (pixelId && /^\d{5,20}$/.test(pixelId) && typeof window !== 'undefined' && window.fbq) {
       window.fbq('init', pixelId);
       window.fbq('trackSingle', pixelId, 'PageView');
     }
   }, [pixelId]);
 
-  if (!pixelId) return null;
+  if (!pixelId || !/^\d{5,20}$/.test(pixelId)) return null;
 
   return (
     <>

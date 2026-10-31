@@ -12,7 +12,7 @@ const https = require('https');
 
 const BACKEND_URL = 'https://watsstore.runasp.net';
 const FRONTEND_URL = 'https://frontend-bay-ten-58.vercel.app';
-const ADMIN_SECRET = 'WatsStore_SuperAdmin_SecretKey_2026_Secure!';
+const ADMIN_SECRET = process.env.WATSSTORE_TEST_ADMIN_KEY;
 
 const testRunId = Date.now().toString().slice(-6);
 

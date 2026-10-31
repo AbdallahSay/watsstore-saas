@@ -43,19 +43,14 @@ namespace WatsStore.Api.Controllers
                     return true;
                 }
 
-                var adminEmail = _config["AdminSettings:Email"] ?? "abdallahsay10@gmail.com";
-                if (User.HasClaim(c => (c.Type == "email" || c.Type == ClaimTypes.Email) &&
-                    string.Equals(c.Value, adminEmail, StringComparison.OrdinalIgnoreCase)))
-                {
-                    return true;
-                }
+
             }
 
             // 2. Check X-Admin-Key header fallback
             if (Request.Headers.TryGetValue("X-Admin-Key", out var headerKey) && !string.IsNullOrWhiteSpace(headerKey))
             {
-                var secretKey = _config["AdminSettings:SecretKey"] ?? "WatsStore_SuperAdmin_SecretKey_2026_Secure!";
-                if (string.Equals(headerKey.ToString(), secretKey, StringComparison.Ordinal))
+                var secretKey = _config["AdminSettings:SecretKey"] ?? string.Empty;
+                if (!string.IsNullOrWhiteSpace(secretKey) && string.Equals(headerKey.ToString(), secretKey, StringComparison.Ordinal))
                 {
                     return true;
                 }
@@ -84,13 +79,13 @@ namespace WatsStore.Api.Controllers
         public async Task<IActionResult> Login([FromBody] AdminLoginRequest request)
         {
             var adminEmail = _config["AdminSettings:Email"] ?? "abdallahsay10@gmail.com";
-            var adminPassword = _config["AdminSettings:Password"] ?? "Admin@WatsStore2026!";
-            var secretKey = _config["AdminSettings:SecretKey"] ?? "WatsStore_SuperAdmin_SecretKey_2026_Secure!";
+            var adminPassword = _config["AdminSettings:Password"] ?? string.Empty;
+            var secretKey = _config["AdminSettings:SecretKey"] ?? string.Empty;
 
             bool isValid = false;
 
             // Method 1: Master Secret Key
-            if (!string.IsNullOrWhiteSpace(request.SecretKey) && 
+            if (!string.IsNullOrWhiteSpace(secretKey) && !string.IsNullOrWhiteSpace(request.SecretKey) && 
                 string.Equals(request.SecretKey.Trim(), secretKey, StringComparison.Ordinal))
             {
                 isValid = true;
@@ -112,7 +107,7 @@ namespace WatsStore.Api.Controllers
                     }
 
                     // Fallback to config password
-                    if (!isValid && string.Equals(request.Password.Trim(), adminPassword, StringComparison.Ordinal))
+                    if (dbAdmin == null && !string.IsNullOrWhiteSpace(adminPassword) && string.Equals(request.Password, adminPassword, StringComparison.Ordinal))
                     {
                         isValid = true;
                     }
@@ -146,8 +141,8 @@ namespace WatsStore.Api.Controllers
                 return BadRequest(ModelState);
 
             var adminEmail = _config["AdminSettings:Email"] ?? "abdallahsay10@gmail.com";
-            var configPassword = _config["AdminSettings:Password"] ?? "Admin@WatsStore2026!";
-            var secretKey = _config["AdminSettings:SecretKey"] ?? "WatsStore_SuperAdmin_SecretKey_2026_Secure!";
+            var configPassword = _config["AdminSettings:Password"] ?? string.Empty;
+            var secretKey = _config["AdminSettings:SecretKey"] ?? string.Empty;
 
             var dbAdmin = await _db.SuperAdmins.FirstOrDefaultAsync(a => a.Email == adminEmail);
             if (dbAdmin == null)
@@ -170,8 +165,7 @@ namespace WatsStore.Api.Controllers
             {
                 isCurrentValid = true;
             }
-            else if (string.Equals(request.CurrentPassword.Trim(), configPassword, StringComparison.Ordinal) ||
-                     string.Equals(request.CurrentPassword.Trim(), secretKey, StringComparison.Ordinal))
+            else if (string.IsNullOrWhiteSpace(dbAdmin.PasswordHash) && !string.IsNullOrWhiteSpace(configPassword) && string.Equals(request.CurrentPassword, configPassword, StringComparison.Ordinal))
             {
                 isCurrentValid = true;
             }
@@ -196,44 +190,9 @@ namespace WatsStore.Api.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var cleanEmail = request.Email.Trim().ToLowerInvariant();
-            var targetAdminEmail = (_config["AdminSettings:Email"] ?? "abdallahsay10@gmail.com").ToLowerInvariant();
-
-            if (!string.Equals(cleanEmail, targetAdminEmail, StringComparison.OrdinalIgnoreCase))
-            {
-                return BadRequest(new { message = "البريد الإلكتروني المدخل غير مسجل كمسؤول عام في منصة WatsStore." });
-            }
-
-            var dbAdmin = await _db.SuperAdmins.FirstOrDefaultAsync(a => a.Email == cleanEmail);
-            if (dbAdmin == null)
-            {
-                var defaultPassword = _config["AdminSettings:Password"] ?? "Admin@WatsStore2026!";
-                dbAdmin = new SuperAdmin
-                {
-                    Id = Guid.NewGuid(),
-                    Email = cleanEmail,
-                    PasswordHash = BCrypt.Net.BCrypt.HashPassword(defaultPassword),
-                    UpdatedAt = DateTime.UtcNow
-                };
-                _db.SuperAdmins.Add(dbAdmin);
-            }
-
-            // Generate temporary secure 6-digit PIN reset token
-            var pin = new Random().Next(100000, 999999).ToString();
-            var resetToken = $"WATS-{pin}";
-
-            dbAdmin.ResetToken = resetToken;
-            dbAdmin.ResetTokenExpiresAt = DateTime.UtcNow.AddMinutes(15);
-            dbAdmin.UpdatedAt = DateTime.UtcNow;
-
-            await _db.SaveChangesAsync();
-
-            return Ok(new AdminForgotPasswordResponse
-            {
-                Message = $"تم إنشاء رمز استعادة كلمة المرور بنجاح للمسؤول العام ({targetAdminEmail}). صالح لمدة 15 دقيقة.",
-                ResetToken = resetToken,
-                ExpiresInMinutes = 15
-            });
+            // Recovery requires a verified delivery channel. Never return recovery credentials.
+            await Task.CompletedTask;
+            return StatusCode(503, new { message = "استعادة الحساب تتطلب التواصل مع مسؤول الاستضافة عبر قناة موثوقة." });
         }
 
         [HttpPost("reset-password")]
@@ -243,42 +202,8 @@ namespace WatsStore.Api.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var cleanEmail = request.Email.Trim().ToLowerInvariant();
-            var targetAdminEmail = (_config["AdminSettings:Email"] ?? "abdallahsay10@gmail.com").ToLowerInvariant();
-
-            if (!string.Equals(cleanEmail, targetAdminEmail, StringComparison.OrdinalIgnoreCase))
-            {
-                return BadRequest(new { message = "البريد الإلكتروني المدخل غير مطابق لحساب المسؤول العام." });
-            }
-
-            var dbAdmin = await _db.SuperAdmins.FirstOrDefaultAsync(a => a.Email == cleanEmail);
-            if (dbAdmin == null || string.IsNullOrWhiteSpace(dbAdmin.ResetToken))
-            {
-                return BadRequest(new { message = "لم يتم العثور على طلب استعادة نشط لهذا الحساب. يرجى طلب رمز استعادة جديد." });
-            }
-
-            if (!string.Equals(dbAdmin.ResetToken.Trim(), request.ResetToken.Trim(), StringComparison.OrdinalIgnoreCase))
-            {
-                return BadRequest(new { message = "رمز استعادة كلمة المرور غير صحيح. يرجى التحقق وإعادة الإدخال." });
-            }
-
-            if (dbAdmin.ResetTokenExpiresAt.HasValue && dbAdmin.ResetTokenExpiresAt.Value < DateTime.UtcNow)
-            {
-                return BadRequest(new { message = "انتهت صلاحية رمز استعادة كلمة المرور (المدة القصوى 15 دقيقة). يرجى طلب رمز جديد." });
-            }
-
-            // Update to new password
-            dbAdmin.PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.NewPassword.Trim());
-            dbAdmin.ResetToken = null;
-            dbAdmin.ResetTokenExpiresAt = null;
-            dbAdmin.UpdatedAt = DateTime.UtcNow;
-
-            await _db.SaveChangesAsync();
-
-            return Ok(new
-            {
-                message = "تمت إعادة تعيين كلمة مرور المسؤول العام بنجاح! يمكنك الآن تسجيل الدخول بكلمة المرور الجديدة."
-            });
+            await Task.CompletedTask;
+            return StatusCode(503, new { message = "استعادة الحساب تتطلب قناة تحقق موثوقة." });
         }
 
         [HttpGet("stats")]

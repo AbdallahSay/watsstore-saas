@@ -41,6 +41,7 @@ namespace WatsStore.Api.Controllers
 
             var store = await _db.Stores
                 .AsNoTracking()
+                .AsSplitQuery()
                 .Include(s => s.Categories.Where(c => c.IsActive).OrderBy(c => c.SortOrder))
                 .Include(s => s.Products.Where(p => p.IsAvailable).OrderBy(p => p.SortOrder).ThenByDescending(p => p.CreatedAt))
                 .FirstOrDefaultAsync(s => s.Slug == normalizedSlug && s.IsActive);
@@ -51,8 +52,7 @@ namespace WatsStore.Api.Controllers
             // Increment Store Profile Visits
             try
             {
-                await _db.Database.ExecuteSqlRawAsync(
-                    "UPDATE Stores SET ViewCount = ViewCount + 1 WHERE Id = {0}", store.Id);
+                await _db.Stores.Where(s => s.Id == store.Id).ExecuteUpdateAsync(u => u.SetProperty(s => s.ViewCount, s => s.ViewCount + 1));
             }
             catch { }
 
@@ -94,10 +94,18 @@ namespace WatsStore.Api.Controllers
                 ? Math.Round(await _db.StoreReviews
                     .Where(r => r.StoreId == store.Id && r.IsApproved)
                     .AverageAsync(r => (double)r.Rating), 1)
-                : 5.0;
+                : 0.0;
 
+            var commerce = await _db.CommerceSettings.AsNoTracking().SingleOrDefaultAsync(x => x.StoreId == store.Id);
+            var stock = await _db.InventoryStocks.AsNoTracking().Where(x => x.StoreId == store.Id && x.VariantKey == "").ToDictionaryAsync(x => x.ProductId, x => x.Quantity);
             var response = new PublicStoreResponse
             {
+                ThemeId = commerce?.PublishedTheme ?? "editorial",
+                CheckoutMode = commerce?.CheckoutMode ?? "whatsapp",
+                CashOnDelivery = commerce?.CashOnDelivery ?? true,
+                InstaPay = commerce?.InstaPay ?? !string.IsNullOrWhiteSpace(store.InstaPayAddress),
+                MobileWallet = commerce?.MobileWallet ?? !string.IsNullOrWhiteSpace(store.VodafoneCashNumber),
+                ShippingZones = System.Text.Json.JsonSerializer.Deserialize<List<ShippingZone>>(commerce?.ShippingZonesJson ?? "[]", CommerceRules.Json) ?? new(),
                 Id = store.Id,
                 StoreName = store.StoreName,
                 Slug = store.Slug,
@@ -141,8 +149,10 @@ namespace WatsStore.Api.Controllers
                     ImageUrl = p.ImageUrl,
                     ImagesJson = p.ImagesJson,
                     Images = ProductImageHelper.ExtractProductImages(p.ImagesJson, p.ImageUrl),
+                    CreatedAt = p.CreatedAt,
                     VariantsJson = p.VariantsJson,
-                    IsAvailable = p.IsAvailable,
+                    StockQuantity = stock.ContainsKey(p.Id) ? stock[p.Id] : null,
+                    IsAvailable = p.IsAvailable && (!stock.ContainsKey(p.Id) || stock[p.Id] > 0),
                     SortOrder = p.SortOrder
                 }).ToList()
             };

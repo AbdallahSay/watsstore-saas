@@ -1,7 +1,7 @@
 const https = require('https');
 
 const API_BASE = 'https://watsstore.runasp.net/api';
-const ADMIN_KEY = 'WatsStore_SuperAdmin_SecretKey_2026_Secure!';
+const ADMIN_KEY = process.env.WATSSTORE_TEST_ADMIN_KEY;
 
 function makeRequest(url, method = 'GET', data = null, headers = {}) {
   return new Promise((resolve, reject) => {

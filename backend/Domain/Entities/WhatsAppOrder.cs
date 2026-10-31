@@ -14,6 +14,19 @@ namespace WatsStore.Api.Domain.Entities
         public string PaymentMethod { get; set; } = "الدفع عند الاستلام";
         public string ItemsJson { get; set; } = "[]";
         public decimal TotalAmount { get; set; }
+        public string Status { get; set; } = "Pending";
+        public string PaymentStatus { get; set; } = "Unpaid";
+        public string? TransferReference { get; set; }
+        public string? TrackingToken { get; set; }
+        public string? IdempotencyKey { get; set; }
+        public string? RequestHash { get; set; }
+        public string Channel { get; set; } = "whatsapp";
+        public decimal Subtotal { get; set; }
+        public decimal DiscountAmount { get; set; }
+        public decimal DeliveryFee { get; set; }
+        public string? CouponCode { get; set; }
+        public string? ShippingSummary { get; set; }
+        public bool InventoryDeducted { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
         // Navigation

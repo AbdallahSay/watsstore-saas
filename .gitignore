@@ -34,3 +34,10 @@ deploy_monsterasp.ps1
 *.swp
 Thumbs.db
 [Dd]esktop.ini
+
+# Local audit fixtures, credentials, browser output and downloaded tools
+work/
+test-results/
+playwright-report/
+*.dpapi
+__pycache__/

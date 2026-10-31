@@ -10,6 +10,10 @@ namespace WatsStore.Api.Infrastructure.Data
         }
 
         public DbSet<Store> Stores => Set<Store>();
+        public DbSet<CommerceSettings> CommerceSettings => Set<CommerceSettings>();
+        public DbSet<InventoryStock> InventoryStocks => Set<InventoryStock>();
+        public DbSet<OrderHistory> OrderHistories => Set<OrderHistory>();
+        public DbSet<InventoryAdjustment> InventoryAdjustments => Set<InventoryAdjustment>();
         public DbSet<Category> Categories => Set<Category>();
         public DbSet<Product> Products => Set<Product>();
         public DbSet<WhatsAppOrder> WhatsAppOrders => Set<WhatsAppOrder>();
@@ -23,6 +27,21 @@ namespace WatsStore.Api.Infrastructure.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+            modelBuilder.Entity<CommerceSettings>(e =>
+            {
+                e.HasKey(x => x.StoreId);
+                e.HasOne(x => x.Store).WithOne().HasForeignKey<CommerceSettings>(x => x.StoreId);
+            });
+            modelBuilder.Entity<InventoryStock>(e =>
+            {
+                e.HasKey(x => x.Id);
+                e.HasIndex(x => new { x.StoreId, x.ProductId, x.VariantKey }).IsUnique();
+            });
+            modelBuilder.Entity<OrderHistory>(e =>
+            {
+                e.HasKey(x => x.Id);
+                e.HasIndex(x => new { x.StoreId, x.OrderId, x.CreatedAt });
+            });
 
             // Store Configuration
             modelBuilder.Entity<Store>(entity =>
@@ -110,6 +129,19 @@ namespace WatsStore.Api.Infrastructure.Data
             modelBuilder.Entity<WhatsAppOrder>(entity =>
             {
                 entity.HasKey(o => o.Id);
+                entity.Property(o => o.Status).HasMaxLength(30);
+                entity.Property(o => o.PaymentStatus).HasMaxLength(30);
+                entity.Property(o => o.Channel).HasMaxLength(20);
+                entity.Property(o => o.TrackingToken).HasMaxLength(64);
+                entity.Property(o => o.IdempotencyKey).HasMaxLength(80);
+                entity.Property(o => o.RequestHash).HasMaxLength(64);
+                entity.Property(o => o.Subtotal).HasPrecision(10, 2);
+                entity.Property(o => o.DiscountAmount).HasPrecision(10, 2);
+                entity.Property(o => o.DeliveryFee).HasPrecision(10, 2);
+                entity.HasIndex(o => new { o.StoreId, o.IdempotencyKey }).IsUnique()
+                      .HasFilter(Database.IsNpgsql() ? "\"IdempotencyKey\" IS NOT NULL" : "[IdempotencyKey] IS NOT NULL");
+                entity.HasIndex(o => o.TrackingToken).IsUnique()
+                      .HasFilter(Database.IsNpgsql() ? "\"TrackingToken\" IS NOT NULL" : "[TrackingToken] IS NOT NULL");
                 
                 if (Database.ProviderName?.Contains("Npgsql", StringComparison.OrdinalIgnoreCase) == true)
                 {

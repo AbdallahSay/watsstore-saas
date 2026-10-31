@@ -223,6 +223,18 @@ export default function DashboardSettingsPage() {
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
+      {slug && <section aria-label="معاينة التصميمات الجديدة" className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-6 shadow-sm">
+        <div className="flex flex-col sm:flex-row gap-4 sm:items-center sm:justify-between">
+          <div>
+            <h2 className="text-lg font-bold text-slate-900">تصميمات المتجر الجديدة</h2>
+            <p className="mt-1 text-sm leading-6 text-slate-600">عاين 3 تصميمات مختلفة باستخدام منتجات متجرك الحقيقية. المعاينة لا تغيّر إعدادات متجرك المنشور.</p>
+          </div>
+          <a href={`/theme-preview/${encodeURIComponent(slug)}`} target="_blank" rel="noopener noreferrer"
+             className="inline-flex min-h-11 items-center justify-center rounded-xl bg-slate-900 px-5 py-2 text-sm font-bold text-white hover:bg-slate-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
+            جرّب الثيمات الثلاثة
+          </a>
+        </div>
+      </section>}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-black text-slate-900">إعدادات المتجر وهوية العلامة التجارية</h1>
