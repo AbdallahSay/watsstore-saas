@@ -6,6 +6,13 @@ namespace WatsStore.Api.DTOs
 {
     public class CreateOrderRequest
     {
+        [StringLength(80, MinimumLength = 16)]
+        public string? IdempotencyKey { get; set; }
+        [RegularExpression("^(online|whatsapp)$")]
+        public string Channel { get; set; } = "whatsapp";
+        [StringLength(60)] public string? ShippingZoneId { get; set; }
+        [StringLength(100)] public string? Governorate { get; set; }
+        [StringLength(100)] public string? TransferReference { get; set; }
         [Required(ErrorMessage = "اسم العميل مطلوب")]
         [StringLength(100, MinimumLength = 2, ErrorMessage = "اسم العميل يجب أن يتراوح بين حرفين و 100 حرف")]
         public string CustomerName { get; set; } = string.Empty;
@@ -29,6 +36,7 @@ namespace WatsStore.Api.DTOs
 
         [Required]
         [MinLength(1, ErrorMessage = "يجب اختيار منتج واحد على الأقل")]
+        [MaxLength(100)]
         public List<OrderItemRequest> Items { get; set; } = new();
     }
 
@@ -45,6 +53,9 @@ namespace WatsStore.Api.DTOs
 
     public class CreateOrderResponse
     {
+        public string? TrackingToken { get; set; }
+        public string Status { get; set; } = "Pending";
+        public string PaymentStatus { get; set; } = "Unpaid";
         public Guid OrderId { get; set; }
         public int OrderNumber { get; set; }
         public decimal Subtotal { get; set; }
@@ -58,6 +69,9 @@ namespace WatsStore.Api.DTOs
 
     public class SavedOrderItemRecord
     {
+        public string? ProductSlug { get; set; }
+        public string? ImageUrl { get; set; }
+        public string? StockKey { get; set; }
         public Guid ProductId { get; set; }
         public string ProductName { get; set; } = string.Empty;
         public decimal UnitPrice { get; set; }

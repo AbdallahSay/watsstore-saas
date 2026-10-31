@@ -6,6 +6,12 @@ namespace WatsStore.Api.DTOs
 {
     public class PublicStoreResponse
     {
+        public string ThemeId { get; set; } = "editorial";
+        public string CheckoutMode { get; set; } = "whatsapp";
+        public bool CashOnDelivery { get; set; } = true;
+        public bool InstaPay { get; set; }
+        public bool MobileWallet { get; set; }
+        public List<ShippingZone> ShippingZones { get; set; } = new();
         public Guid Id { get; set; }
         public string StoreName { get; set; } = string.Empty;
         public string Slug { get; set; } = string.Empty;
@@ -44,6 +50,8 @@ namespace WatsStore.Api.DTOs
 
     public class PublicProductDto
     {
+        public int? StockQuantity { get; set; }
+        public DateTime CreatedAt { get; set; }
         public Guid Id { get; set; }
         public int? CategoryId { get; set; }
         public string Name { get; set; } = string.Empty;

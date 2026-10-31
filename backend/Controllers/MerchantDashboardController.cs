@@ -73,7 +73,7 @@ namespace WatsStore.Api.Controllers
                 .CountAsync(o => o.StoreId == storeId);
 
             var totalRevenue = await _db.WhatsAppOrders
-                .Where(o => o.StoreId == storeId)
+                .Where(o => o.StoreId == storeId && (o.Status == "Confirmed" || o.Status == "Preparing" || o.Status == "Shipped" || o.Status == "Delivered"))
                 .SumAsync(o => o.TotalAmount);
 
             var recentOrders = await _db.WhatsAppOrders
@@ -90,6 +90,9 @@ namespace WatsStore.Api.Controllers
                     CustomerNotes = o.CustomerNotes,
                     PaymentMethod = o.PaymentMethod,
                     ItemsJson = o.ItemsJson,
+                    Status = o.Status, PaymentStatus = o.PaymentStatus,
+                    Subtotal = o.Subtotal, DiscountAmount = o.DiscountAmount, DeliveryFee = o.DeliveryFee,
+                    TransferReference = o.TransferReference, ShippingSummary = o.ShippingSummary,
                     TotalAmount = o.TotalAmount,
                     CreatedAt = o.CreatedAt
                 })
@@ -674,6 +677,9 @@ namespace WatsStore.Api.Controllers
                     CustomerNotes = o.CustomerNotes,
                     PaymentMethod = o.PaymentMethod,
                     ItemsJson = o.ItemsJson,
+                    Status = o.Status, PaymentStatus = o.PaymentStatus,
+                    Subtotal = o.Subtotal, DiscountAmount = o.DiscountAmount, DeliveryFee = o.DeliveryFee,
+                    TransferReference = o.TransferReference, ShippingSummary = o.ShippingSummary,
                     TotalAmount = o.TotalAmount,
                     CreatedAt = o.CreatedAt
                 })
@@ -705,6 +711,9 @@ namespace WatsStore.Api.Controllers
                     CustomerNotes = o.CustomerNotes,
                     PaymentMethod = o.PaymentMethod,
                     ItemsJson = o.ItemsJson,
+                    Status = o.Status, PaymentStatus = o.PaymentStatus,
+                    Subtotal = o.Subtotal, DiscountAmount = o.DiscountAmount, DeliveryFee = o.DeliveryFee,
+                    TransferReference = o.TransferReference, ShippingSummary = o.ShippingSummary,
                     TotalAmount = o.TotalAmount,
                     CreatedAt = o.CreatedAt
                 })
@@ -1139,9 +1148,10 @@ namespace WatsStore.Api.Controllers
                 .OrderByDescending(o => o.CreatedAt)
                 .ToListAsync();
 
-            var totalRevenue = allOrders.Sum(o => o.TotalAmount);
+            var sales = allOrders.Where(o => CommerceRules.CountsAsSale(o.Status)).ToList();
+            var totalRevenue = sales.Sum(o => o.TotalAmount);
             var totalOrdersCount = allOrders.Count;
-            var averageOrderValue = totalOrdersCount > 0 ? Math.Round(totalRevenue / totalOrdersCount, 2) : 0m;
+            var averageOrderValue = totalOrdersCount > 0 ? Math.Round(totalRevenue / Math.Max(1, sales.Count), 2) : 0m;
             var totalProductsCount = await _db.Products.CountAsync(p => p.StoreId == storeId && p.IsAvailable);
 
             var now = DateTime.UtcNow;
@@ -1151,8 +1161,8 @@ namespace WatsStore.Api.Controllers
             var thisMonthOrders = allOrders.Where(o => o.CreatedAt >= startOfThisMonth).ToList();
             var lastMonthOrders = allOrders.Where(o => o.CreatedAt >= startOfLastMonth && o.CreatedAt < startOfThisMonth).ToList();
 
-            var thisMonthRevenue = thisMonthOrders.Sum(o => o.TotalAmount);
-            var lastMonthRevenue = lastMonthOrders.Sum(o => o.TotalAmount);
+            var thisMonthRevenue = thisMonthOrders.Where(o => CommerceRules.CountsAsSale(o.Status)).Sum(o => o.TotalAmount);
+            var lastMonthRevenue = lastMonthOrders.Where(o => CommerceRules.CountsAsSale(o.Status)).Sum(o => o.TotalAmount);
             decimal growthPercentage = 0m;
             if (lastMonthRevenue > 0)
             {
@@ -1170,7 +1180,7 @@ namespace WatsStore.Api.Controllers
             {
                 var targetDate = now.Date.AddDays(-i);
                 var dayOrders = allOrders.Where(o => o.CreatedAt.Date == targetDate).ToList();
-                var dayRevenue = dayOrders.Sum(o => o.TotalAmount);
+                var dayRevenue = dayOrders.Where(o => CommerceRules.CountsAsSale(o.Status)).Sum(o => o.TotalAmount);
                 var dayCount = dayOrders.Count;
 
                 dailySales.Add(new DailySalesDataPoint
@@ -1185,7 +1195,7 @@ namespace WatsStore.Api.Controllers
             // Top Products Analytics
             var productStats = new Dictionary<Guid, (string Name, int Units, decimal Revenue)>();
 
-            foreach (var order in allOrders)
+            foreach (var order in sales)
             {
                 if (string.IsNullOrWhiteSpace(order.ItemsJson)) continue;
                 try
@@ -1270,7 +1280,7 @@ namespace WatsStore.Api.Controllers
                 .OrderByDescending(p => p.Count)
                 .ToList();
 
-            var totalViews = Math.Max(store.ViewCount, totalOrdersCount * 7 + 34);
+            var totalViews = store.ViewCount;
 
             var response = new MerchantAnalyticsResponse
             {

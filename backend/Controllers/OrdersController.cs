@@ -29,137 +29,125 @@ namespace WatsStore.Api.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateOrder(string storeSlug, [FromBody] CreateOrderRequest request)
         {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
-            if (request.Items == null || !request.Items.Any())
-                return BadRequest(new { message = "سلة المشتريات فارغة. يرجى اختيار منتج واحد على الأقل." });
-
-            if (request.Items.Any(i => i.Quantity <= 0))
-                return BadRequest(new { message = "الكمية يجب أن تكون 1 على الأقل لكل منتج." });
-
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+            if (request.Items == null || request.Items.Count == 0 || request.Items.Any(i => i == null)) return BadRequest();
+            if (Sanitizer.Sanitize(request.CustomerName, 100).Length < 2 || Sanitizer.Sanitize(request.CustomerAddress, 300).Length < 5) return BadRequest(new { message = "بيانات العميل غير مكتملة" });
             if (!SlugGenerator.IsValidEgyptianMobile(request.CustomerPhone))
+                return BadRequest(new { message = "رقم الهاتف المصري غير صالح" });
+            if (request.Channel == "online" && string.IsNullOrWhiteSpace(request.IdempotencyKey))
+                return BadRequest(new { message = "مفتاح إعادة المحاولة مطلوب" });
+            var hash = Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(request))));
+            var strategy = _db.Database.CreateExecutionStrategy();
+            return await strategy.ExecuteAsync<IActionResult>(async () =>
             {
-                return BadRequest(new { message = "رقم هاتف العميل غير صالح. يرجى إدخال رقم هاتف محمول مصري صحيح (مثال: 01012345678)." });
-            }
-
-            var normalizedSlug = storeSlug.Trim().ToLowerInvariant();
-
-            var store = await _db.Stores
-                .FirstOrDefaultAsync(s => s.Slug == normalizedSlug && s.IsActive);
-
-            if (store == null)
-                return NotFound(new { message = "المتجر غير موجود أو غير نشط حالياً." });
-
-            if (store.IsTrialExpired())
-            {
-                return StatusCode(StatusCodes.Status403Forbidden, new { 
-                    isTrialExpired = true, 
-                    message = "هذا المتجر غير متاح لاستقبال الطلبات حالياً نظراً لانتهاء الفترة التجريبية المجانية الخاصة به. يرجى التواصل مع صاحب المتجر لتفعيل باقة الاشتراك." 
-                });
-            }
-
-            var productIds = request.Items.Select(i => i.ProductId).Distinct().ToList();
-
-            // Fetch actual database prices to guarantee security and prevent tampering
-            var dbProducts = await _db.Products
-                .Where(p => productIds.Contains(p.Id) && p.StoreId == store.Id && p.IsAvailable)
-                .ToDictionaryAsync(p => p.Id);
-
-            if (dbProducts.Count != productIds.Count)
-            {
-                return BadRequest(new { message = "بعض المنتجات المحددة غير متوفرة حالياً أو لا تتبع هذا المتجر." });
-            }
-
-            decimal subtotal = 0m;
-            var savedItems = new List<SavedOrderItemRecord>();
-
-            foreach (var itemReq in request.Items)
-            {
-                var dbProd = dbProducts[itemReq.ProductId];
-                var lineTotal = dbProd.Price * itemReq.Quantity;
-                subtotal += lineTotal;
-
-                savedItems.Add(new SavedOrderItemRecord
+                _db.ChangeTracker.Clear();
+                await using var transaction = await _db.Database.BeginTransactionAsync(System.Data.IsolationLevel.Serializable);
+                var store = await _db.Stores.FirstOrDefaultAsync(s => s.Slug == storeSlug.Trim().ToLower() && s.IsActive);
+                if (store == null) return NotFound();
+                // Serialize order mutations for this tenant; also coordinates lifecycle and inventory writes.
+                await _db.Stores.Where(s => s.Id == store.Id).ExecuteUpdateAsync(u => u.SetProperty(s => s.ViewCount, s => s.ViewCount));
+                if (!string.IsNullOrWhiteSpace(request.IdempotencyKey))
                 {
-                    ProductId = dbProd.Id,
-                    ProductName = dbProd.Name,
-                    UnitPrice = dbProd.Price,
-                    Quantity = itemReq.Quantity,
-                    Subtotal = lineTotal,
-                    SelectedVariants = itemReq.SelectedVariants
-                });
-            }
-
-            // Coupon Code Validation & Discount Engine
-            decimal discountAmount = 0m;
-            StoreCoupon? appliedCoupon = null;
-
-            if (!string.IsNullOrWhiteSpace(request.CouponCode))
-            {
-                var couponCode = request.CouponCode.Trim().ToUpperInvariant();
-                appliedCoupon = await _db.StoreCoupons
-                    .FirstOrDefaultAsync(c => c.StoreId == store.Id && c.Code == couponCode && c.IsActive);
-
-                if (appliedCoupon == null)
-                {
-                    return BadRequest(new { message = "كود الخصم المدخل غير موجود أو تم إيقافه." });
+                    var existing = await _db.WhatsAppOrders.AsNoTracking().FirstOrDefaultAsync(o => o.StoreId == store.Id && o.IdempotencyKey == request.IdempotencyKey);
+                    if (existing != null)
+                        return existing.RequestHash == hash ? Ok(BuildResponse(existing, store)) : Conflict(new { message = "مفتاح إعادة المحاولة مرتبط بطلب مختلف" });
                 }
-
-                if (appliedCoupon.ExpiryDate.HasValue && appliedCoupon.ExpiryDate.Value < DateTime.UtcNow)
+                if (store.IsTrialExpired()) return StatusCode(403, new { message = "اشتراك المتجر منتهي" });
+                var settings = await _db.CommerceSettings.AsNoTracking().SingleOrDefaultAsync(x => x.StoreId == store.Id)
+                    ?? new CommerceSettings { StoreId = store.Id, InstaPay = !string.IsNullOrWhiteSpace(store.InstaPayAddress), MobileWallet = !string.IsNullOrWhiteSpace(store.VodafoneCashNumber) };
+                if (settings.CheckoutMode != "both" && settings.CheckoutMode != request.Channel)
+                    return BadRequest(new { message = "طريقة إتمام الطلب غير متاحة" });
+                var payment = request.PaymentMethod ?? "الدفع عند الاستلام";
+                var cash = payment is "cod" or "الدفع عند الاستلام";
+                var instapay = payment is "instapay" or "إنستاباي";
+                var wallet = payment is "wallet" or "محفظة إلكترونية" or "فودافون كاش";
+                if (!(cash && settings.CashOnDelivery || instapay && settings.InstaPay && !string.IsNullOrWhiteSpace(store.InstaPayAddress) || wallet && settings.MobileWallet && !string.IsNullOrWhiteSpace(store.VodafoneCashNumber)))
+                    return BadRequest(new { message = "طريقة الدفع غير متاحة" });
+                if (!cash && string.IsNullOrWhiteSpace(request.TransferReference))
+                    return BadRequest(new { message = "أدخل مرجع التحويل للمراجعة" });
+                var zones = JsonSerializer.Deserialize<List<ShippingZone>>(settings.ShippingZonesJson, CommerceRules.Json) ?? new();
+                var deliveryFee = store.DeliveryFee;
+                string? shippingSummary = null;
+                if (zones.Count > 0)
                 {
-                    return BadRequest(new { message = "كود الخصم المدخل منتهي الصلاحية." });
+                    var zone = zones.SingleOrDefault(z => z.Id == request.ShippingZoneId);
+                    if (zone == null || zone.Governorate != request.Governorate)
+                        return BadRequest(new { message = "اختر المحافظة ومنطقة التوصيل الصحيحة" });
+                    deliveryFee = zone.Fee;
+                    shippingSummary = $"{zone.Governorate} — {zone.Name} — {zone.Estimate}";
                 }
-
-                if (appliedCoupon.UsageLimit.HasValue && appliedCoupon.TimesUsed >= appliedCoupon.UsageLimit.Value)
+                if (deliveryFee < 0) return BadRequest(new { message = "إعدادات الشحن غير صالحة" });
+                var ids = request.Items.Select(x => x.ProductId).Distinct().ToList();
+                var products = await _db.Products.Where(p => p.StoreId == store.Id && ids.Contains(p.Id) && p.IsAvailable).ToDictionaryAsync(p => p.Id);
+                if (ids.Count != products.Count) return BadRequest(new { message = "بعض المنتجات غير متاحة في هذا المتجر" });
+                var savedItems = new List<SavedOrderItemRecord>();
+                decimal subtotal = 0;
+                foreach (var item in request.Items)
                 {
-                    return BadRequest(new { message = "وصل كود الخصم للحد الأقصى لعدد مرات الاستخدام." });
+                    var p = products[item.ProductId];
+                    if (p.Price <= 0 || !CommerceRules.ValidVariants(p, item.SelectedVariants))
+                        return BadRequest(new { message = "اختيارات المنتج غير صالحة" });
+                    var variantKey = CommerceRules.VariantKey(item.SelectedVariants);
+                    var stock = await _db.InventoryStocks.AsNoTracking().SingleOrDefaultAsync(x => x.StoreId == store.Id && x.ProductId == p.Id && x.VariantKey == variantKey);
+                    // A base row optionally caps total product stock in addition to each variant.
+                    var stockKeys = new List<string>();
+                    if (stock != null) stockKeys.Add(variantKey);
+                    if (variantKey != "" && await _db.InventoryStocks.AnyAsync(x => x.StoreId == store.Id && x.ProductId == p.Id && x.VariantKey == "")) stockKeys.Add("");
+                    var hasVariantStock = await _db.InventoryStocks.AnyAsync(x => x.StoreId == store.Id && x.ProductId == p.Id && x.VariantKey != "");
+                    if (hasVariantStock && variantKey != "" && stock == null)
+                        return Conflict(new { message = "هذا الاختيار غير متوفر في المخزون" });
+                    foreach (var key in stockKeys)
+                    {
+                        var updated = await _db.InventoryStocks.Where(x => x.StoreId == store.Id && x.ProductId == p.Id && x.VariantKey == key && x.Quantity >= item.Quantity)
+                            .ExecuteUpdateAsync(u => u.SetProperty(x => x.Quantity, x => x.Quantity - item.Quantity));
+                        if (updated != 1) return Conflict(new { message = "الكمية المطلوبة غير متوفرة" });
+                    }
+                    var line = decimal.Round(p.Price * item.Quantity, 2);
+                    subtotal += line;
+                    if (subtotal + deliveryFee > 99999999.99m) return BadRequest(new { message = "قيمة الطلب تتجاوز الحد المسموح" });
+                    savedItems.Add(new SavedOrderItemRecord { ProductId = p.Id, ProductName = p.Name, ProductSlug = p.Slug, ImageUrl = p.ImageUrl, UnitPrice = p.Price, Quantity = item.Quantity, Subtotal = line, SelectedVariants = item.SelectedVariants, StockKey = string.Join(",", stockKeys.Select(k => k == "" ? "base" : k)) });
                 }
-
-                if (string.Equals(appliedCoupon.DiscountType, "Percentage", StringComparison.OrdinalIgnoreCase))
+                decimal discountAmount = 0;
+                StoreCoupon? appliedCoupon = null;
+                if (!string.IsNullOrWhiteSpace(request.CouponCode))
                 {
-                    discountAmount = Math.Round(subtotal * (appliedCoupon.DiscountValue / 100m), 2);
+                    var code = request.CouponCode.Trim().ToUpperInvariant();
+                    appliedCoupon = await _db.StoreCoupons.AsNoTracking().SingleOrDefaultAsync(x => x.StoreId == store.Id && x.Code == code && x.IsActive);
+                    if (appliedCoupon == null || appliedCoupon.ExpiryDate < DateTime.UtcNow || appliedCoupon.UsageLimit.HasValue && appliedCoupon.TimesUsed >= appliedCoupon.UsageLimit)
+                        return BadRequest(new { message = "كود الخصم غير صالح أو انتهى" });
+                    var updated = await _db.StoreCoupons.Where(x => x.Id == appliedCoupon.Id && (!x.UsageLimit.HasValue || x.TimesUsed < x.UsageLimit.Value))
+                        .ExecuteUpdateAsync(u => u.SetProperty(x => x.TimesUsed, x => x.TimesUsed + 1));
+                    if (updated != 1) return Conflict(new { message = "انتهى حد استخدام الكوبون" });
+                    discountAmount = Math.Clamp(appliedCoupon.DiscountType == "Percentage" ? decimal.Round(subtotal * appliedCoupon.DiscountValue / 100, 2) : appliedCoupon.DiscountValue, 0, subtotal);
                 }
-                else
+                var order = new WhatsAppOrder
                 {
-                    discountAmount = appliedCoupon.DiscountValue;
-                }
+                    StoreId = store.Id, CustomerName = Sanitizer.Sanitize(request.CustomerName, 100),
+                    CustomerPhone = SlugGenerator.NormalizeEgyptianPhone(request.CustomerPhone), CustomerAddress = Sanitizer.Sanitize(request.CustomerAddress, 300),
+                    CustomerNotes = Sanitizer.Sanitize(request.CustomerNotes ?? "", 500), PaymentMethod = cash ? "cod" : instapay ? "instapay" : "wallet",
+                    PaymentStatus = cash ? "Unpaid" : "AwaitingVerification", TransferReference = request.TransferReference,
+                    ItemsJson = JsonSerializer.Serialize(savedItems, CommerceRules.Json), Subtotal = subtotal,
+                    DiscountAmount = discountAmount, DeliveryFee = deliveryFee, TotalAmount = subtotal - discountAmount + deliveryFee,
+                    CouponCode = appliedCoupon?.Code, ShippingSummary = shippingSummary, Channel = request.Channel,
+                    IdempotencyKey = request.IdempotencyKey, RequestHash = hash, InventoryDeducted = true,
+                    TrackingToken = Convert.ToHexString(System.Security.Cryptography.RandomNumberGenerator.GetBytes(32)).ToLowerInvariant()
+                };
+                _db.WhatsAppOrders.Add(order);
+                _db.OrderHistories.Add(new OrderHistory { OrderId = order.Id, StoreId = store.Id, Status = "Pending" });
+                await _db.SaveChangesAsync();
+                await transaction.CommitAsync();
+                return Ok(BuildResponse(order, store));
+            });
+        }
 
-                discountAmount = Math.Clamp(discountAmount, 0, subtotal);
-                appliedCoupon.TimesUsed++; // Increment usage count
-            }
-
-            var deliveryFee = store.DeliveryFee;
-            var discountedSubtotal = subtotal - discountAmount;
-            var totalAmount = Math.Max(0m, discountedSubtotal + deliveryFee);
-
-            var cleanCustomerName = Sanitizer.Sanitize(request.CustomerName, 100);
-            var cleanCustomerAddress = Sanitizer.Sanitize(request.CustomerAddress, 250);
-            var cleanCustomerNotes = string.IsNullOrWhiteSpace(request.CustomerNotes) ? null : Sanitizer.Sanitize(request.CustomerNotes, 500);
-            var cleanPaymentMethod = string.IsNullOrWhiteSpace(request.PaymentMethod) 
-                ? "الدفع عند الاستلام" 
-                : Sanitizer.Sanitize(request.PaymentMethod, 50);
-
-            var normalizedCustomerPhone = SlugGenerator.NormalizeEgyptianPhone(request.CustomerPhone);
-            var itemsJson = JsonSerializer.Serialize(savedItems);
-
-            var order = new WhatsAppOrder
-            {
-                Id = Guid.NewGuid(),
-                StoreId = store.Id,
-                CustomerName = cleanCustomerName,
-                CustomerPhone = normalizedCustomerPhone,
-                CustomerAddress = cleanCustomerAddress,
-                CustomerNotes = cleanCustomerNotes,
-                PaymentMethod = cleanPaymentMethod,
-                ItemsJson = itemsJson,
-                TotalAmount = totalAmount,
-                CreatedAt = DateTime.UtcNow
-            };
-
-            _db.WhatsAppOrders.Add(order);
-            await _db.SaveChangesAsync(); // Auto-generates OrderNumber (e.g. 1001)
-
+        private static CreateOrderResponse BuildResponse(WhatsAppOrder order, Store store)
+        {
+            var savedItems = JsonSerializer.Deserialize<List<SavedOrderItemRecord>>(order.ItemsJson, CommerceRules.Json) ?? new();
+            var subtotal = order.Subtotal;
+            var discountAmount = order.DiscountAmount;
+            var deliveryFee = order.DeliveryFee;
+            var totalAmount = order.TotalAmount;
+            var appliedCoupon = string.IsNullOrEmpty(order.CouponCode) ? null : new StoreCoupon { Code = order.CouponCode };
             // Format Arabic WhatsApp message
             var sb = new StringBuilder();
             sb.AppendLine($"🛒 *طلب جديد رقم #{order.OrderNumber}*");
@@ -232,18 +220,27 @@ namespace WatsStore.Api.Controllers
             var storePhone = SlugGenerator.NormalizeEgyptianPhone(store.WhatsAppNumber);
             var whatsAppRedirectUrl = $"https://wa.me/{storePhone}?text={encodedMsg}";
 
-            return Ok(new CreateOrderResponse
+            return new CreateOrderResponse
             {
-                OrderId = order.Id,
-                OrderNumber = order.OrderNumber,
-                Subtotal = subtotal,
-                DiscountAmount = discountAmount,
-                CouponCode = appliedCoupon?.Code,
-                DeliveryFee = deliveryFee,
-                TotalAmount = totalAmount,
-                WhatsAppRedirectUrl = whatsAppRedirectUrl,
-                FormattedMessage = formattedMessage
-            });
+                OrderId = order.Id, OrderNumber = order.OrderNumber, TrackingToken = order.TrackingToken,
+                Status = order.Status, PaymentStatus = order.PaymentStatus, Subtotal = order.Subtotal,
+                DiscountAmount = order.DiscountAmount, CouponCode = order.CouponCode,
+                DeliveryFee = order.DeliveryFee, TotalAmount = order.TotalAmount,
+                WhatsAppRedirectUrl = order.Channel == "whatsapp" ? whatsAppRedirectUrl : "", FormattedMessage = formattedMessage
+            };
+        }
+
+        [HttpGet("track/{token}")]
+        public async Task<IActionResult> Track(string storeSlug, string token)
+        {
+            if (token.Length != 64 || !token.All(Uri.IsHexDigit)) return NotFound();
+            Response.Headers["Cache-Control"] = "no-store";
+            Response.Headers["Referrer-Policy"] = "no-referrer";
+            var order = await _db.WhatsAppOrders.AsNoTracking().Where(o => o.TrackingToken == token && o.Store!.Slug == storeSlug && o.Store.IsActive)
+                .Select(o => new { o.OrderNumber, o.Status, o.PaymentStatus, o.ItemsJson, o.Subtotal, o.DiscountAmount, o.DeliveryFee, o.TotalAmount, o.ShippingSummary, o.CreatedAt, o.StoreId, o.Id }).SingleOrDefaultAsync();
+            if (order == null) return NotFound();
+            var history = await _db.OrderHistories.AsNoTracking().Where(x => x.StoreId == order.StoreId && x.OrderId == order.Id).OrderBy(x => x.CreatedAt).Select(x => new { x.Status, x.CreatedAt }).ToListAsync();
+            return Ok(new { order.OrderNumber, order.Status, order.PaymentStatus, items = JsonSerializer.Deserialize<List<SavedOrderItemRecord>>(order.ItemsJson, CommerceRules.Json), order.Subtotal, order.DiscountAmount, order.DeliveryFee, order.TotalAmount, order.ShippingSummary, order.CreatedAt, history });
         }
     }
 }

@@ -25,7 +25,7 @@ namespace WatsStore.Api.Infrastructure.Utils
 
         public string GenerateToken(Store store)
         {
-            var secretKey = _configuration["Jwt:SecretKey"] ?? "WatsStore_Super_Secret_Key_For_Egypt_Merchants_2026_Secure_Key_Must_Be_Long_Enough!";
+            var secretKey = _configuration["Jwt:SecretKey"] ?? throw new InvalidOperationException("Jwt:SecretKey must be supplied through secure configuration.");
             var issuer = _configuration["Jwt:Issuer"] ?? "WatsStoreApi";
             var audience = _configuration["Jwt:Audience"] ?? "WatsStoreClients";
             var expiryDays = int.TryParse(_configuration["Jwt:ExpiryDays"], out var days) ? days : 30;
@@ -59,7 +59,7 @@ namespace WatsStore.Api.Infrastructure.Utils
 
         public string GenerateAdminToken(string email, string name = "مدير المنصة")
         {
-            var secretKey = _configuration["Jwt:SecretKey"] ?? "WatsStore_Super_Secret_Key_For_Egypt_Merchants_2026_Secure_Key_Must_Be_Long_Enough!";
+            var secretKey = _configuration["Jwt:SecretKey"] ?? throw new InvalidOperationException("Jwt:SecretKey must be supplied through secure configuration.");
             var issuer = _configuration["Jwt:Issuer"] ?? "WatsStoreApi";
             var audience = _configuration["Jwt:Audience"] ?? "WatsStoreClients";
             var expiryDays = 7;
