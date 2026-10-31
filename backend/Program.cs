@@ -46,6 +46,8 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 // 2. Dependency Injection
 builder.Services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
+builder.Services.AddScoped<WatsStore.Api.Infrastructure.Notifications.IOrderPushTransport, WatsStore.Api.Infrastructure.Notifications.VapidPushTransport>();
+builder.Services.AddScoped<WatsStore.Api.Infrastructure.Notifications.PushDispatcher>();
 
 // 3. JWT Authentication
 var secretKey = builder.Configuration["Jwt:SecretKey"] ?? throw new InvalidOperationException("Jwt:SecretKey must be supplied through secure configuration.");
@@ -608,7 +610,9 @@ using (var scope = app.Services.CreateScope())
                     db.SuperAdmins.Remove(legacyAdmin);
                 }
 
-                var defaultHash = BCrypt.Net.BCrypt.HashPassword("Admin@WatsStore2026!");
+                var bootstrapPassword = builder.Configuration["AdminSettings:Password"];
+                if (string.IsNullOrWhiteSpace(bootstrapPassword)) throw new InvalidOperationException("Configure the development admin bootstrap password explicitly.");
+                var defaultHash = BCrypt.Net.BCrypt.HashPassword(bootstrapPassword);
                 db.SuperAdmins.Add(new SuperAdmin
                 {
                     Id = Guid.NewGuid(),

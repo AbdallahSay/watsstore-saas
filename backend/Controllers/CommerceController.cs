@@ -123,7 +123,9 @@ public class CommerceController(AppDbContext db) : ControllerBase
                 order.PaymentStatus = "Cancelled";
             }
             order.Status = request.Status;
-            db.OrderHistories.Add(new OrderHistory { StoreId = Tenant, OrderId = id, Status = request.Status, Note = request.Note });
+            var history = new OrderHistory { StoreId = Tenant, OrderId = id, Status = request.Status, Note = request.Note };
+            db.OrderHistories.Add(history);
+            await WatsStore.Api.Infrastructure.Notifications.NotificationOutbox.Enqueue(db, history);
             await db.SaveChangesAsync();
             await tx.CommitAsync();
             return Ok(new { order.Status });

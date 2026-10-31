@@ -10,6 +10,10 @@ namespace WatsStore.Api.Infrastructure.Data
         }
 
         public DbSet<Store> Stores => Set<Store>();
+        public DbSet<StoreNotificationSetting> StoreNotificationSettings => Set<StoreNotificationSetting>();
+        public DbSet<OrderPushSubscription> OrderPushSubscriptions => Set<OrderPushSubscription>();
+        public DbSet<OrderNotificationDelivery> OrderNotificationDeliveries => Set<OrderNotificationDelivery>();
+        public DbSet<PushDeliveryAttempt> PushDeliveryAttempts => Set<PushDeliveryAttempt>();
         public DbSet<CommerceSettings> CommerceSettings => Set<CommerceSettings>();
         public DbSet<InventoryStock> InventoryStocks => Set<InventoryStock>();
         public DbSet<OrderHistory> OrderHistories => Set<OrderHistory>();
@@ -27,6 +31,17 @@ namespace WatsStore.Api.Infrastructure.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+            modelBuilder.Entity<StoreNotificationSetting>().HasKey(x => x.StoreId);
+            modelBuilder.Entity<StoreNotificationSetting>().HasOne<Store>().WithMany().HasForeignKey(x => x.StoreId).OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<OrderPushSubscription>().HasOne<WhatsAppOrder>().WithMany().HasForeignKey(x => x.OrderId).OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<OrderPushSubscription>().HasOne<Store>().WithMany().HasForeignKey(x => x.StoreId).OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<OrderNotificationDelivery>().HasOne<OrderPushSubscription>().WithMany().HasForeignKey(x => x.SubscriptionId).OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<OrderNotificationDelivery>().HasOne<OrderHistory>().WithMany().HasForeignKey(x => x.EventId).OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<PushDeliveryAttempt>().HasOne<OrderNotificationDelivery>().WithMany().HasForeignKey(x => x.DeliveryId).OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<OrderPushSubscription>().HasIndex(x => new { x.StoreId, x.OrderId, x.EndpointHash }).IsUnique();
+            modelBuilder.Entity<OrderPushSubscription>().HasIndex(x => new { x.StoreId, x.Active });
+            modelBuilder.Entity<OrderNotificationDelivery>().HasIndex(x => new { x.EventId, x.SubscriptionId }).IsUnique();
+            modelBuilder.Entity<OrderNotificationDelivery>().HasIndex(x => new { x.State, x.NextAttemptAt });
             modelBuilder.Entity<CommerceSettings>(e =>
             {
                 e.HasKey(x => x.StoreId);
