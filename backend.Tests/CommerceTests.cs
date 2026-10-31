@@ -245,4 +245,38 @@ public class CommerceTests
         var evilRes = await client.SendAsync(evilReq);
         Assert.False(evilRes.Headers.Contains("Access-Control-Allow-Origin"));
     }
+
+    [Fact]
+    public async Task Orders_preflight_validation_success_and_replay_keep_production_cors_headers()
+    {
+        await using var app = new CommerceFactory();
+        var (store, product) = await app.Seed();
+        var client = app.CreateClient();
+        const string origin = "https://frontend-bay-ten-58.vercel.app";
+        var preflight = new HttpRequestMessage(HttpMethod.Options, Orders(store));
+        preflight.Headers.Add("Origin", origin);
+        preflight.Headers.Add("Access-Control-Request-Method", "POST");
+        preflight.Headers.Add("Access-Control-Request-Headers", "content-type");
+        var preflightResponse = await client.SendAsync(preflight);
+        Assert.Equal(HttpStatusCode.NoContent, preflightResponse.StatusCode);
+        Assert.Equal(origin, preflightResponse.Headers.GetValues("Access-Control-Allow-Origin").Single());
+        Assert.Contains("POST", preflightResponse.Headers.GetValues("Access-Control-Allow-Methods").Single());
+        Assert.Contains("content-type", preflightResponse.Headers.GetValues("Access-Control-Allow-Headers").Single());
+        client.DefaultRequestHeaders.Add("Origin", origin);
+        var invalid = await client.PostAsJsonAsync(Orders(store), new { items = Array.Empty<object>() });
+        Assert.Equal(HttpStatusCode.BadRequest, invalid.StatusCode);
+        Assert.Equal(origin, invalid.Headers.GetValues("Access-Control-Allow-Origin").Single());
+        var request = Request(product);
+        var success = await client.PostAsJsonAsync(Orders(store), request);
+        Assert.Equal(HttpStatusCode.OK, success.StatusCode);
+        Assert.Equal(origin, success.Headers.GetValues("Access-Control-Allow-Origin").Single());
+        var first = await success.Content.ReadFromJsonAsync<CreateOrderResponse>();
+        var replay = await client.PostAsJsonAsync(Orders(store), request);
+        Assert.Equal(first!.OrderId, (await replay.Content.ReadFromJsonAsync<CreateOrderResponse>())!.OrderId);
+        request.Items[0].Quantity = 2;
+        var conflict = await client.PostAsJsonAsync(Orders(store), request);
+        Assert.Equal(HttpStatusCode.Conflict, conflict.StatusCode);
+        Assert.Equal(origin, conflict.Headers.GetValues("Access-Control-Allow-Origin").Single());
+        await app.WithDb(async db => Assert.Equal(1, await db.WhatsAppOrders.CountAsync()));
+    }
 }

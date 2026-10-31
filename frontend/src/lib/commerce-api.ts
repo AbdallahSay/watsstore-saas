@@ -1,5 +1,6 @@
 import { Store, CreateOrderRequest, CreateOrderResponse } from '@/types';
 import type { StoreThemeId } from './store-themes';
+import { API_BASE_URL } from './api-base';
 
 export interface ShippingZone {
   id: string; governorate: string; name: string; fee: number; pickup: boolean; estimate?: string;
@@ -18,17 +19,36 @@ export interface TrackingOrder {
   subtotal: number; discountAmount: number; deliveryFee: number; totalAmount: number;
   shippingSummary?: string; createdAt: string; history: {status: string; createdAt: string}[];
 }
-const base = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+export class CommerceApiError extends Error {
+  constructor(message: string, public readonly status?: number, public readonly uncertain = false) {
+    super(message);
+    this.name = 'CommerceApiError';
+  }
+}
+
 export async function commerceApi<T>(path: string, token?: string, method = 'GET', data?: unknown): Promise<T> {
-  const res = await fetch(`${base}${path}`, {
-    method, cache: 'no-store', headers: { 'Content-Type': 'application/json', ...(token ? {Authorization: `Bearer ${token}`} : {}) },
-    body: data === undefined ? undefined : JSON.stringify(data),
-  });
+  let res: Response;
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 30000);
+  try {
+    res = await fetch(`${API_BASE_URL}${path}`, {
+      method, cache: 'no-store', redirect: 'error', signal: controller.signal,
+      headers: { ...(data === undefined ? {} : {'Content-Type': 'application/json'}), ...(token ? {Authorization: `Bearer ${token}`} : {}) },
+      body: data === undefined ? undefined : JSON.stringify(data),
+    });
+  } catch {
+    throw new CommerceApiError('تعذر تأكيد استلام الطلب بسبب مشكلة في الاتصال. قد يكون الطلب قد سُجّل بالفعل. اضغط «إعادة التحقق من نفس الطلب» دون إنشاء طلب جديد.', undefined, method !== 'GET');
+  } finally { clearTimeout(timeout); }
   if (!res.ok) {
     const error = await res.json().catch(() => null);
-    throw new Error(error?.message || (res.status === 404 ? 'غير موجود / Not found' : `تعذر إتمام الطلب (${res.status})`));
+    const validation = error?.errors && typeof error.errors === 'object'
+      ? Object.values(error.errors).flat().filter((value): value is string => typeof value === 'string').join('، ') : '';
+    const uncertain = method !== 'GET' && (res.status >= 500 || [408, 409].includes(res.status));
+    const fallback = uncertain ? 'تعذر تأكيد حالة الطلب. أعد التحقق بنفس بيانات الطلب لتجنب التكرار.' : res.status === 429 ? 'طلبات كثيرة في وقت قصير. انتظر دقيقة ثم حاول بنفس الطلب.' : `تعذر إتمام الطلب (${res.status}). يرجى مراجعة البيانات.`;
+    throw new CommerceApiError(error?.message || validation || fallback, res.status, uncertain);
   }
-  return res.json();
+  try { return await res.json(); }
+  catch { throw new CommerceApiError('وصل رد غير مكتمل من الخادم. أعد التحقق من نفس الطلب.', res.status, method !== 'GET'); }
 }
 export function createOrder(slug: string, data: CreateOrderRequest) {
   return commerceApi<CreateOrderResponse>(`/public/stores/${encodeURIComponent(slug)}/orders`, undefined, 'POST', data);

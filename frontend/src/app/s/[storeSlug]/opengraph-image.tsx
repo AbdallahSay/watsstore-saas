@@ -1,3 +1,4 @@
+import { API_BASE_URL } from '@/lib/api-base';
 import { ImageResponse } from 'next/og';
 
 export const runtime = 'edge';
@@ -13,7 +14,7 @@ export const contentType = 'image/png';
 export default async function Image({ params: pendingParams }: { params: Promise<{ storeSlug: string }> }) {
   const params = await pendingParams;
   const storeSlug = params?.storeSlug || '';
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://watsstore.runasp.net/api';
+  const apiUrl = API_BASE_URL;
 
   let storeName = decodeURIComponent(storeSlug).replace(/-/g, ' ');
   let category = 'متجر معتمد';
