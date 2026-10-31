@@ -6,6 +6,7 @@ import { createOrder, paymentOptions, CommerceApiError } from '@/lib/commerce-ap
 import { CheckoutAttempt, checkoutKey, prepareCheckoutAttempt, readCheckoutAttempt } from '@/lib/checkout-attempt';
 import { api } from '@/lib/api';
 import { useDialog } from './useDialog';
+import { rememberDeviceOrder } from '@/lib/customer-orders';
 
 interface Props {
   store: Store; items: CartItem[]; open: boolean; english: boolean;
@@ -77,7 +78,9 @@ export default function CommerceCart({store, items, open, english, close, update
       catch { throw new CommerceApiError(previous?.pending ? 'تعذر حفظ بيانات إعادة المحاولة. تظل نتيجة الطلب السابق غير مؤكدة؛ لا تُنشئ طلباً جديداً.' : 'تعذر حفظ بيانات إعادة المحاولة بأمان. اسمح بتخزين بيانات الموقع ثم أعد المحاولة. لم يتم إرسال الطلب.', undefined, !!previous?.pending); }
       attempt.current = saved; setUncertain(true);
       const response = await createOrder(store.slug, {...saved.payload, idempotencyKey: saved.key});
-      setResult(response); clear();
+      setResult(response);
+      if (response.trackingToken) rememberDeviceOrder(store.slug, response.trackingToken, response.orderNumber);
+      clear();
       try { sessionStorage.removeItem(storageKey); } catch { /* optional storage */ }
       attempt.current = null; setUncertain(false);
     } catch (e) {
