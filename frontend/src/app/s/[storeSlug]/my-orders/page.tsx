@@ -15,15 +15,17 @@ export default function CustomerOrdersPage() {
   const [statuses, setStatuses] = useState<Record<string, string>>({});
   const [changes, setChanges] = useState<Record<string, boolean>>({});
   const [checking, setChecking] = useState(false);
+  const checkingRef = useRef(false);
   const [notice, setNotice] = useState('');
   const lastStatuses = useRef<Record<string, string>>({});
   const [notifications, setNotifications] = useState(false);
   const statusNames: Record<string,string> = {Pending:'تم استلام الطلب',Confirmed:'تم تأكيد الطلب',Preparing:'جاري التجهيز',Shipped:'خرج للتوصيل',Delivered:'تم التسليم',Cancelled:'تم إلغاء الطلب',Rejected:'تم رفض الطلب'};
 
   const checkStatuses = useCallback(async () => {
-    if (!slug || document.visibilityState !== 'visible' || checking) return;
+    if (!slug || document.visibilityState !== 'visible' || checkingRef.current) return;
     const saved = readDeviceOrders(slug).slice(0, 10);
     if (!saved.length) return;
+    checkingRef.current = true;
     setChecking(true);
     const results = await Promise.all(saved.map(async o => {
       try {
@@ -47,8 +49,9 @@ export default function CustomerOrdersPage() {
     lastStatuses.current = {...lastStatuses.current,...updated};
     setStatuses(prev => ({...prev,...updated}));
     if (Object.keys(changed).length) {setChanges(prev => ({...prev,...changed})); setNotice('فيه تحديث جديد على حالة أحد طلباتك.');}
+    checkingRef.current = false;
     setChecking(false);
-  }, [slug, checking, notifications]);
+  }, [slug, notifications]);
 
   useEffect(() => {
     if (!orders.length) return;
