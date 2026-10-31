@@ -10,9 +10,9 @@
 // 7. Admin approval idempotency & double-approval rejection (400 Bad Request)
 
 const BASE_URL = process.env.API_BASE_URL || 'https://watsstore.runasp.net';
-const ADMIN_SECRET = 'WatsStore_SuperAdmin_SecretKey_2026_Secure!';
+const ADMIN_SECRET = process.env.WATSSTORE_TEST_ADMIN_KEY;
 const ADMIN_EMAIL = 'abdallahsay10@gmail.com';
-const ADMIN_PASS = 'Admin@WatsStore2026!';
+const ADMIN_PASS = process.env.WATSSTORE_TEST_ADMIN_PASSWORD;
 
 let passed = 0;
 let failed = 0;

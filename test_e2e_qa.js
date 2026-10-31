@@ -103,7 +103,7 @@ async function runAllTests() {
   const adminLoginRes = await request(`${BACKEND_BASE}/api/admin/login`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json; charset=utf-8' },
-    body: JSON.stringify({ email: 'abdallahsay10@gmail.com', password: 'Admin@WatsStore2026!' }),
+    body: JSON.stringify({ email: 'abdallahsay10@gmail.com', password: process.env.WATSSTORE_TEST_ADMIN_PASSWORD }),
   });
 
   if (adminLoginRes.res && adminLoginRes.res.ok) {
@@ -121,7 +121,7 @@ async function runAllTests() {
     const adminKeyRes = await request(`${BACKEND_BASE}/api/admin/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json; charset=utf-8' },
-      body: JSON.stringify({ secretKey: 'WatsStore_SuperAdmin_SecretKey_2026_Secure!' }),
+      body: JSON.stringify({ secretKey: process.env.WATSSTORE_TEST_ADMIN_KEY }),
     });
     if (adminKeyRes.res && adminKeyRes.res.ok) {
       const data = await adminKeyRes.res.json();

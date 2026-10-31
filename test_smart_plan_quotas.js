@@ -35,7 +35,7 @@ async function runTests() {
     const adminLoginRes = await fetch(`${API_BASE}/admin/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email: 'abdallahsay10@gmail.com', password: 'Admin@WatsStore2026!' })
+      body: JSON.stringify({ email: 'abdallahsay10@gmail.com', password: process.env.WATSSTORE_TEST_ADMIN_PASSWORD })
     });
     const adminLoginData = await adminLoginRes.json();
     assert(adminLoginRes.status === 200 && adminLoginData.token, 'Super Admin authenticated successfully');

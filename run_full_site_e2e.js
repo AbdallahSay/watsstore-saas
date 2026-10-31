@@ -12,7 +12,7 @@ const FRONTEND_URL = 'https://frontend-bay-ten-58.vercel.app';
 const BACKEND_URL = 'https://watsstore.runasp.net';
 
 const ADMIN_EMAIL = 'abdallahsay10@gmail.com';
-const ADMIN_PASSWORD = 'Admin@WatsStore2026!';
+const ADMIN_PASSWORD = process.env.WATSSTORE_TEST_ADMIN_PASSWORD;
 
 const testResults = [];
 let passCount = 0;

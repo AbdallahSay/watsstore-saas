@@ -68,7 +68,7 @@ async function runBillingTests() {
       method: 'POST'
     }, {
       email: 'abdallahsay10@gmail.com',
-      password: 'Admin@WatsStore2026!'
+      password: process.env.WATSSTORE_TEST_ADMIN_PASSWORD
     });
     assert(adminLoginRes.status === 200, `Admin login returned HTTP ${adminLoginRes.status}`);
     const adminToken = adminLoginRes.body.token;

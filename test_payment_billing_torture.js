@@ -84,7 +84,7 @@ async function runPaymentTortureSuite() {
     // 1. Super Admin Login
     const adminLogin = await request(`${BACKEND_URL}/api/admin/login`, { method: 'POST' }, {
       email: 'abdallahsay10@gmail.com',
-      password: 'Admin@WatsStore2026!'
+      password: process.env.WATSSTORE_TEST_ADMIN_PASSWORD
     });
     const adminToken = adminLogin.body?.token;
     record('Super Admin Authentication', 'Auth', 200, adminLogin.status, adminLogin.timeMs, adminLogin.status === 200 && !!adminToken);
