@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useDialog } from './commerce/useDialog';
 import { Product, ProductVariantGroup } from '../types';
 import { X, Plus, Minus, ShoppingBag, Check, ChevronLeft, ChevronRight } from 'lucide-react';
 
@@ -19,6 +20,7 @@ export default function ProductModal({
   onClose,
   onAddToCart,
 }: ProductModalProps) {
+  const dialogRef = useDialog(isOpen && !!product, onClose);
   const [quantity, setQuantity] = useState(1);
   const [selectedVariants, setSelectedVariants] = useState<Record<string, string>>({});
   const [variantGroups, setVariantGroups] = useState<ProductVariantGroup[]>([]);
@@ -103,7 +105,7 @@ export default function ProductModal({
       className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fadeIn"
       onClick={onClose}
     >
-      <div 
+      <div ref={dialogRef} role="dialog" aria-modal="true" aria-label={product.name}
         className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 rounded-3xl max-w-lg w-full max-h-[90vh] overflow-y-auto shadow-2xl relative border border-slate-100 dark:border-slate-800 flex flex-col"
         onClick={(e) => e.stopPropagation()}
       >

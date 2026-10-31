@@ -175,17 +175,7 @@ export default function CartDrawer({
 
       const result = await api.createWhatsAppOrder(store.slug, orderPayload);
 
-      // Fire Meta Pixel Purchase event for merchant pixel
-      if (store.metaPixelId) {
-        pixel.purchase(store.metaPixelId, {
-          content_ids: cartItems.map((i) => i.product.id),
-          content_type: 'product',
-          value: totalAmount,
-          currency: 'EGP',
-          num_items: cartItems.reduce((acc, i) => acc + i.quantity, 0),
-        });
-      }
-
+      // Purchase reporting is held until verified conversion deduplication exists.
       // Also fire on platform pixel if present
       const platformPixelId = process.env.NEXT_PUBLIC_PLATFORM_META_PIXEL_ID;
       if (platformPixelId) {

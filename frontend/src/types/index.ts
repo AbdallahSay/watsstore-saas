@@ -1,9 +1,11 @@
+import type { ShippingZone } from '@/lib/commerce-api';
 export interface ProductVariantGroup {
   name: string;
   options: string[];
 }
 
 export interface Product {
+  stockQuantity?: number | null;
   id: string;
   categoryId?: number | null;
   name: string;
@@ -29,6 +31,12 @@ export interface Category {
 }
 
 export interface Store {
+  themeId?: string;
+  checkoutMode?: 'online' | 'whatsapp' | 'both';
+  cashOnDelivery?: boolean;
+  instaPay?: boolean;
+  mobileWallet?: boolean;
+  shippingZones?: ShippingZone[];
   id: string;
   storeName: string;
   slug: string;
@@ -98,6 +106,11 @@ export interface OrderItemRequest {
 }
 
 export interface CreateOrderRequest {
+  idempotencyKey?: string;
+  channel?: 'online' | 'whatsapp';
+  shippingZoneId?: string;
+  governorate?: string;
+  transferReference?: string;
   customerName: string;
   customerPhone: string;
   customerAddress: string;
@@ -108,6 +121,9 @@ export interface CreateOrderRequest {
 }
 
 export interface CreateOrderResponse {
+  trackingToken?: string;
+  status: string;
+  paymentStatus: string;
   orderId: string;
   orderNumber: number;
   subtotal: number;

@@ -2,13 +2,13 @@ import { NextRequest, NextResponse } from 'next/server';
 import { api } from '@/lib/api';
 
 interface RouteProps {
-  params: {
+  params: Promise<{
     publicCode: string;
-  };
+  }>;
 }
 
-export async function GET(request: NextRequest, { params }: RouteProps) {
-  const { publicCode } = params;
+export async function GET(request: NextRequest, { params: pendingParams }: RouteProps) {
+  const { publicCode } = await pendingParams;
 
   try {
     const data = await api.resolveQrCode(publicCode);

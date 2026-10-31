@@ -4,10 +4,10 @@ import { StoreDirectoryCard } from '@/types';
 import DirectoryClient from './DirectoryClient';
 
 interface DirectoryPageProps {
-  searchParams: {
+  searchParams: Promise<{
     city?: string;
     category?: string;
-  };
+  }>;
 }
 
 const EGYPT_CITIES = [
@@ -38,7 +38,8 @@ const BUSINESS_CATEGORIES = [
   'إلكترونيات وموبايل',
 ];
 
-export async function generateMetadata({ searchParams }: DirectoryPageProps): Promise<Metadata> {
+export async function generateMetadata({ searchParams: pendingSearchParams }: DirectoryPageProps): Promise<Metadata> {
+  const searchParams = await pendingSearchParams;
   const { city, category } = searchParams;
   let title = 'دليل المتاجر ومنيو الواتساب في مصر | WatsStore';
   let desc = 'تصفح دليل متاجر الواتساب والكتالوجات المحلية في محافظات مصر. تسوق واطلب مباشرة من التاجر بضغطة زر.';
@@ -65,7 +66,8 @@ export async function generateMetadata({ searchParams }: DirectoryPageProps): Pr
   };
 }
 
-export default async function DirectoryPage({ searchParams }: DirectoryPageProps) {
+export default async function DirectoryPage({ searchParams: pendingSearchParams }: DirectoryPageProps) {
+  const searchParams = await pendingSearchParams;
   const selectedCity = searchParams.city && searchParams.city !== 'الكل' ? searchParams.city : undefined;
   const selectedCategory = searchParams.category && searchParams.category !== 'الكل' ? searchParams.category : undefined;
 

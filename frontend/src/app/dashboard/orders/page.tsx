@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { api } from '@/lib/api';
 import { appSwal } from '@/lib/sweetalert';
@@ -93,7 +94,7 @@ export default function MerchantOrdersPage() {
     return matchesSearch && matchesPayment;
   });
 
-  const totalRevenue = filteredOrders.reduce((sum, o) => sum + (o.totalAmount || 0), 0);
+  const totalRevenue = filteredOrders.filter(o => ['Confirmed','Preparing','Shipped','Delivered'].includes(o.status)).reduce((sum, o) => sum + (o.totalAmount || 0), 0);
 
   if (isLoading) {
     return (
@@ -249,7 +250,7 @@ export default function MerchantOrdersPage() {
                   return (
                     <tr key={order.id} className="hover:bg-slate-50/80 dark:hover:bg-slate-800/50 transition-colors">
                       <td className="py-4 px-4 font-black text-emerald-600 dark:text-emerald-400">
-                        #{order.orderNumber}
+                        <Link href={`/dashboard/orders/${order.id}`} className="underline">#{order.orderNumber}</Link><p className="text-xs mt-2">{order.status}</p>
                       </td>
                       <td className="py-4 px-4">
                         <div className="font-bold text-slate-900 dark:text-white">{order.customerName}</div>

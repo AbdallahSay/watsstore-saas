@@ -5,12 +5,13 @@ import StoreCatalogClient from './StoreCatalogClient';
 import MetaPixel from '@/components/MetaPixel';
 
 interface PageProps {
-  params: {
+  params: Promise<{
     storeSlug: string;
-  };
+  }>;
 }
 
-export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+export async function generateMetadata({ params: pendingParams }: PageProps): Promise<Metadata> {
+  const params = await pendingParams;
   try {
     const store = await api.getPublicStore(params.storeSlug);
     const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://frontend-bay-ten-58.vercel.app';
@@ -45,7 +46,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   }
 }
 
-export default async function StorePage({ params }: PageProps) {
+export default async function StorePage({ params: pendingParams }: PageProps) {
+  const params = await pendingParams;
   let store;
   try {
     store = await api.getPublicStore(params.storeSlug);
@@ -70,7 +72,7 @@ export default async function StorePage({ params }: PageProps) {
       addressCountry: 'EG',
     },
     currenciesAccepted: 'EGP',
-    paymentAccepted: 'Cash on Delivery, WhatsApp Order',
+    paymentAccepted: [store.cashOnDelivery !== false ? 'Cash on Delivery' : '', store.instaPay ? 'Manual InstaPay' : '', store.mobileWallet ? 'Manual Mobile Wallet' : ''].filter(Boolean).join(', '),
     priceRange: '$$',
     aggregateRating: (store.totalReviews && store.totalReviews > 0) ? {
       '@type': 'AggregateRating',
@@ -122,7 +124,7 @@ export default async function StorePage({ params }: PageProps) {
       {/* Schema.org Structured Data */}
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData).replace(/</g, "\u003c") }}
       />
 
       {/* Merchant Dual Meta Pixel (Injected only if configured and Pro/VIP) */}

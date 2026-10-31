@@ -17,10 +17,10 @@ import {
 } from 'lucide-react';
 
 interface ProgrammaticDirectoryProps {
-  params: {
+  params: Promise<{
     city: string;
     category: string;
-  };
+  }>;
 }
 
 const POPULAR_CATEGORIES = [
@@ -46,7 +46,8 @@ const POPULAR_CITIES = [
   'بني سويف',
 ];
 
-export async function generateMetadata({ params }: ProgrammaticDirectoryProps): Promise<Metadata> {
+export async function generateMetadata({ params: pendingParams }: ProgrammaticDirectoryProps): Promise<Metadata> {
+  const params = await pendingParams;
   const city = decodeURIComponent(params.city);
   const category = decodeURIComponent(params.category);
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://frontend-bay-ten-58.vercel.app';
@@ -77,7 +78,8 @@ export async function generateMetadata({ params }: ProgrammaticDirectoryProps): 
   };
 }
 
-export default async function ProgrammaticDirectoryPage({ params }: ProgrammaticDirectoryProps) {
+export default async function ProgrammaticDirectoryPage({ params: pendingParams }: ProgrammaticDirectoryProps) {
+  const params = await pendingParams;
   const city = decodeURIComponent(params.city);
   const category = decodeURIComponent(params.category);
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://frontend-bay-ten-58.vercel.app';
@@ -150,11 +152,11 @@ export default async function ProgrammaticDirectoryPage({ params }: Programmatic
       {/* Inject SEO JSON-LD Structured Data */}
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData).replace(/</g, "\u003c") }}
       />
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbsData) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbsData).replace(/</g, "\u003c") }}
       />
 
       <Navbar />
