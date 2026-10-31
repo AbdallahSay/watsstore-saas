@@ -143,15 +143,15 @@ export default function HomePage() {
             </div>
 
             <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black text-slate-900 dark:text-white tracking-tight leading-[1.15] max-w-4xl mx-auto">
-              {t('hero.title_part1', undefined, 'أنشئ متجرًا إلكترونيًا مجانًا لمدة 14 يومًا')}{' '}
+              {dir === 'rtl' ? 'أنشئ متجرًا إلكترونيًا بتجربة مجانية لمدة 14 يومًا' : 'Create your online store with a free 14-day trial'}{' '}
               <span className="bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 bg-clip-text text-transparent">
-                {t('hero.title_gradient', undefined, 'واستقبل طلباتك عبر واتساب')}
+                {dir === 'rtl' ? 'واستقبل الطلبات عبر واتساب' : 'and receive orders on WhatsApp'}
               </span>{' '}
-              {t('hero.title_part2', undefined, '')}
+              
             </h1>
 
             <p className="mt-6 text-lg sm:text-xl text-slate-600 dark:text-slate-300 max-w-2xl mx-auto leading-relaxed">
-              {t('hero.subtitle', undefined, 'ابدأ تجربة مجانية لمدة 14 يومًا بدون بطاقة بنكية، واعرض حتى 10 منتجات في متجرك الإلكتروني. يختار عملاؤك المنتجات ويصلك طلب منظم عبر واتساب، وبعد التجربة يمكنك اختيار باقة مدفوعة.')}
+              {dir === 'rtl' ? 'ابدأ تجربة مجانية لمدة 14 يومًا بدون بطاقة بنكية، واعرض حتى 10 منتجات في متجرك الإلكتروني. يختار عملاؤك المنتجات ويصلك طلب منظم عبر واتساب، وبعد التجربة يمكنك اختيار باقة مدفوعة.' : 'Start a free 14-day trial without a credit card. Showcase up to 10 products and receive organized WhatsApp orders. Choose a paid plan after the trial.'}
             </p>
 
             {/* CTAs */}
