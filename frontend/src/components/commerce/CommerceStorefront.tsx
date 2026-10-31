@@ -79,6 +79,7 @@ export default function CommerceStorefront({store, previewTheme, preview = false
     <div className="ws-announcement"><span>{store.city} · {store.businessCategory}</span><span>{tr('تسوق من', 'Shop from')} {store.storeName}</span><button onClick={() => setLanguage(english ? 'ar' : 'en')}>{english ? 'العربية' : 'English'}</button></div>
     <header className="ws-header"><a className="ws-brand" href={`/s/${store.slug}`}>{store.logoUrl && <img src={store.logoUrl} alt="" width="38" height="38"/>}<span>{store.storeName}</span></a>
       <nav aria-label={tr('التنقل', 'Main navigation')}><a href="#catalog">{tr('تسوق المجموعة', 'Shop collection')}</a><a href="#reviews">{tr('آراء العملاء', 'Reviews')}</a><a href={wa} target="_blank" rel="noreferrer">{tr('تواصل معنا', 'Contact')}</a></nav>
+      <Link href={`/s/${encodeURIComponent(store.slug)}/my-orders`} className="ws-my-orders-link" style={{fontSize:"0.8rem",fontWeight:700,whiteSpace:"nowrap",padding:"0.6rem"}}>{tr("طلباتي","My orders")}</Link>
       <button className="ws-bag" aria-label={tr(`حقيبة التسوق، ${totalItems} منتجات`, `Shopping bag, ${totalItems} items`)} onClick={() => setCartOpen(true)} disabled={preview}><ShoppingBag size={19}/><span>{tr('الحقيبة', 'Bag')} ({totalItems})</span></button>
     </header>
     {store.isTrialExpired && <p className="ws-error ws-store-alert" role="status">{tr('استقبال الطلبات متوقف مؤقتاً لانتهاء اشتراك المتجر.', 'Orders are temporarily unavailable while the store renews its subscription.')}</p>}
