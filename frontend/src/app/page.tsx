@@ -143,15 +143,15 @@ export default function HomePage() {
             </div>
 
             <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black text-slate-900 dark:text-white tracking-tight leading-[1.15] max-w-4xl mx-auto">
-              {t('hero.title_part1', undefined, 'حوّل محادثات الواتساب إلى')}{' '}
+              {t('hero.title_part1', undefined, 'أنشئ متجرًا إلكترونيًا مجانًا لمدة 14 يومًا')}{' '}
               <span className="bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 bg-clip-text text-transparent">
-                {t('hero.title_gradient', undefined, 'متجر إلكتروني ذكي')}
+                {t('hero.title_gradient', undefined, 'واستقبل طلباتك عبر واتساب')}
               </span>{' '}
-              {t('hero.title_part2', undefined, 'يبيع على مدار الساعة')}
+              {t('hero.title_part2', undefined, '')}
             </h1>
 
             <p className="mt-6 text-lg sm:text-xl text-slate-600 dark:text-slate-300 max-w-2xl mx-auto leading-relaxed">
-              {t('hero.subtitle', undefined, 'أنشئ كتالوج منتجاتك في دقيقتين. زبائنك يختارون المقاسات والألوان، ويصلك طلب مرتب بفاتورة وإجمالي الحساب مباشرة على رقمك بالواتساب بدون عمولات خفية.')}
+              {t('hero.subtitle', undefined, 'ابدأ تجربة مجانية لمدة 14 يومًا بدون بطاقة بنكية، واعرض حتى 10 منتجات في متجرك الإلكتروني. يختار عملاؤك المنتجات ويصلك طلب منظم عبر واتساب، وبعد التجربة يمكنك اختيار باقة مدفوعة.')}
             </p>
 
             {/* CTAs */}
