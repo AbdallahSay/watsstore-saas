@@ -13,7 +13,7 @@ const QA_SLUG_PATTERNS = [
   /^ععععع$/u,
 ];
 
-export function isEligibleSitemapSlug(slug: string): boolean {
+function isEligibleSitemapSlug(slug: string): boolean {
   return Boolean(slug?.trim()) && !QA_SLUG_PATTERNS.some((pattern) => pattern.test(slug.trim()));
 }
 
