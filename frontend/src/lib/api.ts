@@ -25,7 +25,7 @@ import {
   PaymentGatewayItem
 } from '../types';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://watsstore.runasp.net/api';
+import { API_BASE_URL } from './api-base';
 
 async function handleResponseError(res: Response): Promise<never> {
   // 401 Unauthorized handling: Auto-logout & redirect with strict session isolation

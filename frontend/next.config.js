@@ -1,4 +1,10 @@
 /** @type {import('next').NextConfig} */
+if (process.env.VERCEL === '1' && process.env.NEXT_PUBLIC_API_URL) {
+  const apiUrl = new URL(process.env.NEXT_PUBLIC_API_URL);
+  if (apiUrl.protocol !== 'https:' || ['localhost', '127.0.0.1', '[::1]'].includes(apiUrl.hostname)) {
+    throw new Error('Hosted deployments require an HTTPS public API URL, never a local development server.');
+  }
+}
 const nextConfig = {
   reactStrictMode: true,
   images: {

@@ -3,6 +3,8 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
+    "test": "node --test tests/*.test.cjs",
+    "test:checkout": "node tests/checkout.e2e.cjs",
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
