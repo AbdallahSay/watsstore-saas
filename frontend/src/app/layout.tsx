@@ -21,20 +21,20 @@ export const viewport: Viewport = {
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'https://frontend-bay-ten-58.vercel.app'),
   title: {
-    default: 'WatsStore | منصة إنشاء متاجر وكتالوجات الواتساب في مصر',
+    default: 'إنشاء متجر إلكتروني مجانًا لمدة 14 يومًا | WatsStore',
     template: '%s | WatsStore',
   },
-  description: 'أنشئ متجرك الإلكتروني ومنيو منتجاتك في دقيقتين واستقبل طلبات العملاء مباشرة ومفلترة على الواتساب مع دعم كامل لتحسين محركات البحث و SEO المحافظات المصرية.',
-  keywords: ['متجر واتساب', 'منيو واتساب مصر', 'كتالوج واتساب', 'واتس ستور', 'WatsStore', 'تجارة إلكترونية مصر', 'SEO محلي مصر'],
+  description: 'أنشئ متجرًا إلكترونيًا بتجربة مجانية لمدة 14 يومًا مع WatsStore. اعرض حتى 10 منتجات واستقبل الطلبات عبر واتساب، بدون بطاقة بنكية.',
   authors: [{ name: 'WatsStore Platform' }],
   robots: {
     index: true,
     follow: true,
   },
+  alternates: { canonical: '/' },
   openGraph: {
     title: 'WatsStore | منصة إنشاء متاجر وكتالوجات الواتساب في مصر',
-    description: 'أنشئ متجرك الإلكتروني ومنيو منتجاتك في دقيقتين واستقبل طلبات العملاء مباشرة ومفلترة على الواتساب مع دعم كامل لتحسين محركات البحث و SEO المحافظات المصرية.',
-    url: 'https://frontend-bay-ten-58.vercel.app',
+    description: 'أنشئ متجرًا إلكترونيًا بتجربة مجانية لمدة 14 يومًا مع WatsStore. اعرض حتى 10 منتجات واستقبل الطلبات عبر واتساب، بدون بطاقة بنكية.',
+    url: '/',
     siteName: 'WatsStore',
     locale: 'ar_EG',
     type: 'website',
