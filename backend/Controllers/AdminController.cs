@@ -536,12 +536,14 @@ namespace WatsStore.Api.Controllers
             var authError = EnsureAdminAccess();
             if (authError != null) return authError;
 
+            // BOLT OPTIMIZATION: Use .AsSplitQuery() to prevent Cartesian explosion when including multiple collections
             var store = await _db.Stores
                 .Include(s => s.Products)
                 .Include(s => s.Categories)
                 .Include(s => s.Orders)
                 .Include(s => s.Reviews)
                 .Include(s => s.Coupons)
+                .AsSplitQuery()
                 .FirstOrDefaultAsync(s => s.Id == id);
 
             if (store == null)
