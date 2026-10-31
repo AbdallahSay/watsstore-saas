@@ -79,15 +79,45 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", policy =>
     {
+        var explicitAllowedOrigins = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+        {
+            "https://frontend-bay-ten-58.vercel.app",
+            "https://watsstore.vercel.app",
+            "https://watsstore.com",
+            "https://masartech.com",
+            "https://watsstore.app"
+        };
+
+        var configured = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? Array.Empty<string>();
+        foreach (var c in configured)
+        {
+            if (!string.IsNullOrWhiteSpace(c)) explicitAllowedOrigins.Add(c.Trim());
+        }
+
         policy.SetIsOriginAllowed(origin =>
-                  Uri.TryCreate(origin, UriKind.Absolute, out var uri) &&
-                  (((builder.Environment.IsDevelopment() || builder.Environment.IsEnvironment("Testing")) && uri.IsLoopback) ||
-                   (uri.Scheme == "https" &&
-                    (new[] { "watsstore.com", "masartech.com", "watsstore.app" }.Any(domain => uri.Host == domain || uri.Host.EndsWith("." + domain, StringComparison.OrdinalIgnoreCase)) ||
-                     (builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? Array.Empty<string>()).Contains(origin, StringComparer.OrdinalIgnoreCase)))))
-              .AllowAnyMethod()
-              .AllowAnyHeader()
-              .AllowCredentials();
+        {
+            if (string.IsNullOrWhiteSpace(origin) || !Uri.TryCreate(origin, UriKind.Absolute, out var uri))
+                return false;
+
+            // Loopback development and integration testing
+            if ((builder.Environment.IsDevelopment() || builder.Environment.IsEnvironment("Testing")) && uri.IsLoopback)
+                return true;
+
+            if (uri.Scheme != "https")
+                return false;
+
+            // Explicit verified production origins
+            if (explicitAllowedOrigins.Contains(origin))
+                return true;
+
+            // Verified production domain hierarchies
+            var host = uri.Host;
+            var allowedDomains = new[] { "watsstore.com", "masartech.com", "watsstore.app" };
+            return allowedDomains.Any(domain => host.Equals(domain, StringComparison.OrdinalIgnoreCase) || host.EndsWith("." + domain, StringComparison.OrdinalIgnoreCase));
+        })
+        .AllowAnyMethod()
+        .AllowAnyHeader()
+        .AllowCredentials();
     });
 });
 
@@ -260,7 +290,10 @@ app.Use(async (context, next) =>
     }
 });
 
-// 1. Enterprise Security Headers Middleware
+// 1. CORS Middleware (Must run first so OPTIONS preflight is handled immediately and error responses retain CORS headers)
+app.UseCors("AllowAll");
+
+// 2. Enterprise Security Headers Middleware
 app.Use(async (context, next) =>
 {
     context.Response.Headers["X-Content-Type-Options"] = "nosniff";
@@ -273,9 +306,6 @@ app.Use(async (context, next) =>
 
     await next();
 });
-
-// 2. Configure the HTTP request pipeline
-app.UseCors("AllowAll");
 
 // 3. Rate Limiter Middleware
 app.UseRateLimiter();
