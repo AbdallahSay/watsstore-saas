@@ -203,4 +203,46 @@ public class CommerceTests
         var request=new HttpRequestMessage(HttpMethod.Options,"/api/merchant/commerce/settings");request.Headers.Add("Origin","https://evilwatsstore.com");request.Headers.Add("Access-Control-Request-Method","PUT");
         var response=await client.SendAsync(request);Assert.False(response.Headers.Contains("Access-Control-Allow-Origin"));
     }
+
+    [Fact]
+    public async Task Production_frontend_origin_is_explicitly_allowed_by_cors_on_login_preflight_and_post()
+    {
+        await using var app = new CommerceFactory();
+        await app.Seed();
+        var client = app.CreateClient();
+
+        const string prodOrigin = "https://frontend-bay-ten-58.vercel.app";
+
+        // 1. Preflight OPTIONS on login
+        var preflight = new HttpRequestMessage(HttpMethod.Options, "/api/auth/login");
+        preflight.Headers.Add("Origin", prodOrigin);
+        preflight.Headers.Add("Access-Control-Request-Method", "POST");
+        preflight.Headers.Add("Access-Control-Request-Headers", "content-type");
+        var preflightRes = await client.SendAsync(preflight);
+
+        Assert.True(preflightRes.Headers.Contains("Access-Control-Allow-Origin"));
+        Assert.Equal(prodOrigin, preflightRes.Headers.GetValues("Access-Control-Allow-Origin").First());
+        Assert.True(preflightRes.Headers.Contains("Access-Control-Allow-Credentials"));
+
+        // 2. POST login with invalid credentials -> Should return 401 with CORS headers intact
+        var postReq = new HttpRequestMessage(HttpMethod.Post, "/api/auth/login")
+        {
+            Content = JsonContent.Create(new { email = "nonexistent@test.invalid", password = "InvalidPassword123!" })
+        };
+        postReq.Headers.Add("Origin", prodOrigin);
+        var postRes = await client.SendAsync(postReq);
+
+        Assert.Equal(HttpStatusCode.Unauthorized, postRes.StatusCode);
+        Assert.True(postRes.Headers.Contains("Access-Control-Allow-Origin"));
+        Assert.Equal(prodOrigin, postRes.Headers.GetValues("Access-Control-Allow-Origin").First());
+
+        // 3. Unauthorized origin should fail-closed
+        var evilReq = new HttpRequestMessage(HttpMethod.Post, "/api/auth/login")
+        {
+            Content = JsonContent.Create(new { email = "nonexistent@test.invalid", password = "InvalidPassword123!" })
+        };
+        evilReq.Headers.Add("Origin", "https://unauthorized-attacker.com");
+        var evilRes = await client.SendAsync(evilReq);
+        Assert.False(evilRes.Headers.Contains("Access-Control-Allow-Origin"));
+    }
 }
