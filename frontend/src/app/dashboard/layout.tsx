@@ -203,11 +203,11 @@ export default function DashboardLayout({
         {/* User Info, Theme/Language & Logout */}
         <div className="p-4 border-t border-slate-800 space-y-3">
           {/* Quick Theme & Language switch in sidebar */}
-          <div className="px-1 flex items-center justify-between pb-1">
+          <div className="px-1 flex flex-col items-stretch gap-2 pb-2 min-w-0">
             <span className="text-[11px] font-bold text-slate-400">
               {t('lang.select', undefined, 'اللغة والمظهر')}
             </span>
-            <ThemeLanguageBar variant="dashboard" />
+            <ThemeLanguageBar variant="dashboard" showCurrency={false} className="flex-wrap justify-start min-w-0" />
           </div>
 
           <div className="flex items-center gap-2.5 px-2 pt-2 border-t border-slate-800/80">
@@ -240,7 +240,7 @@ export default function DashboardLayout({
         </div>
 
         <div className="flex items-center gap-2">
-          <ThemeLanguageBar variant="compact" />
+          <ThemeLanguageBar variant="compact" showCurrency={false} />
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             className="p-2 text-slate-300 hover:text-white rounded-xl hover:bg-slate-800 min-w-[44px] min-h-[44px] flex items-center justify-center transition-colors"
