@@ -161,9 +161,9 @@ export default function SuperAdminPage() {
 
   // Login Form States
   const [loginMethod, setLoginMethod] = useState<'key' | 'credentials'>('key');
-  const [secretKey, setSecretKey] = useState('WatsStore_SuperAdmin_SecretKey_2026_Secure!');
+  const [secretKey, setSecretKey] = useState('');
   const [email, setEmail] = useState('abdallahsay10@gmail.com');
-  const [password, setPassword] = useState('Admin@WatsStore2026!');
+  const [password, setPassword] = useState('');
   const [isLoggingIn, setIsLoggingIn] = useState(false);
   const [loginError, setLoginError] = useState<string | null>(null);
 

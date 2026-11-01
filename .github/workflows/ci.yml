@@ -118,8 +118,13 @@ jobs:
       - name: Verify actual checkout, lost response and safe replay
         run: npm run test:checkout
         working-directory: frontend
+      - name: Verify My Orders, merchant transitions, tracking and notification permissions
+        run: npm run test:customer-commerce
+        working-directory: frontend
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: checkout-browser-evidence
-          path: work/p0-checkout/e2e/
+          path: |
+            work/p0-checkout/e2e/
+            work/customer-commerce/e2e/

@@ -2,20 +2,23 @@
 
 import Script from 'next/script';
 import { useEffect } from 'react';
+import { usePathname } from 'next/navigation';
 
 interface MetaPixelProps {
   pixelId?: string | null;
 }
 
 export default function MetaPixel({ pixelId }: MetaPixelProps) {
+  const pathname=usePathname();
+  const privateOrderPage=/\/s\/[^/]+\/(?:orders\/|my-orders)/.test(pathname||'');
   useEffect(() => {
-    if (pixelId && /^\d{5,20}$/.test(pixelId) && typeof window !== 'undefined' && window.fbq) {
+    if (!privateOrderPage && pixelId && /^\d{5,20}$/.test(pixelId) && typeof window !== 'undefined' && window.fbq) {
       window.fbq('init', pixelId);
       window.fbq('trackSingle', pixelId, 'PageView');
     }
-  }, [pixelId]);
+  }, [pixelId,privateOrderPage]);
 
-  if (!pixelId || !/^\d{5,20}$/.test(pixelId)) return null;
+  if (privateOrderPage || !pixelId || !/^\d{5,20}$/.test(pixelId)) return null;
 
   return (
     <>
@@ -32,6 +35,7 @@ export default function MetaPixel({ pixelId }: MetaPixelProps) {
             t.src=v;s=b.getElementsByTagName(e)[0];
             s.parentNode.insertBefore(t,s)}(window, document,'script',
             'https://connect.facebook.net/en_US/fbevents.js');
+            fbq('set', 'autoConfig', false, '${pixelId}');
             fbq('init', '${pixelId}');
             fbq('trackSingle', '${pixelId}', 'PageView');
           `,

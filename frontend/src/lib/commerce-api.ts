@@ -15,6 +15,7 @@ export interface OrderSnapshot {
   subtotal: number; imageUrl?: string; selectedVariants?: Record<string, string>;
 }
 export interface TrackingOrder {
+  lastUpdatedAt?: string; paymentMethod?: string; currency?: string;
   orderNumber: number; status: string; paymentStatus: string; items: OrderSnapshot[];
   subtotal: number; discountAmount: number; deliveryFee: number; totalAmount: number;
   shippingSummary?: string; createdAt: string; history: {status: string; createdAt: string}[];

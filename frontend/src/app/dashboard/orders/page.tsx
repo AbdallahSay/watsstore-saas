@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { orderLabel } from '@/lib/order-status';
 import { useEffect, useState } from 'react';
 import { api } from '@/lib/api';
 import { appSwal } from '@/lib/sweetalert';
@@ -27,14 +28,17 @@ export default function MerchantOrdersPage() {
   const [isExporting, setIsExporting] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [paymentFilter, setPaymentFilter] = useState('ALL');
+  const [statusFilter,setStatusFilter] = useState('ALL');
+  const [from,setFrom] = useState(''); const [to,setTo] = useState('');
+  const [page,setPage] = useState(1);const [total,setTotal] = useState(0);
 
   const fetchOrders = async () => {
     const token = (localStorage.getItem('watsstore_merchant_token') || localStorage.getItem('watsstore_token'));
     if (!token) return;
 
     try {
-      const data = await api.getOrders(token, 1, 100);
-      setOrders(data.orders || []);
+      const data = await api.getOrders(token, page, 100);
+      setOrders(data.orders || []);setTotal(data.total);
     } catch (err: any) {
       appSwal.fire({
         icon: 'error',
@@ -48,7 +52,7 @@ export default function MerchantOrdersPage() {
 
   useEffect(() => {
     fetchOrders();
-  }, []);
+  }, [page]);
 
   const handleExportCsv = async () => {
     const token = (localStorage.getItem('watsstore_merchant_token') || localStorage.getItem('watsstore_token'));
@@ -87,11 +91,11 @@ export default function MerchantOrdersPage() {
 
     const matchesPayment = 
       paymentFilter === 'ALL' ||
-      (paymentFilter === 'CASH' && (!o.paymentMethod || o.paymentMethod.includes('الاستلام'))) ||
-      (paymentFilter === 'WALLET' && o.paymentMethod?.includes('محفظة')) ||
-      (paymentFilter === 'INSTAPAY' && o.paymentMethod?.includes('إنستاباي'));
+      (paymentFilter === 'CASH' && (!o.paymentMethod || o.paymentMethod==='cod' || o.paymentMethod.includes('الاستلام'))) ||
+      (paymentFilter === 'WALLET' && (o.paymentMethod==='wallet'||o.paymentMethod?.includes('محفظة'))) ||
+      (paymentFilter === 'INSTAPAY' && (o.paymentMethod==='instapay'||o.paymentMethod?.includes('إنستاباي')));
 
-    return matchesSearch && matchesPayment;
+    return matchesSearch && matchesPayment && (statusFilter==='ALL'||o.status===statusFilter) && (!from||o.createdAt.slice(0,10)>=from) && (!to||o.createdAt.slice(0,10)<=to);
   });
 
   const totalRevenue = filteredOrders.filter(o => ['Confirmed','Preparing','Shipped','Delivered'].includes(o.status)).reduce((sum, o) => sum + (o.totalAmount || 0), 0);
@@ -153,6 +157,7 @@ export default function MerchantOrdersPage() {
         </div>
       </div>
 
+      <section className="border rounded-xl p-4 flex flex-wrap gap-3 items-end"><label className="grid gap-2 text-xs">الحالة<select value={statusFilter} onChange={e=>setStatusFilter(e.target.value)} className="p-3 border rounded bg-white dark:bg-slate-900"><option value="ALL">كل الحالات</option>{['Pending','Confirmed','Preparing','Shipped','Delivered','Cancelled','Rejected'].map(status=><option key={status} value={status}>{orderLabel(status)}</option>)}</select></label><label className="grid gap-2 text-xs">من<input type="date" value={from} onChange={e=>setFrom(e.target.value)} className="p-3 border rounded bg-transparent"/></label><label className="grid gap-2 text-xs">إلى<input type="date" value={to} onChange={e=>setTo(e.target.value)} className="p-3 border rounded bg-transparent"/></label><p className="text-xs">فلترة داخل الصفحة الحالية · صفحة {page} من {Math.max(1,Math.ceil(total/100))} · {total} طلب إجمالاً</p><button disabled={page<=1} onClick={()=>setPage(p=>p-1)} className="p-3 border rounded disabled:opacity-50">السابق</button><button disabled={page*100>=total} onClick={()=>setPage(p=>p+1)} className="p-3 border rounded disabled:opacity-50">التالي</button></section>
       {/* Search and Filters */}
       <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 flex flex-col md:flex-row gap-3 items-center justify-between transition-colors">
         <div className="relative w-full md:w-80">
@@ -250,7 +255,7 @@ export default function MerchantOrdersPage() {
                   return (
                     <tr key={order.id} className="hover:bg-slate-50/80 dark:hover:bg-slate-800/50 transition-colors">
                       <td className="py-4 px-4 font-black text-emerald-600 dark:text-emerald-400">
-                        <Link href={`/dashboard/orders/${order.id}`} className="underline">#{order.orderNumber}</Link><p className="text-xs mt-2">{order.status}</p>
+                        <Link href={`/dashboard/orders/${order.id}`} className="underline">#{order.orderNumber}</Link><p className="text-xs mt-2">{orderLabel(order.status,language!=='ar')}</p>
                       </td>
                       <td className="py-4 px-4">
                         <div className="font-bold text-slate-900 dark:text-white">{order.customerName}</div>
