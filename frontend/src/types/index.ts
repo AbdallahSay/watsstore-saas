@@ -121,6 +121,11 @@ export interface CreateOrderRequest {
 }
 
 export interface CreateOrderResponse {
+  items?: import('@/lib/commerce-api').OrderSnapshot[];
+  paymentMethod?: string;
+  shippingSummary?: string;
+  currency?: string;
+  createdAt?: string;
   trackingToken?: string;
   status: string;
   paymentStatus: string;
