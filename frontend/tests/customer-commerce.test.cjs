@@ -33,6 +33,13 @@ test('terminal status semantics stop delivered, cancelled and rejected orders on
  const {terminalOrder}=loader()('order-status');for(const status of ['Delivered','Cancelled','Rejected'])assert.equal(terminalOrder(status),true);
  for(const status of [undefined,'Pending','Confirmed','Preparing','Shipped'])assert.equal(terminalOrder(status),false);
 });
+test('mobile foreground alerts use a service worker when Notification construction is unsupported',async()=>{
+ browser();let displayed=0;window.isSecureContext=true;global.Notification=class{static permission='granted';constructor(){throw new TypeError('Use a service worker');}};window.Notification=Notification;
+ navigator.serviceWorker={register:async()=>{},ready:Promise.resolve({showNotification:async(title,options)=>{displayed++;assert.equal(options.data.url,'/s/a/my-orders');assert.ok(!JSON.stringify(options).includes(token(1)));}})};
+ const load=loader();load('customer-orders').rememberDeviceOrder('a',token(1),1);localStorage.setItem('ws_foreground_a','enabled');
+ await load('foreground-notifications').notifyOrderChange('a',token(1),'Confirmed','v1',false);assert.equal(displayed,1);
+ await load('foreground-notifications').notifyOrderChange('a',token(1),'Confirmed','v1',false);assert.equal(displayed,1);
+});
 test('service worker deduplicates events and rejects private or cross-origin click URLs',async()=>{
  const vm=require('node:vm');const handlers={},events=new Map(),shown=[],opened=[];
  const db={close(){},transaction(){const tx={objectStore:()=>({get(id){const r={};setTimeout(()=>{r.result=events.get(id);r.onsuccess();tx.oncomplete();},0);return r;},put(value){events.set(value.id,value);},delete(id){events.delete(id);}})};return tx;}};
