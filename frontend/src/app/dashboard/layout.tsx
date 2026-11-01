@@ -114,6 +114,7 @@ export default function DashboardLayout({
   }
 
   const navLinks = [
+    {name:"إشعارات الطلبات",href:"/dashboard/notifications",icon:Receipt},
     { name: "القوالب والتجارة", href: "/dashboard/themes", icon: Sparkles },
     { name: "المخزون", href: "/dashboard/inventory", icon: ShoppingBag },
     { name: t('dash.overview', undefined, 'نظرة عامة للمتجر'), href: '/dashboard', icon: LayoutDashboard },

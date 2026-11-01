@@ -1,11 +1,12 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
-import Link from 'next/link';
+import OrderConfirmation from './OrderConfirmation';
 import { CartItem, Store, CreateOrderResponse } from '@/types';
 import { createOrder, paymentOptions, CommerceApiError } from '@/lib/commerce-api';
 import { CheckoutAttempt, checkoutKey, prepareCheckoutAttempt, readCheckoutAttempt } from '@/lib/checkout-attempt';
 import { api } from '@/lib/api';
 import { useDialog } from './useDialog';
+import { rememberDeviceOrder } from '@/lib/customer-orders';
 
 interface Props {
   store: Store; items: CartItem[]; open: boolean; english: boolean;
@@ -77,7 +78,9 @@ export default function CommerceCart({store, items, open, english, close, update
       catch { throw new CommerceApiError(previous?.pending ? 'تعذر حفظ بيانات إعادة المحاولة. تظل نتيجة الطلب السابق غير مؤكدة؛ لا تُنشئ طلباً جديداً.' : 'تعذر حفظ بيانات إعادة المحاولة بأمان. اسمح بتخزين بيانات الموقع ثم أعد المحاولة. لم يتم إرسال الطلب.', undefined, !!previous?.pending); }
       attempt.current = saved; setUncertain(true);
       const response = await createOrder(store.slug, {...saved.payload, idempotencyKey: saved.key});
-      setResult(response); clear();
+      setResult(response);
+      if (response.trackingToken) rememberDeviceOrder(store.slug, response.trackingToken, response.orderNumber);
+      clear();
       try { sessionStorage.removeItem(storageKey); } catch { /* optional storage */ }
       attempt.current = null; setUncertain(false);
     } catch (e) {
@@ -96,14 +99,7 @@ export default function CommerceCart({store, items, open, english, close, update
     <div className="ws-cart ws-checkout" ref={ref} role="dialog" aria-modal="true" aria-labelledby="cart-title" dir={english ? 'ltr' : 'rtl'}>
       <header><h2 id="cart-title">{result ? tr('تم استلام طلبك', 'Order received') : step === 'cart' ? tr('حقيبة التسوق', 'Shopping bag') : tr('إتمام الطلب', 'Checkout')}</h2><button type="button" disabled={busy} onClick={close} aria-label={tr('إغلاق', 'Close')}>×</button></header>
       <div className="ws-cart-body">
-        {result ? <div className="ws-confirmation" role="status">
-          <p className="ws-eyebrow">{tr('شكراً لاختيارك', 'THANK YOU')}</p><h3>#{result.orderNumber}</h3>
-          <p>{tr('طلبك بانتظار تأكيد المتجر. التحويلات تخضع للمراجعة.', 'Your order awaits merchant confirmation. Transfers require verification.')}</p>
-          <strong>{money(result.totalAmount)}</strong>
-          {result.trackingToken && <Link className="ws-primary-action" href={`/s/${store.slug}/orders/${result.trackingToken}`}>{tr('متابعة الطلب', 'Track order')}</Link>}
-          {result.whatsAppRedirectUrl && <a className="ws-secondary-action" href={result.whatsAppRedirectUrl} target="_blank" rel="noreferrer">{tr('إرسال الطلب عبر واتساب', 'Send order on WhatsApp')}</a>}
-          <button onClick={() => {setResult(null); setStep('cart'); close();}}>{tr('متابعة التسوق', 'Continue shopping')}</button>
-        </div> : <>
+        {result ? <OrderConfirmation result={result} slug={store.slug} english={english} currency={store.currency} continueShopping={() => {setResult(null);setStep('cart');close();}}/> : <>
           {items.length === 0 ? <p>{tr('حقيبتك فارغة. اكتشف منتجات المتجر.', 'Your bag is empty. Explore the collection.')}</p> : <>
             <ul className="ws-cart-items">{items.map((item, index) => <li key={`${item.product.id}-${index}`}>
               {item.product.imageUrl && <img src={item.product.imageUrl} alt="" width="64" height="80" loading="lazy"/>}
