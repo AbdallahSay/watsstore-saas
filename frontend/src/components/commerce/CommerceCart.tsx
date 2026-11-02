@@ -10,9 +10,10 @@ import { rememberDeviceOrder } from '@/lib/customer-orders';
 
 interface Props {
   directCheckout?: boolean; store: Store; items: CartItem[]; open: boolean; english: boolean;
+  preview?: boolean;
   close: () => void; update: (index: number, quantity: number) => void; clear: () => void;
 }
-export default function CommerceCart({directCheckout = false, store, items, open, english, close, update, clear}: Props) {
+export default function CommerceCart({directCheckout = false, store, items, open, english, preview = false, close, update, clear}: Props) {
   const tr = (ar: string, en: string) => english ? en : ar;
   const submitting = useRef(false);
   const requestClose = () => { if (!submitting.current) close(); };
@@ -78,6 +79,38 @@ export default function CommerceCart({directCheckout = false, store, items, open
     event.preventDefault();
     if (submitting.current || couponBusy) return;
     submitting.current = true; setBusy(true); setError('');
+    if (preview) {
+      // Safe preview simulation: verifies theme checkout/confirmation UX without modifying production database
+      const simulated: CreateOrderResponse = {
+        orderId: 'preview-simulated-order',
+        orderNumber: Math.floor(100000 + Math.random() * 900000),
+        status: 'Pending',
+        paymentStatus: 'Pending',
+        subtotal,
+        discountAmount: discount,
+        couponCode: coupon.trim() || undefined,
+        totalAmount: Math.max(0, subtotal - discount) + shipping,
+        deliveryFee: shipping,
+        currency: store.currency || 'EGP',
+        items: items.map(x => ({
+          productId: x.product.id,
+          productName: x.product.name,
+          quantity: x.quantity,
+          unitPrice: x.product.price,
+          subtotal: x.product.price * x.quantity,
+          selectedVariants: x.selectedVariants
+        })),
+        paymentMethod: payment,
+        shippingSummary: zone ? `${zone.governorate} (${zone.name})` : undefined,
+        whatsAppRedirectUrl: store.whatsAppNumber ? `https://wa.me/${store.whatsAppNumber.replace(/\D/g, '')}?text=${encodeURIComponent(`[معاينة تجريبية] طلب استعراض للقالب ${store.storeName}`)}` : '',
+        formattedMessage: `[معاينة تجريبية] طلب استعراض للقالب ${store.storeName}`,
+      };
+      setResult(simulated);
+      clear();
+      setBusy(false);
+      submitting.current = false;
+      return;
+    }
     const payload = {
       customerName: details.name.trim(), customerPhone: details.phone.trim(),
       customerAddress: details.address.trim(), customerNotes: details.notes,

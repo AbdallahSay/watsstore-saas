@@ -691,7 +691,7 @@ export default function ThemesMarketplacePage() {
                   <div className="flex items-center gap-2">
                     <button
                       onClick={() => setPreviewViewport('desktop')}
-                      className={`p-2 rounded-lg min-h-[38px] text-xs font-bold flex items-center gap-1.5 border ${
+                      className={`p-2 rounded-lg min-h-[44px] text-xs font-bold flex items-center gap-1.5 border transition-colors ${
                         previewViewport === 'desktop'
                           ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900 border-transparent'
                           : 'bg-white dark:bg-slate-900 border-slate-300 dark:border-slate-700'
@@ -702,7 +702,7 @@ export default function ThemesMarketplacePage() {
                     </button>
                     <button
                       onClick={() => setPreviewViewport('mobile')}
-                      className={`p-2 rounded-lg min-h-[38px] text-xs font-bold flex items-center gap-1.5 border ${
+                      className={`p-2 rounded-lg min-h-[44px] text-xs font-bold flex items-center gap-1.5 border transition-colors ${
                         previewViewport === 'mobile'
                           ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900 border-transparent'
                           : 'bg-white dark:bg-slate-900 border-slate-300 dark:border-slate-700'
@@ -716,7 +716,7 @@ export default function ThemesMarketplacePage() {
 
                 <div
                   className={`rounded-2xl border border-slate-300 dark:border-slate-800 overflow-hidden shadow-xl bg-slate-100 dark:bg-slate-950 transition-all ${
-                    previewViewport === 'mobile' ? 'max-w-[390px] mx-auto border-4 border-slate-700 rounded-[36px] p-2' : 'w-full'
+                    previewViewport === 'mobile' ? 'w-full max-w-[390px] mx-auto sm:border-4 sm:border-slate-700 sm:rounded-[36px] p-1 sm:p-2 border border-slate-700 rounded-xl' : 'w-full'
                   }`}
                 >
                   {store && (
@@ -972,37 +972,39 @@ export default function ThemesMarketplacePage() {
 
           {/* FULL SCREEN LIVE PREVIEW MODAL */}
           {previewThemeId && store && (
-            <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex flex-col animate-fadeIn">
+            <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex flex-col animate-fadeIn">
               {/* Modal Topbar */}
-              <div className="bg-slate-900 text-white px-5 py-3 border-b border-slate-800 flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <span className="font-extrabold text-sm">
-                    معاينة حية للقالب: {STORE_THEMES[previewThemeId]?.nameAr} ({STORE_THEMES[previewThemeId]?.name})
+              <div className="bg-slate-900 text-white px-3 sm:px-5 py-2.5 sm:py-3 border-b border-slate-800 flex flex-wrap items-center justify-between gap-2 sm:gap-3 relative z-30">
+                <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+                  <span className="font-extrabold text-xs sm:text-sm truncate">
+                    معاينة: {STORE_THEMES[previewThemeId]?.nameAr} ({STORE_THEMES[previewThemeId]?.name})
                   </span>
-                  <span className="text-[10px] px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 font-bold border border-emerald-500/40">
-                    بيانات متجرك الحقيقية
+                  <span className="text-[10px] px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 font-bold border border-emerald-500/40 whitespace-nowrap hidden xs:inline">
+                    بيانات حقيقية
                   </span>
                 </div>
 
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2 sm:gap-3 flex-wrap justify-end">
                   <div className="flex items-center gap-1 bg-slate-800 p-1 rounded-xl">
                     <button
                       onClick={() => setPreviewViewport('desktop')}
-                      className={`px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-colors ${
+                      className={`px-3 py-1.5 rounded-lg text-xs font-bold min-h-[44px] flex items-center gap-1.5 transition-colors ${
                         previewViewport === 'desktop' ? 'bg-emerald-600 text-white' : 'text-slate-400 hover:text-white'
                       }`}
+                      aria-label="عرض شاشة الكمبيوتر"
                     >
                       <Monitor className="w-3.5 h-3.5" />
-                      <span>كمبيوتر</span>
+                      <span className="hidden sm:inline">كمبيوتر</span>
                     </button>
                     <button
                       onClick={() => setPreviewViewport('mobile')}
-                      className={`px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-colors ${
+                      className={`px-3 py-1.5 rounded-lg text-xs font-bold min-h-[44px] flex items-center gap-1.5 transition-colors ${
                         previewViewport === 'mobile' ? 'bg-emerald-600 text-white' : 'text-slate-400 hover:text-white'
                       }`}
+                      aria-label="عرض شاشة الموبايل"
                     >
                       <Smartphone className="w-3.5 h-3.5" />
-                      <span>موبايل (375px)</span>
+                      <span>موبايل</span>
                     </button>
                   </div>
 
@@ -1012,15 +1014,15 @@ export default function ThemesMarketplacePage() {
                       setPreviewThemeId(null);
                       setActiveTab('customizer');
                     }}
-                    className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold min-h-[44px] flex items-center gap-1.5"
+                    className="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold min-h-[44px] flex items-center gap-1.5 shadow-sm active:scale-95 transition-all"
                   >
                     <Check className="w-4 h-4" />
-                    <span>اختيار هذا القالب للمسودة</span>
+                    <span>اختيار للمسودة</span>
                   </button>
 
                   <button
                     onClick={() => setPreviewThemeId(null)}
-                    className="p-2 text-slate-400 hover:text-white rounded-xl min-w-[44px] min-h-[44px] flex items-center justify-center hover:bg-slate-800"
+                    className="p-2 text-slate-400 hover:text-white rounded-xl min-w-[44px] min-h-[44px] flex items-center justify-center hover:bg-slate-800 active:scale-95"
                     aria-label="إغلاق المعاينة"
                   >
                     <X className="w-5 h-5" />
@@ -1029,13 +1031,14 @@ export default function ThemesMarketplacePage() {
               </div>
 
               {/* Modal Body with Viewport simulation */}
-              <div className="flex-1 overflow-y-auto p-4 sm:p-8 flex items-center justify-center bg-slate-950">
+              <div className="flex-1 overflow-auto p-2 sm:p-6 flex items-start sm:items-center justify-center bg-slate-950">
                 <div
-                  className={`bg-white dark:bg-slate-900 transition-all duration-300 shadow-2xl overflow-y-auto ${
+                  className={`transition-all duration-300 shadow-2xl overflow-y-auto ${
                     previewViewport === 'mobile'
-                      ? 'w-[390px] h-[780px] max-h-[90vh] rounded-[44px] border-[10px] border-slate-800 shadow-emerald-950/20'
-                      : 'w-full max-w-6xl h-full max-h-[90vh] rounded-2xl border border-slate-800'
+                      ? 'w-full max-w-[390px] h-full max-h-[92vh] sm:rounded-[44px] sm:border-[10px] sm:border-slate-800 rounded-xl border border-slate-700 shadow-emerald-950/20'
+                      : 'w-full max-w-6xl h-full max-h-[92vh] rounded-xl border border-slate-800'
                   }`}
+                  style={{ backgroundColor: 'transparent' }}
                 >
                   <CommerceStorefront
                     store={store}

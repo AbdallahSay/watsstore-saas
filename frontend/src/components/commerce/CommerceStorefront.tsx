@@ -128,7 +128,7 @@ export default function CommerceStorefront({
     `${n.toLocaleString(english ? 'en-EG' : 'ar-EG', { maximumFractionDigits: 2 })} ${store.currency}`;
 
   function add(p: Product, quantity: number, selections: Record<string, string>, buyNow = false) {
-    if (!p.isAvailable || preview || store.isTrialExpired) return;
+    if (!p.isAvailable || store.isTrialExpired) return;
     const key = (v: Record<string, string>) => JSON.stringify(Object.entries(v).sort(([a], [b]) => a.localeCompare(b)));
     setItems((old) => {
       const index = old.findIndex((x) => x.product.id === p.id && key(x.selectedVariants) === key(selections));
@@ -151,7 +151,7 @@ export default function CommerceStorefront({
   }
 
   function quickAddNoVariants(p: Product, delta: number) {
-    if (!p.isAvailable || preview || store.isTrialExpired) return;
+    if (!p.isAvailable || store.isTrialExpired) return;
     if (p.variantsJson && p.variantsJson !== '[]' && p.variantsJson !== '{}') {
       setProduct(p);
       return;
@@ -260,7 +260,7 @@ export default function CommerceStorefront({
 
       {/* Store Header */}
       <header className="ws-header">
-        <a className="ws-brand" href={`/s/${store.slug}`}>
+        <a className="ws-brand" href={preview ? '#top' : `/s/${store.slug}`} onClick={preview ? (e) => e.preventDefault() : undefined}>
           {store.logoUrl && <img src={store.logoUrl} alt="" width="38" height="38" />}
           <span>{store.storeName}</span>
         </a>
@@ -280,7 +280,8 @@ export default function CommerceStorefront({
         <div className="ws-header-actions">
           <Link
             prefetch={false}
-            href={`/s/${encodeURIComponent(store.slug)}/my-orders`}
+            href={preview ? '#my-orders' : `/s/${encodeURIComponent(store.slug)}/my-orders`}
+            onClick={preview ? (e) => e.preventDefault() : undefined}
             className="ws-my-orders-link"
           >
             {tr('طلباتي', 'My orders')}
@@ -292,7 +293,6 @@ export default function CommerceStorefront({
               setDirectCheckout(false);
               setCartOpen(true);
             }}
-            disabled={preview}
           >
             <ShoppingBag size={18} />
             <span>
@@ -318,7 +318,7 @@ export default function CommerceStorefront({
             store={store}
             product={detailProduct}
             english={english}
-            disabled={preview || !!store.isTrialExpired}
+            disabled={!!store.isTrialExpired}
             add={add}
           />
         ) : (
@@ -521,7 +521,8 @@ export default function CommerceStorefront({
                             <Link
                               prefetch={false}
                               className="ws-product-page-link"
-                              href={`/s/${encodeURIComponent(store.slug)}/p/${encodeURIComponent(p.slug)}`}
+                              href={preview ? '#product-details' : `/s/${encodeURIComponent(store.slug)}/p/${encodeURIComponent(p.slug)}`}
+                              onClick={preview ? (e) => { e.preventDefault(); setProduct(p); } : undefined}
                               style={{ fontSize: '11px', color: 'var(--ws-accent)', fontWeight: 600, textDecoration: 'none' }}
                             >
                               {tr('صفحة المنتج', 'Product page')} ↗
@@ -702,6 +703,7 @@ export default function CommerceStorefront({
           items={items}
           open={cartOpen}
           english={english}
+          preview={preview}
           close={() => setCartOpen(false)}
           update={(index, quantity) =>
             setItems((old) =>
