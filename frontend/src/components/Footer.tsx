@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Store, MessageCircle, Heart, ShieldCheck } from 'lucide-react';
+import { Store, MessageCircle, Heart, ShieldCheck, Sparkles, Phone } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
 
 export default function Footer() {
@@ -32,15 +32,26 @@ export default function Footer() {
             <h2 className="text-white font-bold text-sm mb-4">
               {t('footer.quick_links', undefined, 'روابط سريعة')}
             </h2>
-            <ul className="space-y-2 text-sm">
+            <ul className="space-y-2.5 text-sm">
               <li>
                 <Link prefetch={false} href="/#features" className="hover:text-emerald-400 transition-colors">
                   {t('footer.link_features', undefined, 'المميزات والخصائص')}
                 </Link>
               </li>
               <li>
+                <Link prefetch={false} href="/#themes" className="hover:text-emerald-400 transition-colors flex items-center gap-1.5">
+                  <Sparkles className="w-3.5 h-3.5 text-emerald-400" />
+                  <span>{t('footer.link_themes', undefined, 'سوق القوالب (10)')}</span>
+                </Link>
+              </li>
+              <li>
                 <Link prefetch={false} href="/#pricing" className="hover:text-emerald-400 transition-colors">
                   {t('footer.link_pricing', undefined, 'باقات الأسعار')}
+                </Link>
+              </li>
+              <li>
+                <Link prefetch={false} href="/#testimonials" className="hover:text-emerald-400 transition-colors">
+                  {t('footer.link_testimonials', undefined, 'قصص نجاح التجار')}
                 </Link>
               </li>
               <li>
@@ -60,7 +71,7 @@ export default function Footer() {
             <h2 className="text-white font-bold text-sm mb-4">
               {t('footer.merchant_portals', undefined, 'بوابات التجار')}
             </h2>
-            <ul className="space-y-2 text-sm">
+            <ul className="space-y-2.5 text-sm">
               <li>
                 <Link prefetch={false} href="/register" className="hover:text-emerald-400 transition-colors">
                   {t('footer.link_register', undefined, 'تسجيل متجر جديد')}
@@ -76,6 +87,11 @@ export default function Footer() {
                   {t('footer.link_dashboard', undefined, 'إدارة الكتالوج والطلبات')}
                 </Link>
               </li>
+              <li>
+                <Link prefetch={false} href="/dashboard/themes" className="hover:text-emerald-400 transition-colors">
+                  {dir === 'rtl' ? 'تخصيص القوالب والمظهر' : 'Customize Storefront Themes'}
+                </Link>
+              </li>
             </ul>
           </div>
 
@@ -86,21 +102,28 @@ export default function Footer() {
             <p className="text-sm text-slate-400 dark:text-slate-400 leading-relaxed mb-4">
               {t('footer.support_desc', undefined, 'فريق الدعم الفني وإدارة المنصة في خدمتكم لتفعيل باقات Pro/VIP والمساعدة في إعداد المتاجر.')}
             </p>
-            <div className="space-y-2">
+            <div className="space-y-2.5">
               <a
                 href="https://wa.me/201011653619"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl text-sm font-bold transition-colors w-full justify-center shadow-md shadow-emerald-600/20"
+                className="inline-flex items-center gap-2 px-4 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl text-sm font-bold transition-colors w-full justify-center shadow-md shadow-emerald-600/20 min-h-[44px]"
               >
                 <MessageCircle className="w-4 h-4" />
                 <span>{t('footer.whatsapp_support', undefined, 'واتساب الدعم: 01011653619')}</span>
               </a>
               <a
+                href="tel:01011653619"
+                className="inline-flex items-center gap-2 px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-xl text-xs font-semibold transition-colors w-full justify-center min-h-[44px]"
+              >
+                <Phone className="w-3.5 h-3.5 text-emerald-400" />
+                <span>{dir === 'rtl' ? 'اتصال هاتفي: 01011653619' : 'Call Support: 01011653619'}</span>
+              </a>
+              <a
                 href="https://www.facebook.com/search/top?q=Masar%20Tech"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-block text-xs text-slate-400 hover:text-white transition-colors text-center w-full"
+                className="inline-block text-xs text-slate-400 hover:text-white transition-colors text-center w-full py-1"
               >
                 {t('footer.facebook_page', undefined, 'صفحة Masar Tech الرسمية على فيسبوك ↗')}
               </a>

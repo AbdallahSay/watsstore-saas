@@ -316,5 +316,9 @@
   "admin.pricing": "Pricing & Plans Management",
   "admin.gateways": "Payment Gateways & Accounts",
   "admin.settings": "Account Settings",
-  "admin.live_api": "MonsterASP API Live"
+  "admin.live_api": "MonsterASP API Live",
+  "nav.themes": "Store Themes (10)",
+  "nav.testimonials": "Reviews & Stories",
+  "footer.link_themes": "Themes Marketplace (10)",
+  "footer.link_testimonials": "Success Stories"
 }

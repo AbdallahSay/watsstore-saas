@@ -255,7 +255,7 @@ export default function InventoryManagementPage() {
               disabled={busy || !selectedProductId}
               className="px-6 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs min-h-[44px] transition-colors disabled:opacity-50 shadow-sm"
             >
-              {busy ? tr('جاري التسجيل...', 'Saving...') : tr('تسجيل وتحديث المخزون', 'Save adjustment')}
+              {busy ? tr('جاري التسجيل...', 'Saving...') : tr('تسجيل التعديل', 'Save adjustment')}
             </button>
           </div>
         </form>

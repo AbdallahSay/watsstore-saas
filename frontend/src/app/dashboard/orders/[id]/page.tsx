@@ -109,7 +109,7 @@ export default function OrderDetailsPage() {
       );
       await load();
       setMessage({
-        text: status ? tr(`تم تحديث حالة الطلب إلى «${statusLabel(status)}».`, `Order updated to ${statusLabel(status)}.`) : tr('تم التحقق من الدفع.', 'Payment verified.'),
+        text: status ? tr(`تم تحديث حالة الطلب إلى «${statusLabel(status)}».`, `Order updated.`) : tr('تم التحقق من الدفع.', 'Payment verified.'),
         type: 'success',
       });
       setNote('');

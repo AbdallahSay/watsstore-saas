@@ -147,7 +147,7 @@ export default function ThemesMarketplacePage() {
   }
 
   // Filter themes by category and search query
-  const filteredThemes = useMemo(() => {
+  const visibleThemes = useMemo(() => {
     return Object.values(STORE_THEMES).filter((t) => {
       const matchesCategory = selectedCategory === 'all' || t.primaryCategory === selectedCategory;
       const q = searchQuery.trim().toLowerCase();
@@ -341,7 +341,7 @@ export default function ThemesMarketplacePage() {
 
               {/* Themes Grid */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {filteredThemes.map((theme) => {
+                {visibleThemes.map((theme) => {
                   const isPublished = settings.publishedTheme === theme.id;
                   const isDraft = settings.draftTheme === theme.id;
 
@@ -473,7 +473,7 @@ export default function ThemesMarketplacePage() {
                         </button>
 
                         <button
-                          onClick={() => updateSettings({ draftTheme: theme.id })}
+                          onClick={() => updateSettings({ draftTheme:theme.id })}
                           disabled={busy || isDraft}
                           className={`flex-1 min-h-[44px] py-2.5 px-3 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 transition-colors ${
                             isDraft

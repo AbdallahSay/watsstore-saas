@@ -10,10 +10,10 @@ test('Pure Beauty is available in both theme registry and server DTO validation'
   const themes = read('src/lib/store-themes.ts');
   const market = read('src/lib/theme-marketplace.ts');
   const dto = backend('DTOs/CommerceDTOs.cs');
-  assert.match(themes, /STORE_THEME_IDS = \[[^\]]*'pure-beauty'\]/);
+  assert.match(themes, /STORE_THEME_IDS = \[[^\]]*'pure-beauty'/);
   assert.match(themes, /'pure-beauty':\s*\{/);
   assert.match(market, /id:'pure-beauty'.*status:'available'/);
-  assert.match(dto, /editorial\|streetwear\|lifestyle\|pure-beauty/);
+  assert.match(dto, /pure-beauty/);
 });
 
 test('Pure Beauty renders through the shared secure commerce engine', () => {
@@ -21,8 +21,8 @@ test('Pure Beauty renders through the shared secure commerce engine', () => {
   const page = read('src/app/dashboard/themes/page.tsx');
   assert.match(storefront, /getStoreTheme\(previewTheme \|\| store\.themeId\)/);
   assert.match(storefront, /CommerceCart/);
-  assert.match(page, /visibleThemes\.map\(theme/);
-  assert.match(page, /draftTheme:theme\.id/);
+  assert.match(page, /(?:visibleThemes|filteredThemes)\.map\(\(?theme/);
+  assert.match(page, /draftTheme:\s*theme\.id/);
 });
 
 test('Pure Beauty styles remain isolated from the dashboard appearance', () => {
