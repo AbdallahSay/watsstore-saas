@@ -1,6 +1,6 @@
 # Mobile ecommerce transformation
 
-Release status: **frontend released through PR #38**. Application merge SHA: `97b49f80544f1c27e1534b0a4725ea2019364430`; Vercel production deployment: `dpl_68X5xbc8X4gwiqHr7iUSuuhuQjos`. All three CI jobs and dependency audits passed before merge. Public production interactions passed on all available engines without any order submission. No production order, inventory, payment, migration or notification configuration was changed.
+Release status: **frontend released through PR #38 and follow-up #39**. Current application merge SHA: `03e7171317080422b891a69094882c9e834473e1`; Vercel production deployment: `dpl_4GkBH4EEZqKNVjcDy8QbHZKy9rQN`. All three CI jobs and dependency audits passed before merge. Public production interactions passed on all available engines without any order submission. No production order, inventory, payment, migration or notification configuration was changed.
 
 ## Scope and changes
 
@@ -16,7 +16,7 @@ Reviewable implementation commits:
 - `46a56ee`: trusted raster uploads use responsive Next.js image sizes; optimization is restricted to the configured backend's `/uploads/**` path. Existing external image links retain ordinary browser rendering. Speculative marketing route loads are deferred.
 - `55e1c31`: slow first visits use stable fallback text instead of a late font swap; cached/fast Cairo loading remains available.
 
-A small post-release follow-up places purchase controls before the full product description so long merchant copy cannot bury the primary action. It introduces no API or data change.
+PR #39 places purchase controls before long descriptions, supports keyboard image upload and labels variant controls, closes mobile drawers when resizing into desktop navigation, and gives the admin plan dialog focus containment, Escape, short-height scrolling and keyboard plan selection. These changes introduce no API or data migration.
 
 The existing editorial, streetwear and lifestyle tokens and real merchant content are preserved. Related products come from the actual same-category catalogue. There are no invented reviews, products or stock claims. Design references reuse the recent inspected project ledger in `docs/design/RESEARCH_LEDGER.md`; its documented reference-count limitation still applies.
 
@@ -28,7 +28,7 @@ The expanded after audit covers **36 routes/states × Arabic/English × Chrome/F
 
 Widths: 320, 360, 375, 390, 414, 430, 768, 1024, 1280, 1440 and 1920px. Long Arabic names, unbroken 70-character SKU text, customer names and addresses are real isolated fixture records. Tables become labeled cards on phones while retaining table/row/cell semantics. Desktop tables remain usable.
 
-The landing/merchant drawers and product/category/coupon editors also passed open, Tab containment, Escape, trigger-focus restoration and viewport-bound checks at applicable widths and at 900px/420px heights. Checkout/cart/confirmation additionally have explicit bounds checks across all eleven widths at 844px and 390px heights. These short viewports exercise available space; they do not simulate a physical iPhone keyboard or prove native iPhone testing.
+All six cases—the landing/merchant drawers, product/category/coupon editors and admin plan dialog—also passed open, Tab containment, Escape, trigger-focus restoration and viewport-bound checks at applicable widths and at 900px/420px heights. Checkout/cart/confirmation additionally have explicit bounds checks across all eleven widths at 844px and 390px heights. These short viewports exercise available space; they do not simulate a physical iPhone keyboard or prove native iPhone testing.
 
 CI also checks 844×390 landscape and 640×450 CSS-pixel reflow for every route/language/engine. The latter is the effective layout size corresponding to a 1280px desktop at 200% zoom; it is not a claim of physical-device pinch-zoom testing.
 
@@ -69,7 +69,7 @@ CI runs dependency audits, existing regressions, Playwright's cross-engine journ
 
 ### Performance results
 
-Median of three runs; mobile viewport 390×844; CPU slowdown 4×. Simulated settings use RTT 150ms and throughput 1638.4kbps. Applied DevTools settings use request latency 562.5ms, download 1474.56kbps and upload 675kbps (the Lighthouse defaults for this mode).
+Median of three runs; mobile viewport 390×844, device pixel ratio 1; CPU slowdown 4×. Simulated settings use RTT 150ms and throughput 1638.4kbps. Applied DevTools settings use request latency 562.5ms, download 1474.56kbps and upload 675kbps (the Lighthouse defaults for this mode).
 
 | Page | Applied LCP | Applied CLS | Applied performance / accessibility | Simulated LCP | Simulated CLS |
 |---|---:|---:|---:|---:|---:|
@@ -81,7 +81,7 @@ The 2.5s LCP, 0.1 CLS and 95 accessibility targets pass in the applied-throttlin
 
 ### Read-only production verification
 
-At `2026-11-02T10:10:38.392Z`, `scripts/verify-production-readonly.cjs` passed six contexts: Chrome/Firefox/WebKit × Arabic/English, on the actual production domain and `/s/a9`.
+At `11/02/2026 11:06:38`, `scripts/verify-production-readonly.cjs` passed six contexts: Chrome/Firefox/WebKit × Arabic/English, on the actual production domain and `/s/a9`.
 
 - Store and checkout viewport checks cover every requested width. Dedicated product, empty search, Buy Now, customer input retention, short-height checkout and My Orders also passed.
 - Every browser write request was blocked by a route guard. **Zero order POSTs were attempted; zero production orders were created by this verification.** All observed optimized images returned 200 with `image/webp`.
@@ -143,3 +143,14 @@ Selected before/after screenshots:
 | landing | [390px](docs/evidence/mobile-transformation/before-landing-390.png) | [390px](docs/evidence/mobile-transformation/after-landing-390.png) |
 | admin | [390px](docs/evidence/mobile-transformation/before-admin-390.png) | [390px](docs/evidence/mobile-transformation/after-admin-390.png) |
 | merchant-orders | [390px](docs/evidence/mobile-transformation/before-merchant-orders-390.png) | [390px](docs/evidence/mobile-transformation/after-merchant-orders-390.png) |
+
+### Final application release follow-up
+
+[#39](https://github.com/AbdallahSay/watsstore-saas/pull/39) merged after [CI 41431561318](https://github.com/AbdallahSay/watsstore-saas/actions/runs/41431561318) passed Backend, Frontend and Checkout/Playwright, including both dependency audits. Tested source: `64eabf73eb5630aedbdfa9fde1c63d278eaf2855`; merge/application release: `03e7171317080422b891a69094882c9e834473e1`. Vercel `dpl_4GkBH4EEZqKNVjcDy8QbHZKy9rQN` is READY for production and owns the public alias.
+
+The [final browser artifact](https://github.com/AbdallahSay/watsstore-saas/actions/runs/41431561318/artifacts/13134189912) is 41,990,079 bytes, digest `sha256:619d0cd9dfc923c9d0aaa71c3c7b8c5ca0a64f3762f5c96bb6e004a3381796af`, retained through 2027-01-31. Drawer rotation and admin dialog before/after reproductions are in `dialog-regressions.json`. Actual keyboard upload passed in the isolated merchant operation suite.
+
+A separate three-run applied-throttling product remeasurement on `f09a8d3` after purchase-control reordering had median LCP 1.709s, CLS 0, performance 99 and accessibility 100. Individual values are retained in `lighthouse-product-polish-devtools.json`. This does not replace the separate simulated results or establish field INP.
+
+This final evidence update is documentation only; the immutable application release above identifies the code exercised in production. No subsequent documentation commit implies a backend deployment or additional production transaction verification.
+Final production rerun: Chrome/Firefox passed four contexts, then WebKit passed both languages in a diagnostic run. Earlier WebKit attempts hit a network-idle navigation timeout and one recoverable React #419 (server Suspense boundary switched to client rendering). No error/fatal runtime logs were returned for the release at 11:06 UTC; the underlying transient cause is unconfirmed. Both attempts and the subsequent success are recorded rather than suppressing browser errors. No production write was attempted.
