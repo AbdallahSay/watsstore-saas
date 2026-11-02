@@ -9,10 +9,10 @@ import { useDialog } from './useDialog';
 import { rememberDeviceOrder } from '@/lib/customer-orders';
 
 interface Props {
-  store: Store; items: CartItem[]; open: boolean; english: boolean;
+  directCheckout?: boolean; store: Store; items: CartItem[]; open: boolean; english: boolean;
   close: () => void; update: (index: number, quantity: number) => void; clear: () => void;
 }
-export default function CommerceCart({store, items, open, english, close, update, clear}: Props) {
+export default function CommerceCart({directCheckout = false, store, items, open, english, close, update, clear}: Props) {
   const tr = (ar: string, en: string) => english ? en : ar;
   const submitting = useRef(false);
   const requestClose = () => { if (!submitting.current) close(); };
@@ -27,6 +27,12 @@ export default function CommerceCart({store, items, open, english, close, update
   const [couponBusy, setCouponBusy] = useState(false);
   const couponRequest = useRef(0);
   const [result, setResult] = useState<CreateOrderResponse | null>(null);
+  useEffect(() => {
+    if (result && items.length) {
+      setResult(null);
+      setStep(directCheckout ? 'checkout' : 'cart');
+    }
+  }, [items, result, directCheckout]);
   const [zoneId, setZoneId] = useState('');
   const methods = paymentOptions(store);
   const [payment, setPayment] = useState(methods[0]?.id || 'cod');
@@ -46,6 +52,7 @@ export default function CommerceCart({store, items, open, english, close, update
       setError('هناك محاولة طلب لم يتم تأكيد نتيجتها. أعد التحقق من نفس الطلب؛ لا تُنشئ طلباً جديداً.');
     }
   }, [storageKey]);
+  useEffect(() => { if (open && !attempt.current?.pending) setStep(directCheckout ? 'checkout' : 'cart'); }, [open, directCheckout]);
   const subtotal = items.reduce((n, x) => n + x.product.price * x.quantity, 0);
   const zone = store.shippingZones?.find(z => z.id === zoneId);
   const shipping = zone?.fee ?? store.deliveryFee;
@@ -111,7 +118,7 @@ export default function CommerceCart({store, items, open, english, close, update
       <div className="ws-cart-body">
         {result ? <OrderConfirmation result={result} slug={store.slug} english={english} currency={store.currency} continueShopping={() => {setResult(null);setStep('cart');close();}}/> : <>
           {items.length === 0 ? <p>{tr('حقيبتك فارغة. اكتشف منتجات المتجر.', 'Your bag is empty. Explore the collection.')}</p> : <>
-            <ul className="ws-cart-items">{items.map((item, index) => <li key={`${item.product.id}-${index}`}>
+            <nav className="ws-checkout-progress" aria-label={tr("خطوات الطلب", "Order steps")}><ol><li><a href="#checkout-items">1. {tr("مراجعة الحقيبة", "Review bag")}</a></li><li><a href="#checkout-customer" aria-current={step === "checkout" ? "step" : undefined} onClick={() => setStep("checkout")}>2. {tr("بيانات التوصيل", "Delivery details")}</a></li><li><a href="#checkout-payment" onClick={() => setStep("checkout")}>3. {tr("الدفع", "Payment")}</a></li><li><a href="#checkout-confirm" onClick={() => setStep("checkout")}>4. {tr("التأكيد", "Confirmation")}</a></li></ol></nav><ul id="checkout-items" className="ws-cart-items">{items.map((item, index) => <li key={`${item.product.id}-${index}`}>
               {item.product.imageUrl && <img src={item.product.imageUrl} alt="" width="64" height="80" loading="lazy"/>}
               <div><h3>{item.product.name}</h3><small>{Object.values(item.selectedVariants).join(' / ')}</small><p>{money(item.product.price)}</p>
                 <div className="ws-quantity"><button disabled={busy || uncertain} onClick={() => update(index, item.quantity - 1)} aria-label={tr('تقليل الكمية', 'Decrease quantity')}>−</button><span>{item.quantity}</span><button disabled={busy || uncertain || item.quantity >= 1000} onClick={() => update(index, item.quantity + 1)} aria-label={tr('زيادة الكمية', 'Increase quantity')}>+</button><button disabled={busy || uncertain} onClick={() => update(index, 0)}>{tr('حذف', 'Remove')}</button></div>
@@ -121,19 +128,19 @@ export default function CommerceCart({store, items, open, english, close, update
             <dl className="ws-totals"><div><dt>{tr('المنتجات', 'Subtotal')}</dt><dd>{money(subtotal)}</dd></div>{discount > 0 && <div><dt>{tr('الخصم', 'Discount')}</dt><dd>−{money(discount)}</dd></div>}<div><dt>{tr('التوصيل التقديري', 'Estimated delivery')}</dt><dd>{!shippingKnown ? tr('يحدد عند إتمام الطلب', 'Select at checkout') : money(shipping)}</dd></div><div><dt>{tr('الإجمالي التقديري', 'Estimated total')}</dt><dd>{shippingKnown ? money(Math.max(0, subtotal - discount) + shipping) : tr('يظهر بعد اختيار منطقة التوصيل', 'Shown after selecting delivery zone')}</dd></div></dl>
             {step === 'cart' ? <button className="ws-primary-action" disabled={store.isTrialExpired} onClick={() => setStep('checkout')}>{tr('المتابعة لإتمام الطلب', 'Continue to checkout')}</button> : <form onSubmit={submit} className="ws-checkout-form">
               <button type="button" onClick={() => setStep('cart')} disabled={busy || uncertain}>{tr('← العودة للحقيبة', '← Back to bag')}</button>
-              <fieldset className="ws-checkout-fields" disabled={busy || uncertain}><label>{tr('الاسم', 'Full name')}<input name="name" value={details.name} onChange={e => setDetails(d => ({...d, name:e.target.value}))} autoComplete="name" required minLength={2} maxLength={100}/></label>
+              <fieldset id="checkout-customer" className="ws-checkout-fields" disabled={busy || uncertain}><legend>{tr("٢. العميل والتوصيل", "2. Customer & delivery")}</legend><label>{tr('الاسم', 'Full name')}<input name="name" value={details.name} onChange={e => setDetails(d => ({...d, name:e.target.value}))} autoComplete="name" required minLength={2} maxLength={100}/></label>
               <label>{tr('رقم الموبايل المصري', 'Egyptian mobile number')}<input name="phone" value={details.phone} onChange={e => setDetails(d => ({...d, phone:e.target.value}))} type="tel" inputMode="tel" autoComplete="tel" dir="ltr" required pattern="(?:\+?20|0020|0)?1[0125][0-9]{8}" placeholder="01012345678"/></label>
               <label>{tr('العنوان بالتفصيل', 'Delivery address')}<textarea name="address" value={details.address} onChange={e => setDetails(d => ({...d, address:e.target.value}))} autoComplete="street-address" required minLength={5} maxLength={300}/></label>
               {!!store.shippingZones?.length && <label>{tr('المحافظة ومنطقة التوصيل', 'Governorate & delivery zone')}<select value={zoneId} onChange={e => setZoneId(e.target.value)} required><option value="">{tr('اختر المنطقة', 'Select zone')}</option>{store.shippingZones.map(z => <option key={z.id} value={z.id}>{z.governorate} · {z.name} · {money(z.fee)}</option>)}</select>{zone?.estimate && <small>{zone.estimate}</small>}</label>}
-              <label>{tr('طريقة الدفع', 'Payment method')}<select value={payment} onChange={e => setPayment(e.target.value)}>{methods.map(m => <option key={m.id} value={m.id}>{english ? m.en : m.ar}</option>)}</select></label>
+              </fieldset><fieldset id="checkout-payment" className="ws-checkout-fields" disabled={busy || uncertain}><legend>{tr('٣. طريقة الدفع', '3. Payment method')}</legend><label>{tr('طريقة الدفع', 'Payment method')}<select value={payment} onChange={e => setPayment(e.target.value)}>{methods.map(m => <option key={m.id} value={m.id}>{english ? m.en : m.ar}</option>)}</select></label>
               {payment !== 'cod' && <><p className="ws-transfer-info">{tr('حوّل إلى:', 'Transfer to:')} <b dir="ltr">{payment === 'instapay' ? store.instaPayAddress : store.vodafoneCashNumber}</b><br/>{tr('لن يتم تأكيد الدفع قبل مراجعة المتجر.', 'Payment is confirmed only after merchant verification.')}</p><label>{tr('مرجع التحويل', 'Transfer reference')}<input name="reference" value={details.reference} onChange={e => setDetails(d => ({...d, reference:e.target.value}))} required minLength={3} maxLength={100}/></label></>}
               <label>{tr('ملاحظات (اختياري)', 'Notes (optional)')}<textarea name="notes" value={details.notes} onChange={e => setDetails(d => ({...d, notes:e.target.value}))} maxLength={500}/></label>
               {store.checkoutMode === 'both' && <label>{tr('إتمام الطلب', 'Checkout with')}<select value={channel} onChange={e => setChannel(e.target.value as 'online' | 'whatsapp')}><option value="online">{tr('طلب مباشر من الموقع', 'Order online')}</option><option value="whatsapp">WhatsApp</option></select></label>}
               </fieldset><p><small>{tr('تُراجع الأسعار والمخزون والشحن على الخادم عند إرسال الطلب.', 'Prices, stock and delivery are validated when you place your order.')}</small></p>
-              <section className="ws-checkout-review" aria-label={tr('راجع طلبك قبل التأكيد', 'Review before placing your order')}>
+              <section id="checkout-confirm" className="ws-checkout-review" aria-label={tr('راجع طلبك قبل التأكيد', 'Review before placing your order')}>
                 <h3>{uncertain ? tr('التحقق من الطلب السابق', 'Checking your previous order') : tr('مراجعة الطلب', 'Order review')}</h3>
                 {uncertain ? <p>{tr('هنستخدم نفس بيانات المحاولة الأصلية المحفوظة. تفاصيل الطلب والقيمة المؤكدة هتظهر بعد التحقق من الخادم.', 'We will reuse the saved original request. Confirmed items and totals appear after verification with the server.')}</p> : <>
-                <p>{totalItems} {tr('منتجات', 'items')} · {methods.find(method => method.id === payment)?.[english ? 'en' : 'ar']}</p>
+                <p className="ws-checkout-customer-summary">{details.name}<br/>{details.address}<br/><span dir="ltr">{details.phone}</span></p><p>{totalItems} {tr('منتجات', 'items')} · {methods.find(method => method.id === payment)?.[english ? 'en' : 'ar']}</p>
                 {zone && <p>{zone.governorate} · {zone.name}</p>}
                 <dl className="ws-totals"><div><dt>{tr('المنتجات', 'Subtotal')}</dt><dd>{money(subtotal)}</dd></div>{discount > 0 && <div><dt>{tr('الخصم', 'Discount')}</dt><dd>−{money(discount)}</dd></div>}<div><dt>{tr('التوصيل', 'Delivery')}</dt><dd>{shippingKnown ? money(shipping) : tr('اختر منطقة التوصيل', 'Select delivery zone')}</dd></div><div><dt>{tr('الإجمالي التقديري', 'Estimated total')}</dt><dd>{shippingKnown ? money(Math.max(0, subtotal - discount) + shipping) : '—'}</dd></div></dl>
                 <small>{tr('القيمة النهائية المؤكدة هتظهر بعد تسجيل الطلب.', 'The confirmed final total appears after the order is created.')}</small></>}

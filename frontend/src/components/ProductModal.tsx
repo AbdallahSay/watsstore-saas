@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import { useDialog } from './commerce/useDialog';
+import { useLanguage } from '@/context/LanguageContext';
 import { Product, ProductVariantGroup } from '../types';
 import { X, Plus, Minus, ShoppingBag, Check, ChevronLeft, ChevronRight } from 'lucide-react';
 
@@ -25,6 +26,8 @@ function ProductModalContent({
   onClose,
   onAddToCart,
 }: ProductModalProps & {product: Product}) {
+  const {language}=useLanguage();
+  const tr=(ar:string,en:string)=>language==='ar'?ar:en;
   const dialogRef = useDialog(isOpen && !!product, onClose);
   const [quantity, setQuantity] = useState(1);
   const variantGroups = useMemo<ProductVariantGroup[]>(() => {
@@ -42,7 +45,7 @@ function ProductModalContent({
 
   const handleConfirm = () => {
     if (isOutOfStock) {
-      setValidationError('نعتذر، هذا المنتج غير متوفر حالياً في المخزون');
+      setValidationError(tr('نعتذر، هذا المنتج غير متوفر حالياً في المخزون','This product is currently unavailable.'));
       return;
     }
 
@@ -84,7 +87,7 @@ function ProductModalContent({
         <button
           onClick={onClose}
           className="absolute top-4 left-4 z-10 w-10 h-10 min-w-[44px] min-h-[44px] rounded-full bg-slate-100/90 dark:bg-slate-800/90 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 flex items-center justify-center transition-colors shadow-sm"
-          aria-label="إغلاق"
+          aria-label={tr('إغلاق','Close')}
         >
           <X className="w-5 h-5" />
         </button>
@@ -127,7 +130,7 @@ function ProductModalContent({
                       setActiveImageIndex((prev) => (prev - 1 + galleryImages.length) % galleryImages.length);
                     }}
                     className="pointer-events-auto w-11 h-11 min-w-[44px] min-h-[44px] rounded-full bg-black/40 hover:bg-black/70 text-white backdrop-blur-sm flex items-center justify-center transition-all shadow-md active:scale-95"
-                    aria-label="الصورة السابقة"
+                    aria-label={tr('الصورة السابقة','Previous image')}
                   >
                     <ChevronRight className="w-5 h-5" />
                   </button>
@@ -139,7 +142,7 @@ function ProductModalContent({
                       setActiveImageIndex((prev) => (prev + 1) % galleryImages.length);
                     }}
                     className="pointer-events-auto w-11 h-11 min-w-[44px] min-h-[44px] rounded-full bg-black/40 hover:bg-black/70 text-white backdrop-blur-sm flex items-center justify-center transition-all shadow-md active:scale-95"
-                    aria-label="الصورة التالية"
+                    aria-label={tr('الصورة التالية','Next image')}
                   >
                     <ChevronLeft className="w-5 h-5" />
                   </button>
@@ -204,7 +207,7 @@ function ProductModalContent({
           {/* Out of Stock Notice */}
           {isOutOfStock && (
             <div className="p-3.5 bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 text-xs font-bold rounded-xl border border-rose-200 dark:border-rose-800 flex items-center gap-2">
-              <span>⚠️ هذا المنتج غير متوفر حالياً في المخزون ولا يمكن إضافته للسلة.</span>
+              <span>{tr('⚠️ هذا المنتج غير متوفر حالياً في المخزون ولا يمكن إضافته للسلة.','This product is unavailable and cannot be added to your bag.')}</span>
             </div>
           )}
 
@@ -255,14 +258,14 @@ function ProductModalContent({
 
           {/* Quantity Selector */}
           <div className="pt-2 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
-            <span className="text-sm font-bold text-slate-800 dark:text-slate-200">الكمية:</span>
+            <span className="text-sm font-bold text-slate-800 dark:text-slate-200">{tr('الكمية:','Quantity:')}</span>
             <div className="flex items-center gap-3 bg-slate-100 dark:bg-slate-800 rounded-xl p-1 border border-slate-200 dark:border-slate-700">
               <button
                 type="button"
                 disabled={isOutOfStock}
                 onClick={() => setQuantity((q) => Math.max(1, q - 1))}
                 className="w-11 h-11 min-w-[44px] min-h-[44px] rounded-lg bg-white dark:bg-slate-700 text-slate-700 dark:text-slate-200 flex items-center justify-center hover:bg-slate-200 dark:hover:bg-slate-600 font-bold disabled:opacity-40 active:scale-95 transition-transform"
-                aria-label="إنقاص الكمية"
+                aria-label={tr('إنقاص الكمية','Decrease quantity')}
               >
                 <Minus className="w-4 h-4" />
               </button>
@@ -274,7 +277,7 @@ function ProductModalContent({
                 disabled={isOutOfStock}
                 onClick={() => setQuantity((q) => q + 1)}
                 className="w-11 h-11 min-w-[44px] min-h-[44px] rounded-lg bg-white dark:bg-slate-700 text-slate-700 dark:text-slate-200 flex items-center justify-center hover:bg-slate-200 dark:hover:bg-slate-600 font-bold disabled:opacity-40 active:scale-95 transition-transform"
-                aria-label="زيادة الكمية"
+                aria-label={tr('زيادة الكمية','Increase quantity')}
               >
                 <Plus className="w-4 h-4" />
               </button>
@@ -296,8 +299,8 @@ function ProductModalContent({
               <ShoppingBag className="w-5 h-5" />
               <span>
                 {isOutOfStock
-                  ? 'المنتج غير متوفر حالياً'
-                  : `إضافة إلى السلة (${(product.price * quantity).toFixed(2)} ${currency})`}
+                  ? tr('المنتج غير متوفر حالياً','Currently unavailable')
+                  : `${tr('إضافة إلى السلة','Add to bag')} (${(product.price * quantity).toFixed(2)} ${currency})`}
               </span>
             </button>
           </div>
