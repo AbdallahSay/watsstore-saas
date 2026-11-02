@@ -151,6 +151,9 @@ jobs:
       - name: Verify ten mobile merchant previews and theme publish/restore lifecycle
         run: npm run test:theme-preview-mobile
         working-directory: frontend
+      - name: Verify 10 storefront themes across 18 widths and WhatsApp UI
+        run: npm run test:storefront-mobile
+        working-directory: frontend
       - name: Verify responsive page matrix and accessible dialogs
         run: |
           npm run test:responsive
