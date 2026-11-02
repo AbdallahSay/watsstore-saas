@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
+import { useDialog } from '@/hooks/useDialog';
 import { 
   Store as StoreIcon, 
   LayoutDashboard, 
@@ -81,17 +82,7 @@ export default function DashboardLayout({
     }
   }, [router]);
 
-  // Lock body scroll when mobile menu drawer is open
-  useEffect(() => {
-    if (isMobileMenuOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
-    }
-    return () => {
-      document.body.style.overflow = '';
-    };
-  }, [isMobileMenuOpen]);
+  const drawerRef = useDialog(isMobileMenuOpen, () => setIsMobileMenuOpen(false));
 
   const handleLogout = () => {
     localStorage.removeItem('watsstore_merchant_token');
@@ -114,9 +105,9 @@ export default function DashboardLayout({
   }
 
   const navLinks = [
-    {name:"إشعارات الطلبات",href:"/dashboard/notifications",icon:Receipt},
-    { name: "القوالب والتجارة", href: "/dashboard/themes", icon: Sparkles },
-    { name: "المخزون", href: "/dashboard/inventory", icon: ShoppingBag },
+    {name:dir === "rtl" ? "إشعارات الطلبات" : "Order notifications",href:"/dashboard/notifications",icon:Receipt},
+    { name: dir === "rtl" ? "القوالب والتجارة" : "Themes & commerce", href: "/dashboard/themes", icon: Sparkles },
+    { name: dir === "rtl" ? "المخزون" : "Inventory", href: "/dashboard/inventory", icon: ShoppingBag },
     { name: t('dash.overview', undefined, 'نظرة عامة للمتجر'), href: '/dashboard', icon: LayoutDashboard },
     { name: t('dash.orders', undefined, 'الطلبات والمبيعات'), href: '/dashboard/orders', icon: Receipt },
     { name: t('dash.analytics', undefined, 'الإحصائيات والتقارير'), href: '/dashboard/analytics', icon: BarChart3 },
@@ -129,7 +120,7 @@ export default function DashboardLayout({
   ];
 
   return (
-    <div dir={dir} className="min-h-screen bg-slate-100 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col md:flex-row transition-colors duration-200">
+    <div dir={dir} className="ws-merchant-shell min-h-screen bg-slate-100 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col md:flex-row transition-colors duration-200">
       {/* Sidebar for Desktop */}
       <aside className="hidden md:flex w-64 bg-slate-900 text-slate-300 flex-col justify-between shrink-0 border-r md:border-r-0 md:border-inline-end border-slate-800">
         <div>
@@ -245,7 +236,7 @@ export default function DashboardLayout({
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             className="p-2 text-slate-300 hover:text-white rounded-xl hover:bg-slate-800 min-w-[44px] min-h-[44px] flex items-center justify-center transition-colors"
-            aria-label="القائمة"
+            aria-label={dir === 'rtl' ? "القائمة" : "Menu"} aria-expanded={isMobileMenuOpen} aria-controls="merchant-navigation"
           >
             {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
           </button>
@@ -258,8 +249,9 @@ export default function DashboardLayout({
           className="md:hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-sm animate-fadeIn"
           onClick={() => setIsMobileMenuOpen(false)}
         >
-          <div 
-            className="fixed inset-y-0 rtl:right-0 ltr:left-0 w-72 max-w-[85vw] bg-slate-900 text-slate-300 p-5 flex flex-col justify-between overflow-y-auto rtl:border-l ltr:border-r border-slate-800 shadow-2xl"
+          <div
+            ref={drawerRef} id="merchant-navigation" role="dialog" aria-modal="true" aria-label={dir === 'rtl' ? "قائمة التاجر" : "Merchant navigation"} tabIndex={-1}
+            className="ws-dialog fixed inset-y-0 rtl:right-0 ltr:left-0 w-72 max-w-[85vw] bg-slate-900 text-slate-300 p-5 flex flex-col justify-between overflow-y-auto rtl:border-l ltr:border-r border-slate-800 shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="space-y-4">
@@ -274,7 +266,7 @@ export default function DashboardLayout({
                 <button
                   onClick={() => setIsMobileMenuOpen(false)}
                   className="w-10 h-10 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white flex items-center justify-center min-w-[44px] min-h-[44px]"
-                  aria-label="إغلاق القائمة"
+                  aria-label={dir === 'rtl' ? "إغلاق القائمة" : "Close menu"}
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -315,6 +307,7 @@ export default function DashboardLayout({
 
             {/* Bottom Actions */}
             <div className="pt-4 border-t border-slate-800 space-y-2 pb-safe">
+              <ThemeLanguageBar variant="dashboard" className="flex-wrap mb-3" />
               {user && (
                 <Link
                   href={`/s/${user.slug}`}
@@ -339,9 +332,9 @@ export default function DashboardLayout({
       )}
 
       {/* Main Content Body */}
-      <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
+      <main className="min-w-0 w-full flex-1 p-4 sm:p-6 lg:p-8">
         {/* Desktop Top Bar */}
-        <div className="hidden md:flex items-center justify-between px-5 py-3 mb-6 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm transition-colors">
+        <div className="hidden md:flex flex-wrap gap-3 items-center justify-between px-5 py-3 mb-6 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm transition-colors">
           <div className="flex items-center gap-2">
             <span className="text-xs font-bold text-slate-500 dark:text-slate-400">
               {user?.storeName ? `${user.storeName} • ` : ''}{t('dash.merchant_panel', undefined, 'لوحة تحكم التاجر')}

@@ -142,7 +142,7 @@ export default function MerchantOrdersPage() {
       </div>
 
       {/* Summary Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <div className="ws-order-summary grid grid-cols-3 gap-2 sm:gap-4">
         <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 transition-colors">
           <span className="text-xs font-bold text-slate-500 dark:text-slate-400 block">إجمالي عدد الطلبات</span>
           <span className="text-2xl font-black text-slate-900 dark:text-white mt-1 block">{orders.length} طلب</span>
@@ -157,7 +157,7 @@ export default function MerchantOrdersPage() {
         </div>
       </div>
 
-      <section className="border rounded-xl p-4 flex flex-wrap gap-3 items-end"><label className="grid gap-2 text-xs">الحالة<select value={statusFilter} onChange={e=>setStatusFilter(e.target.value)} className="p-3 border rounded bg-white dark:bg-slate-900"><option value="ALL">كل الحالات</option>{['Pending','Confirmed','Preparing','Shipped','Delivered','Cancelled','Rejected'].map(status=><option key={status} value={status}>{orderLabel(status)}</option>)}</select></label><label className="grid gap-2 text-xs">من<input type="date" value={from} onChange={e=>setFrom(e.target.value)} className="p-3 border rounded bg-transparent"/></label><label className="grid gap-2 text-xs">إلى<input type="date" value={to} onChange={e=>setTo(e.target.value)} className="p-3 border rounded bg-transparent"/></label><p className="text-xs">فلترة داخل الصفحة الحالية · صفحة {page} من {Math.max(1,Math.ceil(total/100))} · {total} طلب إجمالاً</p><button disabled={page<=1} onClick={()=>setPage(p=>p-1)} className="p-3 border rounded disabled:opacity-50">السابق</button><button disabled={page*100>=total} onClick={()=>setPage(p=>p+1)} className="p-3 border rounded disabled:opacity-50">التالي</button></section>
+      <section className="ws-order-filters border rounded-xl p-4 grid grid-cols-2 lg:flex lg:flex-wrap gap-3 items-end"><label className="grid gap-2 text-xs">الحالة<select value={statusFilter} onChange={e=>setStatusFilter(e.target.value)} className="p-3 border rounded bg-white dark:bg-slate-900"><option value="ALL">كل الحالات</option>{['Pending','Confirmed','Preparing','Shipped','Delivered','Cancelled','Rejected'].map(status=><option key={status} value={status}>{orderLabel(status)}</option>)}</select></label><label className="grid gap-2 text-xs">من<input type="date" value={from} onChange={e=>setFrom(e.target.value)} className="p-3 border rounded bg-transparent"/></label><label className="grid gap-2 text-xs">إلى<input type="date" value={to} onChange={e=>setTo(e.target.value)} className="p-3 border rounded bg-transparent"/></label><p className="text-xs">فلترة داخل الصفحة الحالية · صفحة {page} من {Math.max(1,Math.ceil(total/100))} · {total} طلب إجمالاً</p><button disabled={page<=1} onClick={()=>setPage(p=>p-1)} className="p-3 border rounded disabled:opacity-50">السابق</button><button disabled={page*100>=total} onClick={()=>setPage(p=>p+1)} className="p-3 border rounded disabled:opacity-50">التالي</button></section>
       {/* Search and Filters */}
       <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 flex flex-col md:flex-row gap-3 items-center justify-between transition-colors">
         <div className="relative w-full md:w-80">
@@ -227,20 +227,20 @@ export default function MerchantOrdersPage() {
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-right text-xs">
-              <thead>
-                <tr className="border-b border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/60 text-slate-500 dark:text-slate-400 font-bold">
-                  <th className="py-3.5 px-4">رقم الطلب</th>
-                  <th className="py-3.5 px-4">بيانات العميل</th>
-                  <th className="py-3.5 px-4">طريقة الدفع</th>
-                  <th className="py-3.5 px-4">العنوان</th>
-                  <th className="py-3.5 px-4">تفاصيل المنتجات</th>
-                  <th className="py-3.5 px-4">المبلغ المستحق</th>
-                  <th className="py-3.5 px-4">تاريخ الطلب</th>
-                  <th className="py-3.5 px-4 text-center">مراسلة العميل</th>
+            <table role="table" className="ws-mobile-cards w-full text-right text-xs">
+              <thead role="rowgroup">
+                <tr role="row" className="border-b border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/60 text-slate-500 dark:text-slate-400 font-bold">
+                  <th role="columnheader" scope="col" className="py-3.5 px-4">رقم الطلب</th>
+                  <th role="columnheader" scope="col" className="py-3.5 px-4">بيانات العميل</th>
+                  <th role="columnheader" scope="col" className="py-3.5 px-4">طريقة الدفع</th>
+                  <th role="columnheader" scope="col" className="py-3.5 px-4">العنوان</th>
+                  <th role="columnheader" scope="col" className="py-3.5 px-4">تفاصيل المنتجات</th>
+                  <th role="columnheader" scope="col" className="py-3.5 px-4">المبلغ المستحق</th>
+                  <th role="columnheader" scope="col" className="py-3.5 px-4">تاريخ الطلب</th>
+                  <th role="columnheader" scope="col" className="py-3.5 px-4 text-center">مراسلة العميل</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100 dark:divide-slate-800 text-slate-700 dark:text-slate-300">
+              <tbody role="rowgroup" className="divide-y divide-slate-100 dark:divide-slate-800 text-slate-700 dark:text-slate-300">
                 {filteredOrders.map((order) => {
                   let items: any[] = [];
                   try {
@@ -253,23 +253,23 @@ export default function MerchantOrdersPage() {
                   const waLink = `https://wa.me/${cleanPhone.startsWith('2') ? cleanPhone : '20' + cleanPhone.replace(/^0+/, '')}`;
 
                   return (
-                    <tr key={order.id} className="hover:bg-slate-50/80 dark:hover:bg-slate-800/50 transition-colors">
-                      <td className="py-4 px-4 font-black text-emerald-600 dark:text-emerald-400">
+                    <tr role="row" key={order.id} className="hover:bg-slate-50/80 dark:hover:bg-slate-800/50 transition-colors">
+                      <td role="cell" data-label={language === 'ar' ? "رقم الطلب" : "Order"} className="py-4 px-4 font-black text-emerald-600 dark:text-emerald-400">
                         <Link href={`/dashboard/orders/${order.id}`} className="underline">#{order.orderNumber}</Link><p className="text-xs mt-2">{orderLabel(order.status,language!=='ar')}</p>
                       </td>
-                      <td className="py-4 px-4">
+                      <td role="cell" data-label={language === 'ar' ? "العميل" : "Customer"} className="py-4 px-4">
                         <div className="font-bold text-slate-900 dark:text-white">{order.customerName}</div>
                         <div className="text-slate-400 dark:text-slate-500 font-mono text-[11px] dir-ltr text-right">{order.customerPhone}</div>
                       </td>
-                      <td className="py-4 px-4">
+                      <td role="cell" data-label={language === 'ar' ? "الدفع" : "Payment"} className="py-4 px-4">
                         <span className="inline-block px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 font-bold text-[11px] text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700">
                           {order.paymentMethod || 'الدفع عند الاستلام'}
                         </span>
                       </td>
-                      <td className="py-4 px-4 max-w-[200px] truncate" title={order.customerAddress}>
+                      <td role="cell" data-label={language === 'ar' ? "العنوان" : "Address"} className="py-4 px-4 max-w-[200px] truncate" title={order.customerAddress}>
                         {order.customerAddress}
                       </td>
-                      <td className="py-4 px-4">
+                      <td role="cell" data-label={language === 'ar' ? "المنتجات" : "Items"} className="py-4 px-4">
                         <div className="space-y-1 max-w-[240px]">
                           {items.map((it: any, i: number) => (
                             <div key={i} className="text-[11px]">
@@ -284,10 +284,10 @@ export default function MerchantOrdersPage() {
                           ))}
                         </div>
                       </td>
-                      <td className="py-4 px-4 font-black text-slate-900 dark:text-white">
+                      <td role="cell" data-label={language === 'ar' ? "الإجمالي" : "Total"} className="py-4 px-4 font-black text-slate-900 dark:text-white">
                         {order.totalAmount?.toFixed(2)} ج.م
                       </td>
-                      <td className="py-4 px-4 text-slate-400 dark:text-slate-500 text-[11px] whitespace-nowrap">
+                      <td role="cell" data-label={language === 'ar' ? "التاريخ" : "Date"} className="py-4 px-4 text-slate-400 dark:text-slate-500 text-[11px] whitespace-nowrap">
                         {new Date(order.createdAt).toLocaleDateString('ar-EG', {
                           month: 'short',
                           day: 'numeric',
@@ -295,7 +295,7 @@ export default function MerchantOrdersPage() {
                           minute: '2-digit',
                         })}
                       </td>
-                      <td className="py-4 px-4 text-center">
+                      <td role="cell" data-label={language === 'ar' ? "تواصل" : "Contact"} className="py-4 px-4 text-center">
                         <a
                           href={waLink}
                           target="_blank"

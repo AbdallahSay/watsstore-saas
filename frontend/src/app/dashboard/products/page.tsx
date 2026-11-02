@@ -1,5 +1,7 @@
 'use client';
 
+import { useDialog } from '@/hooks/useDialog';
+
 import { useEffect, useState, useRef } from 'react';
 import { api } from '@/lib/api';
 import { Product, Category, ProductVariantGroup } from '@/types';
@@ -97,16 +99,7 @@ export default function DashboardProductsPage() {
   }, []);
 
   // Lock body scroll when product edit/create modal is open
-  useEffect(() => {
-    if (isModalOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
-    }
-    return () => {
-      document.body.style.overflow = '';
-    };
-  }, [isModalOpen]);
+  const dialogRef = useDialog(isModalOpen, () => { if (!isSaving) setIsModalOpen(false); });
 
   const openUpgradeWhatsApp = (targetPlan: 'Pro' | 'VIP' = 'Pro') => {
     const text = encodeURIComponent(
@@ -749,18 +742,18 @@ export default function DashboardProductsPage() {
       ) : (
         <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-sm overflow-hidden">
           <div className="overflow-x-auto">
-            <table className="w-full text-right text-xs">
-              <thead className="bg-slate-50 dark:bg-slate-800/80 border-b border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 font-bold">
-                <tr>
-                  <th className="py-4 px-4">{t('products.th_image_name', undefined, 'الصورة والاسم')}</th>
-                  <th className="py-4 px-4">{t('products.th_category', undefined, 'القسم')}</th>
-                  <th className="py-4 px-4">{t('products.th_price', undefined, 'السعر')}</th>
-                  <th className="py-4 px-4">{t('products.th_variants', undefined, 'المتغيرات (المقاسات/الألوان)')}</th>
-                  <th className="py-4 px-4 text-center">{t('products.th_availability', undefined, 'حالة التوفر (تبديل فوري)')}</th>
-                  <th className="py-4 px-4 text-center">{t('products.th_actions', undefined, 'الإجراءات')}</th>
+            <table role="table" className="ws-mobile-cards w-full text-right text-xs">
+              <thead role="rowgroup" className="bg-slate-50 dark:bg-slate-800/80 border-b border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 font-bold">
+                <tr role="row">
+                  <th role="columnheader" scope="col" className="py-4 px-4">{t('products.th_image_name', undefined, 'الصورة والاسم')}</th>
+                  <th role="columnheader" scope="col" className="py-4 px-4">{t('products.th_category', undefined, 'القسم')}</th>
+                  <th role="columnheader" scope="col" className="py-4 px-4">{t('products.th_price', undefined, 'السعر')}</th>
+                  <th role="columnheader" scope="col" className="py-4 px-4">{t('products.th_variants', undefined, 'المتغيرات (المقاسات/الألوان)')}</th>
+                  <th role="columnheader" scope="col" className="py-4 px-4 text-center">{t('products.th_availability', undefined, 'حالة التوفر (تبديل فوري)')}</th>
+                  <th role="columnheader" scope="col" className="py-4 px-4 text-center">{t('products.th_actions', undefined, 'الإجراءات')}</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100 dark:divide-slate-800 text-slate-700 dark:text-slate-300">
+              <tbody role="rowgroup" className="divide-y divide-slate-100 dark:divide-slate-800 text-slate-700 dark:text-slate-300">
                 {products.map((product) => {
                   let variantCount = 0;
                   if (product.variantsJson) {
@@ -773,8 +766,8 @@ export default function DashboardProductsPage() {
                   const isToggling = togglingId === product.id;
 
                   return (
-                    <tr key={product.id} className="hover:bg-slate-50/80 dark:hover:bg-slate-800/50 transition-colors">
-                      <td className="py-3 px-4">
+                    <tr role="row" key={product.id} className="hover:bg-slate-50/80 dark:hover:bg-slate-800/50 transition-colors">
+                      <td role="cell" data-label={language === 'ar' ? "المنتج" : "Product"} className="py-3 px-4">
                         <div className="flex items-center gap-3">
                           {product.imageUrl ? (
                             <img
@@ -798,11 +791,11 @@ export default function DashboardProductsPage() {
                         </div>
                       </td>
 
-                      <td className="py-3 px-4 text-slate-600 dark:text-slate-300 font-semibold">
+                      <td role="cell" data-label={language === 'ar' ? "القسم" : "Category"} className="py-3 px-4 text-slate-600 dark:text-slate-300 font-semibold">
                         {categories.find((c) => c.id === product.categoryId)?.name || 'بدون قسم'}
                       </td>
 
-                      <td className="py-3 px-4">
+                      <td role="cell" data-label={language === 'ar' ? "السعر" : "Price"} className="py-3 px-4">
                         <span className="font-black text-slate-900 dark:text-white text-sm">
                           {product.price.toFixed(2)} ج.م
                         </span>
@@ -813,7 +806,7 @@ export default function DashboardProductsPage() {
                         )}
                       </td>
 
-                      <td className="py-3 px-4">
+                      <td role="cell" data-label={language === 'ar' ? "الاختيارات" : "Variants"} className="py-3 px-4">
                         {variantCount > 0 ? (
                           <span className="bg-emerald-50 text-emerald-700 font-bold px-2.5 py-1 rounded-lg border border-emerald-200/60 inline-flex items-center gap-1">
                             <SlidersHorizontal className="w-3 h-3" />
@@ -825,7 +818,7 @@ export default function DashboardProductsPage() {
                       </td>
 
                       {/* 1-Click Interactive Availability Toggle */}
-                      <td className="py-3 px-4 text-center">
+                      <td role="cell" data-label={language === 'ar' ? "التوفر" : "Availability"} className="py-3 px-4 text-center">
                         <button
                           type="button"
                           disabled={isToggling}
@@ -848,7 +841,7 @@ export default function DashboardProductsPage() {
                         </button>
                       </td>
 
-                      <td className="py-3 px-4">
+                      <td role="cell" data-label={language === 'ar' ? "الإجراءات" : "Actions"} className="py-3 px-4">
                         <div className="flex items-center justify-center gap-2">
                           <button
                             onClick={() => openEditModal(product)}
@@ -879,10 +872,10 @@ export default function DashboardProductsPage() {
       {isModalOpen && (
         <div 
           className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm animate-fadeIn"
-          onClick={() => setIsModalOpen(false)}
+          onClick={() => { if (!isSaving) setIsModalOpen(false); }}
         >
-          <div 
-            className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 rounded-3xl max-w-xl w-full max-h-[90vh] overflow-y-auto shadow-2xl p-6 border border-slate-200 dark:border-slate-800 space-y-5"
+          <div ref={dialogRef} role="dialog" aria-modal="true" aria-label={language === 'ar' ? "بيانات المنتج" : "Product editor"} tabIndex={-1}
+            className="ws-dialog bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 rounded-3xl max-w-xl w-full max-h-[90vh] overflow-y-auto shadow-2xl p-6 border border-slate-200 dark:border-slate-800 space-y-5"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
@@ -890,7 +883,7 @@ export default function DashboardProductsPage() {
                 {editingProduct ? 'تعديل بيانات المنتج' : 'إضافة منتج جديد'}
               </h3>
               <button
-                onClick={() => setIsModalOpen(false)}
+                onClick={() => { if (!isSaving) setIsModalOpen(false); }}
                 className="w-10 h-10 min-w-[44px] min-h-[44px] rounded-full bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 flex items-center justify-center text-slate-500 dark:text-slate-400 transition-colors"
                 title="إغلاق النافذة"
                 aria-label="إغلاق النافذة"
@@ -901,8 +894,8 @@ export default function DashboardProductsPage() {
 
             <form onSubmit={handleSaveProduct} className="space-y-4 text-xs">
               <div>
-                <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">اسم المنتج *</label>
-                <input
+                <label htmlFor="products-field-1" className="block font-bold text-slate-700 dark:text-slate-300 mb-1">اسم المنتج *</label>
+                <input id="products-field-1"
                   type="text"
                   required
                   value={formName}
@@ -913,8 +906,8 @@ export default function DashboardProductsPage() {
               </div>
 
               <div>
-                <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">القسم / التصنيف</label>
-                <select
+                <label htmlFor="products-field-2" className="block font-bold text-slate-700 dark:text-slate-300 mb-1">القسم / التصنيف</label>
+                <select id="products-field-2"
                   value={formCategoryId}
                   onChange={(e) => setFormCategoryId(e.target.value === '' ? '' : Number(e.target.value))}
                   className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 font-medium text-sm focus:outline-none focus:border-emerald-500 bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
@@ -1086,8 +1079,8 @@ export default function DashboardProductsPage() {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">سعر البيع الحالي (ج.م) *</label>
-                  <input
+                  <label htmlFor="products-field-3" className="block font-bold text-slate-700 dark:text-slate-300 mb-1">سعر البيع الحالي (ج.م) *</label>
+                  <input id="products-field-3"
                     type="number"
                     step="0.01"
                     required
@@ -1099,8 +1092,8 @@ export default function DashboardProductsPage() {
                 </div>
 
                 <div>
-                  <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">السعر قبل الخصم (اختياري)</label>
-                  <input
+                  <label htmlFor="products-field-4" className="block font-bold text-slate-700 dark:text-slate-300 mb-1">السعر قبل الخصم (اختياري)</label>
+                  <input id="products-field-4"
                     type="number"
                     step="0.01"
                     value={formCompareAtPrice}
@@ -1230,7 +1223,7 @@ export default function DashboardProductsPage() {
               <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-end gap-3">
                 <button
                   type="button"
-                  onClick={() => setIsModalOpen(false)}
+                  onClick={() => { if (!isSaving) setIsModalOpen(false); }}
                   className="px-4 py-2.5 text-xs font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-colors"
                 >
                   إلغاء

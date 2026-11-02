@@ -367,3 +367,36 @@ table {
 }
 
 
+
+/* Layout constraints belong to the content, not to a clipped document. */
+.ws-merchant-shell main, .ws-admin-shell { min-width: 0; overflow-wrap: anywhere; }
+.ws-merchant-shell main > *, .ws-admin-shell main > * { min-width: 0; }
+.ws-merchant-shell form > *, .ws-merchant-shell .grid > * { min-width: 0; }
+.ws-merchant-shell select { max-width: 100%; }
+.ws-dialog { max-height: calc(100dvh - 2rem); overflow-y: auto; overscroll-behavior: contain; padding-bottom: max(1.5rem, env(safe-area-inset-bottom)); }
+.ws-dialog[role="dialog"] { outline: none; }
+@media (prefers-reduced-motion: reduce) {
+  .animate-fadeIn { animation: none; }
+  html:focus-within { scroll-behavior: auto; }
+}
+.ws-admin-shell button { min-height: 44px; }
+.ws-merchant-shell button, [data-testid="theme-language-bar"] button { min-height: 44px; min-width: 44px; }
+@media (max-width: 767px) {
+  .ws-order-summary > div { padding: 12px; }
+  .ws-order-summary .text-2xl { font-size: 1.1rem; }
+  .ws-order-summary .text-xs { font-size: .65rem; }
+  .ws-order-filters label:first-child, .ws-order-filters p { grid-column: 1 / -1; }
+  .ws-order-filters input { width: 100%; }
+  .ws-mobile-cards, .ws-mobile-cards tbody { display: block; width: 100%; }
+  .ws-mobile-cards thead { position: absolute; width: 1px; height: 1px; padding: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+  .ws-mobile-cards tbody { padding: 12px; }
+  .ws-mobile-cards tr { display: grid; grid-template-columns: minmax(0,1fr); border: 1px solid #cbd5e1; border-radius: 16px; margin-bottom: 12px; padding: 8px 0; }
+  .ws-mobile-cards td { display: block; width: 100%; min-width: 0; max-width: none; padding: 8px 16px; white-space: normal; overflow-wrap: anywhere; overflow: visible; text-align: start; }
+  .ws-mobile-cards td::before { content: attr(data-label); display: block; font-size: 11px; font-weight: 600; color: #64748b; margin-bottom: 5px; }
+  .dark .ws-mobile-cards td::before { color: #94a3b8; }
+  .ws-mobile-cards td > div { max-width: 100%; }
+  .ws-mobile-cards td button,.ws-mobile-cards td a { min-height: 44px; min-width: 44px; }
+  .ws-mobile-cards td a { display: inline-flex; align-items: center; }
+  .ws-merchant-shell input, .ws-merchant-shell select, .ws-merchant-shell textarea,
+  .ws-admin-shell input, .ws-admin-shell select, .ws-admin-shell textarea { font-size: 16px; min-height: 44px; }
+}

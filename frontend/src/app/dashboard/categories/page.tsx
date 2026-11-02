@@ -1,5 +1,7 @@
 'use client';
 
+import { useDialog } from '@/hooks/useDialog';
+
 import { useEffect, useState } from 'react';
 import { api } from '@/lib/api';
 import { Category } from '@/types';
@@ -48,16 +50,7 @@ export default function DashboardCategoriesPage() {
   }, []);
 
   // Lock body scroll when category modal is open
-  useEffect(() => {
-    if (isModalOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
-    }
-    return () => {
-      document.body.style.overflow = '';
-    };
-  }, [isModalOpen]);
+  const dialogRef = useDialog(isModalOpen, () => { if (!isSaving) setIsModalOpen(false); });
 
   const openCreateModal = () => {
     setEditingCategory(null);
@@ -174,30 +167,30 @@ export default function DashboardCategoriesPage() {
         </div>
       ) : (
         <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-sm overflow-hidden">
-          <table className="w-full text-right text-xs">
-            <thead className="bg-slate-50 dark:bg-slate-800/80 border-b border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 font-bold">
-              <tr>
-                <th className="py-4 px-4">{t('categories.th_name', undefined, 'اسم القسم')}</th>
-                <th className="py-4 px-4">{t('categories.th_sort', undefined, 'ترتيب الظهور')}</th>
-                <th className="py-4 px-4">{t('categories.th_count', undefined, 'عدد المنتجات')}</th>
-                <th className="py-4 px-4 text-center">{t('categories.th_actions', undefined, 'الإجراءات')}</th>
+          <table role="table" className="ws-mobile-cards w-full text-right text-xs">
+            <thead role="rowgroup" className="bg-slate-50 dark:bg-slate-800/80 border-b border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 font-bold">
+              <tr role="row">
+                <th role="columnheader" scope="col" className="py-4 px-4">{t('categories.th_name', undefined, 'اسم القسم')}</th>
+                <th role="columnheader" scope="col" className="py-4 px-4">{t('categories.th_sort', undefined, 'ترتيب الظهور')}</th>
+                <th role="columnheader" scope="col" className="py-4 px-4">{t('categories.th_count', undefined, 'عدد المنتجات')}</th>
+                <th role="columnheader" scope="col" className="py-4 px-4 text-center">{t('categories.th_actions', undefined, 'الإجراءات')}</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100 dark:divide-slate-800 text-slate-700 dark:text-slate-300">
+            <tbody role="rowgroup" className="divide-y divide-slate-100 dark:divide-slate-800 text-slate-700 dark:text-slate-300">
               {categories.map((cat) => (
-                <tr key={cat.id} className="hover:bg-slate-50/80 dark:hover:bg-slate-800/50 transition-colors">
-                  <td className="py-3.5 px-4 font-bold text-slate-900 dark:text-white text-sm">
+                <tr role="row" key={cat.id} className="hover:bg-slate-50/80 dark:hover:bg-slate-800/50 transition-colors">
+                  <td role="cell" data-label={language === 'ar' ? "القسم" : "Category"} className="py-3.5 px-4 font-bold text-slate-900 dark:text-white text-sm">
                     {cat.name}
                   </td>
-                  <td className="py-3.5 px-4 text-slate-600 dark:text-slate-300">
+                  <td role="cell" data-label={language === 'ar' ? "الترتيب" : "Sort order"} className="py-3.5 px-4 text-slate-600 dark:text-slate-300">
                     #{cat.sortOrder}
                   </td>
-                  <td className="py-3.5 px-4">
+                  <td role="cell" data-label={language === 'ar' ? "المنتجات" : "Products"} className="py-3.5 px-4">
                     <span className="bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold px-2 py-0.5 rounded-md text-[11px]">
                       {cat.productCount || 0} منتج
                     </span>
                   </td>
-                  <td className="py-3.5 px-4">
+                  <td role="cell" data-label={language === 'ar' ? "الإجراءات" : "Actions"} className="py-3.5 px-4">
                     <div className="flex items-center justify-center gap-2">
                       <button
                         onClick={() => openEditModal(cat)}
@@ -226,10 +219,10 @@ export default function DashboardCategoriesPage() {
       {isModalOpen && (
         <div 
           className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm animate-fadeIn"
-          onClick={() => setIsModalOpen(false)}
+          onClick={() => { if (!isSaving) setIsModalOpen(false); }}
         >
-          <div 
-            className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 rounded-3xl max-w-md w-full shadow-2xl p-6 border border-slate-200 dark:border-slate-800 space-y-4"
+          <div ref={dialogRef} role="dialog" aria-modal="true" aria-label={language === 'ar' ? "بيانات القسم" : "Category editor"} tabIndex={-1}
+            className="ws-dialog bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 rounded-3xl max-w-md w-full shadow-2xl p-6 border border-slate-200 dark:border-slate-800 space-y-4"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
@@ -237,7 +230,7 @@ export default function DashboardCategoriesPage() {
                 {editingCategory ? 'تعديل بيانات القسم' : 'إضافة قسم جديد'}
               </h3>
               <button
-                onClick={() => setIsModalOpen(false)}
+                onClick={() => { if (!isSaving) setIsModalOpen(false); }}
                 className="w-10 h-10 min-w-[44px] min-h-[44px] rounded-full bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 flex items-center justify-center text-slate-500 dark:text-slate-400 transition-colors"
                 title="إغلاق النافذة"
                 aria-label="إغلاق النافذة"
@@ -248,8 +241,8 @@ export default function DashboardCategoriesPage() {
 
             <form onSubmit={handleSaveCategory} className="space-y-4 text-xs">
               <div>
-                <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">اسم القسم *</label>
-                <input
+                <label htmlFor="categories-field-1" className="block font-bold text-slate-700 dark:text-slate-300 mb-1">اسم القسم *</label>
+                <input id="categories-field-1"
                   type="text"
                   required
                   value={formName}
@@ -260,8 +253,8 @@ export default function DashboardCategoriesPage() {
               </div>
 
               <div>
-                <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">ترتيب الظهور في القائمة</label>
-                <input
+                <label htmlFor="categories-field-2" className="block font-bold text-slate-700 dark:text-slate-300 mb-1">ترتيب الظهور في القائمة</label>
+                <input id="categories-field-2"
                   type="number"
                   min="1"
                   required
@@ -274,7 +267,7 @@ export default function DashboardCategoriesPage() {
               <div className="pt-2 border-t border-slate-100 dark:border-slate-800 flex items-center justify-end gap-2">
                 <button
                   type="button"
-                  onClick={() => setIsModalOpen(false)}
+                  onClick={() => { if (!isSaving) setIsModalOpen(false); }}
                   className="px-4 py-2 text-xs font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-colors"
                 >
                   إلغاء
