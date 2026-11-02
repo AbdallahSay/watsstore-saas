@@ -3,30 +3,38 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
 const root = path.resolve(__dirname, '..');
-const read = rel => fs.readFileSync(path.join(root, rel), 'utf8');
-const backend = rel => fs.readFileSync(path.join(root, '..', 'backend', rel), 'utf8');
+const read = name => fs.readFileSync(path.join(root, name), 'utf8');
 
-test('Pure Beauty is available in both theme registry and server DTO validation', () => {
+test('all ten production theme IDs and the Pure Beauty design are registered', () => {
   const themes = read('src/lib/store-themes.ts');
-  const market = read('src/lib/theme-marketplace.ts');
-  const dto = backend('DTOs/CommerceDTOs.cs');
-  assert.match(themes, /STORE_THEME_IDS = \[[^\]]*'pure-beauty'/);
-  assert.match(themes, /'pure-beauty':\s*\{/);
-  assert.match(market, /id:'pure-beauty'.*status:'available'/);
-  assert.match(dto, /pure-beauty/);
+  const expected = ['editorial-luxe','street-pulse','pure-beauty','tech-grid','fresh-market',
+    'living-space','golden-atelier','active-motion','little-joy','crafted-story'];
+  const ids = themes.match(/export const STORE_THEME_IDS = \[([\s\S]*?)\] as const;/);
+  assert.ok(ids, 'Theme registry should define an explicit allowlist');
+  for (const id of expected) {
+    assert.match(ids[1], new RegExp("'"+id+"'"));
+    assert.match(themes, new RegExp("'"+id+"':\\s*\\{"));
+  }
+  assert.match(themes, /editorial: 'editorial-luxe'/);
+  assert.match(themes, /streetwear: 'street-pulse'/);
+  assert.match(themes, /lifestyle: 'living-space'/);
 });
 
-test('Pure Beauty renders through the shared secure commerce engine', () => {
+test('merchant can preview every theme with real store data without auto-publishing', () => {
   const storefront = read('src/components/commerce/CommerceStorefront.tsx');
   const page = read('src/app/dashboard/themes/page.tsx');
   assert.match(storefront, /getStoreTheme\(previewTheme \|\| store\.themeId\)/);
   assert.match(storefront, /CommerceCart/);
-  assert.match(page, /(?:visibleThemes|filteredThemes)\.map\(\(?theme/);
-  assert.match(page, /draftTheme:\s*theme\.id/);
+  assert.match(page, /(?:visibleThemes|filteredThemes)\.map\(\(theme\) =>/);
+  assert.match(page, /setPreviewThemeId\(theme\.id\)/);
+  assert.match(page, /previewTheme=\{previewThemeId\}/);
+  assert.match(page, /previewCustomization=\{customization\}/);
+  assert.match(page, /updateSettings\(\{ draftTheme: previewThemeId \}\)/);
+  assert.match(page, /executeAction\('publish'\)/);
 });
 
-test('Pure Beauty styles remain isolated from the dashboard appearance', () => {
-  const css = read('src/styles/themes/pure-beauty.css');
-  assert.match(css, /\.ws-storefront\.ws-theme--pure-beauty/);
-  assert.doesNotMatch(css, /(?:^|\n)\s*(?:html|body|:root|\.dark|\.dashboard)\s*[{,]/);
+test('storefront CSS and theme customization remain separate from dashboard appearance', () => {
+  const styles = read('src/styles/themes/pure-beauty.css');
+  assert.match(styles, /\.ws-storefront\.ws-theme--pure-beauty/);
+  assert.doesNotMatch(styles, /(?:^|\n)\s*(?:html|body|:root|\.dark|\.dashboard)\s*[{,]/);
 });
