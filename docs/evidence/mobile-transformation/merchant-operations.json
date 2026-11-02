@@ -1,0 +1,8 @@
+{
+  "status": "PASS",
+  "categoryCreateEdit": true,
+  "productCreateEdit": true,
+  "actualImageUploadAndPreview": true,
+  "inventoryAdjustment": 7,
+  "productionData": false
+}

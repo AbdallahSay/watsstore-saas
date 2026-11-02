@@ -39,5 +39,6 @@ Thumbs.db
 work/
 test-results/
 playwright-report/
+/wwwroot/
 *.dpapi
 __pycache__/

@@ -66,7 +66,7 @@ async function openCheckout(page,fixture,width) {
     const stocks=await json(`${api}/merchant/commerce/inventory`,fixture.token);
     assert.equal(stocks.find(x=>x.productId===fixture.productId).quantity,24);
     await page.screenshot({path:path.join(output,'mobile-uncertain.png')});
-    await page.reload({waitUntil:'networkidle0'});await page.click('.ws-bag');
+    await page.reload({waitUntil:'networkidle0'});await page.click('.ws-bag');await page.waitForSelector('.ws-checkout-form input[name=name]');
     assert.equal(await page.$eval('.ws-checkout-form input[name=name]',x=>x.value),'اختبار P0 معزول');
     const replayRequest=page.waitForRequest(r=>r.method()==='POST'&&r.url().endsWith('/orders'));
     await clickText(page,'.ws-checkout-form button[type=submit]','إعادة التحقق من نفس الطلب');

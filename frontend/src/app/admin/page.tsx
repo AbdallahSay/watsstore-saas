@@ -1267,15 +1267,15 @@ export default function SuperAdminPage() {
 
   // 2. Main Super Admin Dashboard
   return (
-    <div className="min-h-screen pb-16">
+    <div dir={dir} className="ws-admin-shell min-h-screen pb-16">
       {/* Top Navigation Bar */}
-      <header className="sticky top-0 z-40 bg-slate-900/80 backdrop-blur-md border-b border-slate-800 px-4 sm:px-8 py-3.5 flex items-center justify-between">
+      <header className="sticky top-0 z-40 bg-slate-900/80 backdrop-blur-md border-b border-slate-800 px-4 sm:px-8 py-3.5 flex flex-wrap gap-3 items-center justify-between">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-500 to-teal-400 text-slate-950 flex items-center justify-center font-black shadow-md shadow-emerald-500/20">
             <ShieldCheck className="w-6 h-6" />
           </div>
           <div>
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2">
               <h1 className="text-base font-black text-white">لوحة الإدارة المركزية</h1>
               <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
                 Super Admin
@@ -1290,9 +1290,9 @@ export default function SuperAdminPage() {
         </div>
 
         {/* Center Navigation Tabs */}
-        <div className="hidden md:flex items-center gap-1.5 bg-slate-950/80 border border-slate-800 p-1 rounded-xl">
+        <div className="hidden 2xl:flex items-center gap-1.5 bg-slate-950/80 border border-slate-800 p-1 rounded-xl">
           <button
-            onClick={() => setActiveTab('stores')}
+            data-admin-tab="stores" onClick={() => setActiveTab('stores')}
             className={`px-3.5 py-1.5 text-xs font-bold rounded-lg transition-all flex items-center gap-1.5 ${
               activeTab === 'stores'
                 ? 'bg-emerald-500 text-slate-950 font-black shadow-sm'
@@ -1303,7 +1303,7 @@ export default function SuperAdminPage() {
             <span>المتاجر والإحصائيات</span>
           </button>
           <button
-            onClick={() => setActiveTab('subscriptions')}
+            data-admin-tab="subscriptions" onClick={() => setActiveTab('subscriptions')}
             className={`px-3.5 py-1.5 text-xs font-bold rounded-lg transition-all flex items-center gap-1.5 relative ${
               activeTab === 'subscriptions'
                 ? 'bg-emerald-500 text-slate-950 font-black shadow-sm'
@@ -1319,7 +1319,7 @@ export default function SuperAdminPage() {
             )}
           </button>
           <button
-            onClick={() => setActiveTab('pricing')}
+            data-admin-tab="pricing" onClick={() => setActiveTab('pricing')}
             className={`px-3.5 py-1.5 text-xs font-bold rounded-lg transition-all flex items-center gap-1.5 ${
               activeTab === 'pricing'
                 ? 'bg-emerald-500 text-slate-950 font-black shadow-sm'
@@ -1330,7 +1330,7 @@ export default function SuperAdminPage() {
             <span>إدارة الأسعار والباقات</span>
           </button>
           <button
-            onClick={() => setActiveTab('gateways')}
+            data-admin-tab="gateways" onClick={() => setActiveTab('gateways')}
             className={`px-3.5 py-1.5 text-xs font-bold rounded-lg transition-all flex items-center gap-1.5 ${
               activeTab === 'gateways'
                 ? 'bg-emerald-500 text-slate-950 font-black shadow-sm'
@@ -1341,7 +1341,7 @@ export default function SuperAdminPage() {
             <span>وسائل الدفع والمحافظ</span>
           </button>
           <button
-            onClick={() => setActiveTab('settings')}
+            data-admin-tab="settings" onClick={() => setActiveTab('settings')}
             className={`px-3.5 py-1.5 text-xs font-bold rounded-lg transition-all flex items-center gap-1.5 ${
               activeTab === 'settings'
                 ? 'bg-emerald-500 text-slate-950 font-black shadow-sm'
@@ -1353,9 +1353,9 @@ export default function SuperAdminPage() {
           </button>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-2 min-w-0">
           {/* Theme & 7-Language Bar */}
-          <ThemeLanguageBar variant="admin" />
+          <ThemeLanguageBar variant="admin" className="flex-wrap" />
 
           {/* Live Status indicator */}
           <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-slate-950/80 border border-slate-800 rounded-full text-xs">
@@ -1385,11 +1385,11 @@ export default function SuperAdminPage() {
       </header>
 
       {/* Mobile Tab Switcher */}
-      <div className="md:hidden px-4 pt-4">
-        <div className="grid grid-cols-5 gap-1 bg-slate-900 border border-slate-800 p-1 rounded-xl">
+      <div className="2xl:hidden px-4 pt-4 min-w-0">
+        <div className="flex overflow-x-auto gap-1 bg-slate-900 border border-slate-800 p-1 rounded-xl">
           <button
-            onClick={() => setActiveTab('stores')}
-            className={`py-2 text-[11px] font-bold rounded-lg transition-all flex items-center justify-center gap-1 ${
+            data-admin-tab="stores" onClick={() => setActiveTab('stores')}
+            className={`px-3 py-2 shrink-0 text-[11px] font-bold rounded-lg transition-all flex items-center justify-center gap-1 ${
               activeTab === 'stores'
                 ? 'bg-emerald-500 text-slate-950 font-black'
                 : 'text-slate-400 hover:text-white'
@@ -1399,8 +1399,8 @@ export default function SuperAdminPage() {
             <span>المتاجر</span>
           </button>
           <button
-            onClick={() => setActiveTab('subscriptions')}
-            className={`py-2 text-[11px] font-bold rounded-lg transition-all flex items-center justify-center gap-1 relative ${
+            data-admin-tab="subscriptions" onClick={() => setActiveTab('subscriptions')}
+            className={`px-3 py-2 shrink-0 text-[11px] font-bold rounded-lg transition-all flex items-center justify-center gap-1 relative ${
               activeTab === 'subscriptions'
                 ? 'bg-emerald-500 text-slate-950 font-black'
                 : 'text-slate-400 hover:text-white'
@@ -1415,8 +1415,8 @@ export default function SuperAdminPage() {
             )}
           </button>
           <button
-            onClick={() => setActiveTab('pricing')}
-            className={`py-2 text-[11px] font-bold rounded-lg transition-all flex items-center justify-center gap-1 ${
+            data-admin-tab="pricing" onClick={() => setActiveTab('pricing')}
+            className={`px-3 py-2 shrink-0 text-[11px] font-bold rounded-lg transition-all flex items-center justify-center gap-1 ${
               activeTab === 'pricing'
                 ? 'bg-emerald-500 text-slate-950 font-black'
                 : 'text-slate-400 hover:text-white'
@@ -1426,8 +1426,8 @@ export default function SuperAdminPage() {
             <span>الأسعار</span>
           </button>
           <button
-            onClick={() => setActiveTab('gateways')}
-            className={`py-2 text-[11px] font-bold rounded-lg transition-all flex items-center justify-center gap-1 ${
+            data-admin-tab="gateways" onClick={() => setActiveTab('gateways')}
+            className={`px-3 py-2 shrink-0 text-[11px] font-bold rounded-lg transition-all flex items-center justify-center gap-1 ${
               activeTab === 'gateways'
                 ? 'bg-emerald-500 text-slate-950 font-black'
                 : 'text-slate-400 hover:text-white'
@@ -1437,8 +1437,8 @@ export default function SuperAdminPage() {
             <span>المحافظ</span>
           </button>
           <button
-            onClick={() => setActiveTab('settings')}
-            className={`py-2 text-[11px] font-bold rounded-lg transition-all flex items-center justify-center gap-1 ${
+            data-admin-tab="settings" onClick={() => setActiveTab('settings')}
+            className={`px-3 py-2 shrink-0 text-[11px] font-bold rounded-lg transition-all flex items-center justify-center gap-1 ${
               activeTab === 'settings'
                 ? 'bg-emerald-500 text-slate-950 font-black'
                 : 'text-slate-400 hover:text-white'

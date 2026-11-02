@@ -1,5 +1,7 @@
 'use client';
 
+import { useDialog } from '@/hooks/useDialog';
+
 import { useEffect, useState } from 'react';
 import { api } from '@/lib/api';
 import { StoreCoupon } from '@/types';
@@ -66,16 +68,7 @@ export default function DashboardCouponsPage() {
   }, []);
 
   // Lock body scroll when coupon create modal is open
-  useEffect(() => {
-    if (isModalOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
-    }
-    return () => {
-      document.body.style.overflow = '';
-    };
-  }, [isModalOpen]);
+  const dialogRef = useDialog(isModalOpen, () => { if (!isSubmitting) setIsModalOpen(false); });
 
   const handleCopyCode = (code: string) => {
     navigator.clipboard.writeText(code);
@@ -371,26 +364,26 @@ export default function DashboardCouponsPage() {
       ) : (
         <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm">
           <div className="overflow-x-auto">
-            <table className="w-full text-right text-xs">
-              <thead className="bg-slate-50 dark:bg-slate-800/80 border-b border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 font-bold">
-                <tr>
-                  <th className="p-4">كود الخصم</th>
-                  <th className="p-4">نوع وقيمة الخصم</th>
-                  <th className="p-4">مرات الاستخدام</th>
-                  <th className="p-4">تاريخ الانتهاء</th>
-                  <th className="p-4">الحالة</th>
-                  <th className="p-4 text-center">الإجراءات</th>
+            <table role="table" className="ws-mobile-cards w-full text-right text-xs">
+              <thead role="rowgroup" className="bg-slate-50 dark:bg-slate-800/80 border-b border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 font-bold">
+                <tr role="row">
+                  <th role="columnheader" scope="col" className="p-4">كود الخصم</th>
+                  <th role="columnheader" scope="col" className="p-4">نوع وقيمة الخصم</th>
+                  <th role="columnheader" scope="col" className="p-4">مرات الاستخدام</th>
+                  <th role="columnheader" scope="col" className="p-4">تاريخ الانتهاء</th>
+                  <th role="columnheader" scope="col" className="p-4">الحالة</th>
+                  <th role="columnheader" scope="col" className="p-4 text-center">الإجراءات</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+              <tbody role="rowgroup" className="divide-y divide-slate-100 dark:divide-slate-800">
                 {filteredCoupons.map((coupon) => {
                   const isExpired = coupon.expiryDate && new Date(coupon.expiryDate) < new Date();
                   const isMaxReached = coupon.usageLimit && coupon.timesUsed >= coupon.usageLimit;
 
                   return (
-                    <tr key={coupon.id} className="hover:bg-slate-50/70 dark:hover:bg-slate-800/50 transition-colors">
+                    <tr role="row" key={coupon.id} className="hover:bg-slate-50/70 dark:hover:bg-slate-800/50 transition-colors">
                       {/* Code */}
-                      <td className="p-4">
+                      <td role="cell" data-label={language === 'ar' ? "الكود" : "Code"} className="p-4">
                         <div className="flex items-center gap-2">
                           <span className="font-mono font-black text-sm text-slate-900 dark:text-white bg-slate-100 dark:bg-slate-800 px-2.5 py-1 rounded-lg border border-slate-200 dark:border-slate-700 tracking-wider">
                             {coupon.code}
@@ -411,7 +404,7 @@ export default function DashboardCouponsPage() {
                       </td>
 
                       {/* Discount Value */}
-                      <td className="p-4 font-bold text-slate-800 dark:text-slate-200">
+                      <td role="cell" data-label={language === 'ar' ? "الخصم" : "Discount"} className="p-4 font-bold text-slate-800 dark:text-slate-200">
                         {coupon.discountType === 'Percentage' ? (
                           <span className="inline-flex items-center gap-1 text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200">
                             <Percent className="w-3.5 h-3.5" />
@@ -426,7 +419,7 @@ export default function DashboardCouponsPage() {
                       </td>
 
                       {/* Usage */}
-                      <td className="p-4">
+                      <td role="cell" data-label={language === 'ar' ? "الاستخدام" : "Usage"} className="p-4">
                         <div className="space-y-0.5">
                           <div className="font-bold text-slate-800 dark:text-slate-200">
                             {coupon.timesUsed} {coupon.usageLimit ? `من ${coupon.usageLimit}` : 'استخدام'}
@@ -445,7 +438,7 @@ export default function DashboardCouponsPage() {
                       </td>
 
                       {/* Expiry */}
-                      <td className="p-4 text-slate-600 dark:text-slate-400">
+                      <td role="cell" data-label={language === 'ar' ? "الانتهاء" : "Expiry"} className="p-4 text-slate-600 dark:text-slate-400">
                         {coupon.expiryDate ? (
                           <div className="space-y-0.5">
                             <span className={`block font-medium ${isExpired ? 'text-rose-600 line-through' : 'text-slate-700'}`}>
@@ -461,7 +454,7 @@ export default function DashboardCouponsPage() {
                       </td>
 
                       {/* Status */}
-                      <td className="p-4">
+                      <td role="cell" data-label={language === 'ar' ? "الحالة" : "Status"} className="p-4">
                         {coupon.isActive ? (
                           isExpired ? (
                             <span className="inline-flex items-center gap-1 text-[11px] font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded-full border border-amber-200">
@@ -484,7 +477,7 @@ export default function DashboardCouponsPage() {
                       </td>
 
                       {/* Actions */}
-                      <td className="p-4 text-center">
+                      <td role="cell" data-label={language === 'ar' ? "الإجراءات" : "Actions"} className="p-4 text-center">
                         <div className="flex items-center justify-center gap-2">
                           <button
                             type="button"
@@ -526,10 +519,10 @@ export default function DashboardCouponsPage() {
       {isModalOpen && (
         <div 
           className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 backdrop-blur-sm p-4 animate-fadeIn"
-          onClick={() => setIsModalOpen(false)}
+          onClick={() => { if (!isSubmitting) setIsModalOpen(false); }}
         >
-          <div 
-            className="w-full max-w-lg bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden"
+          <div ref={dialogRef} role="dialog" aria-modal="true" aria-label={language === 'ar' ? "إنشاء كود خصم" : "Create coupon"} tabIndex={-1}
+            className="ws-dialog w-full max-w-lg bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-800"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Modal Header */}
@@ -544,7 +537,7 @@ export default function DashboardCouponsPage() {
                 </div>
               </div>
               <button
-                onClick={() => setIsModalOpen(false)}
+                onClick={() => { if (!isSubmitting) setIsModalOpen(false); }}
                 className="w-10 h-10 min-w-[44px] min-h-[44px] rounded-full bg-white dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-500 dark:text-slate-400 flex items-center justify-center border border-slate-200 dark:border-slate-700 transition-colors"
                 title="إغلاق النافذة"
                 aria-label="إغلاق النافذة"
@@ -630,10 +623,10 @@ export default function DashboardCouponsPage() {
               {/* Usage Limit & Expiry */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
+                  <label htmlFor="coupons-field-1" className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
                     الحد الأقصى للاستخدام (اختياري)
                   </label>
-                  <input
+                  <input id="coupons-field-1"
                     type="number"
                     min="1"
                     value={formUsageLimit}
@@ -644,10 +637,10 @@ export default function DashboardCouponsPage() {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
+                  <label htmlFor="coupons-field-2" className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
                     تاريخ انتهاء الكوبون (اختياري)
                   </label>
-                  <input
+                  <input id="coupons-field-2"
                     type="date"
                     value={formExpiryDate}
                     onChange={(e) => setFormExpiryDate(e.target.value)}
@@ -673,7 +666,7 @@ export default function DashboardCouponsPage() {
               <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-end gap-2">
                 <button
                   type="button"
-                  onClick={() => setIsModalOpen(false)}
+                  onClick={() => { if (!isSubmitting) setIsModalOpen(false); }}
                   className="px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 text-xs font-bold transition-colors"
                 >
                   إلغاء

@@ -29,27 +29,27 @@ export default function Footer() {
           </div>
 
           <div>
-            <h4 className="text-white font-bold text-sm mb-4">
+            <h2 className="text-white font-bold text-sm mb-4">
               {t('footer.quick_links', undefined, 'روابط سريعة')}
-            </h4>
+            </h2>
             <ul className="space-y-2 text-sm">
               <li>
-                <Link href="/#features" className="hover:text-emerald-400 transition-colors">
+                <Link prefetch={false} href="/#features" className="hover:text-emerald-400 transition-colors">
                   {t('footer.link_features', undefined, 'المميزات والخصائص')}
                 </Link>
               </li>
               <li>
-                <Link href="/#pricing" className="hover:text-emerald-400 transition-colors">
+                <Link prefetch={false} href="/#pricing" className="hover:text-emerald-400 transition-colors">
                   {t('footer.link_pricing', undefined, 'باقات الأسعار')}
                 </Link>
               </li>
               <li>
-                <Link href="/directory" className="hover:text-emerald-400 transition-colors">
+                <Link prefetch={false} href="/directory" className="hover:text-emerald-400 transition-colors">
                   {t('footer.link_directory', undefined, 'دليل المتاجر في المحافظات')}
                 </Link>
               </li>
               <li>
-                <Link href="/s/al-amal-fashion" className="hover:text-emerald-400 transition-colors">
+                <Link prefetch={false} href="/s/al-amal-fashion" className="hover:text-emerald-400 transition-colors">
                   {t('footer.link_demo', undefined, 'معاينة المتجر التجريبي')}
                 </Link>
               </li>
@@ -57,22 +57,22 @@ export default function Footer() {
           </div>
 
           <div>
-            <h4 className="text-white font-bold text-sm mb-4">
+            <h2 className="text-white font-bold text-sm mb-4">
               {t('footer.merchant_portals', undefined, 'بوابات التجار')}
-            </h4>
+            </h2>
             <ul className="space-y-2 text-sm">
               <li>
-                <Link href="/register" className="hover:text-emerald-400 transition-colors">
+                <Link prefetch={false} href="/register" className="hover:text-emerald-400 transition-colors">
                   {t('footer.link_register', undefined, 'تسجيل متجر جديد')}
                 </Link>
               </li>
               <li>
-                <Link href="/login" className="hover:text-emerald-400 transition-colors">
+                <Link prefetch={false} href="/login" className="hover:text-emerald-400 transition-colors">
                   {t('footer.link_login', undefined, 'تسجيل دخول لوحة التحكم')}
                 </Link>
               </li>
               <li>
-                <Link href="/dashboard" className="hover:text-emerald-400 transition-colors">
+                <Link prefetch={false} href="/dashboard" className="hover:text-emerald-400 transition-colors">
                   {t('footer.link_dashboard', undefined, 'إدارة الكتالوج والطلبات')}
                 </Link>
               </li>
@@ -80,9 +80,9 @@ export default function Footer() {
           </div>
 
           <div>
-            <h4 className="text-white font-bold text-sm mb-4">
+            <h2 className="text-white font-bold text-sm mb-4">
               {t('footer.support_title', undefined, 'تواصل ودعم فني Masar Tech')}
-            </h4>
+            </h2>
             <p className="text-sm text-slate-400 dark:text-slate-400 leading-relaxed mb-4">
               {t('footer.support_desc', undefined, 'فريق الدعم الفني وإدارة المنصة في خدمتكم لتفعيل باقات Pro/VIP والمساعدة في إعداد المتاجر.')}
             </p>
@@ -91,7 +91,7 @@ export default function Footer() {
                 href="https://wa.me/201011653619"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-sm font-bold transition-colors w-full justify-center shadow-md shadow-emerald-600/20"
+                className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl text-sm font-bold transition-colors w-full justify-center shadow-md shadow-emerald-600/20"
               >
                 <MessageCircle className="w-4 h-4" />
                 <span>{t('footer.whatsapp_support', undefined, 'واتساب الدعم: 01011653619')}</span>
