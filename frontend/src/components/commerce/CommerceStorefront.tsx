@@ -64,6 +64,7 @@ export default function CommerceStorefront({
   const [reviewBusy, setReviewBusy] = useState(false);
 
   const cartKey = `watsstore_cart_${store.slug}`;
+  const productHref = (item: Product) => `/s/${encodeURIComponent(store.slug)}/p/${encodeURIComponent(item.slug)}${previewTheme && !preview ? `?theme=${encodeURIComponent(previewTheme)}` : ''}`;
 
   useEffect(() => {
     if (cartOpen) setCartLoaded(true);
@@ -155,7 +156,7 @@ export default function CommerceStorefront({
     if (!p.isAvailable || store.isTrialExpired) return;
     if (p.variantsJson && p.variantsJson !== '[]' && p.variantsJson !== '{}') {
       if (preview) setPreviewDetail(p);
-      else router.push(`/s/${encodeURIComponent(store.slug)}/p/${encodeURIComponent(p.slug)}`);
+      else router.push(productHref(p));
       return;
     }
     const currentItem = items.find((x) => x.product.id === p.id && Object.keys(x.selectedVariants).length === 0);
@@ -333,6 +334,7 @@ export default function CommerceStorefront({
             english={english}
             disabled={!!store.isTrialExpired}
             add={add}
+            themeQuery={previewTheme && !preview ? previewTheme : undefined}
           />
         ) : (
           <>
@@ -490,7 +492,7 @@ export default function CommerceStorefront({
                           <Link
                             prefetch={false}
                             className="ws-product-image"
-                            href={preview ? '#product-details' : `/s/${encodeURIComponent(store.slug)}/p/${encodeURIComponent(p.slug)}`}
+                            href={preview ? '#product-details' : productHref(p)}
                             onClick={(event) => {
                               if (preview) {
                                 event.preventDefault();
@@ -534,12 +536,12 @@ export default function CommerceStorefront({
 
                           <div className="ws-product-info">
                             <h3>
-                              <Link prefetch={false} href={preview ? '#product-details' : `/s/${encodeURIComponent(store.slug)}/p/${encodeURIComponent(p.slug)}`} onClick={preview ? (event) => { event.preventDefault(); setPreviewDetail(p); } : undefined}>{p.name}</Link>
+                              <Link prefetch={false} href={preview ? '#product-details' : productHref(p)} onClick={preview ? (event) => { event.preventDefault(); setPreviewDetail(p); } : undefined}>{p.name}</Link>
                             </h3>
                             <Link
                               prefetch={false}
                               className="ws-product-page-link"
-                              href={preview ? '#product-details' : `/s/${encodeURIComponent(store.slug)}/p/${encodeURIComponent(p.slug)}`}
+                              href={preview ? '#product-details' : productHref(p)}
                               onClick={preview ? (e) => { e.preventDefault(); setPreviewDetail(p); } : undefined}
                               style={{ fontSize: '11px', color: 'var(--ws-accent)', fontWeight: 600, textDecoration: 'none' }}
                             >
