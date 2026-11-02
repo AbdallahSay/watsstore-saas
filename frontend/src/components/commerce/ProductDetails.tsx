@@ -9,10 +9,12 @@ import { Product, ProductVariantGroup, Store } from '@/types';
 interface Props {
   store: Store; product: Product; english: boolean; disabled: boolean;
   add: (product: Product, quantity: number, variants: Record<string, string>, buyNow?: boolean) => void;
+  themeQuery?: string;
 }
 
-export default function ProductDetails({ store, product, english, disabled, add }: Props) {
+export default function ProductDetails({ store, product, english, disabled, add, themeQuery }: Props) {
   const tr = (ar: string, en: string) => english ? en : ar;
+  const themeSuffix = themeQuery ? `?theme=${encodeURIComponent(themeQuery)}` : '';
   const groups = useMemo<ProductVariantGroup[]>(() => {
     try {
       const parsed: unknown = JSON.parse(product.variantsJson || '[]');
@@ -36,7 +38,7 @@ export default function ProductDetails({ store, product, english, disabled, add 
   const money = (value: number) => `${value.toLocaleString(english ? 'en-EG' : 'ar-EG')} ${store.currency}`;
   const related = store.products.filter(p => p.id !== product.id && p.isAvailable && p.categoryId === product.categoryId).slice(0, 4);
   return <>
-    <nav className="ws-product-breadcrumb" aria-label={tr('مسار التصفح', 'Breadcrumb')}><Link prefetch={false} href={`/s/${store.slug}`}>{store.storeName}</Link><span aria-hidden="true"> / </span><span>{product.name}</span></nav>
+    <nav className="ws-product-breadcrumb" aria-label={tr('مسار التصفح', 'Breadcrumb')}><Link prefetch={false} href={`/s/${encodeURIComponent(store.slug)}${themeSuffix}`}>{store.storeName}</Link><span aria-hidden="true"> / </span><span>{product.name}</span></nav>
     <section className="ws-product-detail" aria-labelledby="product-title">
       <div className="ws-product-gallery">
         {images.length ? <StoreImage sizes="(max-width: 767px) 100vw, 55vw" className="ws-product-main-image" src={images[active]} alt={product.name} width="900" height="1000" fetchPriority="high"/> : <div className="ws-empty-art">{product.name}</div>}
@@ -70,7 +72,7 @@ export default function ProductDetails({ store, product, english, disabled, add 
         {product.description && <p className="ws-product-description">{product.description}</p>}
       </div>
     </section>
-    {!!related.length && <section className="ws-related"><h2>{tr('من نفس المجموعة', 'From the same collection')}</h2><div className="ws-product-grid">{related.map(p => <article className="ws-product-card" key={p.id}><Link prefetch={false} href={`/s/${encodeURIComponent(store.slug)}/p/${encodeURIComponent(p.slug)}`}>{p.imageUrl && <StoreImage sizes="(max-width: 767px) 50vw, 25vw" src={p.imageUrl} alt={p.name} loading="lazy" width="400" height="500"/>}<h3>{p.name}</h3><p>{money(p.price)}</p></Link></article>)}</div></section>}
+    {!!related.length && <section className="ws-related"><h2>{tr('من نفس المجموعة', 'From the same collection')}</h2><div className="ws-product-grid">{related.map(p => <article className="ws-product-card" key={p.id}><Link prefetch={false} href={`/s/${encodeURIComponent(store.slug)}/p/${encodeURIComponent(p.slug)}${themeSuffix}`}>{p.imageUrl && <StoreImage sizes="(max-width: 767px) 50vw, 25vw" src={p.imageUrl} alt={p.name} loading="lazy" width="400" height="500"/>}<h3>{p.name}</h3><p>{money(p.price)}</p></Link></article>)}</div></section>}
   </>;
 }
 
