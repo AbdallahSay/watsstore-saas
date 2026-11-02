@@ -1,0 +1,23 @@
+{
+  "scope": "isolated localhost fixtures only",
+  "verifiedSource": "64eabf73eb5630aedbdfa9fde1c63d278eaf2855",
+  "merchantDrawerResize": {
+    "viewportChange": "390x844 to 844x390",
+    "before": { "bodyOverflow": "hidden", "visibleDialogs": 0 },
+    "after": { "bodyOverflow": "unset", "visibleDialogs": 0 },
+    "status": "PASS: hidden desktop drawer releases the page scroll lock"
+  },
+  "adminPlanDialog": {
+    "viewport": "390x420",
+    "before": { "dialogRoles": 0, "headingVisibleAfterEscape": true },
+    "after": { "dialogRoles": 1, "headingVisibleAfterEscape": false },
+    "keyboardPlanSelection": "VIP is selectable with Enter without saving",
+    "status": "PASS: six editor/drawer cases across applicable requested widths and 900/420px heights"
+  },
+  "imageUpload": {
+    "selection": "real file chooser opened by keyboard Enter",
+    "uploadedAssetHttpStatus": 200,
+    "database": "isolated SQLite",
+    "productionDataWritten": false
+  }
+}
