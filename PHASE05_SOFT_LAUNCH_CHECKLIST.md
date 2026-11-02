@@ -10,7 +10,7 @@ Release decision: **HOLD full production soft launch** pending the gates below. 
 | Backend capability | Deployed revision and real SQL draft/publish/restore round-trip | **NOT DEPLOYED** |
 | Five merchants / five customers | Actual observations and times | **NOT RUN** |
 | Physical iPhone, Android, tablet, Edge | Native input, safe areas, text sizing and shopping results | **NOT RUN** |
-| Performance | Repeated lab values; disclose misses; field INP if available | Final report; no field INP |
+| Performance | Repeated lab values; disclose misses; field INP if available | **Target NOT MET**: applied landing/setup LCP and simulated LCP/CLS misses; no field INP |
 | Push notifications | Reliable host, secure VAPID, closed-page receipt, dedup/unsubscribe/recovery | **DISABLED / UNVERIFIED**, independent PR34 |
 
 ## Safe release sequence

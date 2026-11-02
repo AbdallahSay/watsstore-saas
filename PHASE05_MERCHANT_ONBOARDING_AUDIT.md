@@ -1,6 +1,6 @@
 # Phase 05 merchant onboarding audit
 
-Application revision under test: `0ba852ede74f614ad5d5f73d364fd1d86ed67dc2`. Final release status and CI: [release report](PHASE05_FINAL_RELEASE_REPORT.md).
+Application revision: `2426469137ba8fb50e6d97448e26dee390dbef15`. Final release status and CI: [release report](PHASE05_FINAL_RELEASE_REPORT.md).
 
 ## Existing behavior and gaps
 
@@ -13,6 +13,7 @@ Registration already created one tenant and account. Products, uploads, categori
 - Existing payment accounts, fees, pixels and delivery configuration survive information-only updates. First-product navigation opens the existing product editor with its quota/default-category checks.
 - Clear links for product, category, inventory, orders, theme preview and support; return guidance from existing editors. Store copy/share handles clipboard failure.
 - Registration has a synchronous submission lock, associated field labels, a 30-second timeout and login recovery after an uncertain result. It does not automatically repeat an uncertain account creation.
+- Successful JSON must contain nonempty token, store ID, store name and slug before session storage or success UI. A structurally incomplete response is uncertain, even with HTTP 200.
 - Removed unsupported certification, safety and material claims from theme decoration. Catalog/category facts replace invented trust badges.
 
 ## Verification

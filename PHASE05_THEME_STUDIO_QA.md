@@ -12,7 +12,7 @@ Merchant APIs return `themeStateVersion: 1`, `publishedAt` and editing capabilit
 
 ## Tests
 
-- Ten themes × three mobile dashboard widths × three browser engines, real inner-frame controls, mobile/desktop switch and inner width assertion.
+- Ten themes × two mobile dashboard widths (320/390 px) × three browser engines: **60 preview cases**, plus **10 draft/publish/restore cases**. Real inner-frame controls, mobile/desktop switch and inner width assertion.
 - Actual draft/save/publish/restore lifecycle and public store match in the isolated backend.
 - Five independent newly registered sector merchants publish and restore while order/stock state stays intact.
 - Preview product/cart actions do not create orders, persist bags/history, post reviews or send advertising events.
@@ -21,5 +21,6 @@ Merchant APIs return `themeStateVersion: 1`, `publishedAt` and editing capabilit
 
 ![Before: theme studio](docs/evidence/phase05/before-themes.png)
 ![After: mobile setup design entry](docs/evidence/phase05/after-design.png)
+![Actual mobile viewport inside merchant preview](docs/evidence/phase05/after-preview.png)
 
 Final outcomes: [release report](PHASE05_FINAL_RELEASE_REPORT.md). Production backend capability and SQL Server round-trip remain unverified. Do not enable publishing merely because a local preview or `/health` works.

@@ -2,6 +2,8 @@
 
 This document distinguishes automated CSS viewports from physical hardware.
 
+The final local serial regression passed: 216 responsive contexts / 3,888 width measurements, 30 published-theme native journeys, 60 previews plus 10 publish lifecycles, 12 setup contexts, five automated sector pilots and 18 text-size/delayed-API stress cases. Axe found zero violations in 60 cases, but **44 cases have incomplete checks** retained in `docs/evidence/phase05/accessibility.json` for manual review. Automated results are not universal accessibility certification.
+
 | Coverage | Environment | Status |
 |---|---|---|
 | Chromium, Firefox, WebKit | Playwright desktop binaries; localhost production Next build + isolated API | See final automated results |

@@ -1,0 +1,243 @@
+{
+  "site": "https://watsstore.vercel.app",
+  "verifiedAt": "2026-11-02T16:31:48.973Z",
+  "readOnly": true,
+  "results": [
+    {
+      "engine": "chrome",
+      "language": "ar",
+      "status": "PASS",
+      "store": "a9",
+      "configuredCheckoutMode": "whatsapp",
+      "orderRequests": 0,
+      "blockedOtherWrites": [],
+      "optimizedImageResponses": [
+        {
+          "status": 200,
+          "type": "image/webp",
+          "bytes": "7280"
+        },
+        {
+          "status": 200,
+          "type": "image/webp",
+          "bytes": "4728"
+        },
+        {
+          "status": 200,
+          "type": "image/webp",
+          "bytes": "6540"
+        },
+        {
+          "status": 200,
+          "type": "image/webp",
+          "bytes": "8636"
+        },
+        {
+          "status": 200,
+          "type": "image/webp",
+          "bytes": "13334"
+        }
+      ]
+    },
+    {
+      "engine": "chrome",
+      "language": "en",
+      "status": "PASS",
+      "store": "a9",
+      "configuredCheckoutMode": "whatsapp",
+      "orderRequests": 0,
+      "blockedOtherWrites": [],
+      "optimizedImageResponses": [
+        {
+          "status": 200,
+          "type": "image/webp",
+          "bytes": "7280"
+        },
+        {
+          "status": 200,
+          "type": "image/webp",
+          "bytes": "8636"
+        },
+        {
+          "status": 200,
+          "type": "image/webp",
+          "bytes": "6540"
+        },
+        {
+          "status": 200,
+          "type": "image/webp",
+          "bytes": "4728"
+        },
+        {
+          "status": 200,
+          "type": "image/webp",
+          "bytes": "13334"
+        }
+      ]
+    },
+    {
+      "engine": "firefox",
+      "language": "ar",
+      "status": "PASS",
+      "store": "a9",
+      "configuredCheckoutMode": "whatsapp",
+      "orderRequests": 0,
+      "blockedOtherWrites": [],
+      "optimizedImageResponses": [
+        {
+          "status": 200,
+          "type": "image/webp",
+          "bytes": "7280"
+        },
+        {
+          "status": 200,
+          "type": "image/webp",
+          "bytes": "6540"
+        },
+        {
+          "status": 200,
+          "type": "image/webp",
+          "bytes": "4728"
+        },
+        {
+          "status": 200,
+          "type": "image/webp",
+          "bytes": "13334"
+        }
+      ]
+    },
+    {
+      "engine": "firefox",
+      "language": "en",
+      "status": "PASS",
+      "store": "a9",
+      "configuredCheckoutMode": "whatsapp",
+      "orderRequests": 0,
+      "blockedOtherWrites": [],
+      "optimizedImageResponses": [
+        {
+          "status": 200,
+          "type": "image/webp",
+          "bytes": "7280"
+        },
+        {
+          "status": 200,
+          "type": "image/webp",
+          "bytes": "4728"
+        },
+        {
+          "status": 200,
+          "type": "image/webp",
+          "bytes": "6540"
+        },
+        {
+          "status": 200,
+          "type": "image/webp",
+          "bytes": "13334"
+        }
+      ]
+    },
+    {
+      "engine": "webkit",
+      "language": "ar",
+      "status": "PASS",
+      "store": "a9",
+      "configuredCheckoutMode": "whatsapp",
+      "orderRequests": 0,
+      "blockedOtherWrites": [],
+      "optimizedImageResponses": [
+        {
+          "status": 200,
+          "type": "image/webp",
+          "bytes": "7280"
+        },
+        {
+          "status": 200,
+          "type": "image/webp",
+          "bytes": "4728"
+        },
+        {
+          "status": 200,
+          "type": "image/webp",
+          "bytes": "6540"
+        },
+        {
+          "status": 200,
+          "type": "image/webp",
+          "bytes": "8636"
+        },
+        {
+          "status": 200,
+          "type": "image/webp",
+          "bytes": "12502"
+        },
+        {
+          "status": 200,
+          "type": "image/webp",
+          "bytes": "15370"
+        },
+        {
+          "status": 200,
+          "type": "image/webp",
+          "bytes": "8192"
+        },
+        {
+          "status": 200,
+          "type": "image/webp",
+          "bytes": "13334"
+        }
+      ]
+    },
+    {
+      "engine": "webkit",
+      "language": "en",
+      "status": "PASS",
+      "store": "a9",
+      "configuredCheckoutMode": "whatsapp",
+      "orderRequests": 0,
+      "blockedOtherWrites": [],
+      "optimizedImageResponses": [
+        {
+          "status": 200,
+          "type": "image/webp",
+          "bytes": "7280"
+        },
+        {
+          "status": 200,
+          "type": "image/webp",
+          "bytes": "6540"
+        },
+        {
+          "status": 200,
+          "type": "image/webp",
+          "bytes": "8636"
+        },
+        {
+          "status": 200,
+          "type": "image/webp",
+          "bytes": "4728"
+        },
+        {
+          "status": 200,
+          "type": "image/webp",
+          "bytes": "12502"
+        },
+        {
+          "status": 200,
+          "type": "image/webp",
+          "bytes": "15370"
+        },
+        {
+          "status": 200,
+          "type": "image/webp",
+          "bytes": "8192"
+        },
+        {
+          "status": 200,
+          "type": "image/webp",
+          "bytes": "13334"
+        }
+      ]
+    }
+  ]
+}

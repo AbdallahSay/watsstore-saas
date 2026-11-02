@@ -1,0 +1,642 @@
+[
+  {
+    "name": "landing",
+    "appearance": "light",
+    "language": "ar",
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "color-contrast",
+        "nodes": 16
+      }
+    ]
+  },
+  {
+    "name": "setup",
+    "appearance": "light",
+    "language": "ar",
+    "violations": [],
+    "incomplete": []
+  },
+  {
+    "name": "register",
+    "appearance": "light",
+    "language": "ar",
+    "violations": [],
+    "incomplete": []
+  },
+  {
+    "name": "studio",
+    "appearance": "light",
+    "language": "ar",
+    "violations": [],
+    "incomplete": []
+  },
+  {
+    "name": "products",
+    "appearance": "light",
+    "language": "ar",
+    "violations": [],
+    "incomplete": []
+  },
+  {
+    "name": "store-editorial-luxe",
+    "appearance": "light",
+    "language": "ar",
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "color-contrast",
+        "nodes": 2
+      }
+    ]
+  },
+  {
+    "name": "store-street-pulse",
+    "appearance": "light",
+    "language": "ar",
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "color-contrast",
+        "nodes": 4
+      }
+    ]
+  },
+  {
+    "name": "store-pure-beauty",
+    "appearance": "light",
+    "language": "ar",
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "color-contrast",
+        "nodes": 4
+      }
+    ]
+  },
+  {
+    "name": "store-tech-grid",
+    "appearance": "light",
+    "language": "ar",
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "color-contrast",
+        "nodes": 2
+      }
+    ]
+  },
+  {
+    "name": "store-fresh-market",
+    "appearance": "light",
+    "language": "ar",
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "color-contrast",
+        "nodes": 2
+      }
+    ]
+  },
+  {
+    "name": "store-living-space",
+    "appearance": "light",
+    "language": "ar",
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "color-contrast",
+        "nodes": 2
+      }
+    ]
+  },
+  {
+    "name": "store-golden-atelier",
+    "appearance": "light",
+    "language": "ar",
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "color-contrast",
+        "nodes": 2
+      }
+    ]
+  },
+  {
+    "name": "store-active-motion",
+    "appearance": "light",
+    "language": "ar",
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "color-contrast",
+        "nodes": 2
+      }
+    ]
+  },
+  {
+    "name": "store-little-joy",
+    "appearance": "light",
+    "language": "ar",
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "color-contrast",
+        "nodes": 2
+      }
+    ]
+  },
+  {
+    "name": "store-crafted-story",
+    "appearance": "light",
+    "language": "ar",
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "color-contrast",
+        "nodes": 2
+      }
+    ]
+  },
+  {
+    "name": "landing",
+    "appearance": "light",
+    "language": "en",
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "color-contrast",
+        "nodes": 16
+      }
+    ]
+  },
+  {
+    "name": "setup",
+    "appearance": "light",
+    "language": "en",
+    "violations": [],
+    "incomplete": []
+  },
+  {
+    "name": "register",
+    "appearance": "light",
+    "language": "en",
+    "violations": [],
+    "incomplete": []
+  },
+  {
+    "name": "studio",
+    "appearance": "light",
+    "language": "en",
+    "violations": [],
+    "incomplete": []
+  },
+  {
+    "name": "products",
+    "appearance": "light",
+    "language": "en",
+    "violations": [],
+    "incomplete": []
+  },
+  {
+    "name": "store-editorial-luxe",
+    "appearance": "light",
+    "language": "en",
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "color-contrast",
+        "nodes": 2
+      }
+    ]
+  },
+  {
+    "name": "store-street-pulse",
+    "appearance": "light",
+    "language": "en",
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "color-contrast",
+        "nodes": 5
+      }
+    ]
+  },
+  {
+    "name": "store-pure-beauty",
+    "appearance": "light",
+    "language": "en",
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "color-contrast",
+        "nodes": 4
+      }
+    ]
+  },
+  {
+    "name": "store-tech-grid",
+    "appearance": "light",
+    "language": "en",
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "color-contrast",
+        "nodes": 2
+      }
+    ]
+  },
+  {
+    "name": "store-fresh-market",
+    "appearance": "light",
+    "language": "en",
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "color-contrast",
+        "nodes": 2
+      }
+    ]
+  },
+  {
+    "name": "store-living-space",
+    "appearance": "light",
+    "language": "en",
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "color-contrast",
+        "nodes": 2
+      }
+    ]
+  },
+  {
+    "name": "store-golden-atelier",
+    "appearance": "light",
+    "language": "en",
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "color-contrast",
+        "nodes": 2
+      }
+    ]
+  },
+  {
+    "name": "store-active-motion",
+    "appearance": "light",
+    "language": "en",
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "color-contrast",
+        "nodes": 2
+      }
+    ]
+  },
+  {
+    "name": "store-little-joy",
+    "appearance": "light",
+    "language": "en",
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "color-contrast",
+        "nodes": 2
+      }
+    ]
+  },
+  {
+    "name": "store-crafted-story",
+    "appearance": "light",
+    "language": "en",
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "color-contrast",
+        "nodes": 2
+      }
+    ]
+  },
+  {
+    "name": "landing",
+    "appearance": "dark",
+    "language": "ar",
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "color-contrast",
+        "nodes": 16
+      }
+    ]
+  },
+  {
+    "name": "setup",
+    "appearance": "dark",
+    "language": "ar",
+    "violations": [],
+    "incomplete": []
+  },
+  {
+    "name": "register",
+    "appearance": "dark",
+    "language": "ar",
+    "violations": [],
+    "incomplete": []
+  },
+  {
+    "name": "studio",
+    "appearance": "dark",
+    "language": "ar",
+    "violations": [],
+    "incomplete": []
+  },
+  {
+    "name": "products",
+    "appearance": "dark",
+    "language": "ar",
+    "violations": [],
+    "incomplete": []
+  },
+  {
+    "name": "store-editorial-luxe",
+    "appearance": "dark",
+    "language": "ar",
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "color-contrast",
+        "nodes": 2
+      }
+    ]
+  },
+  {
+    "name": "store-street-pulse",
+    "appearance": "dark",
+    "language": "ar",
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "color-contrast",
+        "nodes": 4
+      }
+    ]
+  },
+  {
+    "name": "store-pure-beauty",
+    "appearance": "dark",
+    "language": "ar",
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "color-contrast",
+        "nodes": 4
+      }
+    ]
+  },
+  {
+    "name": "store-tech-grid",
+    "appearance": "dark",
+    "language": "ar",
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "color-contrast",
+        "nodes": 2
+      }
+    ]
+  },
+  {
+    "name": "store-fresh-market",
+    "appearance": "dark",
+    "language": "ar",
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "color-contrast",
+        "nodes": 2
+      }
+    ]
+  },
+  {
+    "name": "store-living-space",
+    "appearance": "dark",
+    "language": "ar",
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "color-contrast",
+        "nodes": 2
+      }
+    ]
+  },
+  {
+    "name": "store-golden-atelier",
+    "appearance": "dark",
+    "language": "ar",
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "color-contrast",
+        "nodes": 2
+      }
+    ]
+  },
+  {
+    "name": "store-active-motion",
+    "appearance": "dark",
+    "language": "ar",
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "color-contrast",
+        "nodes": 2
+      }
+    ]
+  },
+  {
+    "name": "store-little-joy",
+    "appearance": "dark",
+    "language": "ar",
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "color-contrast",
+        "nodes": 2
+      }
+    ]
+  },
+  {
+    "name": "store-crafted-story",
+    "appearance": "dark",
+    "language": "ar",
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "color-contrast",
+        "nodes": 2
+      }
+    ]
+  },
+  {
+    "name": "landing",
+    "appearance": "dark",
+    "language": "en",
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "color-contrast",
+        "nodes": 16
+      }
+    ]
+  },
+  {
+    "name": "setup",
+    "appearance": "dark",
+    "language": "en",
+    "violations": [],
+    "incomplete": []
+  },
+  {
+    "name": "register",
+    "appearance": "dark",
+    "language": "en",
+    "violations": [],
+    "incomplete": []
+  },
+  {
+    "name": "studio",
+    "appearance": "dark",
+    "language": "en",
+    "violations": [],
+    "incomplete": []
+  },
+  {
+    "name": "products",
+    "appearance": "dark",
+    "language": "en",
+    "violations": [],
+    "incomplete": []
+  },
+  {
+    "name": "store-editorial-luxe",
+    "appearance": "dark",
+    "language": "en",
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "color-contrast",
+        "nodes": 2
+      }
+    ]
+  },
+  {
+    "name": "store-street-pulse",
+    "appearance": "dark",
+    "language": "en",
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "color-contrast",
+        "nodes": 5
+      }
+    ]
+  },
+  {
+    "name": "store-pure-beauty",
+    "appearance": "dark",
+    "language": "en",
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "color-contrast",
+        "nodes": 4
+      }
+    ]
+  },
+  {
+    "name": "store-tech-grid",
+    "appearance": "dark",
+    "language": "en",
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "color-contrast",
+        "nodes": 2
+      }
+    ]
+  },
+  {
+    "name": "store-fresh-market",
+    "appearance": "dark",
+    "language": "en",
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "color-contrast",
+        "nodes": 2
+      }
+    ]
+  },
+  {
+    "name": "store-living-space",
+    "appearance": "dark",
+    "language": "en",
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "color-contrast",
+        "nodes": 2
+      }
+    ]
+  },
+  {
+    "name": "store-golden-atelier",
+    "appearance": "dark",
+    "language": "en",
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "color-contrast",
+        "nodes": 2
+      }
+    ]
+  },
+  {
+    "name": "store-active-motion",
+    "appearance": "dark",
+    "language": "en",
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "color-contrast",
+        "nodes": 2
+      }
+    ]
+  },
+  {
+    "name": "store-little-joy",
+    "appearance": "dark",
+    "language": "en",
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "color-contrast",
+        "nodes": 2
+      }
+    ]
+  },
+  {
+    "name": "store-crafted-story",
+    "appearance": "dark",
+    "language": "en",
+    "violations": [],
+    "incomplete": [
+      {
+        "id": "color-contrast",
+        "nodes": 2
+      }
+    ]
+  }
+]

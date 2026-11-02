@@ -118,7 +118,7 @@ for (const method of methods)
           method,
           mode: stepIndex<5?"navigation":stepIndex===5||stepIndex===7?"timespan":"snapshot",
           performance:
-            lhr.categories.performance?.score == null
+            stepIndex >= 5 || lhr.categories.performance?.score == null
               ? null
               : lhr.categories.performance.score * 100,
           accessibility:
