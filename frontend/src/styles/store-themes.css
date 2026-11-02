@@ -1638,3 +1638,120 @@
 .ws-checkout-fields legend { font-weight: 700; padding-block: 20px 12px; }
 .ws-checkout-fields, .ws-checkout-review, .ws-cart-items { scroll-margin-top: 20px; }
 .ws-checkout-customer-summary { overflow-wrap: anywhere; }
+
+/* Responsive merchant preview uses its own canvas width rather than window width. */
+.ws-preview-canvas { container: ws-mobile-preview / inline-size; }
+@container ws-mobile-preview (max-width: 767px) {
+  .ws-announcement { font-size: 10px; padding-inline: 4%; }
+  .ws-announcement>span:nth-child(2) { display: none; }
+  .ws-header {
+    min-height: 78px;
+    margin-inline: 4%;
+    gap: 12px;
+    flex-wrap: wrap;
+    padding-block: 12px;
+  }
+  .ws-header nav {
+    order: 3;
+    width: 100%;
+    justify-content: space-between;
+    font-size: 11px;
+    gap: 8px;
+    padding-top: 6px;
+    border-top: 1px solid var(--ws-border);
+  }
+  .ws-brand { font-size: 20px; max-width: 60%; }
+  .ws-brand img { width: 32px; height: 32px; }
+  .ws-bag { font-size: 11px; padding: 6px 12px; min-height: 44px; }
+  .ws-my-orders-link { font-size: 11px; padding: 6px 10px; min-height: 44px; }
+
+  .ws-hero {
+    padding: 24px 4% 36px;
+    grid-template-columns: 1fr;
+    gap: 20px;
+    min-height: auto;
+  }
+  .ws-hero-copy { max-width: none; padding: 0; }
+  .ws-hero h1 { margin: 12px 0; font-size: 22px; }
+  .ws-hero h1 span { font-size: clamp(30px, 8vw, 48px); margin-top: 6px; }
+  .ws-hero-description { font-size: 13px; max-width: none; margin-bottom: 20px !important; }
+  .ws-hero-art>img { min-height: 280px; height: 340px; }
+
+  .ws-theme--street-pulse .ws-hero,
+  .ws-theme--streetwear .ws-hero {
+    min-height: 520px;
+    margin-inline: 0;
+    border-radius: 0;
+  }
+  .ws-theme--street-pulse .ws-hero-copy,
+  .ws-theme--streetwear .ws-hero-copy { padding: 40px 4%; }
+  .ws-theme--street-pulse .ws-hero-art>img,
+  .ws-theme--streetwear .ws-hero-art>img { min-height: 520px; }
+
+  .ws-catalog { padding: 28px 4% 48px; }
+  .ws-section-heading { margin-bottom: 20px; }
+  .ws-section-heading h2, .ws-reviews h2 { font-size: 24px; }
+  .ws-catalog-layout { display: block; }
+  .ws-catalog-sidebar { margin-bottom: 16px; }
+  .ws-catalog-sidebar>.ws-eyebrow { display: none; }
+  .ws-categories {
+    flex-direction: row;
+    gap: 8px;
+    margin: 0;
+    overflow-x: auto;
+    padding-bottom: 8px;
+    -webkit-overflow-scrolling: touch;
+  }
+  .ws-categories button {
+    white-space: nowrap;
+    font-size: 12px;
+    padding: 8px 14px;
+    flex-shrink: 0;
+  }
+  .ws-categories button span { display: none; }
+
+  .ws-filters { gap: 8px; margin-bottom: 16px; }
+  .ws-search { flex-basis: 100%; }
+  .ws-filters>label:not(.ws-search) { font-size: 11px; }
+  .ws-filters select { max-width: 140px; }
+  .ws-max-price input { width: 60px; }
+
+  .ws-product-grid,
+  .ws-grid--compact .ws-product-grid,
+  .ws-grid--spacious .ws-product-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px 12px;
+  }
+  .ws-product-info { padding: 12px; }
+  .ws-product-info h3 { font-size: 12px; }
+  .ws-product-price { font-size: 13px; }
+  .ws-view-product { display: none; }
+
+  .ws-reviews { display: block; margin-inline: 4%; padding-block: 36px; }
+  .ws-review-form { margin-top: 28px; padding: 18px; }
+  .ws-footer {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 32px 4%;
+    gap: 18px;
+  }
+
+  .ws-cart>header { padding: 14px 18px; }
+  .ws-cart-body { padding: 18px; }
+  .ws-checkout input, .ws-checkout select, .ws-checkout textarea {
+    font-size: 16px; /* Prevents auto-zoom on iOS Safari */
+    min-height: 48px;
+    width: 100%;
+  }
+}
+
+
+@container ws-mobile-preview (max-width: 767px) {
+ .ws-product-detail { grid-template-columns: minmax(0,1fr); padding-bottom: 32px; }
+ .ws-product-main-image { max-height: 65dvh; }
+}
+/* Shared text resilience scoped exclusively to storefronts. */
+.ws-storefront :is(.ws-catalog-product,.ws-product-info,.ws-product-detail,.ws-cart-items,.ws-filters,.ws-hero-copy) { min-width:0; }
+.ws-storefront :is(.ws-catalog-product,.ws-product-info,.ws-product-information,.ws-cart-items) :is(h1,h2,h3,p,span,strong,button,a) { overflow-wrap:anywhere; }
+.ws-storefront :is(.ws-primary-action,.ws-secondary-action,.ws-product-actions button,.ws-product-page-link) { min-width:0; max-width:100%; min-height:44px; white-space:normal; overflow-wrap:anywhere; text-align:center; }
+.ws-storefront .ws-product-grid > *, .ws-storefront .ws-product-actions > * { min-width:0; }
