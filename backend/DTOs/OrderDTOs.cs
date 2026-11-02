@@ -53,6 +53,11 @@ namespace WatsStore.Api.DTOs
 
     public class CreateOrderResponse
     {
+        public List<PublicOrderItemSnapshot> Items { get; set; } = new();
+        public string PaymentMethod { get; set; } = "";
+        public string? ShippingSummary { get; set; }
+        public string Currency { get; set; } = "ج.م";
+        public DateTime CreatedAt { get; set; }
         public string? TrackingToken { get; set; }
         public string Status { get; set; } = "Pending";
         public string PaymentStatus { get; set; } = "Unpaid";
@@ -78,5 +83,17 @@ namespace WatsStore.Api.DTOs
         public int Quantity { get; set; }
         public decimal Subtotal { get; set; }
         public Dictionary<string, string>? SelectedVariants { get; set; }
+    }
+
+    public class PublicOrderItemSnapshot
+    {
+        public string ProductName { get; set; } = "";
+        public decimal UnitPrice { get; set; }
+        public int Quantity { get; set; }
+        public decimal Subtotal { get; set; }
+        public Dictionary<string, string>? SelectedVariants { get; set; }
+        public static PublicOrderItemSnapshot From(SavedOrderItemRecord item) => new()
+        { ProductName = item.ProductName, UnitPrice = item.UnitPrice, Quantity = item.Quantity,
+          Subtotal = item.Subtotal, SelectedVariants = item.SelectedVariants };
     }
 }

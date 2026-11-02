@@ -222,6 +222,8 @@ namespace WatsStore.Api.Controllers
 
             return new CreateOrderResponse
             {
+                Items = savedItems.Select(PublicOrderItemSnapshot.From).ToList(), PaymentMethod = order.PaymentMethod,
+                ShippingSummary = order.ShippingSummary, Currency = store.Currency, CreatedAt = order.CreatedAt,
                 OrderId = order.Id, OrderNumber = order.OrderNumber, TrackingToken = order.TrackingToken,
                 Status = order.Status, PaymentStatus = order.PaymentStatus, Subtotal = order.Subtotal,
                 DiscountAmount = order.DiscountAmount, CouponCode = order.CouponCode,
@@ -237,10 +239,13 @@ namespace WatsStore.Api.Controllers
             Response.Headers["Cache-Control"] = "no-store";
             Response.Headers["Referrer-Policy"] = "no-referrer";
             var order = await _db.WhatsAppOrders.AsNoTracking().Where(o => o.TrackingToken == token && o.Store!.Slug == storeSlug && o.Store.IsActive)
-                .Select(o => new { o.OrderNumber, o.Status, o.PaymentStatus, o.ItemsJson, o.Subtotal, o.DiscountAmount, o.DeliveryFee, o.TotalAmount, o.ShippingSummary, o.CreatedAt, o.StoreId, o.Id }).SingleOrDefaultAsync();
+                .Select(o => new { o.OrderNumber, o.Status, o.PaymentStatus, o.PaymentMethod, o.ItemsJson, o.Subtotal, o.DiscountAmount, o.DeliveryFee, o.TotalAmount, o.ShippingSummary, o.CreatedAt, o.StoreId, o.Id, o.Store!.Currency }).SingleOrDefaultAsync();
             if (order == null) return NotFound();
             var history = await _db.OrderHistories.AsNoTracking().Where(x => x.StoreId == order.StoreId && x.OrderId == order.Id).OrderBy(x => x.CreatedAt).Select(x => new { x.Status, x.CreatedAt }).ToListAsync();
-            return Ok(new { order.OrderNumber, order.Status, order.PaymentStatus, items = JsonSerializer.Deserialize<List<SavedOrderItemRecord>>(order.ItemsJson, CommerceRules.Json), order.Subtotal, order.DiscountAmount, order.DeliveryFee, order.TotalAmount, order.ShippingSummary, order.CreatedAt, history });
+            return Ok(new { order.OrderNumber, order.Status, order.PaymentStatus, order.PaymentMethod, order.Currency,
+                items = (JsonSerializer.Deserialize<List<SavedOrderItemRecord>>(order.ItemsJson, CommerceRules.Json) ?? new()).Select(PublicOrderItemSnapshot.From),
+                order.Subtotal, order.DiscountAmount, order.DeliveryFee, order.TotalAmount, order.ShippingSummary, order.CreatedAt,
+                lastUpdatedAt = history.Count > 0 ? history.Max(x => x.CreatedAt) : order.CreatedAt, history });
         }
     }
 }
