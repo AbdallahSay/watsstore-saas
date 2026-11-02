@@ -89,3 +89,15 @@ test('Theme WhatsApp Button classes and variants exist in CSS', () => {
   assert.ok(cssContent.includes('.ws-theme-whatsapp-btn--hidden'), '.ws-theme-whatsapp-btn--hidden must exist');
   assert.ok(cssContent.includes('env(safe-area-inset-bottom'), 'Floating button must respect safe area insets');
 });
+
+test('Outlined and minimal WhatsApp labels are readable before hover on dark storefronts', () => {
+  // A filled CTA on Street Pulse needs dark text on orange, but a transparent outlined
+  // CTA requires *light* foreground text on the dark catalog. These are distinct tokens.
+  assert.match(cssContent, /--store-whatsapp-outline-text:\s*var\(--ws-fg\)/);
+  assert.match(cssContent, /--store-whatsapp-outline-hover-text:\s*var\(--store-whatsapp-text\)/);
+  assert.match(cssContent, /\.ws-theme-whatsapp-btn--outlined\s*\{[^}]*color:\s*var\(--store-whatsapp-outline-text/);
+  assert.match(cssContent, /\.ws-theme-whatsapp-btn--outlined:hover\s*\{[^}]*color:\s*var\(--store-whatsapp-outline-hover-text/);
+  assert.match(cssContent, /\.ws-theme-whatsapp-btn--minimal\s*\{[^}]*color:\s*var\(--store-whatsapp-outline-text/);
+  assert.match(cssContent, /\.ws-theme-whatsapp-btn--minimal:hover\s*\{[^}]*color:\s*var\(--store-whatsapp-outline-hover-text/);
+  assert.match(cssContent, /\.ws-theme--street-pulse,\s*\.ws-theme--streetwear\s*\{[^}]*--ws-fg:\s*#f8f7f3;/);
+});
