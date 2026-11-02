@@ -12,16 +12,17 @@ import { useLanguage } from '@/context/LanguageContext';
 import { api } from '@/lib/api';
 import { pixel } from '@/lib/pixel';
 import '@/styles/store-themes.css';
+import '@/styles/themes/pure-beauty.css';
 
 const ProductModal = dynamic(() => import('@/components/ProductModal'));
 const CommerceCart = dynamic(() => import('./CommerceCart'));
 
-interface Props { store: Store; previewTheme?: StoreThemeId; preview?: boolean; detailProduct?: Product }
+interface Props { store: Store; previewTheme?: StoreThemeId | 'pure-beauty'; preview?: boolean; detailProduct?: Product }
 export default function CommerceStorefront({store, previewTheme, preview = false, detailProduct}: Props) {
   const {language, setLanguage} = useLanguage();
   const english = language !== 'ar';
   const tr = (ar: string, en: string) => english ? en : ar;
-  const theme = getStoreTheme(previewTheme || store.themeId);
+  const theme = preview && previewTheme === 'pure-beauty' ? {id:'pure-beauty', cssClass:'ws-theme--pure-beauty'} : getStoreTheme(store.themeId ? (previewTheme || store.themeId) : previewTheme);
   const [category, setCategory] = useState<number | 'all'>('all');
   const [search, setSearch] = useState('');
   const [sort, setSort] = useState('featured');
@@ -91,7 +92,7 @@ export default function CommerceStorefront({store, previewTheme, preview = false
     </header>
     {store.isTrialExpired && <p className="ws-error ws-store-alert" role="status">{tr('استقبال الطلبات متوقف مؤقتاً لانتهاء اشتراك المتجر.', 'Orders are temporarily unavailable while the store renews its subscription.')}</p>}
     <main>{detailProduct ? <ProductDetails key={detailProduct.id} store={store} product={detailProduct} english={english} disabled={preview || !!store.isTrialExpired} add={add}/> : <><section className="ws-hero" aria-labelledby="store-heading"><div className="ws-hero-copy"><p className="ws-eyebrow">{store.businessCategory} / {store.city}</p>
-      <h1 id="store-heading">{store.storeName}<span>{theme.id === 'editorial' ? tr('تفاصيل تستحق الاقتناء.', 'The art of choosing well.') : theme.id === 'streetwear' ? tr('اختياراتك. قواعدك.', 'YOUR STYLE. YOUR RULES.') : tr('أشياء تحب أن تعيش معها.', 'Objects for a life well lived.')}</span></h1>
+      <h1 id="store-heading">{store.storeName}<span>{theme.id === 'pure-beauty' ? tr('جمالك يبدأ من تفاصيلك.', 'A little ritual, a lot of radiance.') : theme.id === 'editorial' ? tr('تفاصيل تستحق الاقتناء.', 'The art of choosing well.') : theme.id === 'streetwear' ? tr('اختياراتك. قواعدك.', 'YOUR STYLE. YOUR RULES.') : tr('أشياء تحب أن تعيش معها.', 'Objects for a life well lived.')}</span></h1>
       {store.seoDescription && <p className="ws-hero-description">{store.seoDescription}</p>}<a className="ws-primary-action" href="#catalog">{tr('اكتشف المجموعة', 'Explore the collection')}<ArrowUpRight size={20}/></a><p className="ws-hero-caption">{tr('منتجات', 'PRODUCTS')} {String(store.products.length).padStart(2,'0')} <span>— {store.city}</span></p></div>
       <div className="ws-hero-art">{heroImage ? <StoreImage sizes="(max-width: 767px) 100vw, 50vw" src={heroImage} alt={store.coverUrl ? store.storeName : heroProduct?.name || store.storeName} fetchPriority="high" width="1000" height="1000"/> : <div className="ws-empty-art">{store.storeName}</div>}{heroProduct && <a href="#catalog" className="ws-photo-caption"><span>{heroProduct.name}</span><span>{money(heroProduct.price)}</span></a>}</div>
       {theme.id === 'lifestyle' && <p className="ws-side-note">{tr('مساحة لما تحب', 'MAKE ROOM FOR WHAT YOU LOVE')}</p>}</section>
