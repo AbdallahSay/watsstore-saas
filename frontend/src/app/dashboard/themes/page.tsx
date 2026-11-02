@@ -684,11 +684,11 @@ export default function ThemesMarketplacePage() {
 
               {/* Live Preview Column */}
               <div className="lg:col-span-2 space-y-4">
-                <div className="flex items-center justify-between">
-                  <h3 className="font-extrabold text-base text-slate-900 dark:text-white">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 min-w-0">
+                  <h3 className="font-extrabold text-base text-slate-900 dark:text-white break-words min-w-0">
                     معاينة حية للمتجر (القالب: {STORE_THEMES[settings.draftTheme]?.nameAr})
                   </h3>
-                  <div className="flex items-center gap-2">
+                  <div className="flex flex-wrap items-center gap-2 min-w-0">
                     <button
                       onClick={() => setPreviewViewport('desktop')}
                       className={`p-2 rounded-lg min-h-[44px] text-xs font-bold flex items-center gap-1.5 border transition-colors ${
@@ -709,18 +709,18 @@ export default function ThemesMarketplacePage() {
                       }`}
                     >
                       <Smartphone className="w-4 h-4" />
-                      <span>موبايل (375px)</span>
+                      <span>عرض الموبايل</span>
                     </button>
                   </div>
                 </div>
 
                 <div
-                  className={`rounded-2xl border border-slate-300 dark:border-slate-800 overflow-hidden shadow-xl bg-slate-100 dark:bg-slate-950 transition-all ${
+                  className={`ws-preview-canvas rounded-2xl border border-slate-300 dark:border-slate-800 overflow-hidden shadow-xl bg-slate-100 dark:bg-slate-950 transition-all ${
                     previewViewport === 'mobile' ? 'w-full max-w-[390px] mx-auto sm:border-4 sm:border-slate-700 sm:rounded-[36px] p-1 sm:p-2 border border-slate-700 rounded-xl' : 'w-full'
                   }`}
                 >
                   {store && (
-                    <div className="max-h-[750px] overflow-y-auto rounded-xl">
+                    <div className="max-h-[min(750px,75dvh)] overflow-y-auto overflow-x-hidden rounded-xl min-w-0 overscroll-contain">
                       <CommerceStorefront
                         store={store}
                         preview
@@ -972,7 +972,7 @@ export default function ThemesMarketplacePage() {
 
           {/* FULL SCREEN LIVE PREVIEW MODAL */}
           {previewThemeId && store && (
-            <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex flex-col animate-fadeIn">
+            <div role="dialog" aria-modal="true" aria-label="معاينة تصميم المتجر" data-testid="merchant-theme-preview" className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex flex-col min-w-0 animate-fadeIn">
               {/* Modal Topbar */}
               <div className="bg-slate-900 text-white px-3 sm:px-5 py-2.5 sm:py-3 border-b border-slate-800 flex flex-wrap items-center justify-between gap-2 sm:gap-3 relative z-30">
                 <div className="flex items-center gap-2 sm:gap-3 min-w-0">
@@ -1031,11 +1031,12 @@ export default function ThemesMarketplacePage() {
               </div>
 
               {/* Modal Body with Viewport simulation */}
-              <div className="flex-1 overflow-auto p-2 sm:p-6 flex items-start sm:items-center justify-center bg-slate-950">
+              <div className="flex-1 min-h-0 min-w-0 overflow-y-auto overflow-x-hidden p-1 sm:p-6 flex items-start sm:items-center justify-center bg-slate-950">
                 <div
-                  className={`transition-all duration-300 shadow-2xl overflow-y-auto ${
+                  data-testid="merchant-preview-canvas"
+                  className={`ws-preview-canvas transition-all duration-300 shadow-2xl overflow-y-auto min-w-0 ${
                     previewViewport === 'mobile'
-                      ? 'w-full max-w-[390px] h-full max-h-[92vh] sm:rounded-[44px] sm:border-[10px] sm:border-slate-800 rounded-xl border border-slate-700 shadow-emerald-950/20'
+                      ? 'w-full max-w-[390px] min-h-[260px] h-[min(780px,calc(100dvh-220px))] sm:rounded-[44px] sm:border-[10px] sm:border-slate-800 rounded-xl border border-slate-700 shadow-emerald-950/20'
                       : 'w-full max-w-6xl h-full max-h-[92vh] rounded-xl border border-slate-800'
                   }`}
                   style={{ backgroundColor: 'transparent' }}
