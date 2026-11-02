@@ -15,6 +15,6 @@ for(const width of stage==='after'?[320,360,375,390,414,430,768,1024,1280,1440,1
  }
  if([390,1440].includes(width))await page.screenshot({path:path.join(output,`chrome-ar-${name}-${width}x${height}.png`)});
 }
-if(stage==='after'){await page.setViewportSize({width:390,height:900});await page.keyboard.press('Escape');await page.getByRole('dialog').waitFor({state:'detached'});assert.equal(await trigger.evaluate(element=>element===document.activeElement),true,'Focus returns to the trigger');}
+if(stage==='after'){await page.setViewportSize({width:390,height:900});await page.keyboard.press('Escape');await page.getByRole('dialog').waitFor({state:'detached'});assert.equal(await trigger.evaluate(element=>element===document.activeElement),true,'Focus returns to the trigger');if(['navigation','merchant-navigation'].includes(name)){await trigger.click();await page.setViewportSize({width:name==='navigation'?1280:844,height:390});await page.getByRole('dialog').waitFor({state:'detached'});assert.notEqual(await page.evaluate(()=>document.body.style.overflow),'hidden','Desktop/landscape resize releases the hidden drawer scroll lock');}}
 console.log(stage+': captured and verified '+name);await context.close();}}finally{await browser.close();}})().catch(e=>{console.error(e);process.exitCode=1;});
 

@@ -82,7 +82,7 @@ export default function DashboardLayout({
     }
   }, [router]);
 
-  const drawerRef = useDialog(isMobileMenuOpen, () => setIsMobileMenuOpen(false));
+  const drawerRef = useDialog(isMobileMenuOpen, () => setIsMobileMenuOpen(false), '(min-width: 768px)');
 
   const handleLogout = () => {
     localStorage.removeItem('watsstore_merchant_token');

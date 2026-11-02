@@ -12,7 +12,7 @@ export default function Navbar() {
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const ArrowIcon = dir === 'rtl' ? ArrowLeft : ArrowRight;
 
-  const drawerRef = useDialog(isMobileOpen, () => setIsMobileOpen(false));
+  const drawerRef = useDialog(isMobileOpen, () => setIsMobileOpen(false), '(min-width: 1280px)');
 
   return (
     <>
