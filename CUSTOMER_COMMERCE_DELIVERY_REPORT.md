@@ -5,6 +5,53 @@
 The customer UI is deployed and verified. Background Web Push and its new backend
 schema remain disabled and undeployed. No real-device push delivery is claimed.
 
+## Operational follow-up — 2026-11-02
+
+PR #34 remains draft; its notification implementation is unchanged. No production
+migration, restore, new order, subscription, dispatch or backend deployment was made.
+The existing production frontend SHA/deployment below remain the last verified release.
+
+- A **fresh COPY_ONLY full SQL backup with CHECKSUM completed** using the existing
+  authorized SQL account. A unique server-side `.bak` was created without replacing
+  prior files or changing application rows. Its private location and request/completion
+  timestamps are recorded in ignored `work/pr34-ops/backup-attempt.json`.
+- **Restorability is NOT verified.** `RESTORE VERIFYONLY WITH CHECKSUM` was denied
+  (SQL **262**). Backup history is still inaccessible (SQL **229**). The account has
+  BACKUP DATABASE permission but CREATE ANY DATABASE = 0, VIEW ANY DATABASE = 0,
+  sysadmin = 0. No isolated restored database is available. Therefore migration
+  rehearsal twice, checks of preserved rows/totals and rollback readiness remain blocked.
+- Server engine is **17.0.5015.4**; any restore environment must support that backup
+  version. There is no local SQL Server instance or Docker installation available.
+- Read-only FTPS inspection succeeded. The website root exposes no `.bak`/`.zpaq`
+  artifact or scheduler entry. This does not rule out the hosting panel's separate
+  database backup or task features; the actual subscription entitlement remains unknown.
+- Live production settings were read and confirmed `WebPush.Enabled=false`,
+  `DeviceDeliveryVerified=false`, no VAPID private key and no WebPush environment
+  overrides in `web.config`. No keys were generated or written to an unverified secret
+  destination. VAPID/dispatcher-key provisioning waits for verified rollback and access
+  to the production configuration facility; no credentials were requested or exposed.
+- MonsterASP's [planned-task documentation](https://help.monsterasp.net/websites/configuration/scheduled-tasks)
+  describes **GET-only URL calls**, a Premium entitlement and a 55-second limit for
+  minute jobs. PR #34 requires an HTTPS **POST** with an Authorization header. The
+  documented facility is not directly compatible. No GET alias, query-string secret,
+  in-memory IIS worker, desktop scheduler, paid hosting or external notification SaaS
+  was introduced. A supported authenticated POST runner is still unverified.
+- [Backup](https://help.monsterasp.net/databases/mssql/backup) and
+  [restore](https://help.monsterasp.net/databases/mssql/restore) are documented hosting
+  panel features. Computer Use stopped because it could not confidently determine
+  the Windows browser URL; panel entitlement and authenticated restore/export controls
+  could not be inspected in this turn. No authentication barrier was bypassed.
+- With no restorable backup/isolated environment or reliable runner, actual supported-
+  device subscription, closed-page receipt, duplicate suppression, unsubscribe and
+  runner recovery **remain unverified**. Existing fake-provider tests are not evidence
+  of device receipt. PR #34 must not be merged or deployed on that basis.
+
+The user confirmed there is no verified dedicated 24/7 host and prioritized mobile-
+first/native-commerce work in a separate branch. That work proceeds independently
+from notification infrastructure. Necessary operational access is hosting-panel
+backup export/isolated restore, a compatible existing scheduler, and supported-device
+testing; no new credentials or purchase are requested.
+
 ## Release evidence
 
 | Item | Result |
