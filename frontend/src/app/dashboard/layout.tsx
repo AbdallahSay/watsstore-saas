@@ -81,16 +81,26 @@ export default function DashboardLayout({
     }
   }, [router]);
 
-  // Lock body scroll when mobile menu drawer is open
+  // Close drawer on route change
+  useEffect(() => {
+    setIsMobileMenuOpen(false);
+  }, [pathname]);
+
+  // Lock body scroll and close on Escape key when drawer is open
   useEffect(() => {
     if (isMobileMenuOpen) {
       document.body.style.overflow = 'hidden';
+      const handleKeyDown = (e: KeyboardEvent) => {
+        if (e.key === 'Escape') setIsMobileMenuOpen(false);
+      };
+      window.addEventListener('keydown', handleKeyDown);
+      return () => {
+        document.body.style.overflow = '';
+        window.removeEventListener('keydown', handleKeyDown);
+      };
     } else {
       document.body.style.overflow = '';
     }
-    return () => {
-      document.body.style.overflow = '';
-    };
   }, [isMobileMenuOpen]);
 
   const handleLogout = () => {
@@ -114,16 +124,16 @@ export default function DashboardLayout({
   }
 
   const navLinks = [
-    {name:"إشعارات الطلبات",href:"/dashboard/notifications",icon:Receipt},
-    { name: "القوالب والتجارة", href: "/dashboard/themes", icon: Sparkles },
-    { name: "المخزون", href: "/dashboard/inventory", icon: ShoppingBag },
     { name: t('dash.overview', undefined, 'نظرة عامة للمتجر'), href: '/dashboard', icon: LayoutDashboard },
+    { name: 'سوق القوالب والتجارة (10)', href: '/dashboard/themes', icon: Sparkles },
     { name: t('dash.orders', undefined, 'الطلبات والمبيعات'), href: '/dashboard/orders', icon: Receipt },
-    { name: t('dash.analytics', undefined, 'الإحصائيات والتقارير'), href: '/dashboard/analytics', icon: BarChart3 },
     { name: t('dash.products', undefined, 'المنتجات والكتالوج'), href: '/dashboard/products', icon: ShoppingBag },
+    { name: 'المخزون والكميات', href: '/dashboard/inventory', icon: ShoppingBag },
     { name: t('dash.categories', undefined, 'الأقسام والتصنيفات'), href: '/dashboard/categories', icon: FolderTree },
-    { name: t('dash.reviews', undefined, 'آراء العملاء والتقييمات'), href: '/dashboard/reviews', icon: Star },
     { name: t('dash.coupons', undefined, 'الخصومات وكوبونات التخفيض'), href: '/dashboard/coupons', icon: Tag },
+    { name: t('dash.reviews', undefined, 'آراء العملاء والتقييمات'), href: '/dashboard/reviews', icon: Star },
+    { name: 'إشعارات الطلبات والتدقيق', href: '/dashboard/notifications', icon: Receipt },
+    { name: t('dash.analytics', undefined, 'الإحصائيات والتقارير'), href: '/dashboard/analytics', icon: BarChart3 },
     { name: t('dash.billing', undefined, 'الفواتير والاشتراك'), href: '/dashboard/billing', icon: CreditCard },
     { name: t('dash.settings', undefined, 'إعدادات المتجر والدفع'), href: '/dashboard/settings', icon: Settings },
   ];
@@ -339,7 +349,7 @@ export default function DashboardLayout({
       )}
 
       {/* Main Content Body */}
-      <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
+      <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 pb-28 sm:pb-16">
         {/* Desktop Top Bar */}
         <div className="hidden md:flex items-center justify-between px-5 py-3 mb-6 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm transition-colors">
           <div className="flex items-center gap-2">

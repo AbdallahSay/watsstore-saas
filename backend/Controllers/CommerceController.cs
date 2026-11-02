@@ -23,7 +23,7 @@ public class CommerceController(AppDbContext db) : ControllerBase
             ?? new CommerceSettings { StoreId = Tenant, InstaPay = !string.IsNullOrWhiteSpace(store.InstaPayAddress), MobileWallet = !string.IsNullOrWhiteSpace(store.VodafoneCashNumber) };
         return Ok(new { settings.PublishedTheme, settings.DraftTheme, settings.PreviousTheme, settings.CheckoutMode,
             settings.CashOnDelivery, settings.InstaPay, settings.MobileWallet,
-            shippingZones = JsonSerializer.Deserialize<List<ShippingZone>>(settings.ShippingZonesJson, CommerceRules.Json), store.Slug });
+            customizationJson = settings.CustomizationJson ?? "{}", shippingZones = JsonSerializer.Deserialize<List<ShippingZone>>(settings.ShippingZonesJson, CommerceRules.Json), store.Slug });
     }
 
     [HttpPut("settings")]
@@ -44,6 +44,7 @@ public class CommerceController(AppDbContext db) : ControllerBase
         settings.InstaPay = request.InstaPay;
         settings.MobileWallet = request.MobileWallet;
         settings.ShippingZonesJson = JsonSerializer.Serialize(request.ShippingZones, CommerceRules.Json);
+        if (!string.IsNullOrWhiteSpace(request.CustomizationJson)) settings.CustomizationJson = request.CustomizationJson;
         await db.SaveChangesAsync();
         return Ok(new { message = "تم حفظ المسودة وإعدادات التجارة" });
     }

@@ -26,6 +26,7 @@ CREATE TABLE [CommerceSettings] (
   [InstaPay] bit NOT NULL DEFAULT 0,
   [MobileWallet] bit NOT NULL DEFAULT 0,
   [ShippingZonesJson] nvarchar(max) NOT NULL DEFAULT '[]',
+  [CustomizationJson] nvarchar(max) NOT NULL DEFAULT '{}',
   PRIMARY KEY ([StoreId]),
   FOREIGN KEY ([StoreId]) REFERENCES [Stores]([Id]) ON DELETE CASCADE
 );
@@ -72,3 +73,5 @@ IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name='IX_WhatsAppOrders_TrackingT
 IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name='IX_InventoryStocks_StoreId_ProductId_VariantKey' AND object_id=OBJECT_ID('InventoryStocks')) CREATE UNIQUE INDEX [IX_InventoryStocks_StoreId_ProductId_VariantKey] ON [InventoryStocks] ([StoreId], [ProductId], [VariantKey]);
 IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name='IX_OrderHistories_StoreId_OrderId_CreatedAt' AND object_id=OBJECT_ID('OrderHistories')) CREATE INDEX [IX_OrderHistories_StoreId_OrderId_CreatedAt] ON [OrderHistories] ([StoreId], [OrderId], [CreatedAt]);
 COMMIT;
+
+IF COL_LENGTH('CommerceSettings','CustomizationJson') IS NULL ALTER TABLE [CommerceSettings] ADD [CustomizationJson] nvarchar(max) NOT NULL DEFAULT '{}';

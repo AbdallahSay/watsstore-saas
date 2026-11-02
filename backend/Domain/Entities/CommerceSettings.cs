@@ -13,6 +13,7 @@ public class CommerceSettings
     public bool InstaPay { get; set; }
     public bool MobileWallet { get; set; }
     public string ShippingZonesJson { get; set; } = "[]";
+    public string CustomizationJson { get; set; } = "{}";
     public Store? Store { get; set; }
 }
 

@@ -9,17 +9,11 @@ import type { Store, Product } from '@/types';
 import { getStoreTheme, STORE_THEME_IDS, STORE_THEMES, type StoreThemeId } from '@/lib/store-themes';
 import '@/styles/store-themes.css';
 
-const labels: Record<StoreThemeId, { eyebrow: string; headline: string; subtitle: string }> = {
-  editorial: { eyebrow: 'مختارات بعناية', headline: 'تفاصيل تصنع الفرق', subtitle: 'اكتشف منتجات مختارة بعناية لتناسب أسلوبك.' },
-  streetwear: { eyebrow: 'COLLECTION / 2026', headline: 'أسلوبك يبدأ هنا', subtitle: 'قطع مميزة تعبر عن شخصيتك.' },
-  lifestyle: { eyebrow: 'بيت يحمل ذوقك', headline: 'مساحات أجمل، حياة أدفأ', subtitle: 'كل ما يضيف لمسة جميلة إلى يومك.' },
-};
-
 export default function StoreThemePreviewPage() {
   const params = useParams<{ slug: string }>();
   const slug = typeof params.slug === 'string' ? params.slug : '';
   const [store, setStore] = useState<Store | null>(null);
-  const [themeId, setThemeId] = useState<StoreThemeId>('editorial');
+  const [themeId, setThemeId] = useState<StoreThemeId>('editorial-luxe');
   const [categoryId, setCategoryId] = useState<number | 'all'>('all');
   const [search, setSearch] = useState('');
   const [cartCount, setCartCount] = useState(0);
@@ -38,7 +32,11 @@ export default function StoreThemePreviewPage() {
   }, [slug]);
 
   const theme = getStoreTheme(themeId);
-  const copy = labels[themeId];
+  const copy = {
+    eyebrow: theme.categoryLabelAr,
+    headline: theme.heroHeadlineAr,
+    subtitle: theme.heroSubheadlineAr,
+  };
   const products = useMemo(() => (store?.products ?? [])
     .filter((p) => categoryId === 'all' || p.categoryId === categoryId)
     .filter((p) => p.name.toLocaleLowerCase().includes(search.trim().toLocaleLowerCase()))
@@ -56,7 +54,7 @@ export default function StoreThemePreviewPage() {
             <button key={id} type="button" aria-pressed={themeId === id}
               onClick={() => setThemeId(id)}
               className={`min-h-11 rounded-full px-3 text-xs border transition-colors ${themeId === id ? 'font-bold border-current' : 'border-current/20 opacity-75 hover:opacity-100'}`}>
-              {STORE_THEMES[id].name}
+              {STORE_THEMES[id].nameAr} ({STORE_THEMES[id].name})
             </button>
           ))}
         </div>
@@ -116,7 +114,6 @@ export default function StoreThemePreviewPage() {
               {p.description && <p className="text-xs mt-2 line-clamp-2" style={{color:'var(--ws-muted)'}}>{p.description}</p>}
               {p.isAvailable && !p.variantsJson && <button type="button" onClick={() => setCartCount(addPreviewCartItem(store.slug, p))} className="mt-3 min-h-11 w-full rounded-lg border font-bold text-xs sm:text-sm" style={{borderColor:'var(--ws-border)'}}>أضف إلى السلة</button>}
               {p.isAvailable && <a href={`/theme-preview/${encodeURIComponent(store.slug)}/checkout?product=${encodeURIComponent(p.id)}`} className="ws-primary-action mt-4 flex w-full items-center justify-center gap-2 px-3 py-2 text-center text-xs sm:text-sm font-bold">اطلب أونلاين <ShoppingBag size={16} aria-hidden="true"/></a>}
-
             </div>
           </article>)}
         </div> : <p className="rounded-lg border p-8 text-center" style={{borderColor:'var(--ws-border)'}}>لا توجد منتجات مطابقة للبحث.</p>}
