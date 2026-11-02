@@ -11,6 +11,7 @@
     "test:responsive": "node tests/responsive-audit.cjs",
     "test:dialogs": "node tests/ui-states-audit.cjs",
     "test:merchant-mobile": "node tests/merchant-mobile.cjs",
+    "test:theme-preview-mobile": "node tests/theme-preview-mobile.e2e.cjs",
     "test:lighthouse": "node tests/lighthouse.mjs",
     "dev": "next dev",
     "build": "next build",
