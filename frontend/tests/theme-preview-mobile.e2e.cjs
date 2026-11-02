@@ -25,6 +25,49 @@ async function settings() {
   return { publishedTheme: data.publishedTheme, draftTheme: data.draftTheme };
 }
 
+async function commerce(method, route, body) {
+  const res = await fetch(api + '/merchant/commerce/' + route, {
+    method,
+    headers: { Authorization: 'Bearer ' + fixture.token, ...(body ? {'Content-Type':'application/json'} : {}) },
+    body: body ? JSON.stringify(body) : undefined
+  });
+  assert.equal(res.status, 200, 'Isolated commerce ' + method + ' ' + route + ' => ' + res.status);
+  return res.json();
+}
+
+function payload(settings, theme) {
+  return {
+    draftTheme:theme, customizationJson: settings.customizationJson || '{}',
+    checkoutMode:settings.checkoutMode, cashOnDelivery:settings.cashOnDelivery,
+    instaPay:settings.instaPay, mobileWallet:settings.mobileWallet,
+    shippingZones:settings.shippingZones || []
+  };
+}
+
+async function verifyThemePublishRestore() {
+  const initial = await commerce('GET', 'settings');
+  for (const theme of themes) {
+    const before = await commerce('GET', 'settings');
+    await commerce('PUT', 'settings', payload(before, theme));
+    const saved = await commerce('GET', 'settings');
+    assert.equal(saved.draftTheme, theme, 'Saved draft: ' + theme);
+    assert.equal(saved.publishedTheme, before.publishedTheme, 'Draft must not publish: ' + theme);
+    const publish = await commerce('POST', 'theme/publish');
+    assert.equal(publish.publishedTheme, theme, 'Published theme: ' + theme);
+    const visible = await fetch(api + '/public/stores/' + encodeURIComponent(fixture.slug));
+    assert.equal(visible.status, 200);
+    assert.equal((await visible.json()).themeId, theme, 'Public store has selected theme');
+    const restore = await commerce('POST', 'theme/restore');
+    assert.equal(restore.publishedTheme, before.publishedTheme, 'Rollback: ' + theme);
+    report.push({theme, action:'draft-publish-restore', status:'PASS'});
+  }
+  const finalState = await commerce('GET', 'settings');
+  await commerce('PUT', 'settings', payload(finalState, initial.draftTheme));
+  const after = await commerce('GET', 'settings');
+  assert.equal(after.publishedTheme, initial.publishedTheme);
+  assert.equal(after.draftTheme, initial.draftTheme);
+}
+
 async function inspect(page, theme, width, engine) {
   const dialog = page.getByTestId('merchant-theme-preview');
   await expect(dialog).toBeVisible();
@@ -114,6 +157,7 @@ async function inspect(page, theme, width, engine) {
     }
   }
   assert.deepEqual(await settings(), original, 'Preview must not save or publish merchant settings');
+  await verifyThemePublishRestore();
   fs.writeFileSync(path.join(output, 'summary.json'), JSON.stringify(report, null, 2));
   console.log('Merchant theme previews passed: ' + report.length);
 })().catch(err => { console.error(err); process.exitCode = 1; });
