@@ -16,6 +16,6 @@ test('storefront card and purchase controls adapt to lengthy content', () => {
  const css = read('src/styles/store-themes.css');
  assert.match(css, /\.ws-preview-canvas \{ container: ws-mobile-preview/);
  assert.match(css, /\.ws-storefront \.ws-product-grid > \*/);
- assert.match(css, /overflow-wrap:\\s*anywhere/);
- assert.match(css, /white-space:\\s*normal/);
+ assert.match(css, /overflow-wrap:\s*anywhere/);
+ assert.match(css, /white-space:\s*normal/);
 });
