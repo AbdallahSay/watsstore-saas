@@ -7,8 +7,18 @@ import {
   Direction,
   LANGUAGES,
   DEFAULT_LANGUAGE,
-  TRANSLATIONS,
+  TranslationDictionary,
 } from '@/i18n/languages';
+import arabic from '@/i18n/dictionaries/ar.json';
+
+const additionalDictionaries = {
+  en: () => import('@/i18n/dictionaries/en.json'),
+  fr: () => import('@/i18n/dictionaries/fr.json'),
+  de: () => import('@/i18n/dictionaries/de.json'),
+  es: () => import('@/i18n/dictionaries/es.json'),
+  tr: () => import('@/i18n/dictionaries/tr.json'),
+  ru: () => import('@/i18n/dictionaries/ru.json'),
+};
 
 interface LanguageContextType {
   language: LanguageCode;
@@ -26,6 +36,15 @@ const LANGUAGE_STORAGE_KEY = 'watsstore_lang';
 export function LanguageProvider({ children }: { children: React.ReactNode }) {
   const [language, setLanguageState] = useState<LanguageCode>(DEFAULT_LANGUAGE);
   const [isMounted, setIsMounted] = useState(false);
+  const [dictionaries, setDictionaries] = useState<Partial<Record<LanguageCode, TranslationDictionary>>>({ar:arabic});
+  useEffect(() => {
+    if (language === 'ar' || dictionaries[language]) return;
+    let active = true;
+    additionalDictionaries[language]().then(module => {
+      if (active) setDictionaries(previous => ({...previous,[language]:module.default}));
+    }).catch(() => { /* Arabic fallbacks remain usable if the optional language chunk fails. */ });
+    return () => { active = false; };
+  }, [language, dictionaries]);
 
   const applyLanguageToHtml = useCallback((langCode: LanguageCode) => {
     if (typeof document !== 'undefined') {
@@ -61,8 +80,8 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
 
   const t = useCallback(
     (key: string, params?: Record<string, string | number>, fallback?: string): string => {
-      const dict = TRANSLATIONS[language] || TRANSLATIONS[DEFAULT_LANGUAGE];
-      let value = dict[key] || TRANSLATIONS[DEFAULT_LANGUAGE][key] || fallback || key;
+      const dict: TranslationDictionary = dictionaries[language] || arabic;
+      let value = dict[key] || arabic[key as keyof typeof arabic] || fallback || key;
 
       if (params) {
         Object.entries(params).forEach(([paramKey, paramVal]) => {
@@ -72,7 +91,7 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
 
       return value;
     },
-    [language]
+    [language, dictionaries]
   );
 
   const languageInfo = LANGUAGES[language] || LANGUAGES[DEFAULT_LANGUAGE];

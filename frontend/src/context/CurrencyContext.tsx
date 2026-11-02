@@ -62,6 +62,7 @@ export function CurrencyProvider({ children }: { children: React.ReactNode }) {
 
   // Fetch live rates from exchangerate-api (free, no key needed for basic endpoint)
   useEffect(() => {
+    if (currency === 'EGP') return;
     const fetchRates = async () => {
       try {
         const res = await fetch('https://open.er-api.com/v6/latest/EGP', { next: { revalidate: 3600 } } as RequestInit);
@@ -83,7 +84,7 @@ export function CurrencyProvider({ children }: { children: React.ReactNode }) {
     };
     fetchRates();
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [currency]);
 
   const setCurrency = useCallback((c: CurrencyCode) => {
     setCurrencyState(c);

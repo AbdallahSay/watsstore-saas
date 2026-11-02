@@ -22,7 +22,6 @@ import {
 } from 'lucide-react';
 import { api } from '@/lib/api';
 import { useLanguage } from '@/context/LanguageContext';
-import appSwal from '@/lib/sweetalert';
 
 export default function HomePage() {
   const { t, dir } = useLanguage();
@@ -56,7 +55,8 @@ export default function HomePage() {
       .catch((err) => console.warn('Using default pricing matrix fallback:', err));
   }, []);
 
-  const handleBannerClick = () => {
+  const handleBannerClick = async () => {
+    const { default: appSwal } = await import('@/lib/sweetalert');
     appSwal.fire({
       icon: 'info',
       title: t('home.banner_text', undefined, '🔥 عرض الإطلاق التجاري: احصل على خصم إضافي عند الاشتراك السنوي اليوم!'),
@@ -158,7 +158,7 @@ export default function HomePage() {
             <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
               <Link
                 href="/register"
-                className="w-full sm:w-auto px-8 py-4 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-base rounded-2xl shadow-xl shadow-emerald-600/25 flex items-center justify-center gap-3 transition-all hover:scale-105 active:scale-95"
+                className="w-full sm:w-auto px-8 py-4 bg-emerald-700 hover:bg-emerald-800 text-white font-extrabold text-base rounded-2xl shadow-xl shadow-emerald-600/25 flex items-center justify-center gap-3 transition-all hover:scale-105 active:scale-95"
               >
                 <span>{t('hero.cta_primary', undefined, 'ابدأ تجربة مجانية لمدة 14 يوماً')}</span>
                 <ArrowIcon className="w-5 h-5" />
@@ -207,7 +207,7 @@ export default function HomePage() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               {/* Feature 1 */}
               <div className="p-8 rounded-3xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/70 dark:border-slate-700/60 hover:shadow-lg transition-all space-y-4">
-                <div className="w-12 h-12 rounded-2xl bg-emerald-600 text-white flex items-center justify-center shadow-md shadow-emerald-500/20">
+                <div className="w-12 h-12 rounded-2xl bg-emerald-700 text-white flex items-center justify-center shadow-md shadow-emerald-500/20">
                   <MessageCircle className="w-6 h-6" />
                 </div>
                 <h3 className="text-xl font-bold text-slate-900 dark:text-white">
@@ -220,7 +220,7 @@ export default function HomePage() {
 
               {/* Feature 2 */}
               <div className="p-8 rounded-3xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/70 dark:border-slate-700/60 hover:shadow-lg transition-all space-y-4">
-                <div className="w-12 h-12 rounded-2xl bg-emerald-600 text-white flex items-center justify-center shadow-md shadow-emerald-500/20">
+                <div className="w-12 h-12 rounded-2xl bg-emerald-700 text-white flex items-center justify-center shadow-md shadow-emerald-500/20">
                   <BarChart3 className="w-6 h-6" />
                 </div>
                 <h3 className="text-xl font-bold text-slate-900 dark:text-white">
@@ -233,7 +233,7 @@ export default function HomePage() {
 
               {/* Feature 3 */}
               <div className="p-8 rounded-3xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/70 dark:border-slate-700/60 hover:shadow-lg transition-all space-y-4">
-                <div className="w-12 h-12 rounded-2xl bg-emerald-600 text-white flex items-center justify-center shadow-md shadow-emerald-500/20">
+                <div className="w-12 h-12 rounded-2xl bg-emerald-700 text-white flex items-center justify-center shadow-md shadow-emerald-500/20">
                   <Search className="w-6 h-6" />
                 </div>
                 <h3 className="text-xl font-bold text-slate-900 dark:text-white">
@@ -246,7 +246,7 @@ export default function HomePage() {
 
               {/* Feature 4 */}
               <div className="p-8 rounded-3xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/70 dark:border-slate-700/60 hover:shadow-lg transition-all space-y-4">
-                <div className="w-12 h-12 rounded-2xl bg-emerald-600 text-white flex items-center justify-center shadow-md shadow-emerald-500/20">
+                <div className="w-12 h-12 rounded-2xl bg-emerald-700 text-white flex items-center justify-center shadow-md shadow-emerald-500/20">
                   <Zap className="w-6 h-6" />
                 </div>
                 <h3 className="text-xl font-bold text-slate-900 dark:text-white">
@@ -259,7 +259,7 @@ export default function HomePage() {
 
               {/* Feature 5 */}
               <div className="p-8 rounded-3xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/70 dark:border-slate-700/60 hover:shadow-lg transition-all space-y-4">
-                <div className="w-12 h-12 rounded-2xl bg-emerald-600 text-white flex items-center justify-center shadow-md shadow-emerald-500/20">
+                <div className="w-12 h-12 rounded-2xl bg-emerald-700 text-white flex items-center justify-center shadow-md shadow-emerald-500/20">
                   <Smartphone className="w-6 h-6" />
                 </div>
                 <h3 className="text-xl font-bold text-slate-900 dark:text-white">
@@ -272,7 +272,7 @@ export default function HomePage() {
 
               {/* Feature 6 */}
               <div className="p-8 rounded-3xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/70 dark:border-slate-700/60 hover:shadow-lg transition-all space-y-4">
-                <div className="w-12 h-12 rounded-2xl bg-emerald-600 text-white flex items-center justify-center shadow-md shadow-emerald-500/20">
+                <div className="w-12 h-12 rounded-2xl bg-emerald-700 text-white flex items-center justify-center shadow-md shadow-emerald-500/20">
                   <TrendingUp className="w-6 h-6" />
                 </div>
                 <h3 className="text-xl font-bold text-slate-900 dark:text-white">
@@ -318,7 +318,7 @@ export default function HomePage() {
                   onClick={() => setBillingCycle('annual')}
                   className={`px-5 py-2.5 rounded-xl font-black text-xs sm:text-sm transition-all flex items-center gap-2 ${
                     billingCycle === 'annual'
-                      ? 'bg-emerald-600 text-white shadow-md scale-100'
+                      ? 'bg-emerald-700 text-white shadow-md scale-100'
                       : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
                   }`}
                 >
@@ -364,13 +364,13 @@ export default function HomePage() {
                       <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
                       <span>{t('home.plan_free_feat2', undefined, 'كوبون خصم واحد نشط لمتجرك')}</span>
                     </li>
-                    <li className="flex items-center gap-2.5 text-slate-400 dark:text-slate-500">
+                    <li className="flex items-center gap-2.5 text-slate-600 dark:text-slate-400">
                       <span className="text-xs">🔒</span>
                       <span className="line-through">
                         {t('home.plan_free_locked_ai', undefined, 'كتابة الوصف بالذكاء الاصطناعي (متاح في Pro)')}
                       </span>
                     </li>
-                    <li className="flex items-center gap-2.5 text-slate-400 dark:text-slate-500">
+                    <li className="flex items-center gap-2.5 text-slate-600 dark:text-slate-400">
                       <span className="text-xs">🔒</span>
                       <span className="line-through">
                         {t('home.plan_free_locked_excel', undefined, 'تصدير تقارير الطلبات إلى Excel (متاح في Pro)')}
@@ -489,7 +489,7 @@ export default function HomePage() {
 
                 <Link
                   href="/register"
-                  className="mt-8 w-full py-3.5 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-sm text-center shadow-lg shadow-emerald-600/25 transition-all hover:scale-[1.02] block"
+                  className="mt-8 w-full py-3.5 rounded-2xl bg-emerald-700 hover:bg-emerald-800 text-white font-extrabold text-sm text-center shadow-lg shadow-emerald-600/25 transition-all hover:scale-[1.02] block"
                 >
                   {t('home.subscribe_pro', undefined, 'اشترك في باقة Pro الآن')}
                 </Link>
@@ -574,7 +574,7 @@ export default function HomePage() {
 
                 <Link
                   href="/register"
-                  className="mt-8 w-full py-3.5 rounded-2xl bg-slate-900 hover:bg-slate-800 dark:bg-emerald-600 dark:hover:bg-emerald-700 text-white font-bold text-sm text-center transition-colors block shadow-md"
+                  className="mt-8 w-full py-3.5 rounded-2xl bg-slate-900 hover:bg-slate-800 dark:bg-emerald-700 dark:hover:bg-emerald-800 text-white font-bold text-sm text-center transition-colors block shadow-md"
                 >
                   {t('home.subscribe_vip', undefined, 'انضم إلى باقة VIP الآن')}
                 </Link>
