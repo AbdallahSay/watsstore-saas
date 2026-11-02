@@ -1795,3 +1795,15 @@
 .ws-product-info h3 a:focus-visible { outline:2px solid var(--ws-accent); outline-offset:3px; }
 .ws-product-price { min-width:0; flex-wrap:wrap; overflow-wrap:normal; font-variant-numeric:tabular-nums; }
 .ws-storefront :is(.ws-secondary-action,.ws-primary-action,.ws-theme-whatsapp-btn) { white-space:normal; min-width:0; max-width:100%; }
+
+
+/* Merchant preview can navigate the full product details without a popup. */
+.ws-preview-product-back {
+  display:inline-flex; align-items:center; justify-content:center;
+  margin:20px 5%; padding:10px 16px;
+  min-height:44px; max-width:90%;
+  border:1px solid var(--ws-border); border-radius:var(--ws-radius-control);
+  background:var(--ws-card); color:var(--ws-fg);
+  font-size:.875rem; font-weight:700; white-space:normal;
+}
+.ws-preview-product-back:hover { border-color:var(--ws-accent); }
