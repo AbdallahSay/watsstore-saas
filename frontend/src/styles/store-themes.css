@@ -236,6 +236,7 @@
 }
 .ws-section-heading {
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
   align-items: flex-end;
   gap: 20px;
@@ -688,6 +689,8 @@
 }
 .ws-review-form {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  min-width: 0;
   gap: 16px;
   background: var(--ws-card);
   border: 1px solid var(--ws-border);
@@ -696,6 +699,9 @@
 }
 .ws-review-form label { display: grid; gap: 7px; font-size: 12px; font-weight: 600; }
 .ws-review-form input, .ws-review-form textarea, .ws-review-form select {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
   background: var(--ws-bg);
   border: 1px solid var(--ws-border);
   border-radius: var(--ws-radius-control);
@@ -812,6 +818,9 @@
   bottom: calc(1.25rem + env(safe-area-inset-bottom, 0px));
   inset-inline-end: calc(1.25rem + env(safe-area-inset-right, 0px));
   z-index: 50;
+  max-width: calc(100vw - 2.5rem);
+  white-space: normal;
+  overflow-wrap: anywhere;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.22);
   transform: translateZ(0);
 }
