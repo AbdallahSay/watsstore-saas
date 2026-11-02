@@ -46,6 +46,48 @@ async function settle(page) {
   });
 }
 
+// WCAG normal-text contrast for theme-adaptive, outlined WhatsApp controls.
+function contrastRatio(foreground, background) {
+  const parse = value => {
+    const values = value.match(/\d+(?:\.\d+)?/g)?.slice(0, 3).map(Number);
+    assert.ok(values && values.length === 3, 'Expected computed RGB color: ' + value);
+    return values;
+  };
+  const lightness = value => parse(value).map(channel => {
+    const normalized = channel / 255;
+    return normalized <= 0.04045 ? normalized / 12.92 : ((normalized + 0.055) / 1.055) ** 2.4;
+  }).reduce((sum, value, index) => sum + value * [0.2126, 0.7152, 0.0722][index], 0);
+  const a = lightness(foreground);
+  const b = lightness(background);
+  return (Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05);
+}
+
+async function auditOutlinedWhatsApp(page, theme, lang) {
+  const button = page.locator('.ws-theme-whatsapp-btn--catalog.ws-theme-whatsapp-btn--outlined');
+  assert.equal(await button.count(), 1, 'Outlined catalog WhatsApp CTA missing: ' + theme);
+  const colors = async () => button.evaluate(el => ({
+    foreground: getComputedStyle(el.querySelector('.ws-theme-whatsapp-label')).color,
+    background: getComputedStyle(el).backgroundColor,
+    storefrontBackground: getComputedStyle(el.closest('.ws-storefront')).backgroundColor
+  }));
+  const normal = await colors();
+  const normalRatio = contrastRatio(normal.foreground, normal.storefrontBackground);
+  assert.ok(normalRatio >= 4.5,
+    'Invisible/unreadable default outlined CTA: ' + theme + ' ' + lang + ' ratio=' + normalRatio.toFixed(2));
+  await button.hover();
+  // Allow theme hover transition to finish before measuring the final appearance.
+  await page.waitForTimeout(250);
+  const hovered = await colors();
+  const hoverRatio = contrastRatio(hovered.foreground, hovered.background);
+  assert.ok(hoverRatio >= 4.5,
+    'Low-contrast hovered outlined CTA: ' + theme + ' ' + lang + ' ratio=' + hoverRatio.toFixed(2));
+  return {
+    normalText: normal.foreground, normalContrast: Number(normalRatio.toFixed(2)),
+    hoverText: hovered.foreground, hoverBackground: hovered.background,
+    hoverContrast: Number(hoverRatio.toFixed(2))
+  };
+}
+
 async function measure(page) {
   return page.evaluate(() => {
     const visible = (el) => {
@@ -174,6 +216,9 @@ async function measure(page) {
         assert.ok(waCheck.waData.href.startsWith('https://wa.me/'), `Invalid wa.me link for theme ${theme}`);
         assert.ok(waCheck.waData.width >= 44 && waCheck.waData.height >= 44, `Touch target below 44px for theme ${theme}`);
 
+        // Verify visible text on transparent outlines even before mouse hover (Street Pulse regression).
+        const outlinedColors = await auditOutlinedWhatsApp(page, theme, lang);
+
         // Record for WhatsApp report
         waAudit.push({
           theme,
@@ -185,6 +230,7 @@ async function measure(page) {
           width: waCheck.waData.width,
           height: waCheck.waData.height,
           href: waCheck.waData.href,
+          outlined: outlinedColors,
         });
 
         // 5. Complete Customer Shopping Journey Test

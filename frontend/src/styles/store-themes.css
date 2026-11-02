@@ -19,6 +19,9 @@
   --ws-card-ratio: 4/5;
   --store-whatsapp-bg: var(--ws-accent, #111827);
   --store-whatsapp-text: var(--ws-accent-contrast, #ffffff);
+  /* Outlined/minimal buttons sit on the storefront surface, not on the filled CTA background. */
+  --store-whatsapp-outline-text: var(--ws-fg);
+  --store-whatsapp-outline-hover-text: var(--store-whatsapp-text);
   --store-whatsapp-border: var(--ws-accent, #111827);
   --store-whatsapp-hover: var(--ws-accent, #1f2937);
   --store-whatsapp-focus: var(--ws-accent, #111827);
@@ -758,23 +761,23 @@
 
 .ws-theme-whatsapp-btn--outlined {
   background-color: transparent;
-  color: var(--ws-fg) !important;
+  color: var(--store-whatsapp-outline-text, var(--ws-fg)) !important;
   border: 1.5px solid var(--store-whatsapp-border);
 }
 .ws-theme-whatsapp-btn--outlined:hover {
   background-color: var(--store-whatsapp-hover);
-  color: var(--store-whatsapp-text) !important;
+  color: var(--store-whatsapp-outline-hover-text) !important;
 }
 
 .ws-theme-whatsapp-btn--minimal {
   background-color: transparent;
-  color: var(--ws-fg) !important;
+  color: var(--store-whatsapp-outline-text, var(--ws-fg)) !important;
   border: 1px solid transparent;
   padding: 8px 12px;
 }
 .ws-theme-whatsapp-btn--minimal:hover {
   background-color: var(--store-whatsapp-hover);
-  color: var(--store-whatsapp-text) !important;
+  color: var(--store-whatsapp-outline-hover-text) !important;
 }
 
 /* Placement / Sizing Variants */
@@ -1156,7 +1159,7 @@
   --store-whatsapp-bg: #c07a72;
   --store-whatsapp-text: #111111;
   --store-whatsapp-border: #c07a72;
-  --store-whatsapp-hover: #ab6760;
+  --store-whatsapp-hover: #bb776e;
   --store-whatsapp-focus: #c07a72;
   --store-whatsapp-radius: 999px;
 }
@@ -1235,7 +1238,7 @@
   --store-whatsapp-bg: #ea580c;
   --store-whatsapp-text: #111111;
   --store-whatsapp-border: #ea580c;
-  --store-whatsapp-hover: #c2410c;
+  --store-whatsapp-hover: #f97316;
   --store-whatsapp-focus: #ea580c;
   --store-whatsapp-radius: 10px;
 }
@@ -1344,7 +1347,7 @@
   --store-whatsapp-bg: #ff2d55;
   --store-whatsapp-text: #111111;
   --store-whatsapp-border: #ff2d55;
-  --store-whatsapp-hover: #e01b41;
+  --store-whatsapp-hover: #ff5b7b;
   --store-whatsapp-focus: #ff2d55;
   --store-whatsapp-radius: 6px;
 }
@@ -1383,6 +1386,7 @@
   --ws-radius-card: 24px;
   --store-whatsapp-bg: #ff6b6b;
   --store-whatsapp-text: #111111;
+  --store-whatsapp-outline-hover-text: #201f23;
   --store-whatsapp-border: #ffd8a8;
   --store-whatsapp-hover: #fa5252;
   --store-whatsapp-focus: #ff6b6b;
@@ -1758,8 +1762,6 @@
 .ws-storefront .ws-product-grid > *, .ws-storefront .ws-product-actions > * { min-width:0; }
 
 /* Accessible text roles: transparent contact controls cannot reuse filled-button ink. */
-.ws-storefront .ws-theme-whatsapp-btn--outlined,.ws-storefront .ws-theme-whatsapp-btn--minimal{color:var(--ws-fg)!important;}
-.ws-storefront .ws-theme-whatsapp-btn--outlined:hover,.ws-storefront .ws-theme-whatsapp-btn--minimal:hover{color:var(--store-whatsapp-text)!important;}
 .ws-storefront .ws-beauty-chip{color:#8d443e;}
 .ws-storefront .ws-furniture-chip{color:#64412d;}
 .ws-storefront .ws-kid-chip{color:#784414;}
