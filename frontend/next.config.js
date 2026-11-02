@@ -8,6 +8,14 @@ if (process.env.VERCEL === '1' && process.env.NEXT_PUBLIC_API_URL) {
 const imageApiUrl = new URL(process.env.NEXT_PUBLIC_API_URL || 'https://watsstore.runasp.net/api');
 const nextConfig = {
   reactStrictMode: true,
+  async redirects() {
+    return [{
+      source: '/:path*',
+      has: [{ type: 'host', value: 'frontend-bay-ten-58.vercel.app' }],
+      destination: 'https://watsstore.vercel.app/:path*',
+      permanent: true,
+    }];
+  },
   images: {
     remotePatterns: [
       {
