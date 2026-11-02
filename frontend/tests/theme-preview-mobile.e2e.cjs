@@ -89,11 +89,10 @@ async function inspect(page, theme, width, engine) {
         try {
           await page.goto(site + '/dashboard/themes', {waitUntil:'networkidle'});
           await expect(page.getByText('سوق القوالب وتخصيص المتجر')).toBeVisible();
-          for (const theme of themes) {
-            const article = page.locator('article').filter({
-              has: page.locator('h2').filter({hasText: new RegExp(theme.replace(/[.*+?^\x24{}()|[\]\\]/g, '\\$&'), 'i')})
-            });
-            await expect(article).toHaveCount(1);
+          const cards = page.locator('article').filter({has:page.getByRole('button', {name:'معاينة حية'})});
+          await expect(cards).toHaveCount(themes.length);
+          for (const [index, theme] of themes.entries()) {
+            const article = cards.nth(index);
             await article.getByRole('button', {name:'معاينة حية'}).click();
             await inspect(page, theme, width, engine);
           }
