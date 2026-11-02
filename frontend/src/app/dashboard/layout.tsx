@@ -228,19 +228,19 @@ export default function DashboardLayout({
       </aside>
 
       {/* Mobile Top Header */}
-      <header className="md:hidden bg-slate-900 text-white px-4 py-3 flex items-center justify-between border-b border-slate-800 z-30 sticky top-0">
+      <header className="md:hidden bg-white dark:bg-slate-900 text-slate-900 dark:text-white px-3 py-3 flex items-center justify-between border-b border-slate-200 dark:border-slate-800 z-30 sticky top-0">
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 rounded-xl bg-emerald-500 flex items-center justify-center text-white font-bold">
             <StoreIcon className="w-4 h-4" />
           </div>
-          <span className="font-bold text-base text-white">WatsStore</span>
+          <span className="font-bold text-base text-slate-900 dark:text-white">WatsStore</span>
         </div>
 
         <div className="flex items-center gap-2">
           <ThemeLanguageBar variant="compact" showCurrency={false} />
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="p-2 text-slate-300 hover:text-white rounded-xl hover:bg-slate-800 min-w-[44px] min-h-[44px] flex items-center justify-center transition-colors"
+            className="p-2 text-slate-700 dark:text-slate-300 hover:text-emerald-700 dark:hover:text-white rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 min-w-[44px] min-h-[44px] flex items-center justify-center transition-colors"
             aria-label={dir === 'rtl' ? "القائمة" : "Menu"} aria-expanded={isMobileMenuOpen} aria-controls="merchant-navigation"
           >
             {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
