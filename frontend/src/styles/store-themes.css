@@ -1445,3 +1445,20 @@
 .ws-checkout-fields legend { font-weight: 700; padding-block: 20px 12px; }
 .ws-checkout-fields, .ws-checkout-review, .ws-cart-items { scroll-margin-top: 20px; }
 .ws-checkout-customer-summary { overflow-wrap: anywhere; }
+
+
+/* Shared resilience: preserve theme identity while preventing text and control overflow. */
+.ws-storefront :is(.ws-catalog-product,.ws-product-info,.ws-product-detail,.ws-cart-items,.ws-filters,.ws-hero-copy) { min-width: 0; }
+.ws-storefront :is(.ws-catalog-product,.ws-product-info,.ws-product-information,.ws-cart-items) :is(h1,h2,h3,p,span,strong,button,a) { overflow-wrap: anywhere; }
+.ws-storefront :is(.ws-primary-action,.ws-secondary-action,.ws-product-actions button,.ws-product-page-link) {
+  min-width: 0;
+  max-width: 100%;
+  min-height: 44px;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  text-align: center;
+}
+.ws-storefront .ws-product-info :is(h3, p) { min-width: 0; }
+.ws-storefront .ws-product-grid > * { min-width: 0; }
+.ws-storefront .ws-product-actions { min-width: 0; }
+.ws-storefront .ws-product-actions > * { min-width: 0; }
