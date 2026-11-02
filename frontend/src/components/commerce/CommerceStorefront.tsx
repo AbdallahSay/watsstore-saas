@@ -58,6 +58,8 @@ export default function CommerceStorefront({
   const [cartLoaded, setCartLoaded] = useState(false);
   const [directCheckout, setDirectCheckout] = useState(false);
   const [product, setProduct] = useState<Product | null>(null);
+  const [previewDetail, setPreviewDetail] = useState<Product | null>(null);
+  const activeDetailProduct = detailProduct || (preview ? previewDetail : null);
   const [reviewMessage, setReviewMessage] = useState('');
   const [reviewBusy, setReviewBusy] = useState(false);
 
@@ -223,7 +225,7 @@ export default function CommerceStorefront({
       data-font={customization.fontPreset || 'cairo'}
       style={dynamicStyles as React.CSSProperties}
     >
-      <a className="ws-skip" href={detailProduct ? '#product-title' : '#catalog'}>
+      <a className="ws-skip" href={activeDetailProduct ? '#product-title' : '#catalog'}>
         {tr('انتقل للمنتجات', 'Skip to products')}
       </a>
 
@@ -268,10 +270,10 @@ export default function CommerceStorefront({
         </a>
 
         <nav aria-label={tr('التنقل', 'Main navigation')}>
-          <a href={detailProduct ? `/s/${store.slug}#catalog` : '#catalog'}>
+          <a href={activeDetailProduct ? `/s/${store.slug}#catalog` : '#catalog'}>
             {tr('المجموعة والمنتجات', 'Collection')}
           </a>
-          <a href={detailProduct ? `/s/${store.slug}#reviews` : '#reviews'}>
+          <a href={activeDetailProduct ? `/s/${store.slug}#reviews` : '#reviews'}>
             {tr('آراء العملاء', 'Reviews')}
           </a>
           <a href={wa} target="_blank" rel="noreferrer">
@@ -314,11 +316,20 @@ export default function CommerceStorefront({
       )}
 
       <main>
-        {detailProduct ? (
+        {preview && previewDetail && (
+          <button
+            type="button"
+            className="ws-preview-product-back"
+            onClick={() => setPreviewDetail(null)}
+          >
+            {tr('العودة لجميع المنتجات', 'Back to all products')}
+          </button>
+        )}
+        {activeDetailProduct ? (
           <ProductDetails
-            key={detailProduct.id}
+            key={activeDetailProduct.id}
             store={store}
-            product={detailProduct}
+            product={activeDetailProduct}
             english={english}
             disabled={!!store.isTrialExpired}
             add={add}
@@ -483,7 +494,7 @@ export default function CommerceStorefront({
                             onClick={(event) => {
                               if (preview) {
                                 event.preventDefault();
-                                setProduct(p);
+                                setPreviewDetail(p);
                               }
                               if (store.metaPixelId && !preview) {
                                 pixel.viewContent(store.metaPixelId, {
@@ -523,7 +534,7 @@ export default function CommerceStorefront({
 
                           <div className="ws-product-info">
                             <h3>
-                              <Link prefetch={false} href={preview ? '#product-details' : `/s/${encodeURIComponent(store.slug)}/p/${encodeURIComponent(p.slug)}`} onClick={preview ? (event) => { event.preventDefault(); setProduct(p); } : undefined}>{p.name}</Link>
+                              <Link prefetch={false} href={preview ? '#product-details' : `/s/${encodeURIComponent(store.slug)}/p/${encodeURIComponent(p.slug)}`} onClick={preview ? (event) => { event.preventDefault(); setPreviewDetail(p); } : undefined}>{p.name}</Link>
                             </h3>
                             <Link
                               prefetch={false}
