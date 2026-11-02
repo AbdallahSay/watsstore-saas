@@ -44,13 +44,13 @@ export default function ProductDetails({ store, product, english, disabled, add 
       <div className="ws-product-information"><p className="ws-eyebrow">{store.categories.find(c => c.id === product.categoryId)?.name}</p><h1 id="product-title">{product.name}</h1>
         <p className="ws-product-detail-price">{money(product.price)} {product.compareAtPrice && product.compareAtPrice > product.price ? <del>{money(product.compareAtPrice)}</del> : null}</p>
         <p role="status">{unavailable ? tr('غير متوفر حالياً', 'Currently unavailable') : tr('متاح للطلب', 'Available to order')}</p>
-        {product.description && <p className="ws-product-description">{product.description}</p>}
         <form onSubmit={event => { event.preventDefault(); if (!unavailable) add(product, quantity, variants); }}>
           {groups.map(group => <fieldset key={group.name}><legend>{group.name}</legend><div className="ws-product-options">{group.options.map(option => <button type="button" key={option} aria-pressed={variants[group.name] === option} onClick={() => setVariants(old => ({...old, [group.name]: option}))}>{option}</button>)}</div></fieldset>)}
           <label className="ws-product-quantity">{tr('الكمية', 'Quantity')}<input type="number" name="quantity" min="1" max={max} required value={quantity} onChange={event => setQuantity(Math.max(1, Math.min(max, Number(event.target.value) || 1)))}/></label>
           <div className="ws-product-actions"><button className="ws-primary-action" disabled={unavailable} type="submit">{tr('أضف إلى الحقيبة', 'Add to bag')}</button><button className="ws-secondary-action" disabled={unavailable} type="button" onClick={() => add(product, quantity, variants, true)}>{tr('اشترِ الآن', 'Buy now')}</button></div>
           <p className="ws-product-stock-note">{tr('نتحقق من مخزون الاختيارات والسعر النهائي على الخادم عند تأكيد الطلب.', 'Variant stock and the final price are checked when your order is confirmed.')}</p>
         </form>
+        {product.description && <p className="ws-product-description">{product.description}</p>}
       </div>
     </section>
     {!!related.length && <section className="ws-related"><h2>{tr('من نفس المجموعة', 'From the same collection')}</h2><div className="ws-product-grid">{related.map(p => <article className="ws-product-card" key={p.id}><Link prefetch={false} href={`/s/${encodeURIComponent(store.slug)}/p/${encodeURIComponent(p.slug)}`}>{p.imageUrl && <StoreImage sizes="(max-width: 767px) 50vw, 25vw" src={p.imageUrl} alt={p.name} loading="lazy" width="400" height="500"/>}<h3>{p.name}</h3><p>{money(p.price)}</p></Link></article>)}</div></section>}

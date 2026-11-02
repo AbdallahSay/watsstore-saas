@@ -3,13 +3,15 @@
 import { useEffect, useRef } from 'react';
 
 /** Keeps keyboard navigation inside an open dialog and restores the trigger. */
-export function useDialog(open: boolean, onClose: () => void) {
+export function useDialog(open: boolean, onClose: () => void, closeAt?: string) {
   const ref = useRef<HTMLDivElement>(null);
   const close = useRef(onClose);
   close.current = onClose;
 
   useEffect(() => {
     if (!open) return;
+    const breakpoint = closeAt ? window.matchMedia(closeAt) : null;
+    if (breakpoint?.matches) { close.current(); return; }
     const dialog = ref.current;
     if (!dialog) return;
     const trigger = document.activeElement as HTMLElement | null;
@@ -35,11 +37,14 @@ export function useDialog(open: boolean, onClose: () => void) {
       }
     };
     document.addEventListener('keydown', handleKey);
+    const handleBreakpoint = () => { if (breakpoint?.matches) close.current(); };
+    breakpoint?.addEventListener('change', handleBreakpoint);
     return () => {
       document.removeEventListener('keydown', handleKey);
+      breakpoint?.removeEventListener('change', handleBreakpoint);
       document.body.style.overflow = overflow;
-      if (trigger?.isConnected) trigger.focus();
+      if (trigger?.isConnected && trigger.getClientRects().length) trigger.focus();
     };
-  }, [open]);
+  }, [open, closeAt]);
   return ref;
 }

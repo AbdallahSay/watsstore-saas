@@ -4,6 +4,7 @@ import React, { useState, useEffect, useCallback, Component, ErrorInfo, ReactNod
 import Link from 'next/link';
 import { appSwal } from '@/lib/sweetalert';
 import { useLanguage } from '@/context/LanguageContext';
+import { useDialog } from '@/hooks/useDialog';
 import { 
   Store as StoreIcon, 
   Users, 
@@ -199,6 +200,9 @@ export default function SuperAdminPage() {
   const [modalSelectedPlan, setModalSelectedPlan] = useState<'Free' | 'Pro' | 'VIP'>('Free');
   const [modalDurationDays, setModalDurationDays] = useState<number>(30); // 30 (monthly) or 365 (annual)
   const [isUpdatingPlanModal, setIsUpdatingPlanModal] = useState(false);
+  const planDialogRef = useDialog(!!storeForPlanModal, () => {
+    if (!isUpdatingPlanModal) setStoreForPlanModal(null);
+  });
 
   // Initialize Auth
   useEffect(() => {
@@ -2918,15 +2922,15 @@ export default function SuperAdminPage() {
             }
           }}
         >
-          <div className="relative w-full max-w-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+          <div ref={planDialogRef} role="dialog" aria-modal="true" aria-labelledby="admin-plan-title" tabIndex={-1} className="relative w-full max-w-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[calc(100dvh-2rem)]">
             {/* Modal Header */}
-            <div className="flex items-center justify-between p-5 border-b border-slate-100 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-800/50">
+            <div className="shrink-0 flex items-center justify-between p-5 border-b border-slate-100 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-800/50">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl bg-purple-500/10 text-purple-600 dark:text-purple-400 flex items-center justify-center border border-purple-500/20 shadow-sm">
                   <Crown className="w-5 h-5" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-black text-slate-900 dark:text-white">
+                  <h3 id="admin-plan-title" className="text-lg font-black text-slate-900 dark:text-white">
                     تعديل باقة متجر &quot;{storeForPlanModal.storeName}&quot;
                   </h3>
                   <div className="flex items-center gap-2 mt-0.5">
@@ -2955,7 +2959,7 @@ export default function SuperAdminPage() {
             </div>
 
             {/* Modal Body */}
-            <div className="p-6 overflow-y-auto space-y-6">
+            <div className="min-h-0 flex-1 p-6 overflow-y-auto space-y-6">
               {/* Plan Cards Grid */}
               <div>
                 <label className="block text-sm font-bold text-slate-800 dark:text-slate-200 mb-3">
@@ -2964,7 +2968,9 @@ export default function SuperAdminPage() {
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
                   {/* Free Card */}
                   <div
-                    onClick={() => setModalSelectedPlan('Free')}
+                    role="button" tabIndex={isUpdatingPlanModal ? -1 : 0} aria-pressed={modalSelectedPlan === 'Free'} aria-disabled={isUpdatingPlanModal}
+                    onClick={() => { if (!isUpdatingPlanModal) setModalSelectedPlan('Free'); }}
+                    onKeyDown={event => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); if (!isUpdatingPlanModal) setModalSelectedPlan('Free'); } }}
                     className={`relative p-4 rounded-xl border-2 cursor-pointer transition-all duration-200 ${
                       modalSelectedPlan === 'Free'
                         ? 'border-emerald-500 bg-emerald-50/70 dark:bg-emerald-950/25 shadow-md ring-2 ring-emerald-500/20'
@@ -3004,7 +3010,9 @@ export default function SuperAdminPage() {
 
                   {/* Pro Card */}
                   <div
-                    onClick={() => setModalSelectedPlan('Pro')}
+                    role="button" tabIndex={isUpdatingPlanModal ? -1 : 0} aria-pressed={modalSelectedPlan === 'Pro'} aria-disabled={isUpdatingPlanModal}
+                    onClick={() => { if (!isUpdatingPlanModal) setModalSelectedPlan('Pro'); }}
+                    onKeyDown={event => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); if (!isUpdatingPlanModal) setModalSelectedPlan('Pro'); } }}
                     className={`relative p-4 rounded-xl border-2 cursor-pointer transition-all duration-200 ${
                       modalSelectedPlan === 'Pro'
                         ? 'border-purple-500 bg-purple-50/70 dark:bg-purple-950/25 shadow-md ring-2 ring-purple-500/20'
@@ -3044,7 +3052,9 @@ export default function SuperAdminPage() {
 
                   {/* VIP Card */}
                   <div
-                    onClick={() => setModalSelectedPlan('VIP')}
+                    role="button" tabIndex={isUpdatingPlanModal ? -1 : 0} aria-pressed={modalSelectedPlan === 'VIP'} aria-disabled={isUpdatingPlanModal}
+                    onClick={() => { if (!isUpdatingPlanModal) setModalSelectedPlan('VIP'); }}
+                    onKeyDown={event => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); if (!isUpdatingPlanModal) setModalSelectedPlan('VIP'); } }}
                     className={`relative p-4 rounded-xl border-2 cursor-pointer transition-all duration-200 ${
                       modalSelectedPlan === 'VIP'
                         ? 'border-amber-500 bg-amber-50/70 dark:bg-amber-950/25 shadow-md ring-2 ring-amber-500/20'
@@ -3126,7 +3136,7 @@ export default function SuperAdminPage() {
             </div>
 
             {/* Modal Footer */}
-            <div className="flex items-center justify-end gap-3 p-5 border-t border-slate-100 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-800/50">
+            <div className="shrink-0 flex flex-wrap items-center justify-end gap-3 p-5 border-t border-slate-100 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-800/50">
               <button
                 type="button"
                 onClick={() => setStoreForPlanModal(null)}

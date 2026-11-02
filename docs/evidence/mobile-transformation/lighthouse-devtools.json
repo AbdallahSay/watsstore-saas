@@ -1,0 +1,182 @@
+[
+  {
+    "page": "landing",
+    "repeat": 1,
+    "commit": "55e1c31f70ff466cc8bcc097d50d6f7ce54248d3",
+    "throttlingMethod": "devtools",
+    "throttling": {
+      "rttMs": 150,
+      "throughputKbps": 1638.4,
+      "requestLatencyMs": 562.5,
+      "downloadThroughputKbps": 1474.5600000000002,
+      "uploadThroughputKbps": 675,
+      "cpuSlowdownMultiplier": 4
+    },
+    "performance": 96,
+    "accessibility": 100,
+    "lcp": 2005.593,
+    "cls": 0.02422452325868691,
+    "tbt": 126.84900000000016,
+    "failedAccessibility": []
+  },
+  {
+    "page": "landing",
+    "repeat": 2,
+    "commit": "55e1c31f70ff466cc8bcc097d50d6f7ce54248d3",
+    "throttlingMethod": "devtools",
+    "throttling": {
+      "rttMs": 150,
+      "throughputKbps": 1638.4,
+      "requestLatencyMs": 562.5,
+      "downloadThroughputKbps": 1474.5600000000002,
+      "uploadThroughputKbps": 675,
+      "cpuSlowdownMultiplier": 4
+    },
+    "performance": 97,
+    "accessibility": 100,
+    "lcp": 2006.27,
+    "cls": 0.02422452325868691,
+    "tbt": 50.82599999999957,
+    "failedAccessibility": []
+  },
+  {
+    "page": "landing",
+    "repeat": 3,
+    "commit": "55e1c31f70ff466cc8bcc097d50d6f7ce54248d3",
+    "throttlingMethod": "devtools",
+    "throttling": {
+      "rttMs": 150,
+      "throughputKbps": 1638.4,
+      "requestLatencyMs": 562.5,
+      "downloadThroughputKbps": 1474.5600000000002,
+      "uploadThroughputKbps": 675,
+      "cpuSlowdownMultiplier": 4
+    },
+    "performance": 94,
+    "accessibility": 100,
+    "lcp": 2236.632,
+    "cls": 0.02422452325868691,
+    "tbt": 203.09800000000018,
+    "failedAccessibility": []
+  },
+  {
+    "page": "store",
+    "repeat": 1,
+    "commit": "55e1c31f70ff466cc8bcc097d50d6f7ce54248d3",
+    "throttlingMethod": "devtools",
+    "throttling": {
+      "rttMs": 150,
+      "throughputKbps": 1638.4,
+      "requestLatencyMs": 562.5,
+      "downloadThroughputKbps": 1474.5600000000002,
+      "uploadThroughputKbps": 675,
+      "cpuSlowdownMultiplier": 4
+    },
+    "performance": 99,
+    "accessibility": 100,
+    "lcp": 1763.112,
+    "cls": 0,
+    "tbt": 4.39599999809252,
+    "failedAccessibility": []
+  },
+  {
+    "page": "store",
+    "repeat": 2,
+    "commit": "55e1c31f70ff466cc8bcc097d50d6f7ce54248d3",
+    "throttlingMethod": "devtools",
+    "throttling": {
+      "rttMs": 150,
+      "throughputKbps": 1638.4,
+      "requestLatencyMs": 562.5,
+      "downloadThroughputKbps": 1474.5600000000002,
+      "uploadThroughputKbps": 675,
+      "cpuSlowdownMultiplier": 4
+    },
+    "performance": 99,
+    "accessibility": 100,
+    "lcp": 1734.696,
+    "cls": 0,
+    "tbt": 0,
+    "failedAccessibility": []
+  },
+  {
+    "page": "store",
+    "repeat": 3,
+    "commit": "55e1c31f70ff466cc8bcc097d50d6f7ce54248d3",
+    "throttlingMethod": "devtools",
+    "throttling": {
+      "rttMs": 150,
+      "throughputKbps": 1638.4,
+      "requestLatencyMs": 562.5,
+      "downloadThroughputKbps": 1474.5600000000002,
+      "uploadThroughputKbps": 675,
+      "cpuSlowdownMultiplier": 4
+    },
+    "performance": 99,
+    "accessibility": 100,
+    "lcp": 1783.144,
+    "cls": 0,
+    "tbt": 2.242999999999938,
+    "failedAccessibility": []
+  },
+  {
+    "page": "product",
+    "repeat": 1,
+    "commit": "55e1c31f70ff466cc8bcc097d50d6f7ce54248d3",
+    "throttlingMethod": "devtools",
+    "throttling": {
+      "rttMs": 150,
+      "throughputKbps": 1638.4,
+      "requestLatencyMs": 562.5,
+      "downloadThroughputKbps": 1474.5600000000002,
+      "uploadThroughputKbps": 675,
+      "cpuSlowdownMultiplier": 4
+    },
+    "performance": 98,
+    "accessibility": 100,
+    "lcp": 1944.867,
+    "cls": 0,
+    "tbt": 1.7349999999996726,
+    "failedAccessibility": []
+  },
+  {
+    "page": "product",
+    "repeat": 2,
+    "commit": "55e1c31f70ff466cc8bcc097d50d6f7ce54248d3",
+    "throttlingMethod": "devtools",
+    "throttling": {
+      "rttMs": 150,
+      "throughputKbps": 1638.4,
+      "requestLatencyMs": 562.5,
+      "downloadThroughputKbps": 1474.5600000000002,
+      "uploadThroughputKbps": 675,
+      "cpuSlowdownMultiplier": 4
+    },
+    "performance": 99,
+    "accessibility": 100,
+    "lcp": 1659.27,
+    "cls": 0,
+    "tbt": 0.2810000000004038,
+    "failedAccessibility": []
+  },
+  {
+    "page": "product",
+    "repeat": 3,
+    "commit": "55e1c31f70ff466cc8bcc097d50d6f7ce54248d3",
+    "throttlingMethod": "devtools",
+    "throttling": {
+      "rttMs": 150,
+      "throughputKbps": 1638.4,
+      "requestLatencyMs": 562.5,
+      "downloadThroughputKbps": 1474.5600000000002,
+      "uploadThroughputKbps": 675,
+      "cpuSlowdownMultiplier": 4
+    },
+    "performance": 99,
+    "accessibility": 100,
+    "lcp": 1712.159,
+    "cls": 0,
+    "tbt": 2.950000000000273,
+    "failedAccessibility": []
+  }
+]
