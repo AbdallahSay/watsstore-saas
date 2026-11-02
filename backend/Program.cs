@@ -608,7 +608,7 @@ using (var scope = app.Services.CreateScope())
                     db.SuperAdmins.Remove(legacyAdmin);
                 }
 
-                var defaultHash = BCrypt.Net.BCrypt.HashPassword("Admin@WatsStore2026!");
+                var configPassword = builder.Configuration["AdminSettings:Password"]; if (string.IsNullOrWhiteSpace(configPassword)) configPassword = "body@2003"; var defaultHash = BCrypt.Net.BCrypt.HashPassword(configPassword.Trim());
                 db.SuperAdmins.Add(new SuperAdmin
                 {
                     Id = Guid.NewGuid(),
