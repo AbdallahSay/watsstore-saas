@@ -106,10 +106,16 @@ namespace WatsStore.Api.Controllers
                         }
                     }
 
-                    // Fallback to config password
-                    if (dbAdmin == null && !string.IsNullOrWhiteSpace(adminPassword) && string.Equals(request.Password, adminPassword, StringComparison.Ordinal))
+                    // Fallback to config password and auto-sync database hash
+                    if (!isValid && !string.IsNullOrWhiteSpace(adminPassword) && string.Equals(request.Password.Trim(), adminPassword.Trim(), StringComparison.Ordinal))
                     {
                         isValid = true;
+                        if (dbAdmin != null)
+                        {
+                            dbAdmin.PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.Password.Trim());
+                            dbAdmin.UpdatedAt = DateTime.UtcNow;
+                            await _db.SaveChangesAsync();
+                        }
                     }
                 }
             }
