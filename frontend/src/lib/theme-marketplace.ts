@@ -21,7 +21,7 @@ export type BusinessThemeCategory = typeof BUSINESS_CATEGORIES[number]['id'];
 export const THEME_DESIGN_ROADMAP = [
   {id:'editorial-luxe',name:'Editorial Luxe',category:'fashion',legacy:'editorial',status:'available-legacy'},
   {id:'street-pulse',name:'Street Pulse',category:'streetwear',legacy:'streetwear',status:'available-legacy'},
-  {id:'pure-beauty',name:'Pure Beauty',category:'beauty',status:'planned'},
+  {id:'pure-beauty',name:'Pure Beauty',category:'beauty',status:'available'},
   {id:'tech-grid',name:'Tech Grid',category:'electronics',status:'planned'},
   {id:'fresh-market',name:'Fresh Market',category:'grocery',status:'planned'},
   {id:'living-space',name:'Living Space',category:'home',legacy:'lifestyle',status:'available-legacy'},
@@ -32,8 +32,9 @@ export const THEME_DESIGN_ROADMAP = [
 ] as const;
 
 /** Only backend-supported IDs may be selected, saved or published. */
-export const LEGACY_THEME_CATEGORIES: Record<'editorial'|'streetwear'|'lifestyle', readonly BusinessThemeCategory[]> = {
+export const LEGACY_THEME_CATEGORIES: Record<'editorial'|'streetwear'|'lifestyle'|'pure-beauty', readonly BusinessThemeCategory[]> = {
   editorial:['fashion','beauty','jewelry','handmade'],
   streetwear:['streetwear','sports','electronics','fashion'],
+  'pure-beauty':['beauty','jewelry','handmade'],
   lifestyle:['home','kids','grocery','handmade','beauty'],
 };
