@@ -51,7 +51,7 @@ async function inspect(page, theme, width, engine) {
       pageOverflow: document.documentElement.scrollWidth > innerWidth + 2,
       columns: grid ? getComputedStyle(grid).gridTemplateColumns.split(' ').filter(Boolean).length : 0,
       overflowing: overflowing.slice(0, 8),
-      modalToolbarOverflow: Array.from(document.querySelectorAll('[data-testid="merchant-theme-preview"] button')).filter(el => {
+      modalToolbarOverflow: Array.from(document.querySelectorAll('[data-testid="merchant-theme-preview"] > div:first-child button')).filter(el => {
         const r = el.getBoundingClientRect();
         return r.width && (r.left < -1 || r.right > innerWidth + 1 || el.scrollWidth > el.clientWidth + 3);
       }).map(el => el.textContent.trim().slice(0, 50)),
@@ -60,7 +60,7 @@ async function inspect(page, theme, width, engine) {
     };
   });
   assert.equal(metrics.pageOverflow, false, 'No page horizontal overflow: ' + engine + ' ' + width);
-  assert.ok(metrics.columns <= 2, 'Mobile preview should show <=2 product columns: ' + theme + ' ' + engine);
+  assert.ok(metrics.columns >= 1 && metrics.columns <= 2, 'Mobile preview should show 1-2 product columns: ' + theme + ' ' + engine);
   assert.deepEqual(metrics.overflowing, [], 'Preview card/button overflow: ' + theme + ' ' + engine);
   assert.deepEqual(metrics.modalToolbarOverflow, [], 'Preview controls must remain within viewport');
   report.push({ engine, width, theme, status: 'PASS', columns: metrics.columns });
