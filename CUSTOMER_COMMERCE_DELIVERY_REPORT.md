@@ -9,12 +9,18 @@ schema remain disabled and undeployed. No real-device push delivery is claimed.
 
 PR #34 remains draft; its notification implementation is unchanged. No production
 migration, restore, new order, subscription, dispatch or backend deployment was made.
-The existing production frontend SHA/deployment below remain the last verified release.
+The original `0cd289e` release below remains the last end-to-end verification recorded
+here. A separate admin hotfix reached master during this continuation; Vercel metadata
+now reports `162c5c94265c063ca5666c7b1124e33f78380901`, deployment
+`dpl_5srbpdU9C6Gn3RLmhQCD134dP3tV`, READY. That was not a deployment by this work,
+and no new production checkout test is claimed for it. Both working branches retain
+the incoming admin security hotfix; notification implementation files are unchanged.
 
 - A **fresh COPY_ONLY full SQL backup with CHECKSUM completed** using the existing
   authorized SQL account. A unique server-side `.bak` was created without replacing
   prior files or changing application rows. Its private location and request/completion
-  timestamps are recorded in ignored `work/pr34-ops/backup-attempt.json`.
+  timestamps are recorded in ignored `work/pr34-ops/backup-attempt.json`: requested
+  **2026-11-02 07:00:25.924 UTC**, completed **07:00:26.369 UTC**.
 - **Restorability is NOT verified.** `RESTORE VERIFYONLY WITH CHECKSUM` was denied
   (SQL **262**). Backup history is still inaccessible (SQL **229**). The account has
   BACKUP DATABASE permission but CREATE ANY DATABASE = 0, VIEW ANY DATABASE = 0,
@@ -51,6 +57,12 @@ first/native-commerce work in a separate branch. That work proceeds independentl
 from notification infrastructure. Necessary operational access is hosting-panel
 backup export/isolated restore, a compatible existing scheduler, and supported-device
 testing; no new credentials or purchase are requested.
+
+The operational report commit `fb6e658` passed all three jobs in
+[CI 41403690193](https://github.com/AbdallahSay/watsstore-saas/actions/runs/41403690193).
+Final integration checks are recorded on PR #34. The independent mobile/native work
+is in [PR #37](https://github.com/AbdallahSay/watsstore-saas/pull/37), with its own CI
+and report; it does not enable or merge these notification changes.
 
 ## Release evidence
 
