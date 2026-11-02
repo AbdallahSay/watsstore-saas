@@ -148,6 +148,9 @@ jobs:
       - name: Verify dedicated product and complete order journey across engines
         run: npm run test:native-journey
         working-directory: frontend
+      - name: Verify ten theme previews on mobile in Chrome, Firefox and WebKit
+        run: npm run test:theme-preview-mobile
+        working-directory: frontend
       - name: Verify responsive page matrix and accessible dialogs
         run: |
           npm run test:responsive
