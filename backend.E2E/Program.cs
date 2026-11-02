@@ -27,7 +27,8 @@ foreach (var theme in new[] { "editorial", "streetwear", "lifestyle" })
         liveStore.StoreName = theme == "editorial" ? "دار التفاصيل" : theme == "streetwear" ? "شارع" : "بيت وأثر";
         liveStore.CoverUrl = "http://localhost:5000/test-product.svg";
         liveStore.SeoDescription = "تشكيلة مختارة بعناية. اختبار معزول للتسوق وإتمام الطلب.";
-        db.Products.AddRange(Enumerable.Range(1,7).Select(i => new Product { StoreId = store.Id, Category = category, Name = $"منتج الاختبار {i}", Slug = $"product-{i}", Price = 80 + i * 25, ImageUrl = p.ImageUrl, Description = p.Description }));
+        db.Products.AddRange(Enumerable.Range(1,7).Select(i => new Product { StoreId = store.Id, Category = category, Name = i == 7 ? new string('W',70)+" — منتج بمواصفات طويلة للمقاسات والألوان" : $"منتج الاختبار {i}", Slug = $"product-{i}", Price = 80 + i * 25, ImageUrl = p.ImageUrl, Description = p.Description }));
+        db.StoreCoupons.Add(new StoreCoupon { StoreId = store.Id, Code = "MOBILE10", DiscountType = "Percentage", DiscountValue = 10, IsActive = true });
         db.InventoryStocks.Add(new InventoryStock { StoreId = store.Id, ProductId = p.Id, Quantity = 25 });
         await db.SaveChangesAsync();
     });

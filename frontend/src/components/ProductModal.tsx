@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useMemo } from 'react';
 import { useDialog } from './commerce/useDialog';
 import { Product, ProductVariantGroup } from '../types';
 import { X, Plus, Minus, ShoppingBag, Check, ChevronLeft, ChevronRight } from 'lucide-react';
@@ -13,59 +13,30 @@ interface ProductModalProps {
   onAddToCart: (product: Product, quantity: number, selectedVariants: Record<string, string>) => void;
 }
 
-export default function ProductModal({
+export default function ProductModal(props: ProductModalProps) {
+  if (!props.isOpen || !props.product) return null;
+  return <ProductModalContent key={props.product.id} {...props} product={props.product}/>;
+}
+
+function ProductModalContent({
   product,
   currency,
   isOpen,
   onClose,
   onAddToCart,
-}: ProductModalProps) {
+}: ProductModalProps & {product: Product}) {
   const dialogRef = useDialog(isOpen && !!product, onClose);
   const [quantity, setQuantity] = useState(1);
-  const [selectedVariants, setSelectedVariants] = useState<Record<string, string>>({});
-  const [variantGroups, setVariantGroups] = useState<ProductVariantGroup[]>([]);
+  const variantGroups = useMemo<ProductVariantGroup[]>(() => {
+    try {
+      const groups:unknown = JSON.parse(product.variantsJson || '[]');
+      if (!Array.isArray(groups)) return [];
+      return groups.filter((group):group is ProductVariantGroup => !!group && typeof group.name === 'string' && Array.isArray(group.options) && group.options.length > 0 && group.options.every((option:unknown) => typeof option === 'string'));
+    } catch { return []; }
+  }, [product.variantsJson]);
+  const [selectedVariants, setSelectedVariants] = useState<Record<string, string>>(() => Object.fromEntries(variantGroups.map(group => [group.name, group.options[0]])));
   const [validationError, setValidationError] = useState<string | null>(null);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
-
-  useEffect(() => {
-    if (product) {
-      setQuantity(1);
-      setActiveImageIndex(0);
-      setValidationError(null);
-      let groups: ProductVariantGroup[] = [];
-      if (product.variantsJson) {
-        try {
-          groups = JSON.parse(product.variantsJson);
-        } catch {
-          groups = [];
-        }
-      }
-      setVariantGroups(groups);
-
-      // Default selections (first option of each group)
-      const initial: Record<string, string> = {};
-      groups.forEach((g) => {
-        if (g.options && g.options.length > 0) {
-          initial[g.name] = g.options[0];
-        }
-      });
-      setSelectedVariants(initial);
-    }
-  }, [product]);
-
-  // Lock body scroll when product modal is open
-  useEffect(() => {
-    if (isOpen && product) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
-    }
-    return () => {
-      document.body.style.overflow = '';
-    };
-  }, [isOpen, product]);
-
-  if (!isOpen || !product) return null;
 
   const isOutOfStock = product.isAvailable === false;
 
@@ -155,7 +126,7 @@ export default function ProductModal({
                       e.stopPropagation();
                       setActiveImageIndex((prev) => (prev - 1 + galleryImages.length) % galleryImages.length);
                     }}
-                    className="pointer-events-auto w-9 h-9 min-w-[36px] min-h-[36px] rounded-full bg-black/40 hover:bg-black/70 text-white backdrop-blur-sm flex items-center justify-center transition-all shadow-md active:scale-95"
+                    className="pointer-events-auto w-11 h-11 min-w-[44px] min-h-[44px] rounded-full bg-black/40 hover:bg-black/70 text-white backdrop-blur-sm flex items-center justify-center transition-all shadow-md active:scale-95"
                     aria-label="الصورة السابقة"
                   >
                     <ChevronRight className="w-5 h-5" />
@@ -167,7 +138,7 @@ export default function ProductModal({
                       e.stopPropagation();
                       setActiveImageIndex((prev) => (prev + 1) % galleryImages.length);
                     }}
-                    className="pointer-events-auto w-9 h-9 min-w-[36px] min-h-[36px] rounded-full bg-black/40 hover:bg-black/70 text-white backdrop-blur-sm flex items-center justify-center transition-all shadow-md active:scale-95"
+                    className="pointer-events-auto w-11 h-11 min-w-[44px] min-h-[44px] rounded-full bg-black/40 hover:bg-black/70 text-white backdrop-blur-sm flex items-center justify-center transition-all shadow-md active:scale-95"
                     aria-label="الصورة التالية"
                   >
                     <ChevronLeft className="w-5 h-5" />
@@ -290,7 +261,7 @@ export default function ProductModal({
                 type="button"
                 disabled={isOutOfStock}
                 onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-                className="w-9 h-9 min-w-[36px] min-h-[36px] rounded-lg bg-white dark:bg-slate-700 text-slate-700 dark:text-slate-200 flex items-center justify-center hover:bg-slate-200 dark:hover:bg-slate-600 font-bold disabled:opacity-40 active:scale-95 transition-transform"
+                className="w-11 h-11 min-w-[44px] min-h-[44px] rounded-lg bg-white dark:bg-slate-700 text-slate-700 dark:text-slate-200 flex items-center justify-center hover:bg-slate-200 dark:hover:bg-slate-600 font-bold disabled:opacity-40 active:scale-95 transition-transform"
                 aria-label="إنقاص الكمية"
               >
                 <Minus className="w-4 h-4" />
@@ -302,7 +273,7 @@ export default function ProductModal({
                 type="button"
                 disabled={isOutOfStock}
                 onClick={() => setQuantity((q) => q + 1)}
-                className="w-9 h-9 min-w-[36px] min-h-[36px] rounded-lg bg-white dark:bg-slate-700 text-slate-700 dark:text-slate-200 flex items-center justify-center hover:bg-slate-200 dark:hover:bg-slate-600 font-bold disabled:opacity-40 active:scale-95 transition-transform"
+                className="w-11 h-11 min-w-[44px] min-h-[44px] rounded-lg bg-white dark:bg-slate-700 text-slate-700 dark:text-slate-200 flex items-center justify-center hover:bg-slate-200 dark:hover:bg-slate-600 font-bold disabled:opacity-40 active:scale-95 transition-transform"
                 aria-label="زيادة الكمية"
               >
                 <Plus className="w-4 h-4" />

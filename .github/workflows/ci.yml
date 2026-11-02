@@ -121,6 +121,9 @@ jobs:
       - name: Verify My Orders, merchant transitions, tracking and notification permissions
         run: npm run test:customer-commerce
         working-directory: frontend
+      - name: Verify mobile native shopping, variants, coupons and accessible checkout
+        run: npm run test:mobile-commerce
+        working-directory: frontend
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -128,3 +131,4 @@ jobs:
           path: |
             work/p0-checkout/e2e/
             work/customer-commerce/e2e/
+            work/mobile-commerce/e2e/
