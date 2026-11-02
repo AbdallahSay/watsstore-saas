@@ -702,14 +702,14 @@ export default function ThemesMarketplacePage() {
                     </button>
                     <button
                       onClick={() => setPreviewViewport('mobile')}
-                      className={`p-2 rounded-lg min-h-[38px] text-xs font-bold flex items-center gap-1.5 border ${
+                      className={`p-2 rounded-lg min-h-11 text-xs font-bold flex items-center gap-1.5 border ${
                         previewViewport === 'mobile'
                           ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900 border-transparent'
                           : 'bg-white dark:bg-slate-900 border-slate-300 dark:border-slate-700'
                       }`}
                     >
                       <Smartphone className="w-4 h-4" />
-                      <span>موبايل (375px)</span>
+                      <span>عرض الموبايل</span>
                     </button>
                   </div>
                 </div>
@@ -1002,7 +1002,7 @@ export default function ThemesMarketplacePage() {
                       }`}
                     >
                       <Smartphone className="w-3.5 h-3.5" />
-                      <span>موبايل (375px)</span>
+                      <span>عرض الموبايل</span>
                     </button>
                   </div>
 
