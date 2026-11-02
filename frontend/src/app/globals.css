@@ -400,3 +400,36 @@ table {
   .ws-merchant-shell input, .ws-merchant-shell select, .ws-merchant-shell textarea,
   .ws-admin-shell input, .ws-admin-shell select, .ws-admin-shell textarea { font-size: 16px; min-height: 44px; }
 }
+
+
+/* Merchant sidebar follows dashboard light/dark preference; storefront themes remain independent. */
+html:not(.dark) .ws-merchant-sidebar { background:#fff; color:#334155; border-color:#e2e8f0; scrollbar-color:#cbd5e1 #fff; }
+html:not(.dark) .ws-merchant-sidebar :is(.border-slate-800,.border-slate-700\/60,.border-slate-700\/50,.border-slate-800\/80) { border-color:#e2e8f0; }
+html:not(.dark) .ws-merchant-sidebar :is(.text-white,.text-slate-300,.text-slate-400,.text-slate-500) { color:#334155; }
+html:not(.dark) .ws-merchant-sidebar :is(.bg-slate-800\/60,.bg-slate-800\/80,.bg-slate-800) { background-color:#f1f5f9; }
+html:not(.dark) .ws-merchant-sidebar nav a:not(.bg-emerald-600):hover { background:#e2e8f0; color:#0f172a; }
+html:not(.dark) .ws-merchant-sidebar nav a.bg-emerald-600,
+html:not(.dark) .ws-merchant-sidebar .bg-emerald-500.text-white { color:#fff; }
+.ws-merchant-sidebar { scrollbar-width:thin; }
+.ws-merchant-content { min-width:0; overflow-wrap:normal; }
+.ws-merchant-content :is(h1,h2,h3,p,button,label,td,th) { word-break:normal; }
+.ws-merchant-content :is(button,a) { overflow-wrap:break-word; }
+.ws-merchant-content button { white-space:normal; text-align:center; }
+.ws-merchant-content .font-mono, .ws-merchant-content [dir="ltr"] { overflow-wrap:anywhere; }
+
+/* Never squeeze merchant table columns into one-letter vertical stacks on phones. */
+@media (max-width: 767px) {
+  .ws-merchant-shell .ws-mobile-cards { display:block !important; table-layout:auto !important; min-width:0 !important; width:100% !important; }
+  .ws-merchant-shell .ws-mobile-cards tbody { display:block !important; width:100% !important; padding:8px !important; }
+  .ws-merchant-shell .ws-mobile-cards tr { display:block !important; width:100% !important; min-width:0 !important; padding:8px 0; }
+  .ws-merchant-shell .ws-mobile-cards td {
+    display:block !important; width:100% !important; min-width:0 !important;
+    max-width:100% !important; padding:10px 12px !important;
+    overflow-wrap:break-word !important; word-break:normal !important;
+    white-space:normal !important; text-align:start !important;
+  }
+  .ws-merchant-shell .ws-mobile-cards td > div { width:100%; min-width:0; max-width:100%; flex-wrap:wrap; }
+  .ws-merchant-shell .ws-mobile-cards td :is(span,button,a) { overflow-wrap:break-word; word-break:normal; max-width:100%; }
+  .ws-merchant-shell .ws-mobile-cards td::before { width:100%; text-align:start; }
+  .ws-merchant-content .grid > * { min-width:0; }
+}
