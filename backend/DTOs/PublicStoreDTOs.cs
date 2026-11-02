@@ -6,7 +6,8 @@ namespace WatsStore.Api.DTOs
 {
     public class PublicStoreResponse
     {
-        public string ThemeId { get; set; } = "editorial";
+        public string ThemeId { get; set; } = "editorial-luxe";
+        public string CustomizationJson { get; set; } = "{}";
         public string CheckoutMode { get; set; } = "whatsapp";
         public bool CashOnDelivery { get; set; } = true;
         public bool InstaPay { get; set; }

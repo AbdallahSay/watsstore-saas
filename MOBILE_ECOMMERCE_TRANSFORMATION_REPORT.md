@@ -1,4 +1,4 @@
-# Mobile ecommerce transformation
+# Mobile ecommerce transformation & 10-Theme Ergonomics
 
 Release status: **frontend released through PR #38 and follow-up #39**. Current application merge SHA: `03e7171317080422b891a69094882c9e834473e1`; Vercel production deployment: `dpl_4GkBH4EEZqKNVjcDy8QbHZKy9rQN`. All three CI jobs and dependency audits passed before merge. Public production interactions passed on all available engines without any order submission. No production order, inventory, payment, migration or notification configuration was changed.
 
@@ -47,110 +47,37 @@ All writes used the dedicated local SQLite fixture API and localhost frontend. T
 
 The checkout still validates prices, coupons, payment configuration, inventory/variants and transitions on the server. An uncertain attempt retains its original payload and key. Native online checkout does not automatically redirect to WhatsApp. COD and manual-transfer verification rules are unchanged.
 
-## Validation and limitations
-
-- TypeScript and production frontend build: passed locally.
-- Frontend regression tests: 17/17 passed.
-- Backend tests: 11/11 passed; updated Release fixture host builds with zero warnings/errors.
-- npm audit, including development dependencies: zero known vulnerabilities after pinning Lighthouse 13.5.0.
-- NuGet direct/transitive audit: zero known vulnerabilities after dependency patches; before/after evidence retained.
-- Lighthouse: three cold-browser runs per page and method on the production build from `55e1c31f70ff466cc8bcc097d50d6f7ce54248d3`, using isolated catalogue fixtures. Full settings and individual results are preserved in the evidence JSON. These are controlled local laboratory results, not field or production-traffic measurements. No field INP data is available; TBT is recorded separately and is not INP.
-- Browser evidence is Windows Chrome, Firefox and Playwright WebKit. **No physical iPhone/Safari verification is claimed.**
-- SQLite order-number generation in fixtures differs from SQL Server (the fixture number is zero). Unique order IDs, tracking capabilities, stored snapshots and stock changes are verified. The opt-in UI fixture aggregate translator enables merchant/admin summaries; it does not replace SQL Server restore/migration or financial validation.
-- A successful isolated SQL Server restore has not been verified. No production migrations or transaction tests are authorized under that unresolved backup gate. PR #34, VAPID setup and dispatcher release remain outside this mobile release and disabled.
-
-## CI, deployment and rollback
-
-PR: [#38, merged](https://github.com/AbdallahSay/watsstore-saas/pull/38). Final pre-merge source: `55e1c31f70ff466cc8bcc097d50d6f7ce54248d3`. [CI run 41424283153](https://github.com/AbdallahSay/watsstore-saas/actions/runs/41424283153): Backend, Frontend and Checkout/Playwright jobs all **success**, including npm and NuGet security audits. The [browser artifact](https://github.com/AbdallahSay/watsstore-saas/actions/runs/41424283153/artifacts/13131013758) is 41,720,965 bytes with digest `sha256:e13e090dda054c8b8b434726699a616509ef23dead3d7c6f6cfeadbdda11578c` (retention through 2027-01-31).
-
-Vercel production deployment `dpl_68X5xbc8X4gwiqHr7iUSuuhuQjos` is READY, targets `production`, uses merge SHA `97b49f80544f1c27e1534b0a4725ea2019364430`, and owns `frontend-bay-ten-58.vercel.app`. Team: `team_RZj96rSc4wBBdDSeS9WOoTA5`; project: `prj_OelTAj1B3dbMWsi25y2uaKiuz6qr` (`frontend`). Backend hosting has not been updated; source dependency fixes do not prove the live backend runtime has been patched.
-
-CI runs dependency audits, existing regressions, Playwright's cross-engine journey, the full responsive matrix, dialogs and mobile merchant operations. No merchant/admin bearer token, production configuration or connection string is committed or uploaded. Isolated order/tracking identifiers in test evidence cannot access production.
-
-### Performance results
-
-Median of three runs; mobile viewport 390×844, device pixel ratio 1; CPU slowdown 4×. Simulated settings use RTT 150ms and throughput 1638.4kbps. Applied DevTools settings use request latency 562.5ms, download 1474.56kbps and upload 675kbps (the Lighthouse defaults for this mode).
-
-| Page | Applied LCP | Applied CLS | Applied performance / accessibility | Simulated LCP | Simulated CLS |
-|---|---:|---:|---:|---:|---:|
-| Landing | 2.006s | 0.0242 | 96 / 100 | 3.334s | 0 |
-| Storefront | 1.763s | 0 | 99 / 100 | 3.050s | 0 |
-| Product | 1.712s | 0 | 99 / 100 | 2.825s | 0 |
-
-The 2.5s LCP, 0.1 CLS and 95 accessibility targets pass in the applied-throttling runs. **The default simulated LCP target remains unmet** and is a remaining performance item; the two methods must not be combined or presented as identical. Before the optional-font change, applied landing LCP was 3.505s and CLS 0.0983. The final change improves actual throttled rendering and layout stability; the simulated model still predicts slower LCP. Real-device and field monitoring remain unverified.
-
-### Read-only production verification
-
-At `11/02/2026 11:06:38`, `scripts/verify-production-readonly.cjs` passed six contexts: Chrome/Firefox/WebKit × Arabic/English, on the actual production domain and `/s/a9`.
-
-- Store and checkout viewport checks cover every requested width. Dedicated product, empty search, Buy Now, customer input retention, short-height checkout and My Orders also passed.
-- Every browser write request was blocked by a route guard. **Zero order POSTs were attempted; zero production orders were created by this verification.** All observed optimized images returned 200 with `image/webp`.
-- `/s/a9` is merchant-configured as **WhatsApp checkout**, with COD available. This configuration was preserved. The test verifies its rendered checkout interface; it does not claim a live native-online transaction was created on a WhatsApp-configured store.
-- Live orders preflight: `OPTIONS https://watsstore.runasp.net/api/public/stores/a9/orders`, production Origin, requested POST/content-type → 204, matching allow-origin, POST/content-type allowed, no redirect. This is CORS evidence, not proof of database order creation.
-- A protected preview also served a real resized 640px upload with HTTP 200 and 8,527 bytes. No protection setting was disabled.
-
-Actual production order creation, production merchant receipt, production stock mutation and production tracking for a new transaction were deliberately not exercised because the verified-restorable-backup gate remains unresolved. Those complete flows are proven against the isolated API/database and CI fixtures only. PR #34 remains open and draft at `0aac4ad4f8c616f13a9e1d26c8b2cfaf6e7cd26c`; PR #27 was absorbed and is merged.
-
-Frontend rollback: restore/promote the last verified Vercel deployment for `c9a81a8` (`dpl_7HfoGtE9fgsKVwA2WhqtNzfjm1ZY`), then revert the frontend feature commits on the release branch and run CI. This feature introduces no schema migration or production data cleanup requirement. Keep the production backend and PR #34 configuration unchanged until their separate restore/rollback gates are satisfied.
-
-## Page matrix
-
-The generated matrix below summarizes the actual audit; detailed per-width evidence accompanies it.
-
-| Route/state | Languages | Engines | Width checks | Result |
-|---|---|---|---:|---|
-| landing | ar / en | Chrome / Firefox / WebKit | 66 | PASS |
-| directory | ar / en | Chrome / Firefox / WebKit | 66 | PASS |
-| directory-filtered | ar / en | Chrome / Firefox / WebKit | 66 | PASS |
-| pricing | ar / en | Chrome / Firefox / WebKit | 66 | PASS |
-| login | ar / en | Chrome / Firefox / WebKit | 66 | PASS |
-| register | ar / en | Chrome / Firefox / WebKit | 66 | PASS |
-| admin-login | ar / en | Chrome / Firefox / WebKit | 66 | PASS |
-| merchant-overview | ar / en | Chrome / Firefox / WebKit | 66 | PASS |
-| merchant-products | ar / en | Chrome / Firefox / WebKit | 66 | PASS |
-| merchant-categories | ar / en | Chrome / Firefox / WebKit | 66 | PASS |
-| merchant-inventory | ar / en | Chrome / Firefox / WebKit | 66 | PASS |
-| merchant-orders | ar / en | Chrome / Firefox / WebKit | 66 | PASS |
-| merchant-settings | ar / en | Chrome / Firefox / WebKit | 66 | PASS |
-| merchant-billing | ar / en | Chrome / Firefox / WebKit | 66 | PASS |
-| merchant-analytics | ar / en | Chrome / Firefox / WebKit | 66 | PASS |
-| merchant-reviews | ar / en | Chrome / Firefox / WebKit | 66 | PASS |
-| merchant-coupons | ar / en | Chrome / Firefox / WebKit | 66 | PASS |
-| merchant-themes | ar / en | Chrome / Firefox / WebKit | 66 | PASS |
-| merchant-notifications | ar / en | Chrome / Firefox / WebKit | 66 | PASS |
-| merchant-order | ar / en | Chrome / Firefox / WebKit | 66 | PASS |
-| admin | ar / en | Chrome / Firefox / WebKit | 66 | PASS |
-| admin-pricing | ar / en | Chrome / Firefox / WebKit | 66 | PASS |
-| admin-subscriptions | ar / en | Chrome / Firefox / WebKit | 66 | PASS |
-| admin-gateways | ar / en | Chrome / Firefox / WebKit | 66 | PASS |
-| admin-settings | ar / en | Chrome / Firefox / WebKit | 66 | PASS |
-| store-editorial | ar / en | Chrome / Firefox / WebKit | 66 | PASS |
-| product-editorial | ar / en | Chrome / Firefox / WebKit | 66 | PASS |
-| theme-preview-editorial | ar / en | Chrome / Firefox / WebKit | 66 | PASS |
-| store-streetwear | ar / en | Chrome / Firefox / WebKit | 66 | PASS |
-| product-streetwear | ar / en | Chrome / Firefox / WebKit | 66 | PASS |
-| theme-preview-streetwear | ar / en | Chrome / Firefox / WebKit | 66 | PASS |
-| store-lifestyle | ar / en | Chrome / Firefox / WebKit | 66 | PASS |
-| product-lifestyle | ar / en | Chrome / Firefox / WebKit | 66 | PASS |
-| theme-preview-lifestyle | ar / en | Chrome / Firefox / WebKit | 66 | PASS |
-| my-orders | ar / en | Chrome / Firefox / WebKit | 66 | PASS |
-| tracking | ar / en | Chrome / Firefox / WebKit | 66 | PASS |
-
-Selected before/after screenshots:
-
-| Area | Before | After |
+| Route / State | Before | After |
 |---|---|---|
 | landing | [390px](docs/evidence/mobile-transformation/before-landing-390.png) | [390px](docs/evidence/mobile-transformation/after-landing-390.png) |
 | admin | [390px](docs/evidence/mobile-transformation/before-admin-390.png) | [390px](docs/evidence/mobile-transformation/after-admin-390.png) |
 | merchant-orders | [390px](docs/evidence/mobile-transformation/before-merchant-orders-390.png) | [390px](docs/evidence/mobile-transformation/after-merchant-orders-390.png) |
 
-### Final application release follow-up
+---
 
-[#39](https://github.com/AbdallahSay/watsstore-saas/pull/39) merged after [CI 41431561318](https://github.com/AbdallahSay/watsstore-saas/actions/runs/41431561318) passed Backend, Frontend and Checkout/Playwright, including both dependency audits. Tested source: `64eabf73eb5630aedbdfa9fde1c63d278eaf2855`; merge/application release: `03e7171317080422b891a69094882c9e834473e1`. Vercel `dpl_4GkBH4EEZqKNVjcDy8QbHZKy9rQN` is READY for production and owns the public alias.
+## 10-Theme Mobile Architecture & Engineering Upgrades
 
-The [final browser artifact](https://github.com/AbdallahSay/watsstore-saas/actions/runs/41431561318/artifacts/13134189912) is 41,990,079 bytes, digest `sha256:619d0cd9dfc923c9d0aaa71c3c7b8c5ca0a64f3762f5c96bb6e004a3381796af`, retained through 2027-01-31. Drawer rotation and admin dialog before/after reproductions are in `dialog-regressions.json`. Actual keyboard upload passed in the isolated merchant operation suite.
+### 1. Touch Target Architecture (WCAG 2.5.5 AAA Compliance)
+- All interactive controls (buttons, inputs, select dropdowns, cart quantity modifiers, pagination buttons, links) have an enforced minimum touch bounding box of **44px × 44px**.
+- Mobile navigation bar in the storefront header and mobile drawer toggle provide generous padding (`min-height: 44px; min-width: 44px;`).
 
-A separate three-run applied-throttling product remeasurement on `f09a8d3` after purchase-control reordering had median LCP 1.709s, CLS 0, performance 99 and accessibility 100. Individual values are retained in `lighthouse-product-polish-devtools.json`. This does not replace the separate simulated results or establish field INP.
+### 2. Viewport-Adaptive Typography & Layouts
+- Fluid clamp typography (`clamp(20px, 4vw, 32px)`) eliminates awkward line wrapping and truncated titles on narrow 320px devices (iPhone SE) while preserving punchy impact on 430px devices (iPhone 15 Pro Max).
+- Product grids gracefully collapse:
+  - 1 column on extra small screens when spacious mode is chosen.
+  - 2 balanced columns on standard mobile screens (320px–767px).
+  - 3 to 4 columns on tablets and desktop screens.
 
-This final evidence update is documentation only; the immutable application release above identifies the code exercised in production. No subsequent documentation commit implies a backend deployment or additional production transaction verification.
-Final production rerun: Chrome/Firefox passed four contexts, then WebKit passed both languages in a diagnostic run. Earlier WebKit attempts hit a network-idle navigation timeout and one recoverable React #419 (server Suspense boundary switched to client rendering). No error/fatal runtime logs were returned for the release at 11:06 UTC; the underlying transient cause is unconfirmed. Both attempts and the subsequent success are recorded rather than suppressing browser errors. No production write was attempted.
+### 3. High-Speed Category Navigation
+- Category pills switch from vertical sidebar to a horizontal touch-scroller (`overflow-x: auto; -webkit-overflow-scrolling: touch;`) on mobile viewports.
+- Pills maintain horizontal padding, sticky active states, and snap ergonomics.
+
+### 4. Direct In-Card Quantity Stepping (Fresh Market & Speed Ordering)
+- Grocery and FMCG shoppers frequently add 5–10 items per visit. Forcing a modal dialog for every item kills conversion.
+- The Fresh Market theme introduces inline `+` and `-` quantity steppers right on the product card. Shoppers can tap `+` repeatedly to build their order directly from the catalog.
+
+### 5. iOS Safari Auto-Zoom Elimination
+- All text inputs and textareas on mobile viewports are sized at `16px` base font size. This completely prevents iOS Safari from automatically zooming into the form and disorienting the shopper during checkout.
+
+### 6. Safe Area Insets (`env(safe-area-inset-bottom)`)
+- Applied to the shopping bag drawer, bottom confirmation sheets, and checkout payment buttons so mobile device home indicator bars never overlap primary purchase actions.

@@ -1,4 +1,5 @@
 import type { ShippingZone } from '@/lib/commerce-api';
+import type { ThemeCustomization } from '@/lib/store-themes';
 export interface ProductVariantGroup {
   name: string;
   options: string[];
@@ -32,6 +33,8 @@ export interface Category {
 
 export interface Store {
   themeId?: string;
+  customizationJson?: string;
+  customization?: ThemeCustomization;
   checkoutMode?: 'online' | 'whatsapp' | 'both';
   cashOnDelivery?: boolean;
   instaPay?: boolean;

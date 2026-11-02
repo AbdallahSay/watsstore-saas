@@ -100,7 +100,8 @@ namespace WatsStore.Api.Controllers
             var stock = await _db.InventoryStocks.AsNoTracking().Where(x => x.StoreId == store.Id && x.VariantKey == "").ToDictionaryAsync(x => x.ProductId, x => x.Quantity);
             var response = new PublicStoreResponse
             {
-                ThemeId = commerce?.PublishedTheme ?? "editorial",
+                ThemeId = commerce?.PublishedTheme ?? "editorial-luxe",
+                CustomizationJson = commerce?.CustomizationJson ?? "{}",
                 CheckoutMode = commerce?.CheckoutMode ?? "whatsapp",
                 CashOnDelivery = commerce?.CashOnDelivery ?? true,
                 InstaPay = commerce?.InstaPay ?? !string.IsNullOrWhiteSpace(store.InstaPayAddress),
