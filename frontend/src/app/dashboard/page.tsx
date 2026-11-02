@@ -222,7 +222,7 @@ export default function DashboardOverviewPage() {
             <div className="flex items-center gap-2 mb-2">
               <span className="text-xs font-bold bg-white/20 backdrop-blur-sm px-3 py-1 rounded-full inline-flex items-center gap-1.5">
                 <Crown className="w-3.5 h-3.5 text-amber-300" />
-                <span>{t('dash.plan_badge', { plan: summary.storeInfo.planType }, `باقة المتجر: ${summary.storeInfo.planType}`)}</span>
+                <span>{t('dash.plan_badge', { plan: (summary.storeInfo.planType || 'Free') }, `باقة المتجر: ${summary.storeInfo.planType || 'Free'}`)}</span>
               </span>
               {summary.storeInfo.planType === 'Free' && (
                 <button
@@ -242,6 +242,7 @@ export default function DashboardOverviewPage() {
           </div>
 
           <div className="flex items-center gap-2.5">
+            {summary.storeInfo.planType === 'Free' && (
             <button
               onClick={() => setIsUpgradeModalOpen(true)}
               className="px-4 py-2.5 min-h-[44px] bg-amber-400 hover:bg-amber-300 text-slate-900 rounded-2xl font-black text-xs sm:text-sm shadow-md flex items-center justify-center gap-1.5 transition-all hover:scale-105"
@@ -249,6 +250,7 @@ export default function DashboardOverviewPage() {
               <Crown className="w-4 h-4 text-amber-900" />
               <span>{t('dash.upgrade_btn', undefined, 'ترقية الباقة')}</span>
             </button>
+            )}
             <a
               href={storeUrl}
               target="_blank"
