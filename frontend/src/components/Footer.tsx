@@ -131,7 +131,7 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500 dark:text-slate-400">
+        <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-400">
           <p>{t('footer.copyright', { year: currentYear }, `© ${currentYear} WatsStore — تطوير وإدارة Masar Tech - 01011653619 🇪🇬`)}</p>
           <div className="flex items-center gap-1.5">
             <span>{t('footer.made_with', undefined, 'صُنع بشغف لخدمة التجارة الإلكترونية المصرية')}</span>

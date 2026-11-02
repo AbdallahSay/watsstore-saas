@@ -232,7 +232,7 @@ export default function DashboardOverviewPage() {
         </div>
       </div>
 
-      <Link href="/dashboard/setup" className="flex flex-wrap items-center justify-between gap-4 p-6 rounded-2xl border border-emerald-300 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-950 dark:text-emerald-100 min-h-11"><div><h2 className="font-bold text-lg">{dir==='rtl'?'جهّز متجرك خطوة بخطوة':'Set up your store, step by step'}</h2><p className="text-sm mt-2">{dir==='rtl'?'بيانات المتجر، الهوية، أول منتج، الدفع، التصميم والنشر.':'Store details, branding, first product, payments, design and publishing.'}</p></div><span className="underline">{dir==='rtl'?'فتح الدليل':'Open setup guide'} ↗</span></Link>
+      <Link prefetch={false} href="/dashboard/setup" className="flex flex-wrap items-center justify-between gap-4 p-6 rounded-2xl border border-emerald-300 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-950 dark:text-emerald-100 min-h-11"><div><h2 className="font-bold text-lg">{dir==='rtl'?'جهّز متجرك خطوة بخطوة':'Set up your store, step by step'}</h2><p className="text-sm mt-2">{dir==='rtl'?'بيانات المتجر، الهوية، أول منتج، الدفع، التصميم والنشر.':'Store details, branding, first product, payments, design and publishing.'}</p></div><span className="underline">{dir==='rtl'?'فتح الدليل':'Open setup guide'} ↗</span></Link>
       {/* Metrics Row */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
         {/* Metric 1 */}
@@ -463,7 +463,7 @@ export default function DashboardOverviewPage() {
               <span>{isExporting ? t('dash.exporting', undefined, 'جاري التحميل...') : t('dash.export_csv', undefined, '📥 تصدير الطلبات لإكسل (CSV)')}</span>
             </button>
 
-            <Link
+            <Link prefetch={false}
               href="/dashboard/orders"
               className="px-3.5 py-2 bg-slate-900 hover:bg-slate-800 dark:bg-slate-800 dark:hover:bg-slate-700 text-white text-xs font-bold rounded-xl flex items-center gap-1.5 transition-colors min-h-[44px]"
             >
