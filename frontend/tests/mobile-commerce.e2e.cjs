@@ -14,15 +14,22 @@ async function bounds(page){const result=await page.evaluate(()=>{const modal=do
  for(const [index,fixture]of fixtures.entries()){
   const context=await browser.createBrowserContext();const page=await context.newPage(),errors=[];page.on('pageerror',e=>errors.push(e.message));let heldCoupon,heldOrder;let pauseCoupon=false,pauseOrder=false;
   await page.setRequestInterception(true);page.on('request',request=>{if(request.method()==='POST'&&request.url().endsWith('/apply-coupon')&&pauseCoupon){pauseCoupon=false;heldCoupon=request;}else if(request.method()==='POST'&&request.url().endsWith('/orders')&&pauseOrder){pauseOrder=false;heldOrder=request;}else request.continue();});
-  await width(page,375,844);await page.goto(`${site}/s/${fixture.slug}`,{waitUntil:'networkidle0'});await page.waitForSelector('.ws-product-info h3 button');
-  await click(page,'.ws-product-info h3 button','منتج اختبار — تصميم عربي');await click(page,'[role=dialog] button','L');
-  const touch=await page.$eval('[role=dialog] button[aria-label="زيادة الكمية"]',x=>({width:x.getBoundingClientRect().width,height:x.getBoundingClientRect().height}));assert.ok(touch.width>=44&&touch.height>=44);
-  await page.click('[role=dialog] button[aria-label="زيادة الكمية"]');await click(page,'[role=dialog] button','إضافة إلى السلة');await page.waitForSelector('.ws-cart');
+  await width(page,375,844);await page.goto(`${site}/s/${fixture.slug}`,{waitUntil:'networkidle0'});await page.waitForSelector('.ws-product-info h3 a');
+  // Product selection now opens a full page, not a modal; variants and quantities stay accessible.
+  await click(page,'.ws-product-info h3 a','منتج اختبار — تصميم عربي');await page.waitForSelector('.ws-product-detail');
+  await click(page,'.ws-product-options button','L');
+  const touch=await page.$eval('.ws-product-options button',x=>({width:x.getBoundingClientRect().width,height:x.getBoundingClientRect().height}));assert.ok(touch.width>=44&&touch.height>=44);
+  await fill(page,'.ws-product-quantity input','2');await click(page,'.ws-product-actions button[type=submit]','أضف إلى الحقيبة');await page.waitForSelector('.ws-cart');
   assert.equal(await page.evaluate(()=>document.body.style.overflow),'hidden');await page.click('.ws-cart>header button');
-  await click(page,'.ws-product-info h3 button','منتج الاختبار 1');await click(page,'[role=dialog] button','إضافة إلى السلة');await page.waitForSelector('.ws-cart-items li:nth-child(2)');
+  await page.goto(`${site}/s/${fixture.slug}`,{waitUntil:'networkidle0'});await page.waitForSelector('.ws-product-info h3 a');
+  await click(page,'.ws-product-info h3 a','منتج الاختبار 1');await page.waitForSelector('.ws-product-detail');
+  await click(page,'.ws-product-actions button[type=submit]','أضف إلى الحقيبة');await page.waitForSelector('.ws-cart-items li:nth-child(2)');
   // Before a delivery zone is selected, never present a numeric grand total.
   assert.ok((await page.$eval('.ws-totals',x=>x.innerText)).includes('يظهر بعد اختيار منطقة التوصيل'));
-  await page.click('.ws-cart>header button');await click(page,'.ws-product-info h3 button','WWWW');await click(page,'[role=dialog] button','إضافة إلى السلة');await page.waitForSelector('.ws-cart-items li:nth-child(3)');
+  await page.click('.ws-cart>header button');
+  await page.goto(`${site}/s/${fixture.slug}`,{waitUntil:'networkidle0'});await page.waitForSelector('.ws-product-info h3 a');
+  await click(page,'.ws-product-info h3 a','WWWW');await page.waitForSelector('.ws-product-detail');
+  await click(page,'.ws-product-actions button[type=submit]','أضف إلى الحقيبة');await page.waitForSelector('.ws-cart-items li:nth-child(3)');
   await width(page,320);await bounds(page);await click(page,'.ws-cart-items li:nth-child(3) button','حذف');
   // A stale coupon response must not overwrite the estimate for a changed cart.
   await fill(page,'#coupon','MOBILE10');pauseCoupon=true;await click(page,'.ws-coupon button','تطبيق');
