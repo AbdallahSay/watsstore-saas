@@ -972,9 +972,9 @@ export default function ThemesMarketplacePage() {
 
           {/* FULL SCREEN LIVE PREVIEW MODAL */}
           {previewThemeId && store && (
-            <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex flex-col animate-fadeIn">
+            <div role="dialog" aria-modal="true" aria-label="معاينة تصميم المتجر" data-testid="merchant-theme-preview" className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex flex-col min-w-0 animate-fadeIn">
               {/* Modal Topbar */}
-              <div className="bg-slate-900 text-white px-5 py-3 border-b border-slate-800 flex items-center justify-between">
+              <div className="bg-slate-900 text-white px-3 sm:px-5 py-3 border-b border-slate-800 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3 min-w-0 shrink-0">
                 <div className="flex items-center gap-3">
                   <span className="font-extrabold text-sm">
                     معاينة حية للقالب: {STORE_THEMES[previewThemeId]?.nameAr} ({STORE_THEMES[previewThemeId]?.name})
@@ -1029,12 +1029,13 @@ export default function ThemesMarketplacePage() {
               </div>
 
               {/* Modal Body with Viewport simulation */}
-              <div className="flex-1 overflow-y-auto p-4 sm:p-8 flex items-center justify-center bg-slate-950">
+              <div className="flex-1 min-h-0 min-w-0 overflow-y-auto overflow-x-hidden p-1 sm:p-4 lg:p-8 flex items-start lg:items-center justify-center bg-slate-950">
                 <div
-                  className={`bg-white dark:bg-slate-900 transition-all duration-300 shadow-2xl overflow-y-auto ${
+                  data-testid="merchant-preview-canvas"
+                   className={`ws-preview-canvas bg-white dark:bg-slate-900 transition-all duration-300 shadow-2xl overflow-y-auto min-w-0 ${
                     previewViewport === 'mobile'
-                      ? 'w-[390px] h-[780px] max-h-[90vh] rounded-[44px] border-[10px] border-slate-800 shadow-emerald-950/20'
-                      : 'w-full max-w-6xl h-full max-h-[90vh] rounded-2xl border border-slate-800'
+                      ? 'w-full max-w-[390px] h-[min(780px,calc(100dvh-220px))] min-h-[260px] rounded-[24px] sm:rounded-[44px] border-4 sm:border-[10px] border-slate-800 shadow-emerald-950/20'
+                      : 'w-full max-w-6xl h-full max-h-[85dvh] rounded-2xl border border-slate-800'
                   }`}
                 >
                   <CommerceStorefront
