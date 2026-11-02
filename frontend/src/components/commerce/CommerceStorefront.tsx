@@ -13,6 +13,7 @@ import { api } from '@/lib/api';
 import { pixel } from '@/lib/pixel';
 import '@/styles/store-themes.css';
 import '@/styles/themes/pure-beauty.css';
+import ThemeWhatsAppButton from './ThemeWhatsAppButton';
 
 const ProductModal = dynamic(() => import('@/components/ProductModal'));
 const CommerceCart = dynamic(() => import('./CommerceCart'));
@@ -391,9 +392,16 @@ export default function CommerceStorefront({
                     <sup>{products.length}</sup>
                   </h2>
                 </div>
-                <a href={wa} target="_blank" rel="noreferrer">
-                  {tr('طلب خاص عبر واتساب؟', 'Custom order via WhatsApp?')} ↗
-                </a>
+                <ThemeWhatsAppButton
+                  phone={store.whatsAppNumber}
+                  variant="catalog"
+                  appearance="outlined"
+                  english={english}
+                  text={tr(
+                    `مرحباً ${store.storeName}، أود الاستفسار عن تفصيل طلب خاص.`,
+                    `Hello ${store.storeName}, I would like to inquire about a custom order.`
+                  )}
+                />
               </div>
 
               <div className="ws-catalog-layout">
@@ -664,10 +672,16 @@ export default function CommerceStorefront({
           <span className="ws-brand">{store.storeName}</span>
           <p>{store.addressDetails || store.city}</p>
         </div>
-        <a href={wa} target="_blank" rel="noreferrer" className="ws-footer-wa-btn">
-          <MessageCircle size={18} />
-          <span>{tr('تواصل عبر واتساب', 'Talk via WhatsApp')}</span>
-        </a>
+        <ThemeWhatsAppButton
+          phone={store.whatsAppNumber}
+          variant="footer"
+          appearance="filled"
+          english={english}
+          text={tr(
+            `مرحباً ${store.storeName}، أود التواصل معكم بخصوص المتجر.`,
+            `Hello ${store.storeName}, I would like to get in touch regarding your store.`
+          )}
+        />
         <Link prefetch={false} href="/">Powered by WatsStore</Link>
       </footer>
 
@@ -699,6 +713,19 @@ export default function CommerceStorefront({
           clear={() => setItems([])}
         />
       )}
+
+      {/* Floating Theme-Adaptive WhatsApp Contact Pill */}
+      <ThemeWhatsAppButton
+        phone={store.whatsAppNumber}
+        variant="floating"
+        appearance="filled"
+        english={english}
+        hidden={cartOpen || Boolean(product)}
+        text={tr(
+          `مرحباً ${store.storeName}، أود الاستفسار عن المنتجات المتاحة في المتجر.`,
+          `Hello ${store.storeName}, I would like to inquire about products in your store.`
+        )}
+      />
     </div>
   );
 }

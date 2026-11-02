@@ -75,6 +75,14 @@ export interface StoreTheme {
     card: string;
     border: string;
   };
+  whatsappTokenDefaults: {
+    bg: string;
+    text: string;
+    border: string;
+    hover: string;
+    focus: string;
+    radius: string;
+  };
   recommendedFor: string[];
   recommendedForAr: string[];
   featuresAr: string[];
@@ -106,6 +114,14 @@ export const STORE_THEMES: Record<StoreThemeId, StoreTheme> = {
       card: '#ede5d9',
       border: '#cfc4b4',
     },
+    whatsappTokenDefaults: {
+      bg: 'transparent',
+      text: '#27251f',
+      border: '#352e24',
+      hover: '#ede5d9',
+      focus: '#352e24',
+      radius: '0px',
+    },
     recommendedFor: ['Haute Couture', 'Designer Bags', 'Niche Perfumes', 'Premium Watches'],
     recommendedForAr: ['أزياء الهوت كوتور', 'الحقائب الفاخرة', 'العطور النيش', 'الساعات الفخمة'],
     featuresAr: ['تخطيط مجلة الموضة', 'أرقام فهرسة دقيقة', 'إطارات غير متناظرة', 'خط سريف راقي'],
@@ -135,6 +151,14 @@ export const STORE_THEMES: Record<StoreThemeId, StoreTheme> = {
       accentContrast: '#131313',
       card: '#1e1e1e',
       border: '#3a3a3a',
+    },
+    whatsappTokenDefaults: {
+      bg: '#fb5b16',
+      text: '#101010',
+      border: '#fb5b16',
+      hover: '#ff7738',
+      focus: '#fb5b16',
+      radius: '4px',
     },
     recommendedFor: ['Streetwear', 'Limited Sneakers', 'Graphic Hoodies', 'Skate Culture'],
     recommendedForAr: ['أزياء الشارع وسنيكرز', 'الهوديز الحصرية', 'الملابس الرياضية العصرية', 'إكسسوارات الشباب'],
@@ -166,6 +190,14 @@ export const STORE_THEMES: Record<StoreThemeId, StoreTheme> = {
       card: '#f6eeeb',
       border: '#ebdcd7',
     },
+    whatsappTokenDefaults: {
+      bg: '#c07a72',
+      text: '#ffffff',
+      border: '#c07a72',
+      hover: '#ab6760',
+      focus: '#c07a72',
+      radius: '999px',
+    },
     recommendedFor: ['Skincare Routine', 'Organic Cosmetics', 'Hair Serums', 'Fragrance & Mists'],
     recommendedForAr: ['عناية بالبشرة', 'مكياج طبيعي', 'منتجات الشعر العضوية', 'عطور وزيوت عطرية'],
     featuresAr: ['شارات المكونات الطبيعية', 'زوايا ناعمة وبطاقات عائمة', 'فلاتر روتين العناية', 'ألوان باستيلية مهدئة'],
@@ -195,6 +227,14 @@ export const STORE_THEMES: Record<StoreThemeId, StoreTheme> = {
       accentContrast: '#05111f',
       card: '#121a29',
       border: '#1f2e45',
+    },
+    whatsappTokenDefaults: {
+      bg: '#00d2ff',
+      text: '#05111f',
+      border: '#00d2ff',
+      hover: '#38e1ff',
+      focus: '#00d2ff',
+      radius: '6px',
     },
     recommendedFor: ['Smartphones & Tablets', 'Gaming Gear', 'Audio & Headsets', 'Smart Home Gadgets'],
     recommendedForAr: ['الهواتف والأجهزة اللوحية', 'معدات الألعاب', 'السماعات والصوتيات', 'أجهزة المنزل الذكي'],
@@ -226,6 +266,14 @@ export const STORE_THEMES: Record<StoreThemeId, StoreTheme> = {
       card: '#e8f6ea',
       border: '#c5e6cb',
     },
+    whatsappTokenDefaults: {
+      bg: '#ea580c',
+      text: '#ffffff',
+      border: '#ea580c',
+      hover: '#c2410c',
+      focus: '#ea580c',
+      radius: '10px',
+    },
     recommendedFor: ['Supermarkets', 'Organic Farm Produce', 'Artisanal Bakery', 'Gourmet Pantry'],
     recommendedForAr: ['سوبرماركت وهايبرماركت', 'خضروات وفواكه طازجة', 'مخابز وحلويات', 'مستلزمات المطبخ والمؤونة'],
     featuresAr: ['عداد كمية سريع على البطاقة', 'شارة طازج يومياً', 'تصنيف سهل ومباشر', 'إجمالي عربة فوري'],
@@ -255,6 +303,14 @@ export const STORE_THEMES: Record<StoreThemeId, StoreTheme> = {
       accentContrast: '#fff9f2',
       card: '#e8d9c6',
       border: '#bda994',
+    },
+    whatsappTokenDefaults: {
+      bg: '#835139',
+      text: '#fff9f2',
+      border: '#835139',
+      hover: '#6e402b',
+      focus: '#835139',
+      radius: '8px',
     },
     recommendedFor: ['Handcrafted Furniture', 'Ceramics & Vases', 'Lighting & Rugs', 'Interior Decor'],
     recommendedForAr: ['الأثاث والمفروشات', 'الخزف والفازات الفنية', 'الإضاءة والسجاد', 'إكسسوارات الديكور الداخلي'],
@@ -286,6 +342,14 @@ export const STORE_THEMES: Record<StoreThemeId, StoreTheme> = {
       card: '#1a1714',
       border: '#3d3428',
     },
+    whatsappTokenDefaults: {
+      bg: '#d4af37',
+      text: '#120f0a',
+      border: '#d4af37',
+      hover: '#e5c358',
+      focus: '#d4af37',
+      radius: '2px',
+    },
     recommendedFor: ['Fine Gold Jewelry', 'Diamond Rings', 'Luxury Swiss Watches', 'Custom Bridal Sets'],
     recommendedForAr: ['المجوهرات الذهبية', 'خواتم الألماس', 'الساعات السويسرية', 'أطقم العرائس المخصصة'],
     featuresAr: ['شارة عيار الذهب والتوثيق', 'إطارات مذهبة رفيعة', 'خلفية مخملية فاخرة', 'معاينة فخمة للمجوهرات'],
@@ -315,6 +379,14 @@ export const STORE_THEMES: Record<StoreThemeId, StoreTheme> = {
       accentContrast: '#ffffff',
       card: '#202024',
       border: '#35353d',
+    },
+    whatsappTokenDefaults: {
+      bg: '#ff2d55',
+      text: '#ffffff',
+      border: '#ff2d55',
+      hover: '#e01b41',
+      focus: '#ff2d55',
+      radius: '6px',
     },
     recommendedFor: ['Gym Apparel', 'Running Shoes', 'Fitness Equipment', 'Outdoor & Adventure'],
     recommendedForAr: ['ملابس الجيم والتمارين', 'أحذية الجري الرياضية', 'أجهزة ومعدات اللياقة', 'مستلزمات التخييم والمغامرة'],
@@ -346,6 +418,14 @@ export const STORE_THEMES: Record<StoreThemeId, StoreTheme> = {
       card: '#fff3e0',
       border: '#ffd8a8',
     },
+    whatsappTokenDefaults: {
+      bg: '#ff6b6b',
+      text: '#ffffff',
+      border: '#ffd8a8',
+      hover: '#fa5252',
+      focus: '#ff6b6b',
+      radius: '999px',
+    },
     recommendedFor: ['Montessori & Wooden Toys', 'Baby Essentials', 'Kids Fashion', 'Storybooks & Crafts'],
     recommendedForAr: ['ألعاب المونتيسوري والذكاء', 'مستلزمات الرضع وحديثي الولادة', 'ملابس الأطفال المبهجة', 'قصص وأنشطة تنمية المهارات'],
     featuresAr: ['شارات الفئة العمرية', 'أزرار دائرية مريحة', 'شارة آمن 100% للأطفال', 'ألوان مبهجة وعائلية'],
@@ -375,6 +455,14 @@ export const STORE_THEMES: Record<StoreThemeId, StoreTheme> = {
       accentContrast: '#fffcf7',
       card: '#f0e6d8',
       border: '#d6c4b0',
+    },
+    whatsappTokenDefaults: {
+      bg: '#965b32',
+      text: '#fffcf7',
+      border: '#965b32',
+      hover: '#7f4b26',
+      focus: '#965b32',
+      radius: '8px',
     },
     recommendedFor: ['Handmade Ceramics', 'Leathercraft Goods', 'Scented Soy Candles', 'Personalized Gift Sets'],
     recommendedForAr: ['الفخار والخزف اليدوي', 'المصنوعات الجلدية الطبيعية', 'شموع الصويا المعطرة', 'هدايا وتذكارات مخصصة بالاسم'],

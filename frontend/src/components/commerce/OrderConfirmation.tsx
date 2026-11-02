@@ -28,7 +28,7 @@ export default function OrderConfirmation({result,slug,english,currency,continue
     <p className="text-sm">{shipping||`${tr('رسوم التوصيل','Delivery fee')}: ${money(result.deliveryFee)}`}</p>
     {result.trackingToken&&<Link prefetch={false} className="ws-primary-action" href={`/s/${encodeURIComponent(slug)}/orders/${result.trackingToken}`}>{tr('متابعة الطلب','Track order')}</Link>}
     <Link prefetch={false} className="ws-secondary-action" href={`/s/${encodeURIComponent(slug)}/my-orders`}>{tr('طلباتي على الجهاز ده','My orders on this device')}</Link>
-    {result.whatsAppRedirectUrl&&<a className="ws-secondary-action" href={result.whatsAppRedirectUrl} target="_blank" rel="noreferrer">{tr('إرسال الطلب عبر واتساب (اختياري)','Send on WhatsApp (optional)')}</a>}
+    {result.whatsAppRedirectUrl&&<a className="ws-secondary-action ws-theme-whatsapp-btn ws-theme-whatsapp-btn--filled" href={result.whatsAppRedirectUrl} target="_blank" rel="noreferrer">{tr('إرسال الطلب عبر واتساب (اختياري)','Send on WhatsApp (optional)')}</a>}
     <button className="ws-secondary-action" onClick={continueShopping}>{tr('متابعة التسوق','Continue shopping')}</button>
     <small>{tr('رابط المتابعة بيتحفظ على الجهاز ده لو المتصفح بيسمح بالتخزين.','The tracking link is saved on this device when browser storage is available.')}</small>
   </div>;

@@ -3,9 +3,13 @@ import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { api } from '@/lib/api';
 import CommerceStorefront from '@/components/commerce/CommerceStorefront';
+import { parseStoreTheme } from '@/lib/store-themes';
 import { Product } from '@/types';
 
-interface Props { params: Promise<{ storeSlug: string; productSlug: string }> }
+interface Props {
+  params: Promise<{ storeSlug: string; productSlug: string }>;
+  searchParams?: Promise<{ theme?: string }>;
+}
 const getStore = cache((slug: string) => api.getPublicStore(slug));
 function findProduct(products: Product[], routeSlug: string) {
   let slug: string;
@@ -25,11 +29,19 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   } catch { return { title: 'Product unavailable' }; }
 }
 
-export default async function ProductPage({ params }: Props) {
+export default async function ProductPage({ params, searchParams }: Props) {
   const { storeSlug, productSlug } = await params;
+  const resolvedSearchParams = searchParams ? await searchParams : undefined;
   const store = await getStore(storeSlug).catch(() => null);
   if (!store) notFound();
   const product = findProduct(store.products, productSlug);
   if (!product) notFound();
-  return <CommerceStorefront key={product.id} store={store} detailProduct={product}/>;
+  return (
+    <CommerceStorefront
+      key={product.id}
+      store={store}
+      detailProduct={product}
+      previewTheme={resolvedSearchParams?.theme ? parseStoreTheme(resolvedSearchParams.theme) : undefined}
+    />
+  );
 }

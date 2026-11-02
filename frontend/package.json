@@ -9,6 +9,7 @@
     "test:mobile-commerce": "node tests/mobile-commerce.e2e.cjs",
     "test:native-journey": "node tests/native-journey.cjs",
     "test:responsive": "node tests/responsive-audit.cjs",
+    "test:storefront-mobile": "node tests/storefront-mobile-matrix.cjs",
     "test:dialogs": "node tests/ui-states-audit.cjs",
     "test:merchant-mobile": "node tests/merchant-mobile.cjs",
     "test:lighthouse": "node tests/lighthouse.mjs",

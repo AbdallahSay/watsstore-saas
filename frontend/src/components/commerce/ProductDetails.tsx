@@ -3,6 +3,7 @@
 import { useMemo, useState } from 'react';
 import Link from 'next/link';
 import StoreImage from './StoreImage';
+import ThemeWhatsAppButton from './ThemeWhatsAppButton';
 import { Product, ProductVariantGroup, Store } from '@/types';
 
 interface Props {
@@ -47,7 +48,23 @@ export default function ProductDetails({ store, product, english, disabled, add 
         <form onSubmit={event => { event.preventDefault(); if (!unavailable) add(product, quantity, variants); }}>
           {groups.map(group => <fieldset key={group.name}><legend>{group.name}</legend><div className="ws-product-options">{group.options.map(option => <button type="button" key={option} aria-pressed={variants[group.name] === option} onClick={() => setVariants(old => ({...old, [group.name]: option}))}>{option}</button>)}</div></fieldset>)}
           <label className="ws-product-quantity">{tr('الكمية', 'Quantity')}<input type="number" name="quantity" min="1" max={max} required value={quantity} onChange={event => setQuantity(Math.max(1, Math.min(max, Number(event.target.value) || 1)))}/></label>
-          <div className="ws-product-actions"><button className="ws-primary-action" disabled={unavailable} type="submit">{tr('أضف إلى الحقيبة', 'Add to bag')}</button><button className="ws-secondary-action" disabled={unavailable} type="button" onClick={() => add(product, quantity, variants, true)}>{tr('اشترِ الآن', 'Buy now')}</button></div>
+          <div className="ws-product-actions">
+            <button className="ws-primary-action" disabled={unavailable} type="submit">{tr('أضف إلى الحقيبة', 'Add to bag')}</button>
+            <button className="ws-secondary-action" disabled={unavailable} type="button" onClick={() => add(product, quantity, variants, true)}>{tr('اشترِ الآن', 'Buy now')}</button>
+            {store.whatsAppNumber && (
+              <ThemeWhatsAppButton
+                phone={store.whatsAppNumber}
+                variant="product"
+                appearance="outlined"
+                english={english}
+                text={tr(
+                  `مرحباً ${store.storeName}، أود الاستفسار عن منتج "${product.name}" المعروض بسعر ${money(product.price)}.`,
+                  `Hello ${store.storeName}, I would like to inquire about "${product.name}" priced at ${money(product.price)}.`
+                )}
+                label={tr('استفسار عبر واتساب', 'Inquire via WhatsApp')}
+              />
+            )}
+          </div>
           <p className="ws-product-stock-note">{tr('نتحقق من مخزون الاختيارات والسعر النهائي على الخادم عند تأكيد الطلب.', 'Variant stock and the final price are checked when your order is confirmed.')}</p>
         </form>
         {product.description && <p className="ws-product-description">{product.description}</p>}

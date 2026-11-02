@@ -1,12 +1,16 @@
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { api } from '@/lib/api';
+import { parseStoreTheme } from '@/lib/store-themes';
 import StoreCatalogClient from './StoreCatalogClient';
 import MetaPixel from '@/components/MetaPixel';
 
 interface PageProps {
   params: Promise<{
     storeSlug: string;
+  }>;
+  searchParams?: Promise<{
+    theme?: string;
   }>;
 }
 
@@ -46,8 +50,9 @@ export async function generateMetadata({ params: pendingParams }: PageProps): Pr
   }
 }
 
-export default async function StorePage({ params: pendingParams }: PageProps) {
+export default async function StorePage({ params: pendingParams, searchParams: pendingSearchParams }: PageProps) {
   const params = await pendingParams;
+  const searchParams = pendingSearchParams ? await pendingSearchParams : undefined;
   let store;
   try {
     store = await api.getPublicStore(params.storeSlug);
@@ -131,7 +136,10 @@ export default async function StorePage({ params: pendingParams }: PageProps) {
       {store.metaPixelId && <MetaPixel pixelId={store.metaPixelId} />}
 
       {/* Main Interactive Store Catalog */}
-      <StoreCatalogClient store={store} />
+      <StoreCatalogClient
+        store={store}
+        previewTheme={searchParams?.theme ? parseStoreTheme(searchParams.theme) : undefined}
+      />
     </>
   );
 }

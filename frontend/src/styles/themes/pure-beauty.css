@@ -10,6 +10,12 @@
   --ws-muted: #715e62;
   --ws-border: #e2cdd0;
   --ws-accent: #9a4c60;
+  --store-whatsapp-bg: #9a4c60;
+  --store-whatsapp-text: #ffffff;
+  --store-whatsapp-border: #9a4c60;
+  --store-whatsapp-hover: #833e50;
+  --store-whatsapp-focus: #9a4c60;
+  --store-whatsapp-radius: 999px;
   --ws-checkout-surface: #fff;
   --ws-checkout-ink: #322525;
   --ws-checkout-border: #e2cdd0;
