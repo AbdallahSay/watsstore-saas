@@ -8,7 +8,8 @@ const cairo = Cairo({
   subsets: ['arabic', 'latin'],
   weight: ['300', '400', '500', '600', '700', '800', '900'],
   variable: '--font-cairo',
-  display: 'swap',
+  // Slow first visits keep a stable fallback instead of shifting the page late.
+  display: 'optional',
 });
 
 export const viewport: Viewport = {
