@@ -162,14 +162,14 @@ export default function SuperAdminPage() {
   // Login Form States
   const [loginMethod, setLoginMethod] = useState<'key' | 'credentials'>('key');
   const [secretKey, setSecretKey] = useState('');
-  const [email, setEmail] = useState('abdallahsay10@gmail.com');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoggingIn, setIsLoggingIn] = useState(false);
   const [loginError, setLoginError] = useState<string | null>(null);
 
   // Forgot Password Modal States
   const [isForgotPasswordOpen, setIsForgotPasswordOpen] = useState(false);
-  const [forgotEmail, setForgotEmail] = useState('abdallahsay10@gmail.com');
+  const [forgotEmail, setForgotEmail] = useState('');
   const [forgotResetToken, setForgotResetToken] = useState('');
   const [forgotNewPassword, setForgotNewPassword] = useState('');
   const [forgotConfirmPassword, setForgotConfirmPassword] = useState('');
@@ -1070,7 +1070,7 @@ export default function SuperAdminPage() {
                       type="email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      placeholder="abdallahsay10@gmail.com"
+                      placeholder="admin@watsstore.com"
                       className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-100 placeholder:text-slate-600 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all text-left"
                       required
                     />
@@ -1083,7 +1083,7 @@ export default function SuperAdminPage() {
                     <button
                       type="button"
                       onClick={() => {
-                        setForgotEmail(email || 'abdallahsay10@gmail.com');
+                        setForgotEmail(email || '');
                         setIsForgotPasswordOpen(true);
                         setForgotStep(1);
                         setForgotError(null);
@@ -1180,7 +1180,7 @@ export default function SuperAdminPage() {
               {forgotStep === 1 ? (
                 <form onSubmit={handleRequestResetToken} className="space-y-4">
                   <p className="text-xs text-slate-300 leading-relaxed">
-                    أدخل البريد الإلكتروني المعتمد للمسؤول العام (<span className="text-emerald-400 font-mono font-bold">abdallahsay10@gmail.com</span>) لإنشاء رمز استعادة آمن صالح لمدة 15 دقيقة:
+                    أدخل البريد الإلكتروني المعتمد للمسؤول العام لإنشاء رمز استعادة آمن صالح لمدة 15 دقيقة:
                   </p>
 
                   <div className="space-y-1.5">
@@ -1475,7 +1475,7 @@ export default function SuperAdminPage() {
                 <div className="space-y-1">
                   <span className="text-slate-400 block text-[11px]">البريد الإلكتروني المعتمد للمسؤول العام:</span>
                   <div className="flex items-center gap-2">
-                    <span className="font-mono font-bold text-white text-sm">abdallahsay10@gmail.com</span>
+                    <span className="font-mono font-bold text-white text-sm">{adminUser?.email || "مدير المنصة"}</span>
                     <span className="px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 text-[10px] font-bold">
                       مالك المنصة
                     </span>
@@ -2441,7 +2441,7 @@ export default function SuperAdminPage() {
                   مرحباً بك في لوحة تحكم مالك المنصة
                 </h2>
                 <p className="text-xs sm:text-sm text-slate-400 max-w-2xl">
-                  الحساب الرئيسي مسجل باسم <span className="text-emerald-400 font-mono font-bold">abdallahsay10@gmail.com</span>. راقب حركة المبيعات، الطلبات، المتاجر النشطة والموقوفة عبر منصة WatsStore.
+                  الحساب الرئيسي للمسؤول العام مسجل ومؤمن. راقب حركة المبيعات، الطلبات، المتاجر النشطة والموقوفة عبر منصة WatsStore.
                 </p>
               </div>
 

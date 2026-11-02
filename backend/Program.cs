@@ -612,7 +612,7 @@ using (var scope = app.Services.CreateScope())
 
                 var bootstrapPassword = builder.Configuration["AdminSettings:Password"];
                 if (string.IsNullOrWhiteSpace(bootstrapPassword)) throw new InvalidOperationException("Configure the development admin bootstrap password explicitly.");
-                var defaultHash = BCrypt.Net.BCrypt.HashPassword(bootstrapPassword);
+                var defaultHash = BCrypt.Net.BCrypt.HashPassword(bootstrapPassword.Trim());
                 db.SuperAdmins.Add(new SuperAdmin
                 {
                     Id = Guid.NewGuid(),
