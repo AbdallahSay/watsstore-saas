@@ -21,6 +21,7 @@
   --store-whatsapp-text: var(--ws-accent-contrast, #ffffff);
   /* Outlined/minimal buttons sit on the storefront surface, not on the filled CTA background. */
   --store-whatsapp-outline-text: var(--ws-fg);
+  --store-whatsapp-outline-hover-text: var(--store-whatsapp-text);
   --store-whatsapp-border: var(--ws-accent, #111827);
   --store-whatsapp-hover: var(--ws-accent, #1f2937);
   --store-whatsapp-focus: var(--ws-accent, #111827);
@@ -765,7 +766,7 @@
 }
 .ws-theme-whatsapp-btn--outlined:hover {
   background-color: var(--store-whatsapp-hover);
-  color: var(--store-whatsapp-text) !important;
+  color: var(--store-whatsapp-outline-hover-text) !important;
 }
 
 .ws-theme-whatsapp-btn--minimal {
@@ -776,7 +777,7 @@
 }
 .ws-theme-whatsapp-btn--minimal:hover {
   background-color: var(--store-whatsapp-hover);
-  color: var(--store-whatsapp-text) !important;
+  color: var(--store-whatsapp-outline-hover-text) !important;
 }
 
 /* Placement / Sizing Variants */
@@ -1158,7 +1159,7 @@
   --store-whatsapp-bg: #c07a72;
   --store-whatsapp-text: #ffffff;
   --store-whatsapp-border: #c07a72;
-  --store-whatsapp-hover: #ab6760;
+  --store-whatsapp-hover: #a66058;
   --store-whatsapp-focus: #c07a72;
   --store-whatsapp-radius: 999px;
 }
@@ -1385,6 +1386,7 @@
   --ws-radius-card: 24px;
   --store-whatsapp-bg: #ff6b6b;
   --store-whatsapp-text: #ffffff;
+  --store-whatsapp-outline-hover-text: #201f23;
   --store-whatsapp-border: #ffd8a8;
   --store-whatsapp-hover: #fa5252;
   --store-whatsapp-focus: #ff6b6b;
