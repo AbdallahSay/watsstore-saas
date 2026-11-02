@@ -2,7 +2,7 @@
  * WatsStore public storefront themes.
  * Deliberately isolated from the merchant dashboard and SaaS marketing pages.
  */
-export const STORE_THEME_IDS = ['editorial', 'streetwear', 'lifestyle'] as const;
+export const STORE_THEME_IDS = ['editorial', 'streetwear', 'lifestyle', 'pure-beauty'] as const;
 export type StoreThemeId = (typeof STORE_THEME_IDS)[number];
 
 export interface StoreTheme {
@@ -30,6 +30,14 @@ export const STORE_THEMES: Record<StoreThemeId, StoreTheme> = {
     cssClass: 'ws-theme--streetwear',
     colorScheme: 'dark',
     fontMood: 'bold',
+  },
+  'pure-beauty': {
+    id: 'pure-beauty',
+    name: 'Pure Beauty',
+    description: 'Soft editorial commerce for skincare and beauty',
+    cssClass: 'ws-theme--pure-beauty',
+    colorScheme: 'light',
+    fontMood: 'editorial',
   },
   lifestyle: {
     id: 'lifestyle',
