@@ -21,7 +21,7 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'https://frontend-bay-ten-58.vercel.app'),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'https://watsstore.vercel.app'),
   title: {
     default: 'إنشاء متجر إلكتروني مجانًا لمدة 14 يومًا | WatsStore',
     template: '%s | WatsStore',

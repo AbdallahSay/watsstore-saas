@@ -18,7 +18,7 @@ function isEligibleSitemapSlug(slug: string): boolean {
 }
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://frontend-bay-ten-58.vercel.app';
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://watsstore.vercel.app';
   const routes: MetadataRoute.Sitemap = [
     {
       url: `${baseUrl}`,
