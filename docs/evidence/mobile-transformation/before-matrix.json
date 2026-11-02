@@ -1,0 +1,3602 @@
+[
+  {
+    "engine": "chrome",
+    "language": "ar",
+    "page": "landing",
+    "measurements": [
+      {
+        "width": 320,
+        "overflow": true,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 360,
+        "overflow": true,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 375,
+        "overflow": true,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 390,
+        "overflow": true,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 414,
+        "overflow": true,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 430,
+        "overflow": true,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 768,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 1024,
+        "overflow": true,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 1280,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 1440,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 1920,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      }
+    ],
+    "errors": [],
+    "apiErrors": []
+  },
+  {
+    "engine": "chrome",
+    "language": "ar",
+    "page": "pricing",
+    "measurements": [
+      {
+        "width": 320,
+        "overflow": true,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 360,
+        "overflow": true,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 375,
+        "overflow": true,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 390,
+        "overflow": true,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 414,
+        "overflow": true,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 430,
+        "overflow": true,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 768,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 1024,
+        "overflow": true,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 1280,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 1440,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 1920,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      }
+    ],
+    "errors": [],
+    "apiErrors": []
+  },
+  {
+    "engine": "chrome",
+    "language": "ar",
+    "page": "login",
+    "measurements": [
+      {
+        "width": 320,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 360,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 375,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 390,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 414,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 430,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 768,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 1024,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 1280,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 1440,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 1920,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      }
+    ],
+    "errors": [],
+    "apiErrors": []
+  },
+  {
+    "engine": "chrome",
+    "language": "ar",
+    "page": "register",
+    "measurements": [
+      {
+        "width": 320,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 360,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 375,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 390,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 414,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 430,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 768,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 1024,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 1280,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 1440,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 1920,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      }
+    ],
+    "errors": [],
+    "apiErrors": []
+  },
+  {
+    "engine": "chrome",
+    "language": "ar",
+    "page": "admin-login",
+    "measurements": [
+      {
+        "width": 320,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 360,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 375,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 390,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 414,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 430,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 768,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 1024,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 1280,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 1440,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 1920,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      }
+    ],
+    "errors": [],
+    "apiErrors": []
+  },
+  {
+    "engine": "chrome",
+    "language": "ar",
+    "page": "merchant-overview",
+    "measurements": [
+      {
+        "width": 320,
+        "overflow": true,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 360,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 375,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 390,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 414,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 430,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 768,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 1024,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 1280,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 1440,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 1920,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      }
+    ],
+    "errors": [],
+    "apiErrors": []
+  },
+  {
+    "engine": "chrome",
+    "language": "ar",
+    "page": "merchant-products",
+    "measurements": [
+      {
+        "width": 320,
+        "overflow": true,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 360,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 375,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 390,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 414,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 430,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 768,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 1024,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 1280,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 1440,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 1920,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      }
+    ],
+    "errors": [],
+    "apiErrors": []
+  },
+  {
+    "engine": "chrome",
+    "language": "ar",
+    "page": "merchant-categories",
+    "measurements": [
+      {
+        "width": 320,
+        "overflow": true,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 360,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 375,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 390,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 414,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 430,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 768,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 1024,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 1280,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 1440,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 1920,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      }
+    ],
+    "errors": [],
+    "apiErrors": []
+  },
+  {
+    "engine": "chrome",
+    "language": "ar",
+    "page": "merchant-inventory",
+    "measurements": [
+      {
+        "width": 320,
+        "overflow": true,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 360,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 375,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 390,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 414,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 430,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 768,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 1024,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 1280,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 1440,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 1920,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      }
+    ],
+    "errors": [],
+    "apiErrors": []
+  },
+  {
+    "engine": "chrome",
+    "language": "ar",
+    "page": "merchant-orders",
+    "measurements": [
+      {
+        "width": 320,
+        "overflow": true,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 360,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 375,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 390,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 414,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 430,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 768,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 1024,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 1280,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 1440,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 1920,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      }
+    ],
+    "errors": [],
+    "apiErrors": []
+  },
+  {
+    "engine": "chrome",
+    "language": "ar",
+    "page": "merchant-settings",
+    "measurements": [
+      {
+        "width": 320,
+        "overflow": true,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 360,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 375,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 390,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 414,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 430,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 768,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 1024,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 1280,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 1440,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 1920,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      }
+    ],
+    "errors": [],
+    "apiErrors": []
+  },
+  {
+    "engine": "chrome",
+    "language": "ar",
+    "page": "merchant-billing",
+    "measurements": [
+      {
+        "width": 320,
+        "overflow": true,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 360,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 375,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 390,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 414,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 430,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 768,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 1024,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 1280,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 1440,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 1920,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      }
+    ],
+    "errors": [],
+    "apiErrors": []
+  },
+  {
+    "engine": "chrome",
+    "language": "ar",
+    "page": "merchant-analytics",
+    "measurements": [
+      {
+        "width": 320,
+        "overflow": true,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 360,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 375,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 390,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 414,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 430,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 768,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 1024,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 1280,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 1440,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 1920,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      }
+    ],
+    "errors": [],
+    "apiErrors": []
+  },
+  {
+    "engine": "chrome",
+    "language": "ar",
+    "page": "merchant-reviews",
+    "measurements": [
+      {
+        "width": 320,
+        "overflow": true,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 360,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 375,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 390,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 414,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 430,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 768,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 1024,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 1280,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 1440,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 1920,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      }
+    ],
+    "errors": [],
+    "apiErrors": []
+  },
+  {
+    "engine": "chrome",
+    "language": "ar",
+    "page": "merchant-coupons",
+    "measurements": [
+      {
+        "width": 320,
+        "overflow": true,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 360,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 375,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 390,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 414,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 430,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 768,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 1024,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 1280,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 1440,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 1920,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      }
+    ],
+    "errors": [],
+    "apiErrors": []
+  },
+  {
+    "engine": "chrome",
+    "language": "ar",
+    "page": "merchant-themes",
+    "measurements": [
+      {
+        "width": 320,
+        "overflow": true,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 360,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 375,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 390,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 414,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 430,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 768,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 1024,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 1280,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 1440,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 1920,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      }
+    ],
+    "errors": [],
+    "apiErrors": []
+  },
+  {
+    "engine": "chrome",
+    "language": "ar",
+    "page": "merchant-notifications",
+    "measurements": [
+      {
+        "width": 320,
+        "overflow": true,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 360,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 375,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 390,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 414,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 430,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 768,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 1024,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 1280,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 1440,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 1920,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      }
+    ],
+    "errors": [],
+    "apiErrors": []
+  },
+  {
+    "engine": "chrome",
+    "language": "ar",
+    "page": "merchant-order",
+    "measurements": [
+      {
+        "width": 320,
+        "overflow": true,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 360,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 375,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 390,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 414,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 430,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 768,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 1024,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 1280,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 1440,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 1920,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      }
+    ],
+    "errors": [],
+    "apiErrors": []
+  },
+  {
+    "engine": "chrome",
+    "language": "ar",
+    "page": "admin",
+    "measurements": [
+      {
+        "width": 320,
+        "overflow": true,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 360,
+        "overflow": true,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 375,
+        "overflow": true,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 390,
+        "overflow": true,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 414,
+        "overflow": true,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 430,
+        "overflow": true,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 768,
+        "overflow": true,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 1024,
+        "overflow": true,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 1280,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 1440,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 1920,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      }
+    ],
+    "errors": [],
+    "apiErrors": []
+  },
+  {
+    "engine": "chrome",
+    "language": "ar",
+    "page": "store-editorial",
+    "measurements": [
+      {
+        "width": 320,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 360,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 375,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 390,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 414,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 430,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 768,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 1024,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 1280,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 1440,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 1920,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      }
+    ],
+    "errors": [],
+    "apiErrors": []
+  },
+  {
+    "engine": "chrome",
+    "language": "ar",
+    "page": "store-streetwear",
+    "measurements": [
+      {
+        "width": 320,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 360,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 375,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 390,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 414,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 430,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 768,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 1024,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 1280,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 1440,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 1920,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      }
+    ],
+    "errors": [],
+    "apiErrors": []
+  },
+  {
+    "engine": "chrome",
+    "language": "ar",
+    "page": "store-lifestyle",
+    "measurements": [
+      {
+        "width": 320,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 360,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 375,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 390,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 414,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 430,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 768,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 1024,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 1280,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 1440,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 1920,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      }
+    ],
+    "errors": [],
+    "apiErrors": []
+  },
+  {
+    "engine": "chrome",
+    "language": "ar",
+    "page": "my-orders",
+    "measurements": [
+      {
+        "width": 320,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 360,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 375,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 390,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 414,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 430,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 768,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 1024,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 1280,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 1440,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 1920,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      }
+    ],
+    "errors": [],
+    "apiErrors": []
+  },
+  {
+    "engine": "chrome",
+    "language": "ar",
+    "page": "tracking",
+    "measurements": [
+      {
+        "width": 320,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 360,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 375,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 390,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 414,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 430,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 768,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 1024,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 1280,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 1440,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      },
+      {
+        "width": 1920,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "rtl"
+      }
+    ],
+    "errors": [],
+    "apiErrors": []
+  },
+  {
+    "engine": "chrome",
+    "language": "en",
+    "page": "landing",
+    "measurements": [
+      {
+        "width": 320,
+        "overflow": true,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 360,
+        "overflow": true,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 375,
+        "overflow": true,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 390,
+        "overflow": true,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 414,
+        "overflow": true,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 430,
+        "overflow": true,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 768,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 1024,
+        "overflow": true,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 1280,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 1440,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 1920,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      }
+    ],
+    "errors": [],
+    "apiErrors": []
+  },
+  {
+    "engine": "chrome",
+    "language": "en",
+    "page": "pricing",
+    "measurements": [
+      {
+        "width": 320,
+        "overflow": true,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 360,
+        "overflow": true,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 375,
+        "overflow": true,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 390,
+        "overflow": true,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 414,
+        "overflow": true,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 430,
+        "overflow": true,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 768,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 1024,
+        "overflow": true,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 1280,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 1440,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 1920,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      }
+    ],
+    "errors": [],
+    "apiErrors": []
+  },
+  {
+    "engine": "chrome",
+    "language": "en",
+    "page": "login",
+    "measurements": [
+      {
+        "width": 320,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 360,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 375,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 390,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 414,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 430,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 768,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 1024,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 1280,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 1440,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 1920,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      }
+    ],
+    "errors": [],
+    "apiErrors": []
+  },
+  {
+    "engine": "chrome",
+    "language": "en",
+    "page": "register",
+    "measurements": [
+      {
+        "width": 320,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 360,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 375,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 390,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 414,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 430,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 768,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 1024,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 1280,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 1440,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 1920,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      }
+    ],
+    "errors": [],
+    "apiErrors": []
+  },
+  {
+    "engine": "chrome",
+    "language": "en",
+    "page": "admin-login",
+    "measurements": [
+      {
+        "width": 320,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 360,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 375,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 390,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 414,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 430,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 768,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 1024,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 1280,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 1440,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 1920,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      }
+    ],
+    "errors": [],
+    "apiErrors": []
+  },
+  {
+    "engine": "chrome",
+    "language": "en",
+    "page": "merchant-overview",
+    "measurements": [
+      {
+        "width": 320,
+        "overflow": true,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 360,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 375,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 390,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 414,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 430,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 768,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 1024,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 1280,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 1440,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 1920,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      }
+    ],
+    "errors": [],
+    "apiErrors": []
+  },
+  {
+    "engine": "chrome",
+    "language": "en",
+    "page": "merchant-products",
+    "measurements": [
+      {
+        "width": 320,
+        "overflow": true,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 360,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 375,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 390,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 414,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 430,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 768,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 1024,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 1280,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 1440,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 1920,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      }
+    ],
+    "errors": [],
+    "apiErrors": []
+  },
+  {
+    "engine": "chrome",
+    "language": "en",
+    "page": "merchant-categories",
+    "measurements": [
+      {
+        "width": 320,
+        "overflow": true,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 360,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 375,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 390,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 414,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 430,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 768,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 1024,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 1280,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 1440,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 1920,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      }
+    ],
+    "errors": [],
+    "apiErrors": []
+  },
+  {
+    "engine": "chrome",
+    "language": "en",
+    "page": "merchant-inventory",
+    "measurements": [
+      {
+        "width": 320,
+        "overflow": true,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 360,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 375,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 390,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 414,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 430,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 768,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 1024,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 1280,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 1440,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 1920,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      }
+    ],
+    "errors": [],
+    "apiErrors": []
+  },
+  {
+    "engine": "chrome",
+    "language": "en",
+    "page": "merchant-orders",
+    "measurements": [
+      {
+        "width": 320,
+        "overflow": true,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 360,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 375,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 390,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 414,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 430,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 768,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 1024,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 1280,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 1440,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 1920,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      }
+    ],
+    "errors": [],
+    "apiErrors": []
+  },
+  {
+    "engine": "chrome",
+    "language": "en",
+    "page": "merchant-settings",
+    "measurements": [
+      {
+        "width": 320,
+        "overflow": true,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 360,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 375,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 390,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 414,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 430,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 768,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 1024,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 1280,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 1440,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 1920,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      }
+    ],
+    "errors": [],
+    "apiErrors": []
+  },
+  {
+    "engine": "chrome",
+    "language": "en",
+    "page": "merchant-billing",
+    "measurements": [
+      {
+        "width": 320,
+        "overflow": true,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 360,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 375,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 390,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 414,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 430,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 768,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 1024,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 1280,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 1440,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 1920,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      }
+    ],
+    "errors": [],
+    "apiErrors": []
+  },
+  {
+    "engine": "chrome",
+    "language": "en",
+    "page": "merchant-analytics",
+    "measurements": [
+      {
+        "width": 320,
+        "overflow": true,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 360,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 375,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 390,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 414,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 430,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 768,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 1024,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 1280,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 1440,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 1920,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      }
+    ],
+    "errors": [],
+    "apiErrors": []
+  },
+  {
+    "engine": "chrome",
+    "language": "en",
+    "page": "merchant-reviews",
+    "measurements": [
+      {
+        "width": 320,
+        "overflow": true,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 360,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 375,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 390,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 414,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 430,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 768,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 1024,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 1280,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 1440,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 1920,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      }
+    ],
+    "errors": [],
+    "apiErrors": []
+  },
+  {
+    "engine": "chrome",
+    "language": "en",
+    "page": "merchant-coupons",
+    "measurements": [
+      {
+        "width": 320,
+        "overflow": true,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 360,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 375,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 390,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 414,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 430,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 768,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 1024,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 1280,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 1440,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 1920,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      }
+    ],
+    "errors": [],
+    "apiErrors": []
+  },
+  {
+    "engine": "chrome",
+    "language": "en",
+    "page": "merchant-themes",
+    "measurements": [
+      {
+        "width": 320,
+        "overflow": true,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 360,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 375,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 390,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 414,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 430,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 768,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 1024,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 1280,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 1440,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 1920,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      }
+    ],
+    "errors": [],
+    "apiErrors": []
+  },
+  {
+    "engine": "chrome",
+    "language": "en",
+    "page": "merchant-notifications",
+    "measurements": [
+      {
+        "width": 320,
+        "overflow": true,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 360,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 375,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 390,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 414,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 430,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 768,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 1024,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 1280,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 1440,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 1920,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      }
+    ],
+    "errors": [],
+    "apiErrors": []
+  },
+  {
+    "engine": "chrome",
+    "language": "en",
+    "page": "merchant-order",
+    "measurements": [
+      {
+        "width": 320,
+        "overflow": true,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 360,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 375,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 390,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 414,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 430,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 768,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 1024,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 1280,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 1440,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 1920,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      }
+    ],
+    "errors": [],
+    "apiErrors": []
+  },
+  {
+    "engine": "chrome",
+    "language": "en",
+    "page": "admin",
+    "measurements": [
+      {
+        "width": 320,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 360,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 375,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 390,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 414,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 430,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 768,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 1024,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 1280,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 1440,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 1920,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      }
+    ],
+    "errors": [],
+    "apiErrors": []
+  },
+  {
+    "engine": "chrome",
+    "language": "en",
+    "page": "store-editorial",
+    "measurements": [
+      {
+        "width": 320,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 360,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 375,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 390,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 414,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 430,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 768,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 1024,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 1280,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 1440,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 1920,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      }
+    ],
+    "errors": [],
+    "apiErrors": []
+  },
+  {
+    "engine": "chrome",
+    "language": "en",
+    "page": "store-streetwear",
+    "measurements": [
+      {
+        "width": 320,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 360,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 375,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 390,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 414,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 430,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 768,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 1024,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 1280,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 1440,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 1920,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      }
+    ],
+    "errors": [],
+    "apiErrors": []
+  },
+  {
+    "engine": "chrome",
+    "language": "en",
+    "page": "store-lifestyle",
+    "measurements": [
+      {
+        "width": 320,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 360,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 375,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 390,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 414,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 430,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 768,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 1024,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 1280,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 1440,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 1920,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      }
+    ],
+    "errors": [],
+    "apiErrors": []
+  },
+  {
+    "engine": "chrome",
+    "language": "en",
+    "page": "my-orders",
+    "measurements": [
+      {
+        "width": 320,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 360,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 375,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 390,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 414,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 430,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 768,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 1024,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 1280,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 1440,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 1920,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      }
+    ],
+    "errors": [],
+    "apiErrors": []
+  },
+  {
+    "engine": "chrome",
+    "language": "en",
+    "page": "tracking",
+    "measurements": [
+      {
+        "width": 320,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 360,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 375,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 390,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 414,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 430,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 768,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 1024,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 1280,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 1440,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      },
+      {
+        "width": 1920,
+        "overflow": false,
+        "smallInputs": 0,
+        "direction": "ltr"
+      }
+    ],
+    "errors": [],
+    "apiErrors": []
+  }
+]

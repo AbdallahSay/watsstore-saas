@@ -2,9 +2,12 @@ using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using WatsStore.Api.Domain.Entities;
 using WatsStore.Tests;
+using WatsStore.Api.Infrastructure.Utils;
+using Microsoft.Extensions.Configuration;
 
 // Isolated test host. Never connects to production or seeds production content.
-await using var factory = new CommerceFactory();
+var audit = Environment.GetEnvironmentVariable("WATSSTORE_UI_FIXTURES") == "1";
+await using var factory = new CommerceFactory(uiAudit: audit);
 factory.UseKestrel(5000);
 var fixtures = new List<object>();
 foreach (var theme in new[] { "editorial", "streetwear", "lifestyle" })
@@ -37,5 +40,11 @@ foreach (var theme in new[] { "editorial", "streetwear", "lifestyle" })
 }
 Directory.CreateDirectory("work");
 await File.WriteAllTextAsync("work/e2e-fixtures.json", JsonSerializer.Serialize(fixtures));
+if (audit)
+{
+    var config = new ConfigurationBuilder().AddInMemoryCollection(new Dictionary<string,string> { ["Jwt:SecretKey"] = CommerceFactory.TestKey }).Build();
+    var admin = new JwtTokenGenerator(config).GenerateAdminToken("qa-admin@test.invalid", "Technical QA");
+    await File.WriteAllTextAsync("work/e2e-admin.json", JsonSerializer.Serialize(new { token = admin, email = "qa-admin@test.invalid", name = "Technical QA", role = "Admin" }));
+}
 Console.WriteLine("Isolated commerce API ready at http://localhost:5000; fixture file written.");
 await Task.Delay(Timeout.InfiniteTimeSpan);

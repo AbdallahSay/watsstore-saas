@@ -5,6 +5,7 @@ using System.Text.Json;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -18,6 +19,8 @@ namespace WatsStore.Tests;
 
 public class CommerceFactory : WebApplicationFactory<Program>
 {
+    private readonly bool uiAudit;
+    public CommerceFactory(bool uiAudit = false) { this.uiAudit = uiAudit; }
     private readonly string path = Path.Combine(Path.GetTempPath(), $"watsstore-test-{Guid.NewGuid()}.db");
     public const string TestKey = "isolated-test-signing-key-with-at-least-32-bytes-only";
     protected override void ConfigureWebHost(IWebHostBuilder builder)
@@ -31,13 +34,26 @@ public class CommerceFactory : WebApplicationFactory<Program>
         }
         var backendDir = Path.Combine(dir, "backend");
         builder.UseContentRoot(backendDir);
+        if (uiAudit)
+        {
+            // UploadController uses the process working directory, as it does
+            // on IIS. Match the isolated host's static root to that directory.
+            var webRoot = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
+            Directory.CreateDirectory(webRoot);
+            builder.UseWebRoot(webRoot);
+        }
         builder.UseEnvironment("Testing");
         builder.UseSetting("Jwt:SecretKey", TestKey);
         builder.ConfigureServices(services =>
         {
             services.RemoveAll<DbContextOptions<AppDbContext>>();
             services.RemoveAll<AppDbContext>();
-            services.AddDbContext<AppDbContext>(o => o.UseSqlite($"Data Source={path};Default Timeout=30"));
+            services.AddDbContext<AppDbContext>(o => {
+                o.UseSqlite($"Data Source={path};Default Timeout=30");
+                // Only visual-summary fixtures opt in; financial tests retain the
+                // original provider behavior and decimal validation paths.
+                if (uiAudit) o.ReplaceService<IAggregateMethodCallTranslatorProvider, RelationalAggregateMethodCallTranslatorProvider>();
+            });
             services.AddControllers().AddApplicationPart(typeof(TestAssetsController).Assembly);
         });
     }

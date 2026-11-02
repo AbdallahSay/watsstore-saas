@@ -41,6 +41,16 @@ jobs:
 
       - name: Run unit & integration tests
         run: dotnet test WatsStore.sln --configuration Release --no-build --verbosity normal
+      - name: Audit direct and transitive NuGet dependencies
+        run: |
+          dotnet list WatsStore.sln package --vulnerable --include-transitive --format json > nuget-audit.json
+          python3 - <<'PY'
+          import json
+          report=json.load(open('nuget-audit.json'))
+          findings=[p['id'] for project in report.get('projects',[]) for framework in project.get('frameworks',[]) for group in ('topLevelPackages','transitivePackages') for p in framework.get(group,[]) if p.get('vulnerabilities')]
+          assert not findings, f'Vulnerable packages: {findings}'
+          assert not any(log.get('level')=='Error' for log in report.get('logs',[])), 'NuGet audit failed'
+          PY
 
   frontend:
     name: Frontend (Typecheck & Build)
@@ -64,6 +74,8 @@ jobs:
 
       - name: Type check
         run: npx tsc --noEmit
+      - name: Audit npm dependencies
+        run: npm audit --audit-level=moderate
 
       - name: Checkout API configuration and retry regression tests
         run: npm test
@@ -76,6 +88,10 @@ jobs:
   checkout:
     name: Checkout (Chrome Mobile & Desktop E2E)
     runs-on: ubuntu-latest
+    env:
+      E2E_SITE_URL: http://localhost:3000
+      AUDIT_STAGE: after
+      AUDIT_ENGINES: chrome,firefox,webkit
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-dotnet@v4
@@ -90,9 +106,14 @@ jobs:
           cache-dependency-path: frontend/package-lock.json
       - run: npm ci
         working-directory: frontend
+      - name: Install Firefox and WebKit for Playwright
+        run: npx playwright install --with-deps firefox webkit
+        working-directory: frontend
       - name: Build isolated backend fixture host
         run: dotnet build backend.E2E/WatsStore.E2E.csproj --configuration Release
       - name: Start isolated API and wait for fixtures
+        env:
+          WATSSTORE_UI_FIXTURES: '1'
         run: |
           mkdir -p work
           dotnet run --project backend.E2E/WatsStore.E2E.csproj --configuration Release --no-build > work/e2e-api.log 2>&1 &
@@ -124,6 +145,15 @@ jobs:
       - name: Verify mobile native shopping, variants, coupons and accessible checkout
         run: npm run test:mobile-commerce
         working-directory: frontend
+      - name: Verify dedicated product and complete order journey across engines
+        run: npm run test:native-journey
+        working-directory: frontend
+      - name: Verify responsive page matrix and accessible dialogs
+        run: |
+          npm run test:responsive
+          npm run test:dialogs
+          npm run test:merchant-mobile
+        working-directory: frontend
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -132,3 +162,4 @@ jobs:
             work/p0-checkout/e2e/
             work/customer-commerce/e2e/
             work/mobile-commerce/e2e/
+            work/transformation/

@@ -1,0 +1,77 @@
+{
+  "version": 1,
+  "parameters": "--vulnerable --include-transitive",
+  "sources": [
+    "https://api.nuget.org/v3/index.json"
+  ],
+  "projects": [
+    {
+      "path": "WatsStore.Api.csproj",
+      "frameworks": [
+        {
+          "framework": "net8.0",
+          "transitivePackages": [
+            {
+              "id": "Azure.Identity",
+              "resolvedVersion": "1.10.3",
+              "vulnerabilities": [
+                {
+                  "severity": "Moderate",
+                  "advisoryurl": "https://github.com/advisories/GHSA-wvxc-855f-jvrv"
+                },
+                {
+                  "severity": "Moderate",
+                  "advisoryurl": "https://github.com/advisories/GHSA-m5vv-6r4h-3vj9"
+                }
+              ]
+            },
+            {
+              "id": "Microsoft.Extensions.Caching.Memory",
+              "resolvedVersion": "8.0.0",
+              "vulnerabilities": [
+                {
+                  "severity": "High",
+                  "advisoryurl": "https://github.com/advisories/GHSA-qj66-m88j-hmgj"
+                }
+              ]
+            },
+            {
+              "id": "Microsoft.Identity.Client",
+              "resolvedVersion": "4.56.0",
+              "vulnerabilities": [
+                {
+                  "severity": "Low",
+                  "advisoryurl": "https://github.com/advisories/GHSA-x674-v45j-fwxw"
+                },
+                {
+                  "severity": "Moderate",
+                  "advisoryurl": "https://github.com/advisories/GHSA-m5vv-6r4h-3vj9"
+                }
+              ]
+            },
+            {
+              "id": "System.Formats.Asn1",
+              "resolvedVersion": "5.0.0",
+              "vulnerabilities": [
+                {
+                  "severity": "High",
+                  "advisoryurl": "https://github.com/advisories/GHSA-447r-wph3-92pm"
+                }
+              ]
+            },
+            {
+              "id": "System.Text.Json",
+              "resolvedVersion": "8.0.4",
+              "vulnerabilities": [
+                {
+                  "severity": "High",
+                  "advisoryurl": "https://github.com/advisories/GHSA-8g4q-xg66-9fp4"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
