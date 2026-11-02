@@ -17,12 +17,12 @@ import '@/styles/themes/pure-beauty.css';
 const ProductModal = dynamic(() => import('@/components/ProductModal'));
 const CommerceCart = dynamic(() => import('./CommerceCart'));
 
-interface Props { store: Store; previewTheme?: StoreThemeId | 'pure-beauty'; preview?: boolean; detailProduct?: Product }
+interface Props { store: Store; previewTheme?: StoreThemeId; preview?: boolean; detailProduct?: Product }
 export default function CommerceStorefront({store, previewTheme, preview = false, detailProduct}: Props) {
   const {language, setLanguage} = useLanguage();
   const english = language !== 'ar';
   const tr = (ar: string, en: string) => english ? en : ar;
-  const theme = preview && previewTheme === 'pure-beauty' ? {id:'pure-beauty', cssClass:'ws-theme--pure-beauty'} : getStoreTheme(store.themeId ? (previewTheme || store.themeId) : previewTheme);
+  const theme = getStoreTheme(previewTheme || store.themeId);
   const [category, setCategory] = useState<number | 'all'>('all');
   const [search, setSearch] = useState('');
   const [sort, setSort] = useState('featured');
