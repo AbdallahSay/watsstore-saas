@@ -49,7 +49,7 @@ async function settle(page) {
 // WCAG normal-text contrast for theme-adaptive, outlined WhatsApp controls.
 function contrastRatio(foreground, background) {
   const parse = value => {
-    const values = value.match(/\\d+(?:\\.\\d+)?/g)?.slice(0, 3).map(Number);
+    const values = value.match(/\d+(?:\.\d+)?/g)?.slice(0, 3).map(Number);
     assert.ok(values && values.length === 3, 'Expected computed RGB color: ' + value);
     return values;
   };
