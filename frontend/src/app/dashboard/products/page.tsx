@@ -944,7 +944,17 @@ export default function DashboardProductsPage() {
                       handleMultiImageUpload(e.dataTransfer.files);
                     }
                   }}
-                  onClick={() => multiFileInputRef.current?.click()}
+                  role="button"
+                  tabIndex={isUploadingImages || isSaving ? -1 : 0}
+                  aria-label={language === 'ar' ? 'رفع صور المنتج' : 'Upload product images'}
+                  aria-disabled={isUploadingImages || isSaving}
+                  onClick={() => { if (!isUploadingImages && !isSaving) multiFileInputRef.current?.click(); }}
+                  onKeyDown={(event) => {
+                    if (event.key === 'Enter' || event.key === ' ') {
+                      event.preventDefault();
+                      if (!isUploadingImages && !isSaving) multiFileInputRef.current?.click();
+                    }
+                  }}
                   className={`border-2 border-dashed rounded-2xl p-4 sm:p-5 text-center cursor-pointer transition-all ${
                     isDragging
                       ? 'border-emerald-500 bg-emerald-50/60 dark:bg-emerald-950/40 ring-2 ring-emerald-500/20'
@@ -1106,7 +1116,7 @@ export default function DashboardProductsPage() {
 
               <div>
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 mb-1.5">
-                  <label className="block font-bold text-slate-700 dark:text-slate-300">وصف المنتج ومميزاته</label>
+                  <label htmlFor="product-description" className="block font-bold text-slate-700 dark:text-slate-300">وصف المنتج ومميزاته</label>
                   <div className="flex items-center gap-2 flex-wrap">
                     {planType === 'Free' ? (
                       <span className="text-[10px] font-bold text-amber-800 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/40 border border-amber-300 dark:border-amber-700 px-2 py-0.5 rounded-full flex items-center gap-1">
@@ -1136,7 +1146,7 @@ export default function DashboardProductsPage() {
                     </button>
                   </div>
                 </div>
-                <textarea
+                <textarea id="product-description"
                   rows={3}
                   value={formDescription}
                   onChange={(e) => setFormDescription(e.target.value)}
@@ -1172,6 +1182,7 @@ export default function DashboardProductsPage() {
                         <input
                           type="text"
                           value={g.name}
+                          aria-label={language === 'ar' ? `اسم الخاصية ${idx + 1}` : `Variant name ${idx + 1}`}
                           onChange={(e) => {
                             const next = [...variantGroups];
                             next[idx].name = e.target.value;
@@ -1183,6 +1194,7 @@ export default function DashboardProductsPage() {
                         <input
                           type="text"
                           value={g.optionsText}
+                          aria-label={language === 'ar' ? `اختيارات الخاصية ${idx + 1}` : `Variant options ${idx + 1}`}
                           onChange={(e) => {
                             const next = [...variantGroups];
                             next[idx].optionsText = e.target.value;
