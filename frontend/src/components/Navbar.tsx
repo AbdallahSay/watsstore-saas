@@ -19,7 +19,7 @@ export default function Navbar() {
     <header className="sticky top-0 z-40 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 transition-colors duration-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
         {/* Brand */}
-        <Link href="/" className="flex items-center gap-2 group shrink-0">
+        <Link prefetch={false} href="/" className="flex items-center gap-2 group shrink-0">
           <div className="w-10 h-10 rounded-xl bg-emerald-700 flex items-center justify-center text-white shadow-md shadow-emerald-500/20 group-hover:scale-105 transition-transform">
             <StoreIcon className="w-5 h-5" />
           </div>
@@ -35,18 +35,18 @@ export default function Navbar() {
 
         {/* Desktop Nav */}
         <nav className="hidden xl:flex items-center gap-7 text-sm font-semibold text-slate-600 dark:text-slate-300">
-          <Link href="/#features" className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
+          <Link prefetch={false} href="/#features" className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
             {t('nav.features', undefined, 'المميزات')}
           </Link>
-          <Link href="/#pricing" className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
+          <Link prefetch={false} href="/#pricing" className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
             {t('nav.pricing', undefined, 'الأسعار والباقات')}
           </Link>
-          <Link href="/directory" className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors flex items-center gap-1">
+          <Link prefetch={false} href="/directory" className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors flex items-center gap-1">
             <ShoppingBag className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
             {t('nav.directory', undefined, 'دليل المتاجر المحلية')}
           </Link>
-          <Link 
-            href="/s/al-amal-fashion" 
+          <Link prefetch={false}
+            href="/s/al-amal-fashion"
             target="_blank"
             className="text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 font-bold bg-emerald-50 dark:bg-emerald-950/50 px-3 py-1.5 rounded-lg border border-emerald-200/60 dark:border-emerald-800/60"
           >
@@ -59,14 +59,14 @@ export default function Navbar() {
           {/* Global Theme & Language Bar */}
           <div className="hidden md:block"><ThemeLanguageBar variant="navbar" showCurrency={false} /></div>
 
-          <Link
+          <Link prefetch={false}
             href="/login"
             className="hidden lg:inline-flex px-3.5 py-2 text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-200 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors min-h-[44px] items-center"
           >
             {t('nav.login', undefined, 'دخول التاجر')}
           </Link>
 
-          <Link
+          <Link prefetch={false}
             href="/register"
             className="hidden sm:flex px-3.5 sm:px-4 py-2 text-xs sm:text-sm font-bold text-white bg-emerald-700 hover:bg-emerald-800 rounded-xl shadow-md shadow-emerald-600/20 flex items-center gap-1.5 sm:gap-2 transition-all hover:gap-2.5 shrink-0 min-h-[44px]"
           >
@@ -89,7 +89,7 @@ export default function Navbar() {
     </header>
       {/* Mobile Off-Canvas Drawer */}
       {isMobileOpen && (
-        <div 
+        <div
           className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm xl:hidden animate-fadeIn"
           onClick={() => setIsMobileOpen(false)}
         >
@@ -122,21 +122,21 @@ export default function Navbar() {
               <ThemeLanguageBar variant="navbar" className="flex-wrap" />
               {/* Navigation Links */}
               <nav className="space-y-2">
-                <Link
+                <Link prefetch={false}
                   href="/#features"
                   onClick={() => setIsMobileOpen(false)}
                   className="flex items-center px-4 py-3 rounded-xl text-sm font-bold text-slate-700 dark:text-slate-200 hover:bg-emerald-50 dark:hover:bg-slate-800 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors min-h-[44px]"
                 >
                   {t('nav.features', undefined, 'المميزات')}
                 </Link>
-                <Link
+                <Link prefetch={false}
                   href="/#pricing"
                   onClick={() => setIsMobileOpen(false)}
                   className="flex items-center px-4 py-3 rounded-xl text-sm font-bold text-slate-700 dark:text-slate-200 hover:bg-emerald-50 dark:hover:bg-slate-800 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors min-h-[44px]"
                 >
                   {t('nav.pricing', undefined, 'الأسعار والباقات')}
                 </Link>
-                <Link
+                <Link prefetch={false}
                   href="/directory"
                   onClick={() => setIsMobileOpen(false)}
                   className="flex items-center gap-2 px-4 py-3 rounded-xl text-sm font-bold text-slate-700 dark:text-slate-200 hover:bg-emerald-50 dark:hover:bg-slate-800 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors min-h-[44px]"
@@ -144,7 +144,7 @@ export default function Navbar() {
                   <ShoppingBag className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                   <span>{t('nav.directory', undefined, 'دليل المتاجر المحلية')}</span>
                 </Link>
-                <Link
+                <Link prefetch={false}
                   href="/s/al-amal-fashion"
                   target="_blank"
                   onClick={() => setIsMobileOpen(false)}
@@ -158,7 +158,7 @@ export default function Navbar() {
 
             {/* Bottom Actions */}
             <div className="pt-6 border-t border-slate-100 dark:border-slate-800 space-y-3 pb-safe">
-              <Link
+              <Link prefetch={false}
                 href="/login"
                 onClick={() => setIsMobileOpen(false)}
                 className="w-full py-3 px-4 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 font-bold text-sm flex items-center justify-center gap-2 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors min-h-[44px]"
@@ -166,7 +166,7 @@ export default function Navbar() {
                 <LogIn className="w-4 h-4" />
                 <span>{t('nav.login', undefined, 'تسجيل دخول التاجر')}</span>
               </Link>
-              <Link
+              <Link prefetch={false}
                 href="/register"
                 onClick={() => setIsMobileOpen(false)}
                 className="w-full py-3 px-4 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-black text-sm flex items-center justify-center gap-2 shadow-md transition-all min-h-[44px]"

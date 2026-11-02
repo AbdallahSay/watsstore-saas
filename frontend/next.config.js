@@ -5,17 +5,16 @@ if (process.env.VERCEL === '1' && process.env.NEXT_PUBLIC_API_URL) {
     throw new Error('Hosted deployments require an HTTPS public API URL, never a local development server.');
   }
 }
+const imageApiUrl = new URL(process.env.NEXT_PUBLIC_API_URL || 'https://watsstore.runasp.net/api');
 const nextConfig = {
   reactStrictMode: true,
   images: {
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: '**',
-      },
-      {
-        protocol: 'http',
-        hostname: '**',
+        hostname: imageApiUrl.hostname,
+        port: imageApiUrl.port,
+        pathname: '/uploads/**',
       },
     ],
   },

@@ -4,15 +4,15 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
-import { 
-  MessageCircle, 
-  Zap, 
-  TrendingUp, 
-  CheckCircle2, 
-  ArrowLeft, 
-  Sparkles, 
-  Smartphone, 
-  Search, 
+import {
+  MessageCircle,
+  Zap,
+  TrendingUp,
+  CheckCircle2,
+  ArrowLeft,
+  Sparkles,
+  Smartphone,
+  Search,
   BarChart3,
   ExternalLink,
   X,
@@ -147,7 +147,7 @@ export default function HomePage() {
               <span className="bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 bg-clip-text text-transparent">
                 {dir === 'rtl' ? 'واستقبل الطلبات عبر واتساب' : 'and receive orders on WhatsApp'}
               </span>{' '}
-              
+
             </h1>
 
             <p className="mt-6 text-lg sm:text-xl text-slate-600 dark:text-slate-300 max-w-2xl mx-auto leading-relaxed">
@@ -156,7 +156,7 @@ export default function HomePage() {
 
             {/* CTAs */}
             <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Link
+              <Link prefetch={false}
                 href="/register"
                 className="w-full sm:w-auto px-8 py-4 bg-emerald-700 hover:bg-emerald-800 text-white font-extrabold text-base rounded-2xl shadow-xl shadow-emerald-600/25 flex items-center justify-center gap-3 transition-all hover:scale-105 active:scale-95"
               >
@@ -164,7 +164,7 @@ export default function HomePage() {
                 <ArrowIcon className="w-5 h-5" />
               </Link>
 
-              <Link
+              <Link prefetch={false}
                 href="/s/al-amal-fashion"
                 target="_blank"
                 className="w-full sm:w-auto px-7 py-4 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-800 dark:text-slate-100 font-bold text-base rounded-2xl border border-slate-300 dark:border-slate-700 shadow-sm flex items-center justify-center gap-2.5 transition-all hover:border-slate-400"
@@ -342,7 +342,7 @@ export default function HomePage() {
                   <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
                     {t('home.plan_free_sub', undefined, 'جرب المنصة بكامل خصائصها قبل الاشتراك')}
                   </p>
-                  
+
                   <div className="mt-6 mb-8">
                     <div className="flex items-baseline gap-1">
                       <span className="text-4xl font-black text-slate-900 dark:text-white">0</span>
@@ -391,7 +391,7 @@ export default function HomePage() {
                   </ul>
                 </div>
 
-                <Link
+                <Link prefetch={false}
                   href="/register"
                   className="mt-8 w-full py-3.5 rounded-2xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-bold text-sm text-center transition-colors block"
                 >
@@ -415,7 +415,7 @@ export default function HomePage() {
                   <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
                     {t('home.plan_pro_sub', undefined, 'للمتاجر الراغبة في التوسع ومضاعفة المبيعات')}
                   </p>
-                  
+
                   {billingCycle === 'annual' ? (
                     <div className="mt-6 mb-8">
                       <div className="flex items-baseline gap-1.5">
@@ -487,7 +487,7 @@ export default function HomePage() {
                   </ul>
                 </div>
 
-                <Link
+                <Link prefetch={false}
                   href="/register"
                   className="mt-8 w-full py-3.5 rounded-2xl bg-emerald-700 hover:bg-emerald-800 text-white font-extrabold text-sm text-center shadow-lg shadow-emerald-600/25 transition-all hover:scale-[1.02] block"
                 >
@@ -504,7 +504,7 @@ export default function HomePage() {
                   <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
                     {t('home.plan_vip_sub', undefined, 'للعلامات التجارية الكبرى والمتاجر الرائدة')}
                   </p>
-                  
+
                   {billingCycle === 'annual' ? (
                     <div className="mt-6 mb-8">
                       <div className="flex items-baseline gap-1.5">
@@ -572,7 +572,7 @@ export default function HomePage() {
                   </ul>
                 </div>
 
-                <Link
+                <Link prefetch={false}
                   href="/register"
                   className="mt-8 w-full py-3.5 rounded-2xl bg-slate-900 hover:bg-slate-800 dark:bg-emerald-700 dark:hover:bg-emerald-800 text-white font-bold text-sm text-center transition-colors block shadow-md"
                 >
@@ -642,7 +642,7 @@ export default function HomePage() {
               {t('home.cta_sub', undefined, 'سجل متجرك الآن في دقيقتين وابدأ تجربة مجانية كاملة لمدة 14 يوماً بدون بطاقة بنكية.')}
             </p>
             <div>
-              <Link
+              <Link prefetch={false}
                 href="/register"
                 className="inline-flex items-center gap-3 px-8 py-4 bg-white text-emerald-700 hover:bg-emerald-50 font-black text-base rounded-2xl shadow-xl transition-all hover:scale-105"
               >

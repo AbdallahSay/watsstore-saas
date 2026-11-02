@@ -34,22 +34,22 @@ export default function Footer() {
             </h2>
             <ul className="space-y-2 text-sm">
               <li>
-                <Link href="/#features" className="hover:text-emerald-400 transition-colors">
+                <Link prefetch={false} href="/#features" className="hover:text-emerald-400 transition-colors">
                   {t('footer.link_features', undefined, 'المميزات والخصائص')}
                 </Link>
               </li>
               <li>
-                <Link href="/#pricing" className="hover:text-emerald-400 transition-colors">
+                <Link prefetch={false} href="/#pricing" className="hover:text-emerald-400 transition-colors">
                   {t('footer.link_pricing', undefined, 'باقات الأسعار')}
                 </Link>
               </li>
               <li>
-                <Link href="/directory" className="hover:text-emerald-400 transition-colors">
+                <Link prefetch={false} href="/directory" className="hover:text-emerald-400 transition-colors">
                   {t('footer.link_directory', undefined, 'دليل المتاجر في المحافظات')}
                 </Link>
               </li>
               <li>
-                <Link href="/s/al-amal-fashion" className="hover:text-emerald-400 transition-colors">
+                <Link prefetch={false} href="/s/al-amal-fashion" className="hover:text-emerald-400 transition-colors">
                   {t('footer.link_demo', undefined, 'معاينة المتجر التجريبي')}
                 </Link>
               </li>
@@ -62,17 +62,17 @@ export default function Footer() {
             </h2>
             <ul className="space-y-2 text-sm">
               <li>
-                <Link href="/register" className="hover:text-emerald-400 transition-colors">
+                <Link prefetch={false} href="/register" className="hover:text-emerald-400 transition-colors">
                   {t('footer.link_register', undefined, 'تسجيل متجر جديد')}
                 </Link>
               </li>
               <li>
-                <Link href="/login" className="hover:text-emerald-400 transition-colors">
+                <Link prefetch={false} href="/login" className="hover:text-emerald-400 transition-colors">
                   {t('footer.link_login', undefined, 'تسجيل دخول لوحة التحكم')}
                 </Link>
               </li>
               <li>
-                <Link href="/dashboard" className="hover:text-emerald-400 transition-colors">
+                <Link prefetch={false} href="/dashboard" className="hover:text-emerald-400 transition-colors">
                   {t('footer.link_dashboard', undefined, 'إدارة الكتالوج والطلبات')}
                 </Link>
               </li>

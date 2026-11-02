@@ -5,7 +5,7 @@ import MetaPixel from '@/components/MetaPixel';
 import AppProviders from '@/context/AppProviders';
 
 const cairo = Cairo({
-  subsets: ['arabic'],
+  subsets: ['arabic', 'latin'],
   weight: ['300', '400', '500', '600', '700', '800', '900'],
   variable: '--font-cairo',
   display: 'swap',

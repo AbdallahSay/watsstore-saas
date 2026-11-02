@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from 'react';
 import Link from 'next/link';
+import StoreImage from './StoreImage';
 import { Product, ProductVariantGroup, Store } from '@/types';
 
 interface Props {
@@ -37,7 +38,7 @@ export default function ProductDetails({ store, product, english, disabled, add 
     <nav className="ws-product-breadcrumb" aria-label={tr('مسار التصفح', 'Breadcrumb')}><Link prefetch={false} href={`/s/${store.slug}`}>{store.storeName}</Link><span aria-hidden="true"> / </span><span>{product.name}</span></nav>
     <section className="ws-product-detail" aria-labelledby="product-title">
       <div className="ws-product-gallery">
-        {images.length ? <img className="ws-product-main-image" src={images[active]} alt={product.name} width="900" height="1000" fetchPriority="high"/> : <div className="ws-empty-art">{product.name}</div>}
+        {images.length ? <StoreImage sizes="(max-width: 767px) 100vw, 55vw" className="ws-product-main-image" src={images[active]} alt={product.name} width="900" height="1000" fetchPriority="high"/> : <div className="ws-empty-art">{product.name}</div>}
         {images.length > 1 && <div className="ws-product-thumbnails" aria-label={tr('صور المنتج', 'Product images')}>{images.map((src, index) => <button key={`${src}-${index}`} aria-label={`${tr('صورة', 'Image')} ${index + 1}`} aria-pressed={index === active} onClick={() => setActive(index)}><img src={src} alt="" width="80" height="80" loading="lazy"/></button>)}</div>}
       </div>
       <div className="ws-product-information"><p className="ws-eyebrow">{store.categories.find(c => c.id === product.categoryId)?.name}</p><h1 id="product-title">{product.name}</h1>
@@ -52,7 +53,7 @@ export default function ProductDetails({ store, product, english, disabled, add 
         </form>
       </div>
     </section>
-    {!!related.length && <section className="ws-related"><h2>{tr('من نفس المجموعة', 'From the same collection')}</h2><div className="ws-product-grid">{related.map(p => <article className="ws-product-card" key={p.id}><Link prefetch={false} href={`/s/${encodeURIComponent(store.slug)}/p/${encodeURIComponent(p.slug)}`}>{p.imageUrl && <img src={p.imageUrl} alt={p.name} loading="lazy" width="400" height="500"/>}<h3>{p.name}</h3><p>{money(p.price)}</p></Link></article>)}</div></section>}
+    {!!related.length && <section className="ws-related"><h2>{tr('من نفس المجموعة', 'From the same collection')}</h2><div className="ws-product-grid">{related.map(p => <article className="ws-product-card" key={p.id}><Link prefetch={false} href={`/s/${encodeURIComponent(store.slug)}/p/${encodeURIComponent(p.slug)}`}>{p.imageUrl && <StoreImage sizes="(max-width: 767px) 50vw, 25vw" src={p.imageUrl} alt={p.name} loading="lazy" width="400" height="500"/>}<h3>{p.name}</h3><p>{money(p.price)}</p></Link></article>)}</div></section>}
   </>;
 }
 
