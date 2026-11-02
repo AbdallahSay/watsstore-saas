@@ -715,7 +715,7 @@ export default function ThemesMarketplacePage() {
                 </div>
 
                 <div
-                  className={`rounded-2xl border border-slate-300 dark:border-slate-800 overflow-hidden shadow-xl bg-slate-100 dark:bg-slate-950 transition-all ${
+                  className={`ws-preview-canvas rounded-2xl border border-slate-300 dark:border-slate-800 overflow-hidden shadow-xl bg-slate-100 dark:bg-slate-950 transition-all ${
                     previewViewport === 'mobile' ? 'w-full max-w-[390px] mx-auto border-2 sm:border-4 border-slate-700 rounded-[22px] sm:rounded-[36px] p-1 sm:p-2' : 'w-full'
                   }`}
                 >
@@ -975,8 +975,8 @@ export default function ThemesMarketplacePage() {
             <div role="dialog" aria-modal="true" aria-label="معاينة تصميم المتجر" data-testid="merchant-theme-preview" className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex flex-col min-w-0 animate-fadeIn">
               {/* Modal Topbar */}
               <div className="bg-slate-900 text-white px-3 sm:px-5 py-3 border-b border-slate-800 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3 min-w-0 shrink-0">
-                <div className="flex items-center gap-3">
-                  <span className="font-extrabold text-sm">
+                <div className="flex flex-wrap items-center gap-2 min-w-0">
+                  <span className="font-extrabold text-sm break-words min-w-0">
                     معاينة حية للقالب: {STORE_THEMES[previewThemeId]?.nameAr} ({STORE_THEMES[previewThemeId]?.name})
                   </span>
                   <span className="text-[10px] px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 font-bold border border-emerald-500/40">
@@ -984,8 +984,8 @@ export default function ThemesMarketplacePage() {
                   </span>
                 </div>
 
-                <div className="flex items-center gap-3">
-                  <div className="flex items-center gap-1 bg-slate-800 p-1 rounded-xl">
+                <div className="flex flex-wrap items-center gap-2 min-w-0">
+                  <div className="flex flex-wrap items-center gap-1 bg-slate-800 p-1 rounded-xl">
                     <button
                       onClick={() => setPreviewViewport('desktop')}
                       className={`px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-colors ${
