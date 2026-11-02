@@ -237,10 +237,12 @@ export default function CommerceStorefront({
       {theme.id === 'street-pulse' && (
         <div className="ws-street-marquee" aria-hidden="true">
           <div className="ws-street-marquee-track">
-            <span>🔥 NEW DROP EXCLUSIVE · LIMITED QUANTITIES · IMMEDIATE DELIVERY 🔥</span>
-            <span>🔥 إصدارات حصرية لا تُفوّت · كميات محدودة للغاية · شحن فوري 🔥</span>
-            <span>🔥 NEW DROP EXCLUSIVE · LIMITED QUANTITIES · IMMEDIATE DELIVERY 🔥</span>
-            <span>🔥 إصدارات حصرية لا تُفوّت · كميات محدودة للغاية · شحن فوري 🔥</span>
+            {[0, 1].map((copy) => (
+              <div className="ws-street-marquee-group" key={copy}>
+                <span>🔥 NEW DROP EXCLUSIVE · LIMITED QUANTITIES · IMMEDIATE DELIVERY 🔥</span>
+                <span>🔥 إصدارات حصرية لا تُفوّت · كميات محدودة للغاية · شحن فوري 🔥</span>
+              </div>
+            ))}
           </div>
         </div>
       )}
@@ -389,7 +391,7 @@ export default function CommerceStorefront({
                     {category === 'all'
                       ? tr('جميع المنتجات', 'All Products')
                       : store.categories.find((c) => c.id === category)?.name}
-                    <sup>{products.length}</sup>
+                    <span className="ws-product-count" aria-label={tr(`عدد المنتجات: ${products.length}`, `Products: ${products.length}`)}>{products.length}</span>
                   </h2>
                 </div>
                 <ThemeWhatsAppButton
@@ -474,11 +476,16 @@ export default function CommerceStorefront({
 
                       return (
                         <article className="ws-catalog-product" key={p.id}>
-                          <button
+                          <Link
+                            prefetch={false}
                             className="ws-product-image"
-                            onClick={() => {
-                              setProduct(p);
-                              if (store.metaPixelId) {
+                            href={preview ? '#product-details' : `/s/${encodeURIComponent(store.slug)}/p/${encodeURIComponent(p.slug)}`}
+                            onClick={(event) => {
+                              if (preview) {
+                                event.preventDefault();
+                                setProduct(p);
+                              }
+                              if (store.metaPixelId && !preview) {
                                 pixel.viewContent(store.metaPixelId, {
                                   content_name: p.name,
                                   content_ids: [p.id],
@@ -489,8 +496,8 @@ export default function CommerceStorefront({
                               }
                             }}
                             aria-label={tr(
-                              `عرض ${p.name} ${String(i + 1).padStart(2, '0')}`,
-                              `View ${p.name} ${String(i + 1).padStart(2, '0')}`
+                              `فتح صفحة ${p.name}`,
+                              `Open product page for ${p.name}`
                             )}
                           >
                             {p.imageUrl ? (
@@ -511,12 +518,12 @@ export default function CommerceStorefront({
                               <span className="ws-stock-badge">{tr('نفدت الكمية', 'Sold out')}</span>
                             )}
 
-                            <span className="ws-view-product">{tr('تفاصيل وسريع', 'View Details')} ↗</span>
-                          </button>
+                            <span className="ws-view-product">{tr('صفحة المنتج', 'Product page')} ↗</span>
+                          </Link>
 
                           <div className="ws-product-info">
                             <h3>
-                              <button onClick={() => setProduct(p)}>{p.name}</button>
+                              <Link prefetch={false} href={preview ? '#product-details' : `/s/${encodeURIComponent(store.slug)}/p/${encodeURIComponent(p.slug)}`} onClick={preview ? (event) => { event.preventDefault(); setProduct(p); } : undefined}>{p.name}</Link>
                             </h3>
                             <Link
                               prefetch={false}
