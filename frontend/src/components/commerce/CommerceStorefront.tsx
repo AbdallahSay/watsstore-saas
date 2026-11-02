@@ -40,12 +40,13 @@ export default function CommerceStorefront({
 
   const theme = getStoreTheme(previewTheme || store.themeId);
   const customization: ThemeCustomization = useMemo(() => {
+    if(preview && previewCustomization !== undefined) return parseThemeCustomization(JSON.stringify(previewCustomization));
     return {
       ...(parseThemeCustomization(store.customizationJson) || {}),
       ...(store.customization || {}),
       ...(previewCustomization || {}),
     };
-  }, [store.customizationJson, store.customization, previewCustomization]);
+  }, [store.customizationJson, store.customization, previewCustomization, preview]);
 
   const [category, setCategory] = useState<number | 'all'>('all');
   const [search, setSearch] = useState('');
@@ -70,6 +71,7 @@ export default function CommerceStorefront({
 
   useEffect(() => {
     setLoaded(false);
+    if(preview){setItems([]);setLoaded(true);return;}
     try {
       const saved = JSON.parse(localStorage.getItem(cartKey) || '[]');
       setItems(
@@ -91,7 +93,7 @@ export default function CommerceStorefront({
       setItems([]);
     }
     setLoaded(true);
-  }, [cartKey, store.products]);
+  }, [cartKey, store.products, preview]);
 
   useEffect(() => {
     if (loaded && !preview) {
@@ -137,7 +139,7 @@ export default function CommerceStorefront({
         ? [...old, { product: p, quantity, selectedVariants: selections }]
         : old.map((x, i) => (i === index ? { ...x, quantity: Math.min(1000, x.quantity + quantity) } : x));
     });
-    if (store.metaPixelId) {
+    if (store.metaPixelId && !preview) {
       pixel.addToCart(store.metaPixelId, {
         content_name: p.name,
         content_ids: [p.id],
@@ -177,6 +179,7 @@ export default function CommerceStorefront({
   }
 
   async function review(e: React.FormEvent<HTMLFormElement>) {
+    if(preview){e.preventDefault();return;}
     e.preventDefault();
     const form = e.currentTarget;
     const data = new FormData(form);
@@ -475,7 +478,7 @@ export default function CommerceStorefront({
                             className="ws-product-image"
                             onClick={() => {
                               setProduct(p);
-                              if (store.metaPixelId) {
+                              if (store.metaPixelId && !preview) {
                                 pixel.viewContent(store.metaPixelId, {
                                   content_name: p.name,
                                   content_ids: [p.id],

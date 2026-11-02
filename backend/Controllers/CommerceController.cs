@@ -31,6 +31,7 @@ public class CommerceController(AppDbContext db) : ControllerBase
     [HttpPut("settings")]
     public async Task<IActionResult> Save(CommerceSettingsRequest request)
     {
+        if(request.ShippingZones == null || request.ShippingZones.Any(x=>x==null)) return BadRequest(new {message="راجع مناطق الشحن"});
         if (request.ShippingZones.Select(x => x.Id).Distinct().Count() != request.ShippingZones.Count || request.ShippingZones.Any(x => x.Pickup && x.Fee != 0))
             return BadRequest(new { message = "المناطق يجب أن تكون فريدة والاستلام مجاني" });
         if (!request.CashOnDelivery && !request.InstaPay && !request.MobileWallet) return BadRequest(new { message = "اختر طريقة دفع واحدة على الأقل" });

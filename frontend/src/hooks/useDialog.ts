@@ -23,7 +23,7 @@ export function useDialog(open: boolean, onClose: () => void, closeAt?: string) 
     dialogs.push(entry);
     document.body.style.overflow = 'hidden';
     const focusable = () => Array.from(dialog.querySelectorAll<HTMLElement>(
-      'a[href],button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex="0"]',
+      'a[href],button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),iframe,[tabindex="0"]',
     )).filter(element => element.getClientRects().length > 0 && !element.matches(':disabled,[aria-disabled="true"]') && element.tabIndex >= 0);
     (focusable()[0] || dialog).focus();
     const handleKey = (event: KeyboardEvent) => {
@@ -44,10 +44,15 @@ export function useDialog(open: boolean, onClose: () => void, closeAt?: string) 
       }
     };
     document.addEventListener('keydown', handleKey);
+    const handleFocus = () => {
+      if(dialogs.at(-1) === entry && !dialog.contains(document.activeElement)) (focusable()[0] || dialog).focus();
+    };
+    document.addEventListener('focusin',handleFocus);
     const handleBreakpoint = () => { if (breakpoint?.matches) close.current(); };
     breakpoint?.addEventListener('change', handleBreakpoint);
     return () => {
       document.removeEventListener('keydown', handleKey);
+      document.removeEventListener('focusin',handleFocus);
       breakpoint?.removeEventListener('change', handleBreakpoint);
       const index = dialogs.indexOf(entry);
       if(index >= 0) dialogs.splice(index,1);

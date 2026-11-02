@@ -4,7 +4,7 @@ import { Suspense, useEffect, useState } from 'react';
 import { useParams, useSearchParams } from 'next/navigation';
 import { api } from '@/lib/api';
 import type { Store } from '@/types';
-import { STORE_THEME_IDS, STORE_THEMES, parseStoreTheme, type StoreThemeId } from '@/lib/store-themes';
+import { STORE_THEME_IDS, STORE_THEMES, parseStoreTheme, parseThemeCustomization, type ThemeCustomization, type StoreThemeId } from '@/lib/store-themes';
 import CommerceStorefront from '@/components/commerce/CommerceStorefront';
 import '@/styles/store-themes.css';
 
@@ -17,6 +17,9 @@ function StoreThemePreviewContent() {
   const [themeId, setThemeId] = useState<StoreThemeId>(initialTheme);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const embedded=searchParams.get('embed')==='1';
+  const [customization,setCustomization]=useState<ThemeCustomization>();
+  useEffect(()=>{if(!embedded)return;const receive=(event:MessageEvent)=>{if(event.origin!==location.origin||event.source!==window.parent||event.data?.type!=='watsstore:preview-design')return;setCustomization(parseThemeCustomization(JSON.stringify(event.data.customization)));setThemeId(parseStoreTheme(event.data.theme));};const key=(event:KeyboardEvent)=>{if(event.key==='Escape'&&!document.querySelector('[role="dialog"]'))window.parent.postMessage({type:'watsstore:preview-close'},location.origin)};window.addEventListener('message',receive);document.addEventListener('keydown',key);window.parent.postMessage({type:'watsstore:preview-ready'},location.origin);return()=>{window.removeEventListener('message',receive);document.removeEventListener('keydown',key)}},[embedded]);
 
   useEffect(() => {
     if (!slug) return;
@@ -56,6 +59,7 @@ function StoreThemePreviewContent() {
     );
   }
 
+  if(embedded)return <CommerceStorefront key={themeId} store={store} preview previewTheme={themeId} previewCustomization={customization}/>;
   return (
     <div className="min-h-screen flex flex-col bg-slate-950 text-white">
       {/* Top sticky switcher bar */}

@@ -43,6 +43,7 @@ export default function CommerceCart({directCheckout = false, store, items, open
   const storageKey = `watsstore_attempt_${store.slug}`;
   useEffect(() => {
     let saved: CheckoutAttempt | null = null;
+    if(preview) return;
     try { saved = readCheckoutAttempt(sessionStorage.getItem(storageKey)); } catch { /* checked before submission */ }
     if (!saved) return;
     attempt.current = saved;
@@ -53,7 +54,7 @@ export default function CommerceCart({directCheckout = false, store, items, open
       setUncertain(true); setStep('checkout');
       setError('هناك محاولة طلب لم يتم تأكيد نتيجتها. أعد التحقق من نفس الطلب؛ لا تُنشئ طلباً جديداً.');
     }
-  }, [storageKey]);
+  }, [storageKey,preview]);
   useEffect(() => { if (open && !attempt.current?.pending) setStep(directCheckout ? 'checkout' : 'cart'); }, [open, directCheckout]);
   const subtotal = items.reduce((n, x) => n + x.product.price * x.quantity, 0);
   const zone = store.shippingZones?.find(z => z.id === zoneId);
@@ -70,6 +71,7 @@ export default function CommerceCart({directCheckout = false, store, items, open
   if (!open) return null;
 
   async function applyCoupon() {
+    if(preview){setError(tr('تُراجع صلاحية الكوبون عند الطلب الفعلي. المعاينة لا ترسل طلبات.','Coupons are checked during real checkout. Preview does not submit requests.'));return;}
     const request = ++couponRequest.current;
     setCouponBusy(true); setError('');
     try { const res = await api.applyCoupon(store.slug, {code: coupon, cartSubtotal: subtotal}); if (request === couponRequest.current) setDiscount(res.discountAmount); }
@@ -149,9 +151,9 @@ export default function CommerceCart({directCheckout = false, store, items, open
 
   return <div className="ws-overlay" onMouseDown={e => {if (e.target === e.currentTarget) requestClose();}}>
     <div className="ws-cart ws-checkout" ref={ref} role="dialog" tabIndex={-1} aria-modal="true" aria-busy={busy} aria-labelledby="cart-title" dir={english ? 'ltr' : 'rtl'}>
-      <header><h2 id="cart-title">{result ? tr('تم استلام طلبك', 'Order received') : step === 'cart' ? tr('حقيبة التسوق', 'Shopping bag') : tr('إتمام الطلب', 'Checkout')}</h2><button type="button" disabled={busy} onClick={requestClose} aria-label={tr('إغلاق', 'Close')}>×</button></header>
+      <header><h2 id="cart-title">{preview ? tr('معاينة الطلب — لم يُرسل','Order preview — not submitted') : result ? tr('تم استلام طلبك', 'Order received') : step === 'cart' ? tr('حقيبة التسوق', 'Shopping bag') : tr('إتمام الطلب', 'Checkout')}</h2><button type="button" disabled={busy} onClick={requestClose} aria-label={tr('إغلاق', 'Close')}>×</button></header>
       <div className="ws-cart-body">
-        {result ? <OrderConfirmation result={result} slug={store.slug} english={english} currency={store.currency} continueShopping={() => {setResult(null);setStep('cart');close();}}/> : <>
+        {result ? <OrderConfirmation preview={preview} result={result} slug={store.slug} english={english} currency={store.currency} continueShopping={() => {setResult(null);setStep('cart');close();}}/> : <>
           {items.length === 0 ? <p>{tr('حقيبتك فارغة. اكتشف منتجات المتجر.', 'Your bag is empty. Explore the collection.')}</p> : <>
             <nav className="ws-checkout-progress" aria-label={tr("خطوات الطلب", "Order steps")}><ol><li><a href="#checkout-items">1. {tr("مراجعة الحقيبة", "Review bag")}</a></li><li><a href="#checkout-customer" aria-current={step === "checkout" ? "step" : undefined} onClick={() => setStep("checkout")}>2. {tr("بيانات التوصيل", "Delivery details")}</a></li><li><a href="#checkout-payment" onClick={() => setStep("checkout")}>3. {tr("الدفع", "Payment")}</a></li><li><a href="#checkout-confirm" onClick={() => setStep("checkout")}>4. {tr("التأكيد", "Confirmation")}</a></li></ol></nav><ul id="checkout-items" className="ws-cart-items">{items.map((item, index) => <li key={`${item.product.id}-${index}`}>
               {item.product.imageUrl && <img src={item.product.imageUrl} alt="" width="64" height="80" loading="lazy"/>}

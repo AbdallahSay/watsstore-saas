@@ -100,19 +100,20 @@ async function settle(page) {
       const desktopContainer = page.locator('.max-w-6xl');
       assert.equal(await desktopContainer.count(), 1, 'Preview must switch to desktop container');
 
+      const previewFrame=previewModal.frameLocator('iframe');
       // 6. Inspect homepage inside preview
       console.log(`6. Inspecting homepage inside preview...`);
-      const previewStorefront = previewModal.locator('.ws-storefront');
+      const previewStorefront = previewFrame.locator('.ws-storefront');
       assert.equal(await previewStorefront.count(), 1, 'Storefront must render inside preview modal');
 
       // 7-8. Open product details and select variants
       console.log(`7-8. Opening product details and testing variants inside preview...`);
-      const firstProductBtn = page.locator('.fixed.inset-0.z-50 .ws-product-image').first();
+      const firstProductBtn = previewFrame.locator('.ws-product-image').first();
       await firstProductBtn.waitFor({ state: 'visible', timeout: 5000 });
       await firstProductBtn.click();
 
       // Wait for dynamically imported ProductModal to mount
-      const productModal = page.locator('div[role="dialog"][aria-modal="true"]').first();
+      const productModal = previewFrame.locator('div[role="dialog"][aria-modal="true"]').first();
       await productModal.waitFor({ state: 'visible', timeout: 5000 });
 
       // Select variant button if present
@@ -128,7 +129,7 @@ async function settle(page) {
       await addToBag.click();
 
       // Check shopping cart bag in preview
-      const cartDrawer = page.locator('.ws-cart');
+      const cartDrawer = previewFrame.locator('.ws-cart');
       await cartDrawer.waitFor({ state: 'visible', timeout: 5000 });
       console.log(`Testing safe preview checkout simulation inside cart drawer...`);
 
@@ -158,7 +159,7 @@ async function settle(page) {
 
       // 10. Test navigation, search, and categories in preview
       console.log(`10. Testing categories & search in preview...`);
-      const catButton = page.locator('.fixed.inset-0.z-50 .ws-categories button').nth(1);
+      const catButton = previewFrame.locator('.ws-categories button').nth(1);
       if (await catButton.isVisible()) {
         await catButton.click();
         await page.waitForTimeout(300);

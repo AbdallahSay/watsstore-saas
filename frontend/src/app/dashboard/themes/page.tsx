@@ -21,7 +21,7 @@ import { Store } from '@/types';
 import { api } from '@/lib/api';
 import { useDialog } from '@/hooks/useDialog';
 import { reportClientIssue } from '@/lib/client-issues';
-import CommerceStorefront from '@/components/commerce/CommerceStorefront';
+import StorePreviewFrame from '@/components/commerce/StorePreviewFrame';
 import {
   Sparkles,
   Smartphone,
@@ -57,7 +57,7 @@ export default function ThemesMarketplacePage() {
   const [settings, setSettings] = useState<CommerceSettings | null>(null);
   const [store, setStore] = useState<Store | null>(null);
   const [previewThemeId, setPreviewThemeId] = useState<StoreThemeId | null>(null);
-  const [previewViewport, setPreviewViewport] = useState<'desktop' | 'mobile'>('desktop');
+  const [previewViewport, setPreviewViewport] = useState<'desktop' | 'mobile'>('mobile');
   const [selectedCategory, setSelectedCategory] = useState<BusinessCategoryKey>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [customization, setCustomization] = useState<ThemeCustomization>({});
@@ -729,10 +729,10 @@ export default function ThemesMarketplacePage() {
                   }`}
                 >
                   {store && (
-                    <div className="max-h-[min(750px,75dvh)] overflow-y-auto overflow-x-hidden rounded-xl min-w-0 overscroll-contain">
-                      <CommerceStorefront
+                    <div className="h-[min(750px,75dvh)] max-h-[min(750px,75dvh)] overflow-hidden rounded-xl min-w-0">
+                      <StorePreviewFrame
                         store={store}
-                        preview
+                        mode={previewViewport}
                         previewTheme={settings.draftTheme}
                         previewCustomization={customization}
                       />
@@ -1050,9 +1050,10 @@ export default function ThemesMarketplacePage() {
                   }`}
                   style={{ backgroundColor: 'transparent' }}
                 >
-                  <CommerceStorefront
+                  <StorePreviewFrame
                     store={store}
-                    preview
+                    mode={previewViewport}
+                    onClose={()=>setPreviewThemeId(null)}
                     previewTheme={previewThemeId}
                     previewCustomization={customization}
                   />
