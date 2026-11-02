@@ -83,6 +83,13 @@ test("registration transport failure and malformed success are uncertain; valida
     global.fetch = async () =>
       new Response("<html>incomplete</html>", { status: 200 });
     await assert.rejects(api.register({}), (e) => e.uncertain);
+    for (const incomplete of [null, {}, { token: 'test-only', storeId: 'a', storeName: 'Store', slug: '' }]) {
+      global.fetch = async () => new Response(JSON.stringify(incomplete), { status: 200 });
+      await assert.rejects(api.register({}), (e) => e instanceof ApiRequestError && e.uncertain);
+    }
+    const complete = { token: 'isolated-unit-only', storeId: 'a', storeName: 'Store', slug: 'test-store' };
+    global.fetch = async () => new Response(JSON.stringify(complete), { status: 200 });
+    assert.deepEqual(await api.register({}), complete);
     global.fetch = async () =>
       new Response(JSON.stringify({ message: "Invalid email" }), {
         status: 400,

@@ -177,11 +177,17 @@ export const api = {
   async register(data: any): Promise<AuthResponse> {
     const controller = new AbortController();
     const timeout = setTimeout(()=>controller.abort(),30000);
-    try { return await fetchJson<AuthResponse>(`${API_BASE_URL}/auth/register`, {
+    try { const result = await fetchJson<AuthResponse>(`${API_BASE_URL}/auth/register`, {
       method: 'POST',
       body: JSON.stringify(data),
       signal: controller.signal,
-    }); } finally { clearTimeout(timeout); }
+    });
+      if (!result || ['token', 'storeId', 'storeName', 'slug'].some(key => {
+        const value = result[key as keyof AuthResponse];
+        return typeof value !== 'string' || !value.trim();
+      })) throw new ApiRequestError('وصل رد تسجيل غير مكتمل. تحقّق من حسابك بتسجيل الدخول قبل المحاولة مجددًا.', 200, true);
+      return result;
+    } finally { clearTimeout(timeout); }
   },
 
   async login(data: any): Promise<AuthResponse> {
