@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import { ShoppingBag, ArrowUpRight, Search, MessageCircle, Plus, Minus, Sparkles } from 'lucide-react';
 import { Store, Product, CartItem } from '@/types';
@@ -15,7 +16,6 @@ import '@/styles/store-themes.css';
 import '@/styles/themes/pure-beauty.css';
 import ThemeWhatsAppButton from './ThemeWhatsAppButton';
 
-const ProductModal = dynamic(() => import('@/components/ProductModal'));
 const CommerceCart = dynamic(() => import('./CommerceCart'));
 
 interface Props {
@@ -34,6 +34,7 @@ export default function CommerceStorefront({
   detailProduct,
 }: Props) {
   const { language, setLanguage } = useLanguage();
+  const router = useRouter();
   const english = language !== 'ar';
   const tr = (ar: string, en: string) => (english ? en : ar);
 
@@ -57,7 +58,6 @@ export default function CommerceStorefront({
   const [cartOpen, setCartOpen] = useState(false);
   const [cartLoaded, setCartLoaded] = useState(false);
   const [directCheckout, setDirectCheckout] = useState(false);
-  const [product, setProduct] = useState<Product | null>(null);
   const [previewDetail, setPreviewDetail] = useState<Product | null>(null);
   const activeDetailProduct = detailProduct || (preview ? previewDetail : null);
   const [reviewMessage, setReviewMessage] = useState('');
@@ -147,7 +147,6 @@ export default function CommerceStorefront({
         currency: 'EGP',
       });
     }
-    setProduct(null);
     setDirectCheckout(buyNow);
     setCartOpen(true);
   }
@@ -155,7 +154,8 @@ export default function CommerceStorefront({
   function quickAddNoVariants(p: Product, delta: number) {
     if (!p.isAvailable || store.isTrialExpired) return;
     if (p.variantsJson && p.variantsJson !== '[]' && p.variantsJson !== '{}') {
-      setProduct(p);
+      if (preview) setPreviewDetail(p);
+      else router.push(`/s/${encodeURIComponent(store.slug)}/p/${encodeURIComponent(p.slug)}`);
       return;
     }
     const currentItem = items.find((x) => x.product.id === p.id && Object.keys(x.selectedVariants).length === 0);
@@ -540,7 +540,7 @@ export default function CommerceStorefront({
                               prefetch={false}
                               className="ws-product-page-link"
                               href={preview ? '#product-details' : `/s/${encodeURIComponent(store.slug)}/p/${encodeURIComponent(p.slug)}`}
-                              onClick={preview ? (e) => { e.preventDefault(); setProduct(p); } : undefined}
+                              onClick={preview ? (e) => { e.preventDefault(); setPreviewDetail(p); } : undefined}
                               style={{ fontSize: '11px', color: 'var(--ws-accent)', fontWeight: 600, textDecoration: 'none' }}
                             >
                               {tr('صفحة المنتج', 'Product page')} ↗
@@ -705,15 +705,6 @@ export default function CommerceStorefront({
       </footer>
 
       {/* Modals & Cart */}
-      {product && (
-        <ProductModal
-          product={product}
-          currency={store.currency}
-          isOpen={!!product}
-          onClose={() => setProduct(null)}
-          onAddToCart={add}
-        />
-      )}
       {(cartOpen || cartLoaded) && (
         <CommerceCart
           directCheckout={directCheckout}
@@ -740,7 +731,7 @@ export default function CommerceStorefront({
         variant="floating"
         appearance="filled"
         english={english}
-        hidden={cartOpen || Boolean(product)}
+        hidden={cartOpen}
         text={tr(
           `مرحباً ${store.storeName}، أود الاستفسار عن المنتجات المتاحة في المتجر.`,
           `Hello ${store.storeName}, I would like to inquire about products in your store.`
