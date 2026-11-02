@@ -8,11 +8,13 @@ import { addPreviewCartItem, readPreviewCart } from '@/lib/preview-cart';
 import type { Store, Product } from '@/types';
 import { getStoreTheme, STORE_THEME_IDS, STORE_THEMES, type StoreThemeId } from '@/lib/store-themes';
 import '@/styles/store-themes.css';
+import '@/styles/themes/pure-beauty.css';
 
 const labels: Record<StoreThemeId, { eyebrow: string; headline: string; subtitle: string }> = {
   editorial: { eyebrow: 'مختارات بعناية', headline: 'تفاصيل تصنع الفرق', subtitle: 'اكتشف منتجات مختارة بعناية لتناسب أسلوبك.' },
   streetwear: { eyebrow: 'COLLECTION / 2026', headline: 'أسلوبك يبدأ هنا', subtitle: 'قطع مميزة تعبر عن شخصيتك.' },
   lifestyle: { eyebrow: 'بيت يحمل ذوقك', headline: 'مساحات أجمل، حياة أدفأ', subtitle: 'كل ما يضيف لمسة جميلة إلى يومك.' },
+  'pure-beauty': { eyebrow: 'طقوس العناية', headline: 'جمالك في تفاصيلك', subtitle: 'اختيارات رقيقة للعناية والجمال كل يوم.' },
 };
 
 export default function StoreThemePreviewPage() {
