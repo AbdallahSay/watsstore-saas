@@ -20,6 +20,7 @@ import {
 import { Store } from '@/types';
 import { api } from '@/lib/api';
 import CommerceStorefront from '@/components/commerce/CommerceStorefront';
+import { EGYPT_GOVERNORATES, EGYPT_CITIES_BY_GOVERNORATE } from '@/lib/egypt-shipping-locations';
 import {
   Sparkles,
   Smartphone,
@@ -884,28 +885,38 @@ export default function ThemesMarketplacePage() {
                         key={zone.id}
                         className="p-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/30 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 items-end"
                       >
-                        <div>
-                          <label className="block text-[11px] font-bold text-slate-500 mb-1">المحافظة</label>
-                          <input
-                            type="text"
-                            maxLength={100}
+                        <div className="min-w-0">
+                          <label htmlFor={`shipping-governorate-${zone.id}`} className="block text-[11px] font-bold text-slate-600 dark:text-slate-300 mb-1">المحافظة</label>
+                          <select
+                            id={`shipping-governorate-${zone.id}`}
                             value={zone.governorate}
-                            onChange={(e) => updateShippingZone(index, { governorate: e.target.value })}
-                            placeholder="مثال: القاهرة"
-                            className="w-full min-h-[44px] px-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white text-xs"
-                          />
+                            onChange={(e) => updateShippingZone(index, { governorate: e.target.value, name: '' })}
+                            className="w-full min-w-0 min-h-[44px] px-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white text-sm"
+                          >
+                            {zone.governorate && !EGYPT_GOVERNORATES.some((gov) => gov === zone.governorate) && (
+                              <option value={zone.governorate}>{zone.governorate} (مسجلة سابقًا)</option>
+                            )}
+                            {EGYPT_GOVERNORATES.map((gov) => <option key={gov} value={gov}>{gov}</option>)}
+                          </select>
                         </div>
 
-                        <div>
-                          <label className="block text-[11px] font-bold text-slate-500 mb-1">المنطقة أو الحي</label>
+                        <div className="min-w-0">
+                          <label htmlFor={`shipping-area-${zone.id}`} className="block text-[11px] font-bold text-slate-600 dark:text-slate-300 mb-1">المدينة أو المنطقة أو الحي</label>
                           <input
+                            id={`shipping-area-${zone.id}`}
+                            list={`shipping-area-options-${index}`}
                             type="text"
                             maxLength={100}
                             value={zone.name}
                             onChange={(e) => updateShippingZone(index, { name: e.target.value })}
-                            placeholder="مثال: التجمع الخامس والرحاب"
-                            className="w-full min-h-[44px] px-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white text-xs"
+                            placeholder="اختار من المقترحات أو اكتب منطقة جديدة"
+                            autoComplete="off"
+                            className="w-full min-w-0 min-h-[44px] px-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white text-sm"
                           />
+                          <datalist id={`shipping-area-options-${index}`}>
+                            {(EGYPT_CITIES_BY_GOVERNORATE[zone.governorate] || []).map((area) => <option key={area} value={area} />)}
+                          </datalist>
+                          <p className="mt-1 text-[11px] text-slate-500 dark:text-slate-400">المقترحات للتسهيل؛ يمكنك كتابة أي قرية أو حي غير موجود يدويًا.</p>
                         </div>
 
                         <div>
