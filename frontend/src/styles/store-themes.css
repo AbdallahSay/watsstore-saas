@@ -19,6 +19,8 @@
   --ws-card-ratio: 4/5;
   --store-whatsapp-bg: var(--ws-accent, #111827);
   --store-whatsapp-text: var(--ws-accent-contrast, #ffffff);
+  /* Outlined/minimal buttons sit on the storefront surface, not on the filled CTA background. */
+  --store-whatsapp-outline-text: var(--ws-fg);
   --store-whatsapp-border: var(--ws-accent, #111827);
   --store-whatsapp-hover: var(--ws-accent, #1f2937);
   --store-whatsapp-focus: var(--ws-accent, #111827);
@@ -758,7 +760,7 @@
 
 .ws-theme-whatsapp-btn--outlined {
   background-color: transparent;
-  color: var(--store-whatsapp-text) !important;
+  color: var(--store-whatsapp-outline-text, var(--ws-fg)) !important;
   border: 1.5px solid var(--store-whatsapp-border);
 }
 .ws-theme-whatsapp-btn--outlined:hover {
@@ -768,12 +770,13 @@
 
 .ws-theme-whatsapp-btn--minimal {
   background-color: transparent;
-  color: var(--store-whatsapp-text) !important;
+  color: var(--store-whatsapp-outline-text, var(--ws-fg)) !important;
   border: 1px solid transparent;
   padding: 8px 12px;
 }
 .ws-theme-whatsapp-btn--minimal:hover {
   background-color: var(--store-whatsapp-hover);
+  color: var(--store-whatsapp-text) !important;
 }
 
 /* Placement / Sizing Variants */
