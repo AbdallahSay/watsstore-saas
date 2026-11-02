@@ -25,7 +25,7 @@ test('merchant can preview every theme with real store data without auto-publish
   const page = read('src/app/dashboard/themes/page.tsx');
   assert.match(storefront, /getStoreTheme\(previewTheme \|\| store\.themeId\)/);
   assert.match(storefront, /CommerceCart/);
-  assert.match(page, /filteredThemes\.map\(\(theme\) =>/);
+  assert.match(page, /(?:visibleThemes|filteredThemes)\.map\(\(theme\) =>/);
   assert.match(page, /setPreviewThemeId\(theme\.id\)/);
   assert.match(page, /previewTheme=\{previewThemeId\}/);
   assert.match(page, /previewCustomization=\{customization\}/);
