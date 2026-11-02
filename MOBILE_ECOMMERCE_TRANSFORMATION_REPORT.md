@@ -1,6 +1,6 @@
 # Mobile ecommerce transformation
 
-Release status: **in progress; not deployed**. CI, final performance measurements and production verification are pending. No production order, inventory, payment, migration or notification configuration was changed during these tests.
+Release status: **frontend released through PR #38**. Application merge SHA: `97b49f80544f1c27e1534b0a4725ea2019364430`; Vercel production deployment: `dpl_68X5xbc8X4gwiqHr7iUSuuhuQjos`. All three CI jobs and dependency audits passed before merge. Public production interactions passed on all available engines without any order submission. No production order, inventory, payment, migration or notification configuration was changed.
 
 ## Scope and changes
 
@@ -12,6 +12,11 @@ Reviewable implementation commits:
 - `65ccd74`: responsive SaaS navigation, merchant cards and filters, admin tabs/header, accessible drawers and editor dialogs, localized order detail/inventory, safe-area and small-viewport constraints.
 - `4601508`: dedicated `/s/{store}/p/{product}` URLs, gallery, variants, quantity, Add to Bag and Buy Now; four numbered checkout sections; retained safe retries and device order history; deferred cart/quick-view code and unnecessary prefetches.
 - `fce8d46`: optional locale dictionaries and alert code load on demand; default EGP views avoid the unnecessary exchange-rate request.
+- `9cf2080`: encoded Arabic product URLs resolve correctly; the merchant operation test follows the URL generated from a newly created Arabic product.
+- `46a56ee`: trusted raster uploads use responsive Next.js image sizes; optimization is restricted to the configured backend's `/uploads/**` path. Existing external image links retain ordinary browser rendering. Speculative marketing route loads are deferred.
+- `55e1c31`: slow first visits use stable fallback text instead of a late font swap; cached/fast Cairo loading remains available.
+
+A small post-release follow-up places purchase controls before the full product description so long merchant copy cannot bury the primary action. It introduces no API or data change.
 
 The existing editorial, streetwear and lifestyle tokens and real merchant content are preserved. Related products come from the actual same-category catalogue. There are no invented reviews, products or stock claims. Design references reuse the recent inspected project ledger in `docs/design/RESEARCH_LEDGER.md`; its documented reference-count limitation still applies.
 
@@ -24,6 +29,8 @@ The expanded after audit covers **36 routes/states × Arabic/English × Chrome/F
 Widths: 320, 360, 375, 390, 414, 430, 768, 1024, 1280, 1440 and 1920px. Long Arabic names, unbroken 70-character SKU text, customer names and addresses are real isolated fixture records. Tables become labeled cards on phones while retaining table/row/cell semantics. Desktop tables remain usable.
 
 The landing/merchant drawers and product/category/coupon editors also passed open, Tab containment, Escape, trigger-focus restoration and viewport-bound checks at applicable widths and at 900px/420px heights. Checkout/cart/confirmation additionally have explicit bounds checks across all eleven widths at 844px and 390px heights. These short viewports exercise available space; they do not simulate a physical iPhone keyboard or prove native iPhone testing.
+
+CI also checks 844×390 landscape and 640×450 CSS-pixel reflow for every route/language/engine. The latter is the effective layout size corresponding to a 1280px desktop at 200% zoom; it is not a claim of physical-device pinch-zoom testing.
 
 Machine evidence and selected original screenshots are in `docs/evidence/mobile-transformation/`; full locally generated screenshots, audit JSON and browser summaries are under ignored `work/transformation/` and are uploaded by CI.
 
@@ -47,16 +54,42 @@ The checkout still validates prices, coupons, payment configuration, inventory/v
 - Backend tests: 11/11 passed; updated Release fixture host builds with zero warnings/errors.
 - npm audit, including development dependencies: zero known vulnerabilities after pinning Lighthouse 13.5.0.
 - NuGet direct/transitive audit: zero known vulnerabilities after dependency patches; before/after evidence retained.
-- Final Lighthouse measurements: pending. Earlier simulated mobile measurements missed the 2.5s LCP target; do not count that target as passed. Accessibility reached 100 on the landing, storefront and product page in the measured iteration; final results must identify the actual build and throttling method. No field INP data is available and TBT must not be described as INP.
+- Lighthouse: three cold-browser runs per page and method on the production build from `55e1c31f70ff466cc8bcc097d50d6f7ce54248d3`, using isolated catalogue fixtures. Full settings and individual results are preserved in the evidence JSON. These are controlled local laboratory results, not field or production-traffic measurements. No field INP data is available; TBT is recorded separately and is not INP.
 - Browser evidence is Windows Chrome, Firefox and Playwright WebKit. **No physical iPhone/Safari verification is claimed.**
 - SQLite order-number generation in fixtures differs from SQL Server (the fixture number is zero). Unique order IDs, tracking capabilities, stored snapshots and stock changes are verified. The opt-in UI fixture aggregate translator enables merchant/admin summaries; it does not replace SQL Server restore/migration or financial validation.
 - A successful isolated SQL Server restore has not been verified. No production migrations or transaction tests are authorized under that unresolved backup gate. PR #34, VAPID setup and dispatcher release remain outside this mobile release and disabled.
 
 ## CI, deployment and rollback
 
-PR: pending. Final CI run: pending. Deployed frontend SHA/deployment ID: **none yet**. Backend hosting has not been updated; source dependency fixes do not prove the live backend runtime has been patched.
+PR: [#38, merged](https://github.com/AbdallahSay/watsstore-saas/pull/38). Final pre-merge source: `55e1c31f70ff466cc8bcc097d50d6f7ce54248d3`. [CI run 41424283153](https://github.com/AbdallahSay/watsstore-saas/actions/runs/41424283153): Backend, Frontend and Checkout/Playwright jobs all **success**, including npm and NuGet security audits. The [browser artifact](https://github.com/AbdallahSay/watsstore-saas/actions/runs/41424283153/artifacts/13131013758) is 41,720,965 bytes with digest `sha256:e13e090dda054c8b8b434726699a616509ef23dead3d7c6f6cfeadbdda11578c` (retention through 2027-01-31).
 
-CI now runs dependency audits, existing regressions, Playwright's cross-engine journey, the full responsive matrix, dialogs and mobile merchant operations. Review the actual run before merge. No test fixture token, production configuration or connection string is committed or uploaded.
+Vercel production deployment `dpl_68X5xbc8X4gwiqHr7iUSuuhuQjos` is READY, targets `production`, uses merge SHA `97b49f80544f1c27e1534b0a4725ea2019364430`, and owns `frontend-bay-ten-58.vercel.app`. Team: `team_RZj96rSc4wBBdDSeS9WOoTA5`; project: `prj_OelTAj1B3dbMWsi25y2uaKiuz6qr` (`frontend`). Backend hosting has not been updated; source dependency fixes do not prove the live backend runtime has been patched.
+
+CI runs dependency audits, existing regressions, Playwright's cross-engine journey, the full responsive matrix, dialogs and mobile merchant operations. No merchant/admin bearer token, production configuration or connection string is committed or uploaded. Isolated order/tracking identifiers in test evidence cannot access production.
+
+### Performance results
+
+Median of three runs; mobile viewport 390×844; CPU slowdown 4×. Simulated settings use RTT 150ms and throughput 1638.4kbps. Applied DevTools settings use request latency 562.5ms, download 1474.56kbps and upload 675kbps (the Lighthouse defaults for this mode).
+
+| Page | Applied LCP | Applied CLS | Applied performance / accessibility | Simulated LCP | Simulated CLS |
+|---|---:|---:|---:|---:|---:|
+| Landing | 2.006s | 0.0242 | 96 / 100 | 3.334s | 0 |
+| Storefront | 1.763s | 0 | 99 / 100 | 3.050s | 0 |
+| Product | 1.712s | 0 | 99 / 100 | 2.825s | 0 |
+
+The 2.5s LCP, 0.1 CLS and 95 accessibility targets pass in the applied-throttling runs. **The default simulated LCP target remains unmet** and is a remaining performance item; the two methods must not be combined or presented as identical. Before the optional-font change, applied landing LCP was 3.505s and CLS 0.0983. The final change improves actual throttled rendering and layout stability; the simulated model still predicts slower LCP. Real-device and field monitoring remain unverified.
+
+### Read-only production verification
+
+At `2026-11-02T10:10:38.392Z`, `scripts/verify-production-readonly.cjs` passed six contexts: Chrome/Firefox/WebKit × Arabic/English, on the actual production domain and `/s/a9`.
+
+- Store and checkout viewport checks cover every requested width. Dedicated product, empty search, Buy Now, customer input retention, short-height checkout and My Orders also passed.
+- Every browser write request was blocked by a route guard. **Zero order POSTs were attempted; zero production orders were created by this verification.** All observed optimized images returned 200 with `image/webp`.
+- `/s/a9` is merchant-configured as **WhatsApp checkout**, with COD available. This configuration was preserved. The test verifies its rendered checkout interface; it does not claim a live native-online transaction was created on a WhatsApp-configured store.
+- Live orders preflight: `OPTIONS https://watsstore.runasp.net/api/public/stores/a9/orders`, production Origin, requested POST/content-type → 204, matching allow-origin, POST/content-type allowed, no redirect. This is CORS evidence, not proof of database order creation.
+- A protected preview also served a real resized 640px upload with HTTP 200 and 8,527 bytes. No protection setting was disabled.
+
+Actual production order creation, production merchant receipt, production stock mutation and production tracking for a new transaction were deliberately not exercised because the verified-restorable-backup gate remains unresolved. Those complete flows are proven against the isolated API/database and CI fixtures only. PR #34 remains open and draft at `0aac4ad4f8c616f13a9e1d26c8b2cfaf6e7cd26c`; PR #27 was absorbed and is merged.
 
 Frontend rollback: restore/promote the last verified Vercel deployment for `c9a81a8` (`dpl_7HfoGtE9fgsKVwA2WhqtNzfjm1ZY`), then revert the frontend feature commits on the release branch and run CI. This feature introduces no schema migration or production data cleanup requirement. Keep the production backend and PR #34 configuration unchanged until their separate restore/rollback gates are satisfied.
 
