@@ -8,13 +8,23 @@ schema remain disabled and undeployed. No real-device push delivery is claimed.
 ## Operational follow-up — 2026-11-02
 
 PR #34 remains draft; its notification implementation is unchanged. No production
-migration, restore, new order, subscription, dispatch or backend deployment was made.
+migration, restore, new order, subscription, dispatch or backend deployment was made
+by this continuation.
 The original `0cd289e` release below remains the last end-to-end verification recorded
 here. A separate admin hotfix reached master during this continuation; Vercel metadata
 now reports `162c5c94265c063ca5666c7b1124e33f78380901`, deployment
 `dpl_5srbpdU9C6Gn3RLmhQCD134dP3tV`, READY. That was not a deployment by this work,
 and no new production checkout test is claimed for it. Both working branches retain
 the incoming admin security hotfix; notification implementation files are unchanged.
+Subsequently, a concurrent workflow merged mobile PR #37 as
+`c9a81a8da948cb11781632d95f1b45a130e8efad`. Vercel now reports production deployment
+`dpl_7HfoGtE9fgsKVwA2WhqtNzfjm1ZY`, READY. Its tested head `c3fd61e` passed all jobs in
+[CI 41408012587](https://github.com/AbdallahSay/watsstore-saas/actions/runs/41408012587):
+17 frontend/component tests, 11 commerce integration tests, build/typecheck and all
+checkout/customer/mobile E2E suites. The mobile branch's isolated test evidence and
+screenshots are included in its report. No production checkout transaction was run
+for this follow-up while backup restorability remains unverified. PR #34 incorporates
+the newly deployed mobile code for compatibility checks without changing notification logic.
 
 - A **fresh COPY_ONLY full SQL backup with CHECKSUM completed** using the existing
   authorized SQL account. A unique server-side `.bak` was created without replacing
