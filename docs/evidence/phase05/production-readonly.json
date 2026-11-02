@@ -239,5 +239,6 @@
         }
       ]
     }
-  ]
+  ],
+  "readOnlyScope": "HTTP GET/HEAD/OPTIONS only; existing public-store GET can increment ViewCount. No order/stock/product/configuration edits submitted."
 }

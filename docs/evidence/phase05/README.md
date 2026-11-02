@@ -1,6 +1,6 @@
 # Phase 05 evidence
 
-All write-based test evidence uses disposable localhost tenants and an isolated SQLite fixture host. It does not verify SQL Server production restore safety. `production-readonly.json` and `production-preflight.json` are explicitly read-only production observations on 2026-11-02; neither submits an order.
+All write-based test evidence uses disposable localhost tenants and an isolated SQLite fixture host. It does not verify SQL Server production restore safety. `production-readonly.json` and `production-preflight.json` are HTTP-read-only production observations on 2026-11-02; neither submits an order. The public-store GET handler increments `ViewCount` in existing source, so HTTP-read-only does not mean zero database side effects. No direct order/stock/product/configuration edits are performed.
 
 The complete serial local functional run used application/test commit `72dfa4fb5e3bd67a62d555041ba0b8a5d1d7d7ab`. Commit `2426469137ba8fb50e6d97448e26dee390dbef15` subsequently tightens registration response validation; its 34 frontend units, production build and all five registration-to-order pilots were rerun successfully. `registration-pilots-final.json` records that repeat. CI at the final PR head reruns the complete mandatory suite.
 
