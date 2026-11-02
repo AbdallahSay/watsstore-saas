@@ -14,7 +14,7 @@ public class ShippingZone
 
 public class CommerceSettingsRequest
 {
-    [RegularExpression("^(editorial|streetwear|lifestyle)$")] public string DraftTheme { get; set; } = "editorial";
+    [RegularExpression("^(editorial|streetwear|lifestyle|pure-beauty)$")] public string DraftTheme { get; set; } = "editorial";
     [RegularExpression("^(online|whatsapp|both)$")] public string CheckoutMode { get; set; } = "whatsapp";
     public bool CashOnDelivery { get; set; } = true;
     public bool InstaPay { get; set; }
