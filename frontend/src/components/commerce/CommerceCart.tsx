@@ -14,7 +14,9 @@ interface Props {
 }
 export default function CommerceCart({store, items, open, english, close, update, clear}: Props) {
   const tr = (ar: string, en: string) => english ? en : ar;
-  const ref = useDialog(open, close);
+  const submitting = useRef(false);
+  const requestClose = () => { if (!submitting.current) close(); };
+  const ref = useDialog(open, requestClose);
   const [step, setStep] = useState<'cart' | 'checkout'>('cart');
   const [coupon, setCoupon] = useState('');
   const [discount, setDiscount] = useState(0);
@@ -23,13 +25,13 @@ export default function CommerceCart({store, items, open, english, close, update
   const [uncertain, setUncertain] = useState(false);
   const [details, setDetails] = useState({name:'', phone:'', address:'', notes:'', reference:''});
   const [couponBusy, setCouponBusy] = useState(false);
+  const couponRequest = useRef(0);
   const [result, setResult] = useState<CreateOrderResponse | null>(null);
   const [zoneId, setZoneId] = useState('');
   const methods = paymentOptions(store);
   const [payment, setPayment] = useState(methods[0]?.id || 'cod');
   const [channel, setChannel] = useState<'online' | 'whatsapp'>(store.checkoutMode === 'whatsapp' || !store.checkoutMode ? 'whatsapp' : 'online');
   const attempt = useRef<CheckoutAttempt | null>(null);
-  const submitting = useRef(false);
   const storageKey = `watsstore_attempt_${store.slug}`;
   useEffect(() => {
     let saved: CheckoutAttempt | null = null;
@@ -47,19 +49,27 @@ export default function CommerceCart({store, items, open, english, close, update
   const subtotal = items.reduce((n, x) => n + x.product.price * x.quantity, 0);
   const zone = store.shippingZones?.find(z => z.id === zoneId);
   const shipping = zone?.fee ?? store.deliveryFee;
+  const shippingKnown = !store.shippingZones?.length || !!zone;
+  const totalItems = items.reduce((count, item) => count + item.quantity, 0);
   const money = (n: number) => `${n.toFixed(2)} ${store.currency}`;
-  useEffect(() => { setDiscount(0); }, [subtotal, coupon]);
+  useEffect(() => { setDiscount(0); couponRequest.current++; setCouponBusy(false); }, [subtotal, coupon]);
+  useEffect(() => {
+    if (!open || step !== 'checkout' || result || uncertain) return;
+    ref.current?.querySelector<HTMLElement>('.ws-cart-body')?.scrollTo({top:0});
+    ref.current?.querySelector<HTMLInputElement>('input[name="name"]')?.focus({preventScroll:true});
+  }, [open, step, result, uncertain, ref]);
   if (!open) return null;
 
   async function applyCoupon() {
+    const request = ++couponRequest.current;
     setCouponBusy(true); setError('');
-    try { const res = await api.applyCoupon(store.slug, {code: coupon, cartSubtotal: subtotal}); setDiscount(res.discountAmount); }
-    catch (e) { setError((e as Error).message); setDiscount(0); }
-    finally { setCouponBusy(false); }
+    try { const res = await api.applyCoupon(store.slug, {code: coupon, cartSubtotal: subtotal}); if (request === couponRequest.current) setDiscount(res.discountAmount); }
+    catch (e) { if (request === couponRequest.current) { setError((e as Error).message); setDiscount(0); } }
+    finally { if (request === couponRequest.current) setCouponBusy(false); }
   }
   async function submit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (submitting.current) return;
+    if (submitting.current || couponBusy) return;
     submitting.current = true; setBusy(true); setError('');
     const payload = {
       customerName: details.name.trim(), customerPhone: details.phone.trim(),
@@ -95,9 +105,9 @@ export default function CommerceCart({store, items, open, english, close, update
     finally { setBusy(false); submitting.current = false; }
   }
 
-  return <div className="ws-overlay" onMouseDown={e => {if (e.target === e.currentTarget && !busy) close();}}>
-    <div className="ws-cart ws-checkout" ref={ref} role="dialog" aria-modal="true" aria-labelledby="cart-title" dir={english ? 'ltr' : 'rtl'}>
-      <header><h2 id="cart-title">{result ? tr('تم استلام طلبك', 'Order received') : step === 'cart' ? tr('حقيبة التسوق', 'Shopping bag') : tr('إتمام الطلب', 'Checkout')}</h2><button type="button" disabled={busy} onClick={close} aria-label={tr('إغلاق', 'Close')}>×</button></header>
+  return <div className="ws-overlay" onMouseDown={e => {if (e.target === e.currentTarget) requestClose();}}>
+    <div className="ws-cart ws-checkout" ref={ref} role="dialog" tabIndex={-1} aria-modal="true" aria-busy={busy} aria-labelledby="cart-title" dir={english ? 'ltr' : 'rtl'}>
+      <header><h2 id="cart-title">{result ? tr('تم استلام طلبك', 'Order received') : step === 'cart' ? tr('حقيبة التسوق', 'Shopping bag') : tr('إتمام الطلب', 'Checkout')}</h2><button type="button" disabled={busy} onClick={requestClose} aria-label={tr('إغلاق', 'Close')}>×</button></header>
       <div className="ws-cart-body">
         {result ? <OrderConfirmation result={result} slug={store.slug} english={english} currency={store.currency} continueShopping={() => {setResult(null);setStep('cart');close();}}/> : <>
           {items.length === 0 ? <p>{tr('حقيبتك فارغة. اكتشف منتجات المتجر.', 'Your bag is empty. Explore the collection.')}</p> : <>
@@ -108,7 +118,7 @@ export default function CommerceCart({store, items, open, english, close, update
               </div>
             </li>)}</ul>
             <div className="ws-coupon"><label htmlFor="coupon">{tr('كود الخصم', 'Discount code')}</label><div><input id="coupon" value={coupon} maxLength={50} onChange={e => setCoupon(e.target.value)} disabled={busy || uncertain}/><button onClick={applyCoupon} disabled={busy || uncertain || couponBusy || !coupon.trim()}>{tr('تطبيق', 'Apply')}</button></div></div>
-            <dl className="ws-totals"><div><dt>{tr('المنتجات', 'Subtotal')}</dt><dd>{money(subtotal)}</dd></div>{discount > 0 && <div><dt>{tr('الخصم', 'Discount')}</dt><dd>−{money(discount)}</dd></div>}<div><dt>{tr('التوصيل التقديري', 'Estimated delivery')}</dt><dd>{store.shippingZones?.length && !zone ? tr('يحدد عند إتمام الطلب', 'Select at checkout') : money(shipping)}</dd></div><div><dt>{tr('الإجمالي التقديري', 'Estimated total')}</dt><dd>{money(Math.max(0, subtotal - discount) + shipping)}</dd></div></dl>
+            <dl className="ws-totals"><div><dt>{tr('المنتجات', 'Subtotal')}</dt><dd>{money(subtotal)}</dd></div>{discount > 0 && <div><dt>{tr('الخصم', 'Discount')}</dt><dd>−{money(discount)}</dd></div>}<div><dt>{tr('التوصيل التقديري', 'Estimated delivery')}</dt><dd>{!shippingKnown ? tr('يحدد عند إتمام الطلب', 'Select at checkout') : money(shipping)}</dd></div><div><dt>{tr('الإجمالي التقديري', 'Estimated total')}</dt><dd>{shippingKnown ? money(Math.max(0, subtotal - discount) + shipping) : tr('يظهر بعد اختيار منطقة التوصيل', 'Shown after selecting delivery zone')}</dd></div></dl>
             {step === 'cart' ? <button className="ws-primary-action" disabled={store.isTrialExpired} onClick={() => setStep('checkout')}>{tr('المتابعة لإتمام الطلب', 'Continue to checkout')}</button> : <form onSubmit={submit} className="ws-checkout-form">
               <button type="button" onClick={() => setStep('cart')} disabled={busy || uncertain}>{tr('← العودة للحقيبة', '← Back to bag')}</button>
               <fieldset className="ws-checkout-fields" disabled={busy || uncertain}><label>{tr('الاسم', 'Full name')}<input name="name" value={details.name} onChange={e => setDetails(d => ({...d, name:e.target.value}))} autoComplete="name" required minLength={2} maxLength={100}/></label>
@@ -120,7 +130,15 @@ export default function CommerceCart({store, items, open, english, close, update
               <label>{tr('ملاحظات (اختياري)', 'Notes (optional)')}<textarea name="notes" value={details.notes} onChange={e => setDetails(d => ({...d, notes:e.target.value}))} maxLength={500}/></label>
               {store.checkoutMode === 'both' && <label>{tr('إتمام الطلب', 'Checkout with')}<select value={channel} onChange={e => setChannel(e.target.value as 'online' | 'whatsapp')}><option value="online">{tr('طلب مباشر من الموقع', 'Order online')}</option><option value="whatsapp">WhatsApp</option></select></label>}
               </fieldset><p><small>{tr('تُراجع الأسعار والمخزون والشحن على الخادم عند إرسال الطلب.', 'Prices, stock and delivery are validated when you place your order.')}</small></p>
-              <button className="ws-primary-action" disabled={busy || store.isTrialExpired || methods.length === 0} type="submit">{busy ? tr('جارٍ التحقق من الطلب…', 'Checking order…') : uncertain ? tr('إعادة التحقق من نفس الطلب', 'Check the same order again') : tr('تأكيد الطلب', 'Place order')}</button>
+              <section className="ws-checkout-review" aria-label={tr('راجع طلبك قبل التأكيد', 'Review before placing your order')}>
+                <h3>{uncertain ? tr('التحقق من الطلب السابق', 'Checking your previous order') : tr('مراجعة الطلب', 'Order review')}</h3>
+                {uncertain ? <p>{tr('هنستخدم نفس بيانات المحاولة الأصلية المحفوظة. تفاصيل الطلب والقيمة المؤكدة هتظهر بعد التحقق من الخادم.', 'We will reuse the saved original request. Confirmed items and totals appear after verification with the server.')}</p> : <>
+                <p>{totalItems} {tr('منتجات', 'items')} · {methods.find(method => method.id === payment)?.[english ? 'en' : 'ar']}</p>
+                {zone && <p>{zone.governorate} · {zone.name}</p>}
+                <dl className="ws-totals"><div><dt>{tr('المنتجات', 'Subtotal')}</dt><dd>{money(subtotal)}</dd></div>{discount > 0 && <div><dt>{tr('الخصم', 'Discount')}</dt><dd>−{money(discount)}</dd></div>}<div><dt>{tr('التوصيل', 'Delivery')}</dt><dd>{shippingKnown ? money(shipping) : tr('اختر منطقة التوصيل', 'Select delivery zone')}</dd></div><div><dt>{tr('الإجمالي التقديري', 'Estimated total')}</dt><dd>{shippingKnown ? money(Math.max(0, subtotal - discount) + shipping) : '—'}</dd></div></dl>
+                <small>{tr('القيمة النهائية المؤكدة هتظهر بعد تسجيل الطلب.', 'The confirmed final total appears after the order is created.')}</small></>}
+              </section>
+              <button className="ws-primary-action" disabled={busy || couponBusy || store.isTrialExpired || methods.length === 0} type="submit">{busy ? tr('جارٍ التحقق من الطلب…', 'Checking order…') : uncertain ? tr('إعادة التحقق من نفس الطلب', 'Check the same order again') : tr('تأكيد الطلب', 'Place order')}</button>
             </form>}
           </>}
         </>}

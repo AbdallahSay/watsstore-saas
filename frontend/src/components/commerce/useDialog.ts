@@ -14,7 +14,8 @@ export function useDialog(open: boolean, close: () => void) {
     const keydown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') { e.preventDefault(); closeRef.current(); }
       if (e.key !== 'Tab') return;
-      const nodes = Array.from(ref.current?.querySelectorAll<HTMLElement>('button:not(:disabled), input, select, textarea, a[href], [tabindex="0"]') || []).filter(x => x.offsetParent !== null);
+      const nodes = Array.from(ref.current?.querySelectorAll<HTMLElement>('button, input, select, textarea, a[href], [tabindex="0"]') || []).filter(x => x.offsetParent !== null && !x.matches(':disabled,[aria-disabled="true"]') && x.tabIndex >= 0);
+      if (!nodes.length) { e.preventDefault(); ref.current?.focus(); return; }
       const first = nodes[0], last = nodes[nodes.length - 1];
       if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last?.focus(); }
       else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first?.focus(); }

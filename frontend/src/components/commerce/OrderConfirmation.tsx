@@ -15,14 +15,15 @@ export default function OrderConfirmation({result,slug,english,currency,continue
     commerceApi<TrackingOrder>(`/public/stores/${encodeURIComponent(slug)}/orders/track/${result.trackingToken}`).then(data=>{if(live)setSnapshot(data);}).catch(()=>{if(live)setError(true);});
     return()=>{live=false;};
   },[slug,result]);
-  const items=result.items||snapshot?.items;
+  const items=result.items?.length?result.items:snapshot?.items;
   const payment=result.paymentMethod||snapshot?.paymentMethod;
   const shipping=result.shippingSummary||snapshot?.shippingSummary;
   const money=(value:number)=>`${value.toFixed(2)} ${result.currency||snapshot?.currency||currency}`;
   return <div className="ws-confirmation" role="status">
     <CheckCircle2 size={44} aria-hidden="true"/><div><p className="ws-eyebrow">{tr('طلبك اتسجل بنجاح','ORDER RECEIVED')}</p><h3>#{result.orderNumber}</h3></div>
-    <p>{tr('المتجر استلم طلبك وهو بانتظار التأكيد. التحويلات تخضع للمراجعة.','Your order awaits merchant confirmation. Manual transfers require verification.')}</p>
-    <strong className="text-2xl">{money(result.totalAmount)}</strong><p className="text-sm">{payment&&`${orderLabel(payment,english)} · `}{orderLabel(result.paymentStatus,english)}</p>
+    <p className="ws-confirmed-status">{orderLabel(snapshot?.status||result.status,english)}</p>
+    <p>{tr('المتجر استلم طلبك. التحويلات بتتأكد بعد مراجعة المتجر.','The store has received your order. Manual transfers require merchant verification.')}</p>
+    <strong className="text-2xl">{money(result.totalAmount)}</strong><p className="text-sm">{payment&&`${orderLabel(payment,english)} · `}{orderLabel(snapshot?.paymentStatus||result.paymentStatus,english)}</p>
     {items?<ul>{items.map((item,i)=><li key={i} className="flex justify-between gap-3 border-b py-3 text-sm"><div><strong>{item.productName}</strong><small className="block">{Object.values(item.selectedVariants||{}).join(' / ')}</small><small>{item.quantity} × {money(item.unitPrice)}</small></div><span>{money(item.subtotal)}</span></li>)}</ul>:<p className="text-sm">{error?tr('تفاصيل المنتجات متاحة من صفحة متابعة الطلب.','Item details are available on the tracking page.'):tr('بنحمّل تفاصيل الطلب المؤكدة…','Loading confirmed order details…')}</p>}
     <p className="text-sm">{shipping||`${tr('رسوم التوصيل','Delivery fee')}: ${money(result.deliveryFee)}`}</p>
     {result.trackingToken&&<Link className="ws-primary-action" href={`/s/${encodeURIComponent(slug)}/orders/${result.trackingToken}`}>{tr('متابعة الطلب','Track order')}</Link>}

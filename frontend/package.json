@@ -6,6 +6,7 @@
     "test": "node --test tests/*.test.cjs",
     "test:checkout": "node tests/checkout.e2e.cjs",
     "test:customer-commerce": "node tests/customer-commerce.e2e.cjs",
+    "test:mobile-commerce": "node tests/mobile-commerce.e2e.cjs",
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
