@@ -23,7 +23,9 @@ public class CommerceController(AppDbContext db) : ControllerBase
             ?? new CommerceSettings { StoreId = Tenant, InstaPay = !string.IsNullOrWhiteSpace(store.InstaPayAddress), MobileWallet = !string.IsNullOrWhiteSpace(store.VodafoneCashNumber) };
         return Ok(new { settings.PublishedTheme, settings.DraftTheme, settings.PreviousTheme, settings.CheckoutMode,
             settings.CashOnDelivery, settings.InstaPay, settings.MobileWallet,
-            customizationJson = settings.CustomizationJson ?? "{}", shippingZones = JsonSerializer.Deserialize<List<ShippingZone>>(settings.ShippingZonesJson, CommerceRules.Json), store.Slug });
+            themeStateVersion = 1, canEditDesign = store.IsActive && !store.IsTrialExpired(),
+            publishedAt = ThemeDesignState.Read(settings.CustomizationJson).PublishedAt,
+            customizationJson = ThemeDesignState.Read(settings.CustomizationJson).Draft.GetRawText(), shippingZones = JsonSerializer.Deserialize<List<ShippingZone>>(settings.ShippingZonesJson, CommerceRules.Json), store.Slug });
     }
 
     [HttpPut("settings")]
@@ -34,6 +36,9 @@ public class CommerceController(AppDbContext db) : ControllerBase
         if (!request.CashOnDelivery && !request.InstaPay && !request.MobileWallet) return BadRequest(new { message = "اختر طريقة دفع واحدة على الأقل" });
         var store = await db.Stores.SingleOrDefaultAsync(s => s.Id == Tenant && s.IsActive);
         if (store == null) return NotFound();
+        if (store.IsTrialExpired()) return StatusCode(403, new { message = "جدد اشتراك المتجر لتعديل الإعدادات" });
+        if (request.CustomizationJson != null && !ThemeDesignState.TryAppearance(request.CustomizationJson, out _))
+            return BadRequest(new { message = "إعدادات التصميم غير صالحة. استخدم الألوان والخيارات المدعومة ونصًا عاديًا." });
         if (request.InstaPay && string.IsNullOrWhiteSpace(store.InstaPayAddress) || request.MobileWallet && string.IsNullOrWhiteSpace(store.VodafoneCashNumber))
             return BadRequest(new { message = "أضف بيانات حساب التحويل في إعدادات المتجر أولاً" });
         var settings = await db.CommerceSettings.SingleOrDefaultAsync(x => x.StoreId == Tenant);
@@ -44,7 +49,13 @@ public class CommerceController(AppDbContext db) : ControllerBase
         settings.InstaPay = request.InstaPay;
         settings.MobileWallet = request.MobileWallet;
         settings.ShippingZonesJson = JsonSerializer.Serialize(request.ShippingZones, CommerceRules.Json);
-        if (!string.IsNullOrWhiteSpace(request.CustomizationJson)) settings.CustomizationJson = request.CustomizationJson;
+        if (request.CustomizationJson != null)
+        {
+            ThemeDesignState.TryAppearance(request.CustomizationJson, out var appearance);
+            var design = ThemeDesignState.Read(settings.CustomizationJson);
+            design.Draft = appearance;
+            settings.CustomizationJson = design.Serialize();
+        }
         await db.SaveChangesAsync();
         return Ok(new { message = "تم حفظ المسودة وإعدادات التجارة" });
     }
@@ -53,9 +64,21 @@ public class CommerceController(AppDbContext db) : ControllerBase
     public async Task<IActionResult> Publish(string op)
     {
         if (op is not ("publish" or "restore")) return NotFound();
+        var store = await db.Stores.AsNoTracking().SingleOrDefaultAsync(s => s.Id == Tenant && s.IsActive);
+        if (store == null) return NotFound();
+        if (store.IsTrialExpired()) return StatusCode(403, new { message = "جدد الاشتراك لنشر التصميم" });
         var settings = await db.CommerceSettings.SingleOrDefaultAsync(x => x.StoreId == Tenant);
         if (settings == null) return BadRequest(new { message = "احفظ المسودة أولاً" });
         var previous = settings.PublishedTheme;
+        var design = ThemeDesignState.Read(settings.CustomizationJson);
+        if(op == "publish" && settings.PublishedTheme == settings.DraftTheme && design.Published.GetRawText() == design.Draft.GetRawText() && design.PublishedAt != null)
+            return Ok(new {settings.PublishedTheme,settings.PreviousTheme,settings.DraftTheme});
+        var previousAppearance = design.Published;
+        design.Published = op == "restore" ? design.Previous : design.Draft;
+        design.Previous = previousAppearance;
+        design.Draft = design.Published;
+        design.PublishedAt = DateTime.UtcNow;
+        settings.CustomizationJson = design.Serialize();
         settings.PublishedTheme = op == "restore" ? settings.PreviousTheme : settings.DraftTheme;
         settings.PreviousTheme = previous;
         settings.DraftTheme = settings.PublishedTheme;

@@ -7,6 +7,7 @@ import { CheckoutAttempt, checkoutKey, prepareCheckoutAttempt, readCheckoutAttem
 import { api } from '@/lib/api';
 import { useDialog } from './useDialog';
 import { rememberDeviceOrder } from '@/lib/customer-orders';
+import { reportClientIssue } from '@/lib/client-issues';
 
 interface Props {
   directCheckout?: boolean; store: Store; items: CartItem[]; open: boolean; english: boolean;
@@ -134,6 +135,7 @@ export default function CommerceCart({directCheckout = false, store, items, open
       try { sessionStorage.removeItem(storageKey); } catch { /* optional storage */ }
       attempt.current = null; setUncertain(false);
     } catch (e) {
+      reportClientIssue('checkout', e instanceof CommerceApiError ? e.status : undefined);
       const pending = e instanceof CommerceApiError && e.uncertain;
       setUncertain(pending);
       if (attempt.current) {

@@ -249,14 +249,14 @@ app.Use(async (context, next) =>
     {
         await next();
     }
-    catch (BadHttpRequestException ex)
+    catch (BadHttpRequestException)
     {
         context.Response.StatusCode = StatusCodes.Status400BadRequest;
         context.Response.ContentType = "application/json; charset=utf-8";
         await context.Response.WriteAsync(System.Text.Json.JsonSerializer.Serialize(new
         {
             message = "الطلب غير صالح أو البيانات المدخلة غير صحيحة",
-            error = ex.Message
+            error = "INVALID_REQUEST"
         }));
     }
     catch (UnauthorizedAccessException ex)
@@ -268,19 +268,21 @@ app.Use(async (context, next) =>
             message = ex.Message ?? "غير مصرح لك بالوصول، يرجى تسجيل الدخول مجدداً."
         }));
     }
-    catch (System.Text.Json.JsonException ex)
+    catch (System.Text.Json.JsonException)
     {
         context.Response.StatusCode = StatusCodes.Status400BadRequest;
         context.Response.ContentType = "application/json; charset=utf-8";
         await context.Response.WriteAsync(System.Text.Json.JsonSerializer.Serialize(new
         {
             message = "صيغة JSON غير صالحة. يرجى التحقق من صحة البيانات المرسلة.",
-            error = ex.Message
+            error = "INVALID_JSON"
         }));
     }
     catch (Exception ex)
     {
-        app.Logger.LogError(ex, "Unhandled request failure for {Path}", context.Request.Path);
+        // Paths can contain private tracking capabilities; SQL messages can contain customer data.
+        app.Logger.LogError("Unhandled request failure {ExceptionType}, code {Code}, trace {TraceId}",
+            ex.GetType().Name, ex is System.Data.Common.DbException dbError ? dbError.ErrorCode : 0, context.TraceIdentifier);
         context.Response.StatusCode = StatusCodes.Status500InternalServerError;
         context.Response.ContentType = "application/json; charset=utf-8";
         await context.Response.WriteAsync(System.Text.Json.JsonSerializer.Serialize(new

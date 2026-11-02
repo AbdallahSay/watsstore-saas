@@ -17,7 +17,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "test:phase05": "node tests/phase05.e2e.cjs",
+    "test:phase05-a11y": "node tests/phase05-accessibility.cjs"
   },
   "dependencies": {
     "lucide-react": "^0.453.0",

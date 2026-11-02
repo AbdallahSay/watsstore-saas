@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState, useMemo, useRef } from 'react';
 import {
   commerceApi,
   CommerceSettings,
@@ -19,6 +19,8 @@ import {
 } from '@/lib/store-themes';
 import { Store } from '@/types';
 import { api } from '@/lib/api';
+import { useDialog } from '@/hooks/useDialog';
+import { reportClientIssue } from '@/lib/client-issues';
 import CommerceStorefront from '@/components/commerce/CommerceStorefront';
 import {
   Sparkles,
@@ -64,6 +66,11 @@ export default function ThemesMarketplacePage() {
   const [message, setMessage] = useState<{ text: string; type: 'success' | 'error' } | null>(null);
   const [busy, setBusy] = useState(false);
   const [dirty, setDirty] = useState(false);
+  const actionLock = useRef(false);
+  const previewRef = useDialog(!!previewThemeId,()=>setPreviewThemeId(null));
+  const designServiceReady = settings?.themeStateVersion === 1;
+  const legacySaveId = ({'editorial-luxe':'editorial','street-pulse':'streetwear','living-space':'lifestyle'} as Record<string,string>)[settings?.draftTheme || ''];
+  useEffect(()=>{const tab=new URLSearchParams(location.search).get('tab');if(['themes','customizer','checkout','shipping'].includes(tab||''))setActiveTab(tab as 'themes'|'customizer'|'checkout'|'shipping');},[]);
 
   async function load() {
     try {
@@ -116,7 +123,8 @@ export default function ThemesMarketplacePage() {
       if (type === 'save') {
         const payload = {
           ...settings,
-          customizationJson: JSON.stringify(customization),
+          customizationJson: designServiceReady ? JSON.stringify(customization) : undefined,
+          draftTheme: designServiceReady ? settings.draftTheme : legacySaveId,
         };
         await commerceApi('/merchant/commerce/settings', merchantToken(), 'PUT', payload);
         setMessage({
@@ -164,6 +172,7 @@ export default function ThemesMarketplacePage() {
 
   return (
     <div className="space-y-8 pb-16">
+      {!designServiceReady && settings && <p role="status" className="p-4 rounded-xl border border-amber-300 bg-amber-50 text-amber-950 dark:bg-amber-950/30 dark:text-amber-100">المعاينة متاحة. نشر التصاميم وتخصيصها محفوظ كمسودة ينتظر التحقق من توافق الخدمة؛ لن نغيّر التصميم المنشور أثناء المعاينة.</p>}
       {/* Page Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-slate-200 dark:border-slate-800 pb-5">
         <div>
@@ -182,7 +191,7 @@ export default function ThemesMarketplacePage() {
         <div className="flex flex-wrap items-center gap-2.5">
           <button
             onClick={() => executeAction('save')}
-            disabled={busy || !dirty}
+            disabled={busy || !dirty || settings?.canEditDesign === false || (!designServiceReady && !legacySaveId)}
             className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white dark:bg-emerald-600 dark:hover:bg-emerald-500 font-bold text-xs min-h-[44px] transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
           >
             <Save className="w-4 h-4" />
@@ -191,7 +200,7 @@ export default function ThemesMarketplacePage() {
 
           <button
             onClick={() => executeAction('publish')}
-            disabled={busy || dirty}
+            disabled={busy || dirty || !designServiceReady || settings?.canEditDesign === false}
             className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs min-h-[44px] transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-md shadow-emerald-600/20"
           >
             <UploadCloud className="w-4 h-4" />
@@ -201,7 +210,7 @@ export default function ThemesMarketplacePage() {
           {settings?.previousTheme && (
             <button
               onClick={() => executeAction('restore')}
-              disabled={busy || dirty}
+              disabled={busy || dirty || !designServiceReady || settings?.canEditDesign === false}
               className="flex items-center gap-1.5 px-3 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold text-xs min-h-[44px] transition-colors disabled:opacity-50"
               title="استعادة القالب السابق"
             >
@@ -376,7 +385,7 @@ export default function ThemesMarketplacePage() {
                             >
                               {theme.categoryLabelAr}
                             </span>
-                            <span className="text-xs opacity-60 font-mono">
+                            <span className="text-xs font-mono">
                               {theme.colorScheme === 'dark' ? 'داكن 🌙' : 'فاتح ☀️'}
                             </span>
                           </div>
@@ -972,7 +981,7 @@ export default function ThemesMarketplacePage() {
 
           {/* FULL SCREEN LIVE PREVIEW MODAL */}
           {previewThemeId && store && (
-            <div role="dialog" aria-modal="true" aria-label="معاينة تصميم المتجر" data-testid="merchant-theme-preview" className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex flex-col min-w-0 animate-fadeIn">
+            <div ref={previewRef} tabIndex={-1} role="dialog" aria-modal="true" aria-label="معاينة تصميم المتجر" data-testid="merchant-theme-preview" className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex flex-col min-w-0 animate-fadeIn">
               {/* Modal Topbar */}
               <div className="bg-slate-900 text-white px-3 sm:px-5 py-2.5 sm:py-3 border-b border-slate-800 flex flex-wrap items-center justify-between gap-2 sm:gap-3 relative z-30">
                 <div className="flex items-center gap-2 sm:gap-3 min-w-0">

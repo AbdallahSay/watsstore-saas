@@ -160,6 +160,12 @@ jobs:
           npm run test:dialogs
           npm run test:merchant-mobile
         working-directory: frontend
+      - name: Verify merchant onboarding, recovery and appearance across engines
+        run: npm run test:phase05
+        working-directory: frontend
+      - name: Audit important merchant and commerce controls for accessibility
+        run: npm run test:phase05-a11y
+        working-directory: frontend
       - uses: actions/upload-artifact@v4
         if: always()
         with:

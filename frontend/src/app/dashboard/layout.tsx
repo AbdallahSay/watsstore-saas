@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
+import SetupReturn from '@/components/SetupReturn';
 import { useDialog } from '@/hooks/useDialog';
 import { 
   Store as StoreIcon, 
@@ -110,6 +111,7 @@ export default function DashboardLayout({
   }
 
   const navLinks = [
+    { name: dir === 'rtl' ? 'دليل تجهيز المتجر' : 'Store setup guide', href: '/dashboard/setup', icon: Sparkles },
     { name: t('dash.overview', undefined, 'نظرة عامة للمتجر'), href: '/dashboard', icon: LayoutDashboard },
     { name: dir === 'rtl' ? 'سوق القوالب والتجارة (10)' : 'Theme marketplace (10)', href: '/dashboard/themes', icon: Sparkles },
     { name: t('dash.orders', undefined, 'الطلبات والمبيعات'), href: '/dashboard/orders', icon: Receipt },
@@ -410,7 +412,7 @@ export default function DashboardLayout({
           </div>
         ) : null}
 
-        {children}
+        <SetupReturn/>{children}
       </main>
     </div>
   );

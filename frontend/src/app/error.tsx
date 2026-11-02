@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react';
 import Link from 'next/link';
+import {reportClientIssue} from '@/lib/client-issues';
 import { AlertTriangle, RotateCcw, Home } from 'lucide-react';
 
 interface ErrorProps {
@@ -12,7 +13,7 @@ interface ErrorProps {
 export default function RootError({ error, reset }: ErrorProps) {
   useEffect(() => {
     // Log the error to an error reporting service
-    console.error('Unhandled App Router Error:', error);
+    reportClientIssue('application');
   }, [error]);
 
   return (
@@ -39,7 +40,7 @@ export default function RootError({ error, reset }: ErrorProps) {
             حدث خطأ غير متوقع
           </h1>
           <p className="text-sm sm:text-base text-slate-600 dark:text-slate-400 leading-relaxed">
-            نعتذر عن هذا الخلل. تم تسجيل تفاصيل الخطأ تلقائياً وجاري التعامل معه من فريقنا التقني.
+            تعذر عرض الصفحة. أعد تحميلها. إذا كانت نتيجة طلبك غير مؤكدة، تحقّق من نفس الطلب قبل إنشاء طلب جديد.
           </p>
           {error.digest && (
             <p className="text-xs font-mono text-slate-400 dark:text-slate-500 bg-slate-100 dark:bg-slate-800/60 py-1.5 px-3 rounded-lg inline-block">
