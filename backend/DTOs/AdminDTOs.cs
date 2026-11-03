@@ -123,4 +123,11 @@ namespace WatsStore.Api.DTOs
         public DateTime? TrialEndsAt { get; set; }
         public string Message { get; set; } = string.Empty;
     }
+
+    /// <summary>Request DTO for the admin test-email endpoint.</summary>
+    public sealed record SendTestEmailRequest(
+        [Required, EmailAddress, MaxLength(200)] string ToEmail,
+        [Required, MaxLength(200)] string ToName,
+        [Required, MaxLength(500)] string Subject
+    );
 }
