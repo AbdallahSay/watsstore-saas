@@ -127,7 +127,7 @@ export default function DashboardLayout({
   return (
     <div dir={dir} className="ws-merchant-shell min-h-screen bg-slate-100 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col md:flex-row transition-colors duration-200">
       {/* Sidebar for Desktop */}
-      <aside className="hidden md:flex w-64 bg-slate-900 text-slate-300 flex-col justify-between shrink-0 border-r md:border-r-0 md:border-inline-end border-slate-800">
+      <aside className="ws-merchant-sidebar hidden md:flex w-64 sticky top-0 self-start h-dvh min-h-0 overflow-y-auto overscroll-contain bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 flex-col shrink-0 border-r md:border-r-0 md:border-inline-end border-slate-200 dark:border-slate-800">
         <div>
           {/* Brand */}
           <div className="p-6 border-b border-slate-800 flex items-center justify-between">
@@ -228,19 +228,19 @@ export default function DashboardLayout({
       </aside>
 
       {/* Mobile Top Header */}
-      <header className="md:hidden bg-slate-900 text-white px-4 py-3 flex items-center justify-between border-b border-slate-800 z-30 sticky top-0">
+      <header className="md:hidden bg-white dark:bg-slate-900 text-slate-900 dark:text-white px-3 py-3 flex items-center justify-between border-b border-slate-200 dark:border-slate-800 z-30 sticky top-0">
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 rounded-xl bg-emerald-500 flex items-center justify-center text-white font-bold">
             <StoreIcon className="w-4 h-4" />
           </div>
-          <span className="font-bold text-base text-white">WatsStore</span>
+          <span className="font-bold text-base text-slate-900 dark:text-white">WatsStore</span>
         </div>
 
         <div className="flex items-center gap-2">
           <ThemeLanguageBar variant="compact" showCurrency={false} />
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="p-2 text-slate-300 hover:text-white rounded-xl hover:bg-slate-800 min-w-[44px] min-h-[44px] flex items-center justify-center transition-colors"
+            className="p-2 text-slate-700 dark:text-slate-300 hover:text-emerald-700 dark:hover:text-white rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 min-w-[44px] min-h-[44px] flex items-center justify-center transition-colors"
             aria-label={dir === 'rtl' ? "القائمة" : "Menu"} aria-expanded={isMobileMenuOpen} aria-controls="merchant-navigation"
           >
             {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
@@ -337,7 +337,7 @@ export default function DashboardLayout({
       )}
 
       {/* Main Content Body */}
-<main className="min-w-0 w-full flex-1 p-4 sm:p-6 lg:p-8 pb-28 sm:pb-16">
+<main className="ws-merchant-content min-w-0 w-full flex-1 p-3 sm:p-6 lg:p-8 pb-28 sm:pb-16">
         {/* Desktop Top Bar */}
         <div className="hidden md:flex flex-wrap gap-3 items-center justify-between px-5 py-3 mb-6 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm transition-colors">
           <div className="flex items-center gap-2">

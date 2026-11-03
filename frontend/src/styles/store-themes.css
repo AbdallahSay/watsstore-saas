@@ -248,12 +248,17 @@
   margin-top: 8px;
   color: var(--ws-fg);
 }
-.ws-section-heading h2 sup {
+.ws-section-heading h2 .ws-product-count {
   font-family: sans-serif;
   font-size: 13px;
-  vertical-align: top;
-  display: inline-block;
-  margin-inline-start: 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  min-width: 27px;
+  min-height: 27px;
+  line-height: 1;
+  margin-inline-start: 2px;
   padding: 3px 8px;
   border-radius: 999px;
   background: var(--ws-card);
@@ -456,7 +461,8 @@
   line-height: 1.5;
   margin-bottom: 6px;
 }
-.ws-product-info h3 button {
+.ws-product-info h3 button,
+.ws-product-info h3 a {
   text-align: start;
   background: transparent;
   border: 0;
@@ -464,7 +470,8 @@
   color: var(--ws-fg);
   overflow-wrap: anywhere;
 }
-.ws-product-info h3 button:hover {
+.ws-product-info h3 button:hover,
+.ws-product-info h3 a:hover {
   color: var(--ws-accent);
 }
 .ws-product-price {
@@ -1131,10 +1138,17 @@
   text-transform: uppercase;
   display: flex;
 }
-.ws-street-marquee-track {
-  display: inline-flex;
+ .ws-street-marquee-track {
+  display: flex;
+  width: max-content;
   animation: ws-marquee 25s linear infinite;
+}
+.ws-street-marquee-group {
+  display: flex;
+  flex-shrink: 0;
   gap: 32px;
+  padding-inline-end: 32px;
+  white-space: nowrap;
 }
 @keyframes ws-marquee {
   0% { transform: translateX(0%); }
@@ -1235,11 +1249,11 @@
   --ws-card-ratio: 1/1;
   --ws-radius-control: 10px;
   --ws-radius-card: 14px;
-  --store-whatsapp-bg: #ea580c;
+  --store-whatsapp-bg: #15803d;
   --store-whatsapp-text: #ffffff;
-  --store-whatsapp-border: #ea580c;
-  --store-whatsapp-hover: #c2410c;
-  --store-whatsapp-focus: #ea580c;
+  --store-whatsapp-border: #15803d;
+  --store-whatsapp-hover: #166534;
+  --store-whatsapp-focus: #15803d;
   --store-whatsapp-radius: 10px;
 }
 .ws-theme--fresh-market .ws-catalog-product {
@@ -1637,7 +1651,7 @@
 .ws-related img { width: 100%; aspect-ratio: 4/5; object-fit: cover; }
 .ws-related h3 { overflow-wrap: anywhere; margin-top: 12px; }
 @media (max-width: 767px) { .ws-product-detail { grid-template-columns: minmax(0,1fr); padding-bottom: 32px; } .ws-product-main-image { max-height: 65dvh; } }
-.ws-product-info h3 button { min-height: 44px; text-align: start; }
+.ws-product-info h3 button, .ws-product-info h3 a { min-height: 44px; text-align: start; }
 .ws-checkout-progress ol { list-style: none; padding: 0; display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 8px; margin: 0 0 20px; }
 .ws-checkout-progress a { display: flex; align-items: center; min-height: 44px; padding: 8px; border: 1px solid var(--ws-checkout-border); border-radius: 8px; font-size: .8rem; }
 .ws-checkout-fields legend { font-weight: 700; padding-block: 20px 12px; }
@@ -1760,3 +1774,36 @@
 .ws-storefront :is(.ws-catalog-product,.ws-product-info,.ws-product-information,.ws-cart-items) :is(h1,h2,h3,p,span,strong,button,a) { overflow-wrap:anywhere; }
 .ws-storefront :is(.ws-primary-action,.ws-secondary-action,.ws-product-actions button,.ws-product-page-link) { min-width:0; max-width:100%; min-height:44px; white-space:normal; overflow-wrap:anywhere; text-align:center; }
 .ws-storefront .ws-product-grid > *, .ws-storefront .ws-product-actions > * { min-width:0; }
+
+
+/* Responsive catalog counters stay inside their card or heading at every shape preset. */
+.ws-section-heading h2 { display:flex; align-items:center; flex-wrap:wrap; column-gap:8px; row-gap:4px; min-width:0; }
+.ws-section-heading h2 .ws-product-count { position:static; font-variant-numeric: tabular-nums; overflow-wrap:normal; white-space:nowrap; }
+.ws-product-image .ws-product-index {
+  inset-block-start: clamp(6px, 1vw, 12px);
+  inset-inline-start: clamp(6px, 1vw, 12px);
+  min-width: 28px; min-height: 28px;
+  padding: 3px 6px;
+  display:inline-flex; align-items:center; justify-content:center;
+  max-width:calc(100% - 16px);
+  line-height:1; white-space:nowrap;
+  font-variant-numeric: tabular-nums;
+  border-radius:min(999px, var(--ws-radius-control, 999px));
+  z-index:2;
+}
+.ws-product-info h3 a { display: inline-flex; align-items:center; text-decoration:none; color:var(--ws-fg); min-width:0; max-width:100%; overflow-wrap:break-word; }
+.ws-product-info h3 a:focus-visible { outline:2px solid var(--ws-accent); outline-offset:3px; }
+.ws-product-price { min-width:0; flex-wrap:wrap; overflow-wrap:normal; font-variant-numeric:tabular-nums; }
+.ws-storefront :is(.ws-secondary-action,.ws-primary-action,.ws-theme-whatsapp-btn) { white-space:normal; min-width:0; max-width:100%; }
+
+
+/* Merchant preview can navigate the full product details without a popup. */
+.ws-preview-product-back {
+  display:inline-flex; align-items:center; justify-content:center;
+  margin:20px 5%; padding:10px 16px;
+  min-height:44px; max-width:90%;
+  border:1px solid var(--ws-border); border-radius:var(--ws-radius-control);
+  background:var(--ws-card); color:var(--ws-fg);
+  font-size:.875rem; font-weight:700; white-space:normal;
+}
+.ws-preview-product-back:hover { border-color:var(--ws-accent); }
