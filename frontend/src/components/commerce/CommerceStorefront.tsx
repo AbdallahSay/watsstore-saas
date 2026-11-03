@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import { ShoppingBag, ArrowUpRight, Search, MessageCircle, Plus, Minus, Sparkles } from 'lucide-react';
 import { Store, Product, CartItem } from '@/types';
@@ -15,7 +16,6 @@ import '@/styles/store-themes.css';
 import '@/styles/themes/pure-beauty.css';
 import ThemeWhatsAppButton from './ThemeWhatsAppButton';
 
-const ProductModal = dynamic(() => import('@/components/ProductModal'));
 const CommerceCart = dynamic(() => import('./CommerceCart'));
 
 interface Props {
@@ -34,6 +34,7 @@ export default function CommerceStorefront({
   detailProduct,
 }: Props) {
   const { language, setLanguage } = useLanguage();
+  const router = useRouter();
   const english = language !== 'ar';
   const tr = (ar: string, en: string) => (english ? en : ar);
 
@@ -57,11 +58,13 @@ export default function CommerceStorefront({
   const [cartOpen, setCartOpen] = useState(false);
   const [cartLoaded, setCartLoaded] = useState(false);
   const [directCheckout, setDirectCheckout] = useState(false);
-  const [product, setProduct] = useState<Product | null>(null);
+  const [previewDetail, setPreviewDetail] = useState<Product | null>(null);
+  const activeDetailProduct = detailProduct || (preview ? previewDetail : null);
   const [reviewMessage, setReviewMessage] = useState('');
   const [reviewBusy, setReviewBusy] = useState(false);
 
   const cartKey = `watsstore_cart_${store.slug}`;
+  const productHref = (item: Product) => `/s/${encodeURIComponent(store.slug)}/p/${encodeURIComponent(item.slug)}${previewTheme && !preview ? `?theme=${encodeURIComponent(previewTheme)}` : ''}`;
 
   useEffect(() => {
     if (cartOpen) setCartLoaded(true);
@@ -127,7 +130,7 @@ export default function CommerceStorefront({
   const money = (n: number) =>
     `${n.toLocaleString(english ? 'en-EG' : 'ar-EG', { maximumFractionDigits: 2 })} ${store.currency}`;
 
-  function add(p: Product, quantity: number, selections: Record<string, string>, buyNow = false) {
+  function add(p: Product, quantity: number, selections: Record<string, string>, buyNow = false, openCart = true) {
     if (!p.isAvailable || store.isTrialExpired) return;
     const key = (v: Record<string, string>) => JSON.stringify(Object.entries(v).sort(([a], [b]) => a.localeCompare(b)));
     setItems((old) => {
@@ -145,15 +148,17 @@ export default function CommerceStorefront({
         currency: 'EGP',
       });
     }
-    setProduct(null);
-    setDirectCheckout(buyNow);
-    setCartOpen(true);
+    if (openCart) {
+      setDirectCheckout(buyNow);
+      setCartOpen(true);
+    }
   }
 
   function quickAddNoVariants(p: Product, delta: number) {
     if (!p.isAvailable || store.isTrialExpired) return;
     if (p.variantsJson && p.variantsJson !== '[]' && p.variantsJson !== '{}') {
-      setProduct(p);
+      if (preview) setPreviewDetail(p);
+      else router.push(productHref(p));
       return;
     }
     const currentItem = items.find((x) => x.product.id === p.id && Object.keys(x.selectedVariants).length === 0);
@@ -171,7 +176,8 @@ export default function CommerceStorefront({
         )
       );
     } else {
-      add(p, 1, {});
+      // Quick Add updates the bag without hijacking product browsing with a drawer.
+      add(p, 1, {}, false, false);
     }
   }
 
@@ -223,7 +229,7 @@ export default function CommerceStorefront({
       data-font={customization.fontPreset || 'cairo'}
       style={dynamicStyles as React.CSSProperties}
     >
-      <a className="ws-skip" href={detailProduct ? '#product-title' : '#catalog'}>
+      <a className="ws-skip" href={activeDetailProduct ? '#product-title' : '#catalog'}>
         {tr('انتقل للمنتجات', 'Skip to products')}
       </a>
 
@@ -237,10 +243,12 @@ export default function CommerceStorefront({
       {theme.id === 'street-pulse' && (
         <div className="ws-street-marquee" aria-hidden="true">
           <div className="ws-street-marquee-track">
-            <span>🔥 NEW DROP EXCLUSIVE · LIMITED QUANTITIES · IMMEDIATE DELIVERY 🔥</span>
-            <span>🔥 إصدارات حصرية لا تُفوّت · كميات محدودة للغاية · شحن فوري 🔥</span>
-            <span>🔥 NEW DROP EXCLUSIVE · LIMITED QUANTITIES · IMMEDIATE DELIVERY 🔥</span>
-            <span>🔥 إصدارات حصرية لا تُفوّت · كميات محدودة للغاية · شحن فوري 🔥</span>
+            {[0, 1].map((copy) => (
+              <div className="ws-street-marquee-group" key={copy}>
+                <span>🔥 NEW DROP EXCLUSIVE · LIMITED QUANTITIES · IMMEDIATE DELIVERY 🔥</span>
+                <span>🔥 إصدارات حصرية لا تُفوّت · كميات محدودة للغاية · شحن فوري 🔥</span>
+              </div>
+            ))}
           </div>
         </div>
       )}
@@ -266,10 +274,10 @@ export default function CommerceStorefront({
         </a>
 
         <nav aria-label={tr('التنقل', 'Main navigation')}>
-          <a href={detailProduct ? `/s/${store.slug}#catalog` : '#catalog'}>
+          <a href={activeDetailProduct ? `/s/${store.slug}#catalog` : '#catalog'}>
             {tr('المجموعة والمنتجات', 'Collection')}
           </a>
-          <a href={detailProduct ? `/s/${store.slug}#reviews` : '#reviews'}>
+          <a href={activeDetailProduct ? `/s/${store.slug}#reviews` : '#reviews'}>
             {tr('آراء العملاء', 'Reviews')}
           </a>
           <a href={wa} target="_blank" rel="noreferrer">
@@ -312,14 +320,24 @@ export default function CommerceStorefront({
       )}
 
       <main>
-        {detailProduct ? (
+        {preview && previewDetail && (
+          <button
+            type="button"
+            className="ws-preview-product-back"
+            onClick={() => setPreviewDetail(null)}
+          >
+            {tr('العودة لجميع المنتجات', 'Back to all products')}
+          </button>
+        )}
+        {activeDetailProduct ? (
           <ProductDetails
-            key={detailProduct.id}
+            key={activeDetailProduct.id}
             store={store}
-            product={detailProduct}
+            product={activeDetailProduct}
             english={english}
             disabled={!!store.isTrialExpired}
             add={add}
+            themeQuery={previewTheme && !preview ? previewTheme : undefined}
           />
         ) : (
           <>
@@ -358,12 +376,6 @@ export default function CommerceStorefront({
                     <span>{store.storeName}</span>
                   </div>
                 )}
-                {heroProduct && (
-                  <a href="#catalog" className="ws-photo-caption">
-                    <span>{heroProduct.name}</span>
-                    <span>{money(heroProduct.price)}</span>
-                  </a>
-                )}
               </div>
             </section>
 
@@ -386,10 +398,12 @@ export default function CommerceStorefront({
                 <div>
                   <p className="ws-eyebrow">{tr('من تشكيلتنا الحصرية', 'FROM OUR CATALOG')}</p>
                   <h2 id="collection-title">
-                    {category === 'all'
-                      ? tr('جميع المنتجات', 'All Products')
-                      : store.categories.find((c) => c.id === category)?.name}
-                    <sup>{products.length}</sup>
+                    <span className="ws-collection-title-text">
+                      {category === 'all'
+                        ? tr('جميع المنتجات', 'All Products')
+                        : store.categories.find((c) => c.id === category)?.name}
+                    </span>
+                    <span className="ws-product-count" aria-label={tr(`عدد المنتجات: ${products.length}`, `Products: ${products.length}`)}>{products.length}</span>
                   </h2>
                 </div>
                 <ThemeWhatsAppButton
@@ -471,14 +485,20 @@ export default function CommerceStorefront({
                         (x) => x.product.id === p.id && Object.keys(x.selectedVariants).length === 0
                       );
                       const inCartQty = cardItem?.quantity || 0;
+                      const hasVariants = !!(p.variantsJson && p.variantsJson !== '[]' && p.variantsJson !== '{}');
 
                       return (
                         <article className="ws-catalog-product" key={p.id}>
-                          <button
+                          <Link
+                            prefetch={false}
                             className="ws-product-image"
-                            onClick={() => {
-                              setProduct(p);
-                              if (store.metaPixelId) {
+                            href={preview ? '#product-details' : productHref(p)}
+                            onClick={(event) => {
+                              if (preview) {
+                                event.preventDefault();
+                                setPreviewDetail(p);
+                              }
+                              if (store.metaPixelId && !preview) {
                                 pixel.viewContent(store.metaPixelId, {
                                   content_name: p.name,
                                   content_ids: [p.id],
@@ -489,8 +509,8 @@ export default function CommerceStorefront({
                               }
                             }}
                             aria-label={tr(
-                              `عرض ${p.name} ${String(i + 1).padStart(2, '0')}`,
-                              `View ${p.name} ${String(i + 1).padStart(2, '0')}`
+                              `فتح صفحة ${p.name}`,
+                              `Open product page for ${p.name}`
                             )}
                           >
                             {p.imageUrl ? (
@@ -511,18 +531,18 @@ export default function CommerceStorefront({
                               <span className="ws-stock-badge">{tr('نفدت الكمية', 'Sold out')}</span>
                             )}
 
-                            <span className="ws-view-product">{tr('تفاصيل وسريع', 'View Details')} ↗</span>
-                          </button>
+                            <span className="ws-view-product">{tr('صفحة المنتج', 'Product page')} ↗</span>
+                          </Link>
 
                           <div className="ws-product-info">
                             <h3>
-                              <button onClick={() => setProduct(p)}>{p.name}</button>
+                              <Link prefetch={false} href={preview ? '#product-details' : productHref(p)} onClick={preview ? (event) => { event.preventDefault(); setPreviewDetail(p); } : undefined}>{p.name}</Link>
                             </h3>
                             <Link
                               prefetch={false}
                               className="ws-product-page-link"
-                              href={preview ? '#product-details' : `/s/${encodeURIComponent(store.slug)}/p/${encodeURIComponent(p.slug)}`}
-                              onClick={preview ? (e) => { e.preventDefault(); setProduct(p); } : undefined}
+                              href={preview ? '#product-details' : productHref(p)}
+                              onClick={preview ? (e) => { e.preventDefault(); setPreviewDetail(p); } : undefined}
                               style={{ fontSize: '11px', color: 'var(--ws-accent)', fontWeight: 600, textDecoration: 'none' }}
                             >
                               {tr('صفحة المنتج', 'Product page')} ↗
@@ -561,6 +581,27 @@ export default function CommerceStorefront({
                             )}
 
                             {/* Fresh Market In-Card Quantity Stepper */}
+                            {theme.id !== 'fresh-market' && p.isAvailable && !store.isTrialExpired && (
+                              <button
+                                type="button"
+                                className="ws-card-quick-add"
+                                data-quick-add-kind={hasVariants ? 'options' : 'direct'}
+                                onClick={() => quickAddNoVariants(p, 1)}
+                                aria-label={hasVariants
+                                  ? tr(`اختيار تفاصيل ${p.name}`, `Choose options for ${p.name}`)
+                                  : tr(`إضافة ${p.name} إلى الحقيبة`, `Add ${p.name} to bag`)}
+                              >
+                                <Plus aria-hidden="true" size={17} />
+                                <span aria-live="polite">
+                                  {hasVariants
+                                    ? tr('اختيار التفاصيل', 'Choose options')
+                                    : inCartQty > 0
+                                      ? tr(`في الحقيبة (${inCartQty})`, `In bag (${inCartQty})`)
+                                      : tr('إضافة إلى الحقيبة', 'Add to bag')}
+                                </span>
+                              </button>
+                            )}
+
                             {theme.id === 'fresh-market' && p.isAvailable && !store.isTrialExpired && (
                               <div className="ws-card-stepper">
                                 <button
@@ -687,15 +728,6 @@ export default function CommerceStorefront({
       </footer>
 
       {/* Modals & Cart */}
-      {product && (
-        <ProductModal
-          product={product}
-          currency={store.currency}
-          isOpen={!!product}
-          onClose={() => setProduct(null)}
-          onAddToCart={add}
-        />
-      )}
       {(cartOpen || cartLoaded) && (
         <CommerceCart
           directCheckout={directCheckout}
@@ -722,7 +754,7 @@ export default function CommerceStorefront({
         variant="floating"
         appearance="filled"
         english={english}
-        hidden={cartOpen || Boolean(product)}
+        hidden={cartOpen}
         text={tr(
           `مرحباً ${store.storeName}، أود الاستفسار عن المنتجات المتاحة في المتجر.`,
           `Hello ${store.storeName}, I would like to inquire about products in your store.`

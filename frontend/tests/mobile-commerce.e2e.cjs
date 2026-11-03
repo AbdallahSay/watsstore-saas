@@ -14,15 +14,22 @@ async function bounds(page){const result=await page.evaluate(()=>{const modal=do
  for(const [index,fixture]of fixtures.entries()){
   const context=await browser.createBrowserContext();const page=await context.newPage(),errors=[];page.on('pageerror',e=>errors.push(e.message));let heldCoupon,heldOrder;let pauseCoupon=false,pauseOrder=false;
   await page.setRequestInterception(true);page.on('request',request=>{if(request.method()==='POST'&&request.url().endsWith('/apply-coupon')&&pauseCoupon){pauseCoupon=false;heldCoupon=request;}else if(request.method()==='POST'&&request.url().endsWith('/orders')&&pauseOrder){pauseOrder=false;heldOrder=request;}else request.continue();});
-  await width(page,375,844);await page.goto(`${site}/s/${fixture.slug}`,{waitUntil:'networkidle0'});await page.waitForSelector('.ws-product-info h3 button');
-  await click(page,'.ws-product-info h3 button','منتج اختبار — تصميم عربي');await click(page,'[role=dialog] button','L');
-  const touch=await page.$eval('[role=dialog] button[aria-label="زيادة الكمية"]',x=>({width:x.getBoundingClientRect().width,height:x.getBoundingClientRect().height}));assert.ok(touch.width>=44&&touch.height>=44);
-  await page.click('[role=dialog] button[aria-label="زيادة الكمية"]');await click(page,'[role=dialog] button','إضافة إلى السلة');await page.waitForSelector('.ws-cart');
+  await width(page,375,844);await page.goto(`${site}/s/${fixture.slug}`,{waitUntil:'networkidle0'});await page.waitForSelector('.ws-product-info h3 a');
+  // Product selection now opens a full page, not a modal; variants and quantities stay accessible.
+  await click(page,'.ws-product-info h3 a','منتج اختبار — تصميم عربي');await page.waitForSelector('.ws-product-detail');
+  await click(page,'.ws-product-options button','L');
+  const touch=await page.$eval('.ws-product-options button',x=>({width:x.getBoundingClientRect().width,height:x.getBoundingClientRect().height}));assert.ok(touch.width>=44&&touch.height>=44);
+  await fill(page,'.ws-product-quantity input','2');await click(page,'.ws-product-actions button[type=submit]','أضف إلى الحقيبة');await page.waitForSelector('.ws-cart');
   assert.equal(await page.evaluate(()=>document.body.style.overflow),'hidden');await page.click('.ws-cart>header button');
-  await click(page,'.ws-product-info h3 button','منتج الاختبار 1');await click(page,'[role=dialog] button','إضافة إلى السلة');await page.waitForSelector('.ws-cart-items li:nth-child(2)');
+  await page.goto(`${site}/s/${fixture.slug}`,{waitUntil:'networkidle0'});await page.waitForSelector('.ws-product-info h3 a');
+  await click(page,'.ws-product-info h3 a','منتج الاختبار 1');await page.waitForSelector('.ws-product-detail');
+  await click(page,'.ws-product-actions button[type=submit]','أضف إلى الحقيبة');await page.waitForSelector('.ws-cart-items li:nth-child(2)');
   // Before a delivery zone is selected, never present a numeric grand total.
   assert.ok((await page.$eval('.ws-totals',x=>x.innerText)).includes('يظهر بعد اختيار منطقة التوصيل'));
-  await page.click('.ws-cart>header button');await click(page,'.ws-product-info h3 button','WWWW');await click(page,'[role=dialog] button','إضافة إلى السلة');await page.waitForSelector('.ws-cart-items li:nth-child(3)');
+  await page.click('.ws-cart>header button');
+  await page.goto(`${site}/s/${fixture.slug}`,{waitUntil:'networkidle0'});await page.waitForSelector('.ws-product-info h3 a');
+  await click(page,'.ws-product-info h3 a','WWWW');await page.waitForSelector('.ws-product-detail');
+  await click(page,'.ws-product-actions button[type=submit]','أضف إلى الحقيبة');await page.waitForSelector('.ws-cart-items li:nth-child(3)');
   await width(page,320);await bounds(page);await click(page,'.ws-cart-items li:nth-child(3) button','حذف');
   // A stale coupon response must not overwrite the estimate for a changed cart.
   await fill(page,'#coupon','MOBILE10');pauseCoupon=true;await click(page,'.ws-coupon button','تطبيق');
@@ -45,7 +52,19 @@ async function bounds(page){const result=await page.evaluate(()=>{const modal=do
   const payload=JSON.parse(heldOrder.postData());assert.equal(payload.items.length,2);assert.equal(payload.items.find(x=>x.productId===fixture.productId).quantity,2);assert.equal(payload.items.find(x=>x.productId===fixture.productId).selectedVariants['المقاس'],'L');
   await heldOrder.continue();const response=await orderResponse;assert.equal(response.status(),200);const created=await response.json();assert.equal(created.subtotal,305);assert.equal(created.discountAmount,30.5);assert.equal(created.deliveryFee,45);assert.equal(created.totalAmount,319.5);await page.waitForSelector('.ws-confirmation');await page.waitForFunction(()=>document.querySelectorAll('.ws-confirmation li').length===2);assert.equal((await json('/merchant/orders',fixture.token)).total,before.total+1);assert.equal((await json('/merchant/commerce/inventory',fixture.token)).find(x=>x.productId===fixture.productId).quantity,stockBefore-2);
   assert.ok((await page.$eval('.ws-confirmed-status',x=>x.innerText)).includes('تم استلام طلبك'));await page.screenshot({path:path.join(output,`${fixture.theme}-mobile-success.png`)});await click(page,'.ws-confirmation button','متابعة التسوق');
-  await page.evaluate(()=>{localStorage.setItem('watsstore_lang','en');});await page.reload({waitUntil:'networkidle0'});await page.waitForFunction(()=>document.documentElement.dir==='ltr');await click(page,'.ws-product-info h3 button','منتج الاختبار 1');await click(page,'[role=dialog] button','Add to bag');await click(page,'.ws-cart button','Continue to checkout');await bounds(page);assert.ok((await page.$eval('.ws-checkout-review',x=>x.innerText)).includes('Order review'));await page.screenshot({path:path.join(output,`${fixture.theme}-english-checkout.png`)});
+  await page.evaluate(()=>{localStorage.setItem('watsstore_lang','en');});
+  // Continue shopping closes the confirmation on the current product route. Return to the
+  // catalog explicitly, then exercise the same real product-page path in English.
+  await page.goto(`${site}/s/${fixture.slug}`,{waitUntil:'networkidle0'});
+  await page.waitForFunction(()=>document.documentElement.dir==='ltr');
+  await click(page,'.ws-product-info h3 a','منتج الاختبار 1');
+  await page.waitForFunction(()=>document.querySelector('#product-title')?.textContent==='منتج الاختبار 1');
+  assert.ok(new URL(page.url()).pathname.includes('/p/'),'English product selection opens a dedicated route');
+  assert.equal(await page.$('[role=dialog]'),null,'Product selection must not open the retired product modal');
+  await click(page,'.ws-product-actions button[type=submit]','Add to bag');
+  await click(page,'.ws-cart button','Continue to checkout');await bounds(page);
+  assert.ok((await page.$eval('.ws-checkout-review',x=>x.innerText)).includes('Order review'));
+  await page.screenshot({path:path.join(output,`${fixture.theme}-english-checkout.png`)});
   assert.deepEqual(errors,[]);results.push({theme:fixture.theme,result:'PASS',widths:[320,375,390,768,1024,1440,1920],checks:['two products','variant L','quantity 2','coupon stale-response protection','server total 319.50','inventory deducted twice','long SKU','16px inputs','44px controls','short viewport','keyboard trap','busy Escape guard','Arabic RTL','English LTR']});await context.close();
  }
  fs.writeFileSync(path.join(output,'summary.json'),JSON.stringify(results,null,2));console.log(results);

@@ -53,7 +53,7 @@ export default function ThemeLanguageBar({
   const activeLang = LANGUAGES[language] || LANGUAGES['ar'];
   const isDark = themeMounted ? theme === 'dark' : false;
 
-  const isDarkBg = variant === 'dashboard' || variant === 'admin';
+  const isDarkBg = (variant === 'dashboard' || variant === 'admin') && isDark;
 
   return (
     <div

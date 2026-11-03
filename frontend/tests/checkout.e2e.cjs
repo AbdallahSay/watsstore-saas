@@ -30,8 +30,9 @@ async function openCheckout(page,fixture,width) {
   await page.setViewport({width,height:width<768?844:1000,isMobile:width<768,hasTouch:width<768});
   await page.goto(`${site}/s/${fixture.slug}`,{waitUntil:'networkidle0'});
   await page.waitForSelector('.ws-product-image');
-  await clickText(page,'.ws-product-info h3 button','منتج اختبار — تصميم عربي');
-  await clickText(page,'[role=dialog] button','إضافة إلى السلة');
+  await clickText(page,'.ws-product-info h3 a','منتج اختبار — تصميم عربي');
+  await page.waitForSelector('.ws-product-detail');
+  await clickText(page,'.ws-product-actions button[type=submit]','أضف إلى الحقيبة');
   await clickText(page,'.ws-cart button','المتابعة لإتمام الطلب');
   await fill(page,'name','اختبار P0 معزول');await fill(page,'phone','01000000000');await fill(page,'address','عنوان الاختبار المعزول — لا يتم الشحن');
   await page.select('.ws-checkout-form select','cairo');
