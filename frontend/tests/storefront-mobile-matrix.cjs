@@ -128,11 +128,37 @@ async function measure(page) {
       };
     }
 
+    const count = document.querySelector('.ws-product-count');
+    const countPill = count ? (() => {
+      const box = count.getBoundingClientRect();
+      const range = document.createRange();
+      range.selectNodeContents(count);
+      const text = range.getBoundingClientRect();
+      const eps = 2;
+      return {
+        visible: visible(count),
+        textContained: text.left >= box.left - eps && text.right <= box.right + eps &&
+          text.top >= box.top - eps && text.bottom <= box.bottom + eps,
+        bg: getComputedStyle(count).backgroundColor,
+      };
+    })() : null;
+    const quickAdds = Array.from(document.querySelectorAll('.ws-card-quick-add'));
+    const brokenQuickAdds = quickAdds.filter((el) => {
+      const rect = el.getBoundingClientRect();
+      const card = el.closest('.ws-catalog-product')?.getBoundingClientRect();
+      return !card || rect.left < card.left - 2 || rect.right > card.right + 2 ||
+        rect.width < 44 || rect.height < 44 || el.scrollWidth > el.clientWidth + 3;
+    }).map((el) => el.textContent?.trim().slice(0, 30));
+
     return {
       width: winWidth,
       scrollWidth: maxScrollWidth,
       overflow,
       waData,
+      countPill,
+      quickAddCount: quickAdds.length,
+      brokenQuickAdds,
+      heroCaptionCount: document.querySelectorAll('.ws-hero-art .ws-photo-caption').length,
       dir: document.documentElement.dir || 'ltr',
     };
   });
@@ -192,6 +218,14 @@ async function measure(page) {
             false,
             `Horizontal overflow detected on theme ${theme} (${lang}) at width ${width}px (scrollWidth: ${m.scrollWidth})`
           );
+          assert.ok(m.countPill?.visible && m.countPill?.textContained,
+            `Collection count escaped its badge: ${theme} ${lang} ${width}px`);
+          assert.deepEqual(m.brokenQuickAdds, [],
+            `Quick-add button overflow/touch size: ${theme} ${lang} ${width}px`);
+          assert.equal(m.heroCaptionCount, 0, 'Hero must not show a random product label/price');
+          if (theme !== 'fresh-market') {
+            assert.ok(m.quickAddCount > 0, `Missing quick-add action for theme ${theme}`);
+          }
           widthResults.push({ width, scrollWidth: m.scrollWidth, overflow: m.overflow });
         }
 
@@ -232,6 +266,31 @@ async function measure(page) {
           href: waCheck.waData.href,
           outlined: outlinedColors,
         });
+
+        // A card has two separate actions: + adds directly; image/title opens product page.
+        // No quick-view product modal should interrupt either action.
+        if (theme !== 'fresh-market') {
+          const directQuickAdd = page.locator('.ws-card-quick-add[data-quick-add-kind="direct"]').first();
+          if (await directQuickAdd.count() > 0) {
+            await directQuickAdd.click();
+            await settle(page);
+            assert.equal(await page.locator('.ws-cart').count(), 0,
+              `Quick-add must not open a popup/drawer: ${theme} ${lang}`);
+            assert.ok((await directQuickAdd.textContent()).includes('1'),
+              `Quick-add should show quantity feedback: ${theme} ${lang}`);
+          }
+        }
+        const firstProductImage = page.locator('.ws-catalog-product .ws-product-image').first();
+        assert.ok((await firstProductImage.getAttribute('href')).includes('/p/'),
+          'Card image must be a real product detail link');
+        await firstProductImage.click();
+        await page.waitForURL(/\/p\//);
+        assert.equal(await page.locator('.ws-product-detail').count(), 1,
+          `Dedicated product detail page missing: ${theme} ${lang}`);
+        assert.equal(await page.locator('[role="dialog"]').count(), 0,
+          `Unexpected quick-view popup: ${theme} ${lang}`);
+        await page.goto(storeUrl, { waitUntil: 'networkidle' });
+        await settle(page);
 
         // 5. Complete Customer Shopping Journey Test
         console.log(`  -> Testing Customer Journey on ${theme} (${lang})...`);
