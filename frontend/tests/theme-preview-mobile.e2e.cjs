@@ -108,6 +108,15 @@ async function inspect(page, theme, width, engine) {
   assert.deepEqual(metrics.modalToolbarOverflow, [], 'Preview controls must remain within viewport');
   report.push({ engine, width, theme, status: 'PASS', columns: metrics.columns });
   if (width === 390) {
+    assert.equal(await canvas.locator('.ws-photo-caption').count(), 0,
+      'Hero should never cover the merchant photo with a random product caption');
+    const imageLink = canvas.locator('.ws-catalog-product .ws-product-image').first();
+    await imageLink.click();
+    await expect(canvas.locator('.ws-product-detail')).toBeVisible();
+    await expect(canvas.locator('.ws-preview-product-back')).toBeVisible();
+    await expect(page.getByTestId('merchant-theme-preview')).toBeVisible();
+    await canvas.locator('.ws-preview-product-back').click();
+    await expect(canvas.locator('.ws-product-grid')).toBeVisible();
     await canvas.screenshot({path: path.join(output, engine + '-' + theme + '-mobile.png')});
   }
   await dialog.getByRole('button', { name: 'إغلاق المعاينة' }).click();
