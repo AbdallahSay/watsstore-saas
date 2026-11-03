@@ -1,0 +1,4 @@
+
+## 2024-10-27 - Entity Framework Core Cartesian Explosion
+**Learning:** When using `.Include()` for multiple collection navigation properties in Entity Framework Core, it generates a single SQL query with multiple JOINs, leading to a Cartesian explosion of data returned from the database. This significantly impacts performance by downloading vastly more data than needed and forcing EF Core to do heavy memory processing to deduplicate entities.
+**Action:** Always append `.AsSplitQuery()` when fetching entities with multiple collection navigation properties (like `Store` loading `Products` and `Categories` together). This instructs EF Core to send separate queries for each collection, avoiding the Cartesian product and improving database performance, network payload size, and memory usage on the backend.
