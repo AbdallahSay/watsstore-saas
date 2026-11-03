@@ -244,7 +244,7 @@ export default function ThemesMarketplacePage() {
           }`}
         >
           <Sparkles className="w-4 h-4" />
-          <span>سوق القوالب (10)</span>
+          <span>سوق القوالب (20)</span>
         </button>
 
         <button

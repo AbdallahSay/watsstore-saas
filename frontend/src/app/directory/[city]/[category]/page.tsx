@@ -50,7 +50,7 @@ export async function generateMetadata({ params: pendingParams }: ProgrammaticDi
   const params = await pendingParams;
   const city = decodeURIComponent(params.city);
   const category = decodeURIComponent(params.category);
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://frontend-bay-ten-58.vercel.app';
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://watsstore.vercel.app';
   const canonicalUrl = `${appUrl}/directory/${encodeURIComponent(params.city)}/${encodeURIComponent(params.category)}`;
 
   const title = `أفضل متاجر ومحلات ${category} في ${city} | تسوق عبر WatsStore by Masar Tech`;
@@ -82,7 +82,7 @@ export default async function ProgrammaticDirectoryPage({ params: pendingParams 
   const params = await pendingParams;
   const city = decodeURIComponent(params.city);
   const category = decodeURIComponent(params.category);
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://frontend-bay-ten-58.vercel.app';
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://watsstore.vercel.app';
 
   let stores: StoreDirectoryCard[] = [];
   try {

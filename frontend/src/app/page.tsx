@@ -72,7 +72,7 @@ export default function HomePage() {
     },
     {
       q: dir === 'rtl' ? 'هل يمكنني تغيير قالب وتصميم المتجر لاحقاً؟' : 'Can I switch my storefront theme later?',
-      a: dir === 'rtl' ? 'نعم! يمكنك التبديل بين جميع القوالب الـ 10 بضغطة زر واحدة من لوحة التحكم في أي وقت دون أن تفقد منتجاتك أو بيانات طلباتك.' : 'Yes! You can switch between all 10 designs with a single click from your merchant dashboard without losing any products or order history.',
+      a: dir === 'rtl' ? 'نعم! يمكنك التبديل بين جميع القوالب الـ 20 بضغطة زر واحدة من لوحة التحكم في أي وقت دون أن تفقد منتجاتك أو بيانات طلباتك.' : 'Yes! You can switch between all 20 designs with a single click from your merchant dashboard without losing any products or order history.',
     },
   ];
 
@@ -168,15 +168,15 @@ export default function HomePage() {
               '@graph': [
                 {
                   '@type': 'Organization',
-                  '@id': 'https://frontend-bay-ten-58.vercel.app/#organization',
+                  '@id': 'https://watsstore.vercel.app/#organization',
                   name: 'WatsStore',
-                  url: 'https://frontend-bay-ten-58.vercel.app',
-                  logo: 'https://frontend-bay-ten-58.vercel.app/favicon.ico',
+                  url: 'https://watsstore.vercel.app',
+                  logo: 'https://watsstore.vercel.app/favicon.ico',
                   description: 'منصة التجارة الإلكترونية وكتالوجات الواتساب الرائدة في مصر',
                 },
                 {
                   '@type': 'SoftwareApplication',
-                  '@id': 'https://frontend-bay-ten-58.vercel.app/#software',
+                  '@id': 'https://watsstore.vercel.app/#software',
                   name: 'WatsStore SaaS',
                   applicationCategory: 'BusinessApplication',
                   operatingSystem: 'All',
@@ -232,7 +232,7 @@ export default function HomePage() {
                 className="w-full sm:w-auto px-7 py-4 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-800 dark:text-slate-100 font-bold text-base rounded-2xl border border-slate-300 dark:border-slate-700 shadow-sm flex items-center justify-center gap-2.5 transition-all hover:border-slate-400 min-h-[48px]"
               >
                 <Palette className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-                <span>{dir === 'rtl' ? 'استعرض تصاميم المتاجر (10)' : 'Explore 10 Store Themes'}</span>
+                <span>{dir === 'rtl' ? 'استعرض تصاميم المتاجر (20)' : 'Explore 20 Store Themes'}</span>
               </a>
             </div>
 
@@ -252,7 +252,7 @@ export default function HomePage() {
               </div>
               <div className="flex items-center gap-2">
                 <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
-                <span>{dir === 'rtl' ? '10 قوالب احترافية لكل الأنشطة' : '10 Niche E-Commerce Themes'}</span>
+                <span>{dir === 'rtl' ? '20 قالباً احترافياً لكل الأنشطة' : '20 Niche E-Commerce Themes'}</span>
               </div>
             </div>
           </div>
@@ -264,7 +264,7 @@ export default function HomePage() {
             <div className="text-center max-w-3xl mx-auto mb-10">
               <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-100/80 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 text-xs font-bold mb-3 border border-emerald-200 dark:border-emerald-800/60">
                 <Sparkles className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
-                <span>{dir === 'rtl' ? '10 تصاميم متجر حقيقية وغير مكررة' : '10 Truly Distinct Storefront Themes'}</span>
+                <span>{dir === 'rtl' ? '20 تصميماً لمتجر حقيقي وغير مكرر' : '20 Truly Distinct Storefront Themes'}</span>
               </div>
               <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white leading-tight">
                 {dir === 'rtl' ? 'تصميم مخصص يعبر عن هوية نشاطك التجاري' : 'An Art-Directed Storefront for Every Business'}
@@ -748,7 +748,7 @@ export default function HomePage() {
                     <li className="flex items-center gap-2.5">
                       <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
                       <span className="font-bold text-emerald-700 dark:text-emerald-400">
-                        {dir === 'rtl' ? 'تخصيص القوالب الـ 10 بالكامل وألوان الهوية' : 'Full access to all 10 themes & custom palettes'}
+                        {dir === 'rtl' ? 'تخصيص القوالب الـ 20 بالكامل وألوان الهوية' : 'Full access to all 20 themes & custom palettes'}
                       </span>
                     </li>
                     <li className="flex items-center gap-2.5">

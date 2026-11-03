@@ -40,7 +40,7 @@ export default function Navbar() {
             </Link>
             <Link prefetch={false} href="/#themes" className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors flex items-center gap-1.5">
               <Sparkles className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-              <span>{t('nav.themes', undefined, 'قوالب المتاجر (10)')}</span>
+              <span>{t('nav.themes', undefined, 'قوالب المتاجر (20)')}</span>
             </Link>
             <Link prefetch={false} href="/#pricing" className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
               {t('nav.pricing', undefined, 'الأسعار والباقات')}
@@ -143,7 +143,7 @@ export default function Navbar() {
                   className="flex items-center gap-2 px-4 py-3 rounded-xl text-sm font-bold text-slate-700 dark:text-slate-200 hover:bg-emerald-50 dark:hover:bg-slate-800 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors min-h-[44px]"
                 >
                   <Sparkles className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-                  <span>{t('nav.themes', undefined, 'قوالب المتاجر (10)')}</span>
+                  <span>{t('nav.themes', undefined, 'قوالب المتاجر (20)')}</span>
                 </Link>
                 <Link prefetch={false}
                   href="/#pricing"

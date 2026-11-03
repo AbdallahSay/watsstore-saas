@@ -41,7 +41,7 @@ export default function Footer() {
               <li>
                 <Link prefetch={false} href="/#themes" className="hover:text-emerald-400 transition-colors flex items-center gap-1.5">
                   <Sparkles className="w-3.5 h-3.5 text-emerald-400" />
-                  <span>{t('footer.link_themes', undefined, 'سوق القوالب (10)')}</span>
+                  <span>{t('footer.link_themes', undefined, 'سوق القوالب (20)')}</span>
                 </Link>
               </li>
               <li>

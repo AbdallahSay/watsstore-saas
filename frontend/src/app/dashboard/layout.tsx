@@ -111,7 +111,7 @@ export default function DashboardLayout({
 
   const navLinks = [
     { name: t('dash.overview', undefined, 'نظرة عامة للمتجر'), href: '/dashboard', icon: LayoutDashboard },
-    { name: dir === 'rtl' ? 'سوق القوالب والتجارة (10)' : 'Theme marketplace (10)', href: '/dashboard/themes', icon: Sparkles },
+    { name: dir === 'rtl' ? 'سوق القوالب والتجارة (20)' : 'Theme marketplace (20)', href: '/dashboard/themes', icon: Sparkles },
     { name: t('dash.orders', undefined, 'الطلبات والمبيعات'), href: '/dashboard/orders', icon: Receipt },
     { name: t('dash.products', undefined, 'المنتجات والكتالوج'), href: '/dashboard/products', icon: ShoppingBag },
     { name: dir === 'rtl' ? 'المخزون والكميات' : 'Inventory & stock', href: '/dashboard/inventory', icon: ShoppingBag },

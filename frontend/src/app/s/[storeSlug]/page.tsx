@@ -18,7 +18,7 @@ export async function generateMetadata({ params: pendingParams }: PageProps): Pr
   const params = await pendingParams;
   try {
     const store = await api.getPublicStore(params.storeSlug);
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://frontend-bay-ten-58.vercel.app';
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://watsstore.vercel.app';
     const canonicalUrl = `${appUrl}/s/${store.slug}`;
     const images = store.coverUrl ? [store.coverUrl] : store.logoUrl ? [store.logoUrl] : [];
 
@@ -61,7 +61,7 @@ export default async function StorePage({ params: pendingParams, searchParams: p
   }
 
   // Schema.org Structured Data for Google Rich Snippets (LocalBusiness + Products)
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://frontend-bay-ten-58.vercel.app';
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://watsstore.vercel.app';
   const structuredData = {
     '@context': 'https://schema.org',
     '@type': 'Store',

@@ -317,8 +317,8 @@
   "admin.gateways": "Payment Gateways & Accounts",
   "admin.settings": "Account Settings",
   "admin.live_api": "MonsterASP API Live",
-  "nav.themes": "Store Themes (10)",
+  "nav.themes": "Store Themes (20)",
   "nav.testimonials": "Reviews & Stories",
-  "footer.link_themes": "Themes Marketplace (10)",
+  "footer.link_themes": "Themes Marketplace (20)",
   "footer.link_testimonials": "Success Stories"
 }
