@@ -43,6 +43,16 @@ Local production build: FAILED on Google Cairo font download timeouts; do not ma
 Existing lint command `next lint` fails on Next 16; lint tooling repair and full execution are pending.
 CI and production verification of this repair are pending.
 
+Follow-up evidence: TypeScript PASS. CI run 41638259364 completed frontend build/audit/tests
+and backend build/audit/tests successfully; browser job was still running at inspection.
+Chrome production HTTP-read-only smoke PASS in Arabic/English, with zero order POST requests;
+this checks the existing production release and does not prove this repair is deployed.
+Public-store GETs can increment the existing visit counter.
+Actual ESLint audit using Next's recommended configuration found 38 errors and 29 warnings
+in 88 source files, including existing effect-state updates and render-time ref access.
+These are unresolved release gates, not waived checks. The legacy next lint command is being replaced.
+Review PR: https://github.com/AbdallahSay/watsstore-saas/pull/55 .
+
 ## Release holds and rollback
 
 SQL backup creation is not a verified isolated restore; prior VERIFYONLY failed SQL 262.
