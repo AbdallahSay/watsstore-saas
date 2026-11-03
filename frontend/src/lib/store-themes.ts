@@ -904,8 +904,8 @@ export function parseThemeCustomization(json: string | null | undefined): ThemeC
     const parsed = typeof json === 'string' ? JSON.parse(json) : json;
     if (parsed && typeof parsed === 'object') {
       return {
-        primaryColor: typeof parsed.primaryColor === 'string' && /^#[0-9a-fA-F]{3,8}$/.test(parsed.primaryColor) ? parsed.primaryColor : undefined,
-        secondaryColor: typeof parsed.secondaryColor === 'string' && /^#[0-9a-fA-F]{3,8}$/.test(parsed.secondaryColor) ? parsed.secondaryColor : undefined,
+        primaryColor: typeof parsed.primaryColor === 'string' && /^#([0-9a-fA-F]{3}|[0-9a-fA-F]{4}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$/.test(parsed.primaryColor) ? parsed.primaryColor : undefined,
+        secondaryColor: typeof parsed.secondaryColor === 'string' && /^#([0-9a-fA-F]{3}|[0-9a-fA-F]{4}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$/.test(parsed.secondaryColor) ? parsed.secondaryColor : undefined,
         fontPreset: ['cairo', 'amiri', 'tajawal', 'sans', 'serif'].includes(parsed.fontPreset) ? parsed.fontPreset : undefined,
         buttonShape: ['rounded', 'pill', 'sharp'].includes(parsed.buttonShape) ? parsed.buttonShape : undefined,
         gridDensity: ['compact', 'standard', 'spacious'].includes(parsed.gridDensity) ? parsed.gridDensity : undefined,

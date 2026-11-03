@@ -8,7 +8,7 @@ export interface ShippingZone {
 export interface CommerceSettings {
   publishedTheme: StoreThemeId; draftTheme: StoreThemeId; previousTheme: StoreThemeId;
   checkoutMode: 'online' | 'whatsapp' | 'both'; cashOnDelivery: boolean;
-  instaPay: boolean; mobileWallet: boolean; shippingZones: ShippingZone[]; slug: string; customizationJson?: string;
+  instaPay: boolean; mobileWallet: boolean; shippingZones: ShippingZone[]; slug: string; customizationJson?: string; publishedAt?: string;
 }
 export interface OrderSnapshot {
   productId: string; productName: string; quantity: number; unitPrice: number;
