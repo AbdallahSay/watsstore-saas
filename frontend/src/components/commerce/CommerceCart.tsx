@@ -4,7 +4,7 @@ import OrderConfirmation from './OrderConfirmation';
 import { CartItem, Store, CreateOrderResponse } from '@/types';
 import { createOrder, paymentOptions, CommerceApiError } from '@/lib/commerce-api';
 import { CheckoutAttempt, checkoutKey, prepareCheckoutAttempt, readCheckoutAttempt } from '@/lib/checkout-attempt';
-import { useBrowserStorage } from '@/hooks/useBrowserStorage';
+import { useBrowserReady } from '@/hooks/useBrowserStorage';
 import { api } from '@/lib/api';
 import { useDialog } from './useDialog';
 import { rememberDeviceOrder } from '@/lib/customer-orders';
@@ -36,11 +36,12 @@ export default function CommerceCart({directCheckout = false, store, items, open
   const [channel, setChannel] = useState<'online' | 'whatsapp'>(store.checkoutMode === 'whatsapp' || !store.checkoutMode ? 'whatsapp' : 'online');
   const attempt = useRef<CheckoutAttempt | null>(null);
   const storageKey = `watsstore_attempt_${store.slug}`;
-  const savedSnapshot = useBrowserStorage(storageKey, true);
-  const [restoredSnapshot, setRestoredSnapshot] = useState<string | null | undefined>();
-  const restoredAttempt = readCheckoutAttempt(savedSnapshot);
-  if (restoredSnapshot !== savedSnapshot) {
-    setRestoredSnapshot(savedSnapshot);
+  const browserReady = useBrowserReady();
+  const [restoredKey, setRestoredKey] = useState<string | null>(null);
+  if (browserReady && restoredKey !== storageKey) {
+    setRestoredKey(storageKey);
+    let restoredAttempt: CheckoutAttempt | null = null;
+    try { restoredAttempt = readCheckoutAttempt(sessionStorage.getItem(storageKey)); } catch { /* Optional browser persistence. */ }
     if (restoredAttempt) {
       const p = restoredAttempt.payload;
       setDetails({name:p.customerName, phone:p.customerPhone, address:p.customerAddress, notes:p.customerNotes || '', reference:p.transferReference || ''});
@@ -48,7 +49,9 @@ export default function CommerceCart({directCheckout = false, store, items, open
       if (restoredAttempt.pending) { setUncertain(true); setStep('checkout'); setError('هناك محاولة طلب لم يتم تأكيد نتيجتها. أعد التحقق من نفس الطلب؛ لا تُنشئ طلباً جديداً.'); }
     }
   }
-  useEffect(() => { if (restoredAttempt) attempt.current = restoredAttempt; }, [savedSnapshot]);
+  useEffect(() => {
+    try { attempt.current = readCheckoutAttempt(sessionStorage.getItem(storageKey)); } catch { attempt.current = null; }
+  }, [storageKey]);
   const openMode = `${open}:${directCheckout}`;
   const [previousOpen, setPreviousOpen] = useState(openMode);
   if (openMode !== previousOpen) { setPreviousOpen(openMode); if (open && !uncertain) setStep(directCheckout ? 'checkout' : 'cart'); }

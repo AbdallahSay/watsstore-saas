@@ -50,7 +50,28 @@ this checks the existing production release and does not prove this repair is de
 Public-store GETs can increment the existing visit counter.
 Actual ESLint audit using Next's recommended configuration found 38 errors and 29 warnings
 in 88 source files, including existing effect-state updates and render-time ref access.
-These are unresolved release gates, not waived checks. The legacy next lint command is being replaced.
+Historical finding above: the 38 ESLint errors have now been repaired with all
+recommended rules still enabled and no added suppressions. Browser storage uses
+React external-store hydration, derived selections no longer cascade through
+effects, and async loader completion handlers own response updates. Ref callbacks
+are committed through effects. `next lint` is replaced by the supported ESLint CLI.
+
+Run 41638676102 failed at ESLint; backend checks passed. Later runs proved lint
+green but exposed GHSA-g3hv-75wg-m249 in the newly added lint dependency tree.
+The compatibility adapter delegates old and new matcher interfaces to patched
+upstream minimatch 11.0.4. Its reviewed source and tarball are checked in; the
+dependency URL is pinned to immutable commit 9c9545d with lockfile integrity.
+The upstream package remains a registry alias and is audited, rather than ignored.
+Advisory: https://github.com/advisories/GHSA-g3hv-75wg-m249 .
+
+Browser follow-up caught and repaired two hydration regressions: cart quantity
+could be overwritten by a stale saved cart, and persisting an in-flight attempt
+could prematurely display the uncertain-outcome state. Restoration is now scoped
+to initialization/store identity; live edits and request outcomes remain authoritative.
+The customer-history test explicitly waits for hydrated order rows after reload
+before asserting the same persistent-unread behavior.
+Final CI and deployment acceptance are still pending; do not infer release from
+these local repairs. Backend and SQL migration diffs against master are empty.
 Review PR: https://github.com/AbdallahSay/watsstore-saas/pull/55 .
 
 ## Release holds and rollback
