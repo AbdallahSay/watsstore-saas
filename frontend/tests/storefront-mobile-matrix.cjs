@@ -285,6 +285,9 @@ async function measure(page) {
           'Card image must be a real product detail link');
         await firstProductImage.click();
         await page.waitForURL(/\/p\//);
+        // Next.js can update the URL before the streamed product page has committed.
+        // Verify the actual rendered details instead of racing route navigation.
+        await page.locator('.ws-product-detail').waitFor({ state: 'visible', timeout: 15000 });
         assert.equal(await page.locator('.ws-product-detail').count(), 1,
           `Dedicated product detail page missing: ${theme} ${lang}`);
         assert.equal(await page.locator('[role="dialog"]').count(), 0,
