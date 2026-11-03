@@ -39,6 +39,9 @@ namespace WatsStore.Api.Controllers
 
             var normalizedSlug = slug.Trim().ToLowerInvariant();
 
+            // ⚡ Bolt Optimization: Using AsSplitQuery to prevent Cartesian explosion
+            // when loading multiple collections (Categories and Products) simultaneously.
+            // Expected Impact: Reduces database CPU usage and network transfer size.
             var store = await _db.Stores
                 .AsNoTracking()
                 .AsSplitQuery()
