@@ -130,7 +130,7 @@ export default function CommerceStorefront({
   const money = (n: number) =>
     `${n.toLocaleString(english ? 'en-EG' : 'ar-EG', { maximumFractionDigits: 2 })} ${store.currency}`;
 
-  function add(p: Product, quantity: number, selections: Record<string, string>, buyNow = false) {
+  function add(p: Product, quantity: number, selections: Record<string, string>, buyNow = false, openCart = true) {
     if (!p.isAvailable || store.isTrialExpired) return;
     const key = (v: Record<string, string>) => JSON.stringify(Object.entries(v).sort(([a], [b]) => a.localeCompare(b)));
     setItems((old) => {
@@ -148,8 +148,10 @@ export default function CommerceStorefront({
         currency: 'EGP',
       });
     }
-    setDirectCheckout(buyNow);
-    setCartOpen(true);
+    if (openCart) {
+      setDirectCheckout(buyNow);
+      setCartOpen(true);
+    }
   }
 
   function quickAddNoVariants(p: Product, delta: number) {
@@ -174,7 +176,8 @@ export default function CommerceStorefront({
         )
       );
     } else {
-      add(p, 1, {});
+      // Quick Add updates the bag without hijacking product browsing with a drawer.
+      add(p, 1, {}, false, false);
     }
   }
 
@@ -373,12 +376,6 @@ export default function CommerceStorefront({
                     <span>{store.storeName}</span>
                   </div>
                 )}
-                {heroProduct && (
-                  <a href="#catalog" className="ws-photo-caption">
-                    <span>{heroProduct.name}</span>
-                    <span>{money(heroProduct.price)}</span>
-                  </a>
-                )}
               </div>
             </section>
 
@@ -401,9 +398,11 @@ export default function CommerceStorefront({
                 <div>
                   <p className="ws-eyebrow">{tr('من تشكيلتنا الحصرية', 'FROM OUR CATALOG')}</p>
                   <h2 id="collection-title">
-                    {category === 'all'
-                      ? tr('جميع المنتجات', 'All Products')
-                      : store.categories.find((c) => c.id === category)?.name}
+                    <span className="ws-collection-title-text">
+                      {category === 'all'
+                        ? tr('جميع المنتجات', 'All Products')
+                        : store.categories.find((c) => c.id === category)?.name}
+                    </span>
                     <span className="ws-product-count" aria-label={tr(`عدد المنتجات: ${products.length}`, `Products: ${products.length}`)}>{products.length}</span>
                   </h2>
                 </div>
@@ -486,6 +485,7 @@ export default function CommerceStorefront({
                         (x) => x.product.id === p.id && Object.keys(x.selectedVariants).length === 0
                       );
                       const inCartQty = cardItem?.quantity || 0;
+                      const hasVariants = !!(p.variantsJson && p.variantsJson !== '[]' && p.variantsJson !== '{}');
 
                       return (
                         <article className="ws-catalog-product" key={p.id}>
@@ -581,6 +581,26 @@ export default function CommerceStorefront({
                             )}
 
                             {/* Fresh Market In-Card Quantity Stepper */}
+                            {theme.id !== 'fresh-market' && p.isAvailable && !store.isTrialExpired && (
+                              <button
+                                type="button"
+                                className="ws-card-quick-add"
+                                onClick={() => quickAddNoVariants(p, 1)}
+                                aria-label={hasVariants
+                                  ? tr(`اختيار تفاصيل ${p.name}`, `Choose options for ${p.name}`)
+                                  : tr(`إضافة ${p.name} إلى الحقيبة`, `Add ${p.name} to bag`)}
+                              >
+                                <Plus aria-hidden="true" size={17} />
+                                <span aria-live="polite">
+                                  {hasVariants
+                                    ? tr('اختيار التفاصيل', 'Choose options')
+                                    : inCartQty > 0
+                                      ? tr(`في الحقيبة (${inCartQty})`, `In bag (${inCartQty})`)
+                                      : tr('إضافة إلى الحقيبة', 'Add to bag')}
+                                </span>
+                              </button>
+                            )}
+
                             {theme.id === 'fresh-market' && p.isAvailable && !store.isTrialExpired && (
                               <div className="ws-card-stepper">
                                 <button
