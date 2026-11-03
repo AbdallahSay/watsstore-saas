@@ -200,7 +200,7 @@ export default function HomePage() {
 
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
             <div className="inline-flex items-center gap-2 bg-emerald-100/80 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 text-xs sm:text-sm font-bold px-4 py-2 rounded-full mb-8 border border-emerald-200/80 dark:border-emerald-800/80 shadow-sm">
-              <Sparkles className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+              <Sparkles className="w-4 h-4 text-emerald-700 dark:text-emerald-400" />
               <span>{t('hero.badge', undefined, 'المنصة الأولى المخصصة للتجار وأصحاب المشاريع في مصر 🇪🇬')}</span>
             </div>
 
@@ -231,7 +231,7 @@ export default function HomePage() {
                 href="#themes"
                 className="w-full sm:w-auto px-7 py-4 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-800 dark:text-slate-100 font-bold text-base rounded-2xl border border-slate-300 dark:border-slate-700 shadow-sm flex items-center justify-center gap-2.5 transition-all hover:border-slate-400 min-h-[48px]"
               >
-                <Palette className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                <Palette className="w-4 h-4 text-emerald-700 dark:text-emerald-400" />
                 <span>{dir === 'rtl' ? 'استعرض تصاميم المتاجر (10)' : 'Explore 10 Store Themes'}</span>
               </a>
             </div>
@@ -239,19 +239,19 @@ export default function HomePage() {
             {/* Trust Badges */}
             <div className="mt-12 flex flex-wrap items-center justify-center gap-4 sm:gap-8 text-xs sm:text-sm font-semibold text-slate-600 dark:text-slate-400">
               <div className="flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
+                <CheckCircle2 className="w-4 h-4 text-emerald-700 dark:text-emerald-400 shrink-0" />
                 <span>{t('hero.trust_no_card', undefined, 'بدون بطاقة بنكية للتسجيل')}</span>
               </div>
               <div className="flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
+                <CheckCircle2 className="w-4 h-4 text-emerald-700 dark:text-emerald-400 shrink-0" />
                 <span>{t('home.trust_mobile', undefined, 'متوافق 100% مع الجوال والموبايل')}</span>
               </div>
               <div className="flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
+                <CheckCircle2 className="w-4 h-4 text-emerald-700 dark:text-emerald-400 shrink-0" />
                 <span>{t('home.trust_pixel', undefined, 'ربط مباشر لبيكسل ميتا (Meta Ads)')}</span>
               </div>
               <div className="flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
+                <CheckCircle2 className="w-4 h-4 text-emerald-700 dark:text-emerald-400 shrink-0" />
                 <span>{dir === 'rtl' ? '10 قوالب احترافية لكل الأنشطة' : '10 Niche E-Commerce Themes'}</span>
               </div>
             </div>
@@ -263,7 +263,7 @@ export default function HomePage() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center max-w-3xl mx-auto mb-10">
               <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-100/80 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 text-xs font-bold mb-3 border border-emerald-200 dark:border-emerald-800/60">
-                <Sparkles className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+                <Sparkles className="w-3.5 h-3.5 text-emerald-700 dark:text-emerald-400" />
                 <span>{dir === 'rtl' ? '10 تصاميم متجر حقيقية وغير مكررة' : '10 Truly Distinct Storefront Themes'}</span>
               </div>
               <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white leading-tight">
@@ -318,7 +318,7 @@ export default function HomePage() {
                       </div>
 
                       {/* Theme Name */}
-                      <h3 className="text-xl font-black text-slate-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
+                      <h3 className="text-xl font-black text-slate-900 dark:text-white group-hover:text-emerald-700 dark:group-hover:text-emerald-400 transition-colors">
                         {dir === 'rtl' ? theme.nameAr : theme.name}
                       </h3>
                       <p className="text-xs text-slate-600 dark:text-slate-400 font-semibold mb-3">
@@ -383,7 +383,7 @@ export default function HomePage() {
                         target="_blank"
                         className="flex-1 py-2.5 px-3 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-bold text-xs flex items-center justify-center gap-1.5 transition-colors min-h-[44px]"
                       >
-                        <Eye className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+                        <Eye className="w-3.5 h-3.5 text-emerald-700 dark:text-emerald-400" />
                         <span>{dir === 'rtl' ? 'معاينة القالب الحي' : 'Live Preview'}</span>
                         <ExternalLink className="w-3 h-3 opacity-60" />
                       </Link>
@@ -407,7 +407,7 @@ export default function HomePage() {
         <section id="features" className="py-20 bg-white dark:bg-slate-900 border-b border-slate-200/80 dark:border-slate-800 transition-colors">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center max-w-3xl mx-auto mb-16">
-              <h2 className="text-xs sm:text-sm font-bold text-emerald-600 dark:text-emerald-400 tracking-wider uppercase mb-2">
+              <h2 className="text-xs sm:text-sm font-bold text-emerald-700 dark:text-emerald-400 tracking-wider uppercase mb-2">
                 {t('home.why_watsstore', undefined, 'لماذا يفضل تجار مصر WatsStore؟')}
               </h2>
               <p className="text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white leading-tight">
@@ -535,12 +535,12 @@ export default function HomePage() {
 
                   <div className="pt-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
                     <div>
-                      <h4 className="font-bold text-sm text-slate-900 dark:text-white">{tItem.name}</h4>
+                      <h3 className="font-bold text-sm text-slate-900 dark:text-white">{tItem.name}</h3>
                       <p className="text-xs text-slate-500 dark:text-slate-400">{tItem.role}</p>
                     </div>
                     <div className="text-end">
-                      <span className="text-base font-black text-emerald-600 dark:text-emerald-400 block">{tItem.growth}</span>
-                      <span className="text-[10px] text-slate-400 font-semibold">{tItem.growthLabel}</span>
+                      <span className="text-base font-black text-emerald-700 dark:text-emerald-400 block">{tItem.growth}</span>
+                      <span className="text-[10px] text-slate-600 dark:text-slate-400 font-semibold">{tItem.growthLabel}</span>
                     </div>
                   </div>
                 </div>
@@ -550,25 +550,25 @@ export default function HomePage() {
             {/* Impact Metric Strip */}
             <div className="mt-12 bg-white dark:bg-slate-900 rounded-3xl p-6 sm:p-8 border border-slate-200/80 dark:border-slate-800 shadow-sm grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
               <div>
-                <span className="text-2xl sm:text-3xl font-black text-emerald-600 dark:text-emerald-400 block">500,000+ ج.م</span>
+                <span className="text-2xl sm:text-3xl font-black text-emerald-700 dark:text-emerald-400 block">500,000+ ج.م</span>
                 <span className="text-xs font-bold text-slate-500 dark:text-slate-400 mt-1 block">
                   {dir === 'rtl' ? 'قيمة طلبات شهرية عبر المنصة' : 'Monthly processed orders'}
                 </span>
               </div>
               <div>
-                <span className="text-2xl sm:text-3xl font-black text-emerald-600 dark:text-emerald-400 block">10</span>
+                <span className="text-2xl sm:text-3xl font-black text-emerald-700 dark:text-emerald-400 block">10</span>
                 <span className="text-xs font-bold text-slate-500 dark:text-slate-400 mt-1 block">
                   {dir === 'rtl' ? 'قوالب تجارية متخصصة' : 'Category-crafted themes'}
                 </span>
               </div>
               <div>
-                <span className="text-2xl sm:text-3xl font-black text-emerald-600 dark:text-emerald-400 block">14 يوماً</span>
+                <span className="text-2xl sm:text-3xl font-black text-emerald-700 dark:text-emerald-400 block">14 يوماً</span>
                 <span className="text-xs font-bold text-slate-500 dark:text-slate-400 mt-1 block">
                   {dir === 'rtl' ? 'تجربة مجانية كاملة بدون كارت' : 'Free trial without card'}
                 </span>
               </div>
               <div>
-                <span className="text-2xl sm:text-3xl font-black text-emerald-600 dark:text-emerald-400 block">100%</span>
+                <span className="text-2xl sm:text-3xl font-black text-emerald-700 dark:text-emerald-400 block">100%</span>
                 <span className="text-xs font-bold text-slate-500 dark:text-slate-400 mt-1 block">
                   {dir === 'rtl' ? 'جاهزية وسرعة على الموبايل' : 'Mobile-first responsiveness'}
                 </span>
@@ -581,7 +581,7 @@ export default function HomePage() {
         <section id="pricing" className="py-24 bg-white dark:bg-slate-900/60 border-t border-slate-200/80 dark:border-slate-800 relative transition-colors">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center max-w-3xl mx-auto mb-12">
-              <h2 className="text-xs sm:text-sm font-bold text-emerald-600 dark:text-emerald-400 tracking-wider uppercase mb-2">
+              <h2 className="text-xs sm:text-sm font-bold text-emerald-700 dark:text-emerald-400 tracking-wider uppercase mb-2">
                 {t('home.pricing_tag', undefined, 'باقات تناسب جميع أحجام الأنشطة')}
               </h2>
               <p className="text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white leading-tight">
@@ -641,22 +641,22 @@ export default function HomePage() {
                         {t('home.plan_free_period', undefined, 'ج.م / لمدة 14 يوماً')}
                       </span>
                     </div>
-                    <p className="text-[11px] text-slate-400 mt-1">
+                    <p className="text-[11px] text-slate-600 dark:text-slate-400 mt-1">
                       {t('home.plan_free_no_card', undefined, 'بدون بطاقة ائتمان أو عمولات مخفية')}
                     </p>
                   </div>
 
                   <ul className="space-y-3.5 text-sm text-slate-600 dark:text-slate-300 border-t border-slate-200/60 dark:border-slate-800 pt-6">
                     <li className="flex items-center gap-2.5">
-                      <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                      <CheckCircle2 className="w-4 h-4 text-emerald-700 shrink-0" />
                       <span>{t('home.plan_free_feat1', undefined, 'حتى 10 منتجات خلال فترة التجربة')}</span>
                     </li>
                     <li className="flex items-center gap-2.5">
-                      <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                      <CheckCircle2 className="w-4 h-4 text-emerald-700 shrink-0" />
                       <span>{dir === 'rtl' ? 'إمكانية تجربة جميع القوالب الـ 10' : 'Access to all 10 theme designs'}</span>
                     </li>
                     <li className="flex items-center gap-2.5">
-                      <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                      <CheckCircle2 className="w-4 h-4 text-emerald-700 shrink-0" />
                       <span>{t('home.plan_free_feat2', undefined, 'كوبون خصم واحد نشط لمتجرك')}</span>
                     </li>
                     <li className="flex items-center gap-2.5 text-slate-500 dark:text-slate-400">
@@ -672,11 +672,11 @@ export default function HomePage() {
                       </span>
                     </li>
                     <li className="flex items-center gap-2.5">
-                      <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                      <CheckCircle2 className="w-4 h-4 text-emerald-700 shrink-0" />
                       <span>{t('home.plan_free_feat3', undefined, 'طلبات واستفسارات غير محدودة عبر الواتساب')}</span>
                     </li>
                     <li className="flex items-center gap-2.5">
-                      <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                      <CheckCircle2 className="w-4 h-4 text-emerald-700 shrink-0" />
                       <span>{t('home.plan_free_feat4', undefined, 'دعم متغيرات المنتجات والمحافظ الإلكترونية')}</span>
                     </li>
                   </ul>
@@ -710,7 +710,7 @@ export default function HomePage() {
                   {billingCycle === 'annual' ? (
                     <div className="mt-6 mb-8">
                       <div className="flex items-baseline gap-1.5">
-                        <span className="text-4xl font-black text-emerald-600">{pricing.proAnnualPrice.toLocaleString()}</span>
+                        <span className="text-4xl font-black text-emerald-700">{pricing.proAnnualPrice.toLocaleString()}</span>
                         <span className="text-sm font-bold text-slate-600 dark:text-slate-400">
                           {t('home.per_year', undefined, 'ج.م / سنوياً')}
                         </span>
@@ -727,12 +727,12 @@ export default function HomePage() {
                   ) : (
                     <div className="mt-6 mb-8">
                       <div className="flex items-baseline gap-1.5">
-                        <span className="text-4xl font-black text-emerald-600">{pricing.proMonthlyPrice}</span>
+                        <span className="text-4xl font-black text-emerald-700">{pricing.proMonthlyPrice}</span>
                         <span className="text-sm font-bold text-slate-600 dark:text-slate-400">
                           {t('home.per_month', undefined, 'ج.م / شهرياً')}
                         </span>
                       </div>
-                      <p className="text-[11px] text-slate-400 mt-1">
+                      <p className="text-[11px] text-slate-600 dark:text-slate-400 mt-1">
                         {t('home.flexible_monthly', undefined, 'تجديد شهري مرن، يمكنك الإلغاء بأي وقت')}
                       </p>
                     </div>
@@ -740,41 +740,41 @@ export default function HomePage() {
 
                   <ul className="space-y-3.5 text-sm text-slate-700 dark:text-slate-300 border-t border-slate-100 dark:border-slate-800 pt-6">
                     <li className="flex items-center gap-2.5">
-                      <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                      <CheckCircle2 className="w-4 h-4 text-emerald-700 shrink-0" />
                       <span className="font-bold text-emerald-800 dark:text-emerald-300">
                         {t('home.plan_pro_feat1', undefined, 'حتى 100 منتج و 15 كوبون خصم نشط')}
                       </span>
                     </li>
                     <li className="flex items-center gap-2.5">
-                      <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                      <CheckCircle2 className="w-4 h-4 text-emerald-700 shrink-0" />
                       <span className="font-bold text-emerald-700 dark:text-emerald-400">
                         {dir === 'rtl' ? 'تخصيص القوالب الـ 10 بالكامل وألوان الهوية' : 'Full access to all 10 themes & custom palettes'}
                       </span>
                     </li>
                     <li className="flex items-center gap-2.5">
-                      <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                      <CheckCircle2 className="w-4 h-4 text-emerald-700 shrink-0" />
                       <span className="font-bold text-emerald-700 dark:text-emerald-400">
                         {t('home.plan_pro_feat2', undefined, '✨ 15 وصف بالذكاء الاصطناعي شهرياً 🤖')}
                       </span>
                     </li>
                     <li className="flex items-center gap-2.5">
-                      <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                      <CheckCircle2 className="w-4 h-4 text-emerald-700 shrink-0" />
                       <span className="font-bold text-emerald-700 dark:text-emerald-400">
                         {t('home.plan_pro_feat3', undefined, '📊 تصدير الطلبات وتقارير المبيعات لـ Excel')}
                       </span>
                     </li>
                     <li className="flex items-center gap-2.5">
-                      <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                      <CheckCircle2 className="w-4 h-4 text-emerald-700 shrink-0" />
                       <span className="font-bold text-emerald-700 dark:text-emerald-400">
                         {t('home.plan_pro_feat4', undefined, 'تفعيل Meta Pixel لتتبع إعلانات فيسبوك وإنستغرام')}
                       </span>
                     </li>
                     <li className="flex items-center gap-2.5">
-                      <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                      <CheckCircle2 className="w-4 h-4 text-emerald-700 shrink-0" />
                       <span>{t('home.plan_pro_feat5', undefined, 'إزالة شارة المنصة بالكامل لعلامة تجارية خاصة')}</span>
                     </li>
                     <li className="flex items-center gap-2.5">
-                      <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                      <CheckCircle2 className="w-4 h-4 text-emerald-700 shrink-0" />
                       <span>{t('home.plan_pro_feat7', undefined, 'دعم فني وتدريب سريع ومباشر على الواتساب')}</span>
                     </li>
                   </ul>
@@ -823,7 +823,7 @@ export default function HomePage() {
                           {t('home.per_month', undefined, 'ج.م / شهرياً')}
                         </span>
                       </div>
-                      <p className="text-[11px] text-slate-400 mt-1">
+                      <p className="text-[11px] text-slate-600 dark:text-slate-400 mt-1">
                         {t('home.vip_flexible', undefined, 'شامل كافة مميزات المنصة والدعم المخصص')}
                       </p>
                     </div>
@@ -831,35 +831,35 @@ export default function HomePage() {
 
                   <ul className="space-y-3.5 text-sm text-slate-600 dark:text-slate-300 border-t border-slate-200/60 dark:border-slate-800 pt-6">
                     <li className="flex items-center gap-2.5">
-                      <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                      <CheckCircle2 className="w-4 h-4 text-emerald-700 shrink-0" />
                       <span className="font-bold text-slate-900 dark:text-white">
                         {t('home.plan_vip_feat1', undefined, 'منتجات غير محدودة وكوبونات غير محدودة 🚀')}
                       </span>
                     </li>
                     <li className="flex items-center gap-2.5">
-                      <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                      <CheckCircle2 className="w-4 h-4 text-emerald-700 shrink-0" />
                       <span className="font-bold text-emerald-700 dark:text-emerald-400">
                         {t('home.plan_vip_feat2', undefined, '💎 150 وصفاً ذكياً بالذكاء الاصطناعي شهرياً')}
                       </span>
                     </li>
                     <li className="flex items-center gap-2.5">
-                      <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                      <CheckCircle2 className="w-4 h-4 text-emerald-700 shrink-0" />
                       <span className="font-bold text-emerald-700 dark:text-emerald-400">
                         {t('home.plan_vip_feat3', undefined, '📊 تصدير الطلبات وتقارير المبيعات لـ Excel')}
                       </span>
                     </li>
                     <li className="flex items-center gap-2.5">
-                      <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                      <CheckCircle2 className="w-4 h-4 text-emerald-700 shrink-0" />
                       <span className="font-bold text-slate-900 dark:text-white">
                         {t('home.plan_vip_feat4', undefined, 'دعم النطاق الخاص الكامل (Custom Domain)')}
                       </span>
                     </li>
                     <li className="flex items-center gap-2.5">
-                      <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                      <CheckCircle2 className="w-4 h-4 text-emerald-700 shrink-0" />
                       <span>{t('home.plan_vip_feat5', undefined, 'جميع مميزات باقة Pro بالكامل')}</span>
                     </li>
                     <li className="flex items-center gap-2.5">
-                      <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                      <CheckCircle2 className="w-4 h-4 text-emerald-700 shrink-0" />
                       <span>{t('home.plan_vip_feat6', undefined, 'مدير حساب مخصص وأولوية قصوى في الدعم الفني')}</span>
                     </li>
                   </ul>
@@ -903,13 +903,13 @@ export default function HomePage() {
                     <button
                       type="button"
                       onClick={() => setOpenFaqIndex(isOpen ? null : index)}
-                      className="w-full p-5 text-start flex items-center justify-between gap-4 font-bold text-slate-900 dark:text-white hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors text-sm sm:text-base min-h-[52px]"
+                      className="w-full p-5 text-start flex items-center justify-between gap-4 font-bold text-slate-900 dark:text-white hover:text-emerald-700 dark:hover:text-emerald-400 transition-colors text-sm sm:text-base min-h-[52px]"
                       aria-expanded={isOpen}
                     >
                       <span>{item.q}</span>
                       <ChevronDown
                         className={`w-5 h-5 text-slate-400 shrink-0 transition-transform duration-200 ${
-                          isOpen ? 'rotate-180 text-emerald-600 dark:text-emerald-400' : ''
+                          isOpen ? 'rotate-180 text-emerald-700 dark:text-emerald-400' : ''
                         }`}
                       />
                     </button>
@@ -957,7 +957,7 @@ export default function HomePage() {
                 href="tel:01011653619"
                 className="w-full sm:w-auto px-6 py-3.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-bold text-sm rounded-2xl border border-slate-200 dark:border-slate-700 flex items-center justify-center gap-2 transition-colors min-h-[44px]"
               >
-                <Phone className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                <Phone className="w-4 h-4 text-emerald-700 dark:text-emerald-400" />
                 <span>{dir === 'rtl' ? 'اتصال مباشر: 01011653619' : 'Call: 01011653619'}</span>
               </a>
             </div>

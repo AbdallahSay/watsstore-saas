@@ -26,6 +26,11 @@ import {
 } from '../types';
 
 import { API_BASE_URL } from './api-base';
+import { reportClientIssue } from './client-issues';
+
+export class ApiRequestError extends Error {
+  constructor(message:string, public readonly status?:number, public readonly uncertain=false){super(message);this.name='ApiRequestError';}
+}
 
 async function handleResponseError(res: Response): Promise<never> {
   // 401 Unauthorized handling: Auto-logout & redirect with strict session isolation
@@ -88,7 +93,7 @@ async function handleResponseError(res: Response): Promise<never> {
   } catch {
     errorMsg = res.statusText || errorMsg;
   }
-  throw new Error(errorMsg);
+  throw new ApiRequestError(errorMsg, res.status, res.status >= 500 || res.status === 408);
 }
 
 async function fetchJson<T>(url: string, options?: RequestInit): Promise<T> {
@@ -105,17 +110,20 @@ async function fetchJson<T>(url: string, options?: RequestInit): Promise<T> {
       cache: options?.cache,
     });
   } catch {
+    reportClientIssue('api');
     if (typeof window !== 'undefined' && !navigator.onLine) {
-      throw new Error('انقطع الاتصال بالإنترنت. يرجى التحقق من اتصالك والمحاولة مجدداً.');
+      throw new ApiRequestError('انقطع الاتصال بالإنترنت. يرجى التحقق من اتصالك.', undefined, options?.method !== undefined && options.method !== 'GET');
     }
-    throw new Error('تعذر الاتصال بالخادم. يرجى التحقق من اتصال الإنترنت والمحاولة لاحقاً.');
+    throw new ApiRequestError('تعذر الاتصال بالخادم. يرجى التحقق من اتصال الإنترنت.', undefined, options?.method !== undefined && options.method !== 'GET');
   }
 
   if (!res.ok) {
+    reportClientIssue('api',res.status);
     await handleResponseError(res);
   }
 
-  return res.json() as Promise<T>;
+  try { return await res.json() as T; }
+  catch { throw new ApiRequestError('وصل رد غير مكتمل من الخادم. تحقّق من نتيجة العملية قبل إعادة إرسالها.', res.status, options?.method !== undefined && options.method !== 'GET'); }
 }
 
 function safeSlug(slug: string): string {
@@ -167,10 +175,19 @@ export const api = {
 
   // Auth
   async register(data: any): Promise<AuthResponse> {
-    return fetchJson<AuthResponse>(`${API_BASE_URL}/auth/register`, {
+    const controller = new AbortController();
+    const timeout = setTimeout(()=>controller.abort(),30000);
+    try { const result = await fetchJson<AuthResponse>(`${API_BASE_URL}/auth/register`, {
       method: 'POST',
       body: JSON.stringify(data),
+      signal: controller.signal,
     });
+      if (!result || ['token', 'storeId', 'storeName', 'slug'].some(key => {
+        const value = result[key as keyof AuthResponse];
+        return typeof value !== 'string' || !value.trim();
+      })) throw new ApiRequestError('وصل رد تسجيل غير مكتمل. تحقّق من حسابك بتسجيل الدخول قبل المحاولة مجددًا.', 200, true);
+      return result;
+    } finally { clearTimeout(timeout); }
   },
 
   async login(data: any): Promise<AuthResponse> {

@@ -1,0 +1,14 @@
+[
+  {
+    "case": "Chrome mobile: committed response lost, reload, same-key replay, one order, one stock deduction, merchant visibility and tracking",
+    "status": "PASS"
+  },
+  {
+    "case": "Chrome 1440px: checkout + duplicate-click protection",
+    "status": "PASS"
+  },
+  {
+    "case": "Chrome 375px: checkout + duplicate-click protection",
+    "status": "PASS"
+  }
+]

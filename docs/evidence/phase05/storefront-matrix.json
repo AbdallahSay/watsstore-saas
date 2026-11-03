@@ -1,0 +1,406 @@
+{
+  "results": [
+    {
+      "theme": "editorial-luxe",
+      "lang": "ar",
+      "widthsTested": 18,
+      "allPassed": true,
+      "journeyPassed": true
+    },
+    {
+      "theme": "editorial-luxe",
+      "lang": "en",
+      "widthsTested": 18,
+      "allPassed": true,
+      "journeyPassed": true
+    },
+    {
+      "theme": "street-pulse",
+      "lang": "ar",
+      "widthsTested": 18,
+      "allPassed": true,
+      "journeyPassed": true
+    },
+    {
+      "theme": "street-pulse",
+      "lang": "en",
+      "widthsTested": 18,
+      "allPassed": true,
+      "journeyPassed": true
+    },
+    {
+      "theme": "pure-beauty",
+      "lang": "ar",
+      "widthsTested": 18,
+      "allPassed": true,
+      "journeyPassed": true
+    },
+    {
+      "theme": "pure-beauty",
+      "lang": "en",
+      "widthsTested": 18,
+      "allPassed": true,
+      "journeyPassed": true
+    },
+    {
+      "theme": "tech-grid",
+      "lang": "ar",
+      "widthsTested": 18,
+      "allPassed": true,
+      "journeyPassed": true
+    },
+    {
+      "theme": "tech-grid",
+      "lang": "en",
+      "widthsTested": 18,
+      "allPassed": true,
+      "journeyPassed": true
+    },
+    {
+      "theme": "fresh-market",
+      "lang": "ar",
+      "widthsTested": 18,
+      "allPassed": true,
+      "journeyPassed": true
+    },
+    {
+      "theme": "fresh-market",
+      "lang": "en",
+      "widthsTested": 18,
+      "allPassed": true,
+      "journeyPassed": true
+    },
+    {
+      "theme": "living-space",
+      "lang": "ar",
+      "widthsTested": 18,
+      "allPassed": true,
+      "journeyPassed": true
+    },
+    {
+      "theme": "living-space",
+      "lang": "en",
+      "widthsTested": 18,
+      "allPassed": true,
+      "journeyPassed": true
+    },
+    {
+      "theme": "golden-atelier",
+      "lang": "ar",
+      "widthsTested": 18,
+      "allPassed": true,
+      "journeyPassed": true
+    },
+    {
+      "theme": "golden-atelier",
+      "lang": "en",
+      "widthsTested": 18,
+      "allPassed": true,
+      "journeyPassed": true
+    },
+    {
+      "theme": "active-motion",
+      "lang": "ar",
+      "widthsTested": 18,
+      "allPassed": true,
+      "journeyPassed": true
+    },
+    {
+      "theme": "active-motion",
+      "lang": "en",
+      "widthsTested": 18,
+      "allPassed": true,
+      "journeyPassed": true
+    },
+    {
+      "theme": "little-joy",
+      "lang": "ar",
+      "widthsTested": 18,
+      "allPassed": true,
+      "journeyPassed": true
+    },
+    {
+      "theme": "little-joy",
+      "lang": "en",
+      "widthsTested": 18,
+      "allPassed": true,
+      "journeyPassed": true
+    },
+    {
+      "theme": "crafted-story",
+      "lang": "ar",
+      "widthsTested": 18,
+      "allPassed": true,
+      "journeyPassed": true
+    },
+    {
+      "theme": "crafted-story",
+      "lang": "en",
+      "widthsTested": 18,
+      "allPassed": true,
+      "journeyPassed": true
+    }
+  ],
+  "whatsappContrast": [
+    {
+      "theme": "editorial-luxe",
+      "lang": "ar",
+      "color": "rgb(39, 37, 31)",
+      "bg": "rgba(0, 0, 0, 0)",
+      "outlined": {
+        "normalText": "rgb(39, 37, 31)",
+        "normalContrast": 13.75,
+        "hoverText": "rgb(39, 37, 31)",
+        "hoverBackground": "rgb(237, 229, 217)",
+        "hoverContrast": 12.26
+      }
+    },
+    {
+      "theme": "editorial-luxe",
+      "lang": "en",
+      "color": "rgb(39, 37, 31)",
+      "bg": "rgba(0, 0, 0, 0)",
+      "outlined": {
+        "normalText": "rgb(39, 37, 31)",
+        "normalContrast": 13.75,
+        "hoverText": "rgb(39, 37, 31)",
+        "hoverBackground": "rgb(237, 229, 217)",
+        "hoverContrast": 12.26
+      }
+    },
+    {
+      "theme": "street-pulse",
+      "lang": "ar",
+      "color": "rgb(16, 16, 16)",
+      "bg": "rgb(251, 91, 22)",
+      "outlined": {
+        "normalText": "rgb(248, 247, 243)",
+        "normalContrast": 17.75,
+        "hoverText": "rgb(16, 16, 16)",
+        "hoverBackground": "rgb(255, 119, 56)",
+        "hoverContrast": 7.2
+      }
+    },
+    {
+      "theme": "street-pulse",
+      "lang": "en",
+      "color": "rgb(16, 16, 16)",
+      "bg": "rgb(251, 91, 22)",
+      "outlined": {
+        "normalText": "rgb(248, 247, 243)",
+        "normalContrast": 17.75,
+        "hoverText": "rgb(16, 16, 16)",
+        "hoverBackground": "rgb(255, 119, 56)",
+        "hoverContrast": 7.2
+      }
+    },
+    {
+      "theme": "pure-beauty",
+      "lang": "ar",
+      "color": "rgb(255, 255, 255)",
+      "bg": "rgb(154, 76, 96)",
+      "outlined": {
+        "normalText": "rgb(50, 37, 37)",
+        "normalContrast": 14.11,
+        "hoverText": "rgb(255, 255, 255)",
+        "hoverBackground": "rgb(131, 62, 80)",
+        "hoverContrast": 7.58
+      }
+    },
+    {
+      "theme": "pure-beauty",
+      "lang": "en",
+      "color": "rgb(255, 255, 255)",
+      "bg": "rgb(154, 76, 96)",
+      "outlined": {
+        "normalText": "rgb(50, 37, 37)",
+        "normalContrast": 14.11,
+        "hoverText": "rgb(255, 255, 255)",
+        "hoverBackground": "rgb(131, 62, 80)",
+        "hoverContrast": 7.58
+      }
+    },
+    {
+      "theme": "tech-grid",
+      "lang": "ar",
+      "color": "rgb(5, 17, 31)",
+      "bg": "rgb(0, 210, 255)",
+      "outlined": {
+        "normalText": "rgb(226, 232, 240)",
+        "normalContrast": 15.66,
+        "hoverText": "rgb(5, 17, 31)",
+        "hoverBackground": "rgb(56, 225, 255)",
+        "hoverContrast": 12.1
+      }
+    },
+    {
+      "theme": "tech-grid",
+      "lang": "en",
+      "color": "rgb(5, 17, 31)",
+      "bg": "rgb(0, 210, 255)",
+      "outlined": {
+        "normalText": "rgb(226, 232, 240)",
+        "normalContrast": 15.66,
+        "hoverText": "rgb(5, 17, 31)",
+        "hoverBackground": "rgb(56, 225, 255)",
+        "hoverContrast": 12.1
+      }
+    },
+    {
+      "theme": "fresh-market",
+      "lang": "ar",
+      "color": "rgb(17, 17, 17)",
+      "bg": "rgb(234, 88, 12)",
+      "outlined": {
+        "normalText": "rgb(20, 48, 29)",
+        "normalContrast": 13.58,
+        "hoverText": "rgb(17, 17, 17)",
+        "hoverBackground": "rgb(249, 115, 22)",
+        "hoverContrast": 6.74
+      }
+    },
+    {
+      "theme": "fresh-market",
+      "lang": "en",
+      "color": "rgb(17, 17, 17)",
+      "bg": "rgb(234, 88, 12)",
+      "outlined": {
+        "normalText": "rgb(20, 48, 29)",
+        "normalContrast": 13.58,
+        "hoverText": "rgb(17, 17, 17)",
+        "hoverBackground": "rgb(249, 115, 22)",
+        "hoverContrast": 6.74
+      }
+    },
+    {
+      "theme": "living-space",
+      "lang": "ar",
+      "color": "rgb(255, 249, 242)",
+      "bg": "rgb(131, 81, 57)",
+      "outlined": {
+        "normalText": "rgb(57, 45, 37)",
+        "normalContrast": 11.65,
+        "hoverText": "rgb(255, 249, 242)",
+        "hoverBackground": "rgb(110, 64, 43)",
+        "hoverContrast": 8.26
+      }
+    },
+    {
+      "theme": "living-space",
+      "lang": "en",
+      "color": "rgb(255, 249, 242)",
+      "bg": "rgb(131, 81, 57)",
+      "outlined": {
+        "normalText": "rgb(57, 45, 37)",
+        "normalContrast": 11.65,
+        "hoverText": "rgb(255, 249, 242)",
+        "hoverBackground": "rgb(110, 64, 43)",
+        "hoverContrast": 8.26
+      }
+    },
+    {
+      "theme": "golden-atelier",
+      "lang": "ar",
+      "color": "rgb(18, 15, 10)",
+      "bg": "rgb(212, 175, 55)",
+      "outlined": {
+        "normalText": "rgb(245, 239, 230)",
+        "normalContrast": 17.19,
+        "hoverText": "rgb(18, 15, 10)",
+        "hoverBackground": "rgb(229, 195, 88)",
+        "hoverContrast": 11.18
+      }
+    },
+    {
+      "theme": "golden-atelier",
+      "lang": "en",
+      "color": "rgb(18, 15, 10)",
+      "bg": "rgb(212, 175, 55)",
+      "outlined": {
+        "normalText": "rgb(245, 239, 230)",
+        "normalContrast": 17.19,
+        "hoverText": "rgb(18, 15, 10)",
+        "hoverBackground": "rgb(229, 195, 88)",
+        "hoverContrast": 11.18
+      }
+    },
+    {
+      "theme": "active-motion",
+      "lang": "ar",
+      "color": "rgb(17, 17, 17)",
+      "bg": "rgb(255, 45, 85)",
+      "outlined": {
+        "normalText": "rgb(244, 244, 246)",
+        "normalContrast": 16.75,
+        "hoverText": "rgb(17, 17, 17)",
+        "hoverBackground": "rgb(255, 91, 123)",
+        "hoverContrast": 6.33
+      }
+    },
+    {
+      "theme": "active-motion",
+      "lang": "en",
+      "color": "rgb(17, 17, 17)",
+      "bg": "rgb(255, 45, 85)",
+      "outlined": {
+        "normalText": "rgb(244, 244, 246)",
+        "normalContrast": 16.75,
+        "hoverText": "rgb(17, 17, 17)",
+        "hoverBackground": "rgb(255, 91, 123)",
+        "hoverContrast": 6.33
+      }
+    },
+    {
+      "theme": "little-joy",
+      "lang": "ar",
+      "color": "rgb(17, 17, 17)",
+      "bg": "rgb(255, 107, 107)",
+      "outlined": {
+        "normalText": "rgb(42, 40, 48)",
+        "normalContrast": 14.28,
+        "hoverText": "rgb(32, 31, 35)",
+        "hoverBackground": "rgb(250, 82, 82)",
+        "hoverContrast": 4.99
+      }
+    },
+    {
+      "theme": "little-joy",
+      "lang": "en",
+      "color": "rgb(17, 17, 17)",
+      "bg": "rgb(255, 107, 107)",
+      "outlined": {
+        "normalText": "rgb(42, 40, 48)",
+        "normalContrast": 14.28,
+        "hoverText": "rgb(32, 31, 35)",
+        "hoverBackground": "rgb(250, 82, 82)",
+        "hoverContrast": 4.99
+      }
+    },
+    {
+      "theme": "crafted-story",
+      "lang": "ar",
+      "color": "rgb(255, 252, 247)",
+      "bg": "rgb(150, 91, 50)",
+      "outlined": {
+        "normalText": "rgb(51, 42, 34)",
+        "normalContrast": 13.05,
+        "hoverText": "rgb(255, 252, 247)",
+        "hoverBackground": "rgb(127, 75, 38)",
+        "hoverContrast": 6.99
+      }
+    },
+    {
+      "theme": "crafted-story",
+      "lang": "en",
+      "color": "rgb(255, 252, 247)",
+      "bg": "rgb(150, 91, 50)",
+      "outlined": {
+        "normalText": "rgb(51, 42, 34)",
+        "normalContrast": 13.05,
+        "hoverText": "rgb(255, 252, 247)",
+        "hoverBackground": "rgb(127, 75, 38)",
+        "hoverContrast": 6.99
+      }
+    }
+  ]
+}

@@ -1,0 +1,236 @@
+[
+  {
+    "engine": "chrome",
+    "language": "ar",
+    "page": "setup",
+    "viewport": {
+      "width": 390,
+      "height": 420
+    },
+    "textScale": 2,
+    "network": "400ms per API request; no bandwidth emulation",
+    "productionData": false,
+    "status": "PASS"
+  },
+  {
+    "engine": "chrome",
+    "language": "ar",
+    "page": "registration",
+    "viewport": {
+      "width": 390,
+      "height": 420
+    },
+    "textScale": 2,
+    "network": "400ms per API request; no bandwidth emulation",
+    "productionData": false,
+    "status": "PASS"
+  },
+  {
+    "engine": "chrome",
+    "language": "ar",
+    "page": "store",
+    "viewport": {
+      "width": 390,
+      "height": 420
+    },
+    "textScale": 2,
+    "network": "400ms per API request; no bandwidth emulation",
+    "productionData": false,
+    "status": "PASS"
+  },
+  {
+    "engine": "chrome",
+    "language": "en",
+    "page": "setup",
+    "viewport": {
+      "width": 390,
+      "height": 420
+    },
+    "textScale": 2,
+    "network": "400ms per API request; no bandwidth emulation",
+    "productionData": false,
+    "status": "PASS"
+  },
+  {
+    "engine": "chrome",
+    "language": "en",
+    "page": "registration",
+    "viewport": {
+      "width": 390,
+      "height": 420
+    },
+    "textScale": 2,
+    "network": "400ms per API request; no bandwidth emulation",
+    "productionData": false,
+    "status": "PASS"
+  },
+  {
+    "engine": "chrome",
+    "language": "en",
+    "page": "store",
+    "viewport": {
+      "width": 390,
+      "height": 420
+    },
+    "textScale": 2,
+    "network": "400ms per API request; no bandwidth emulation",
+    "productionData": false,
+    "status": "PASS"
+  },
+  {
+    "engine": "firefox",
+    "language": "ar",
+    "page": "setup",
+    "viewport": {
+      "width": 390,
+      "height": 420
+    },
+    "textScale": 2,
+    "network": "400ms per API request; no bandwidth emulation",
+    "productionData": false,
+    "status": "PASS"
+  },
+  {
+    "engine": "firefox",
+    "language": "ar",
+    "page": "registration",
+    "viewport": {
+      "width": 390,
+      "height": 420
+    },
+    "textScale": 2,
+    "network": "400ms per API request; no bandwidth emulation",
+    "productionData": false,
+    "status": "PASS"
+  },
+  {
+    "engine": "firefox",
+    "language": "ar",
+    "page": "store",
+    "viewport": {
+      "width": 390,
+      "height": 420
+    },
+    "textScale": 2,
+    "network": "400ms per API request; no bandwidth emulation",
+    "productionData": false,
+    "status": "PASS"
+  },
+  {
+    "engine": "firefox",
+    "language": "en",
+    "page": "setup",
+    "viewport": {
+      "width": 390,
+      "height": 420
+    },
+    "textScale": 2,
+    "network": "400ms per API request; no bandwidth emulation",
+    "productionData": false,
+    "status": "PASS"
+  },
+  {
+    "engine": "firefox",
+    "language": "en",
+    "page": "registration",
+    "viewport": {
+      "width": 390,
+      "height": 420
+    },
+    "textScale": 2,
+    "network": "400ms per API request; no bandwidth emulation",
+    "productionData": false,
+    "status": "PASS"
+  },
+  {
+    "engine": "firefox",
+    "language": "en",
+    "page": "store",
+    "viewport": {
+      "width": 390,
+      "height": 420
+    },
+    "textScale": 2,
+    "network": "400ms per API request; no bandwidth emulation",
+    "productionData": false,
+    "status": "PASS"
+  },
+  {
+    "engine": "webkit",
+    "language": "ar",
+    "page": "setup",
+    "viewport": {
+      "width": 390,
+      "height": 420
+    },
+    "textScale": 2,
+    "network": "400ms per API request; no bandwidth emulation",
+    "productionData": false,
+    "status": "PASS"
+  },
+  {
+    "engine": "webkit",
+    "language": "ar",
+    "page": "registration",
+    "viewport": {
+      "width": 390,
+      "height": 420
+    },
+    "textScale": 2,
+    "network": "400ms per API request; no bandwidth emulation",
+    "productionData": false,
+    "status": "PASS"
+  },
+  {
+    "engine": "webkit",
+    "language": "ar",
+    "page": "store",
+    "viewport": {
+      "width": 390,
+      "height": 420
+    },
+    "textScale": 2,
+    "network": "400ms per API request; no bandwidth emulation",
+    "productionData": false,
+    "status": "PASS"
+  },
+  {
+    "engine": "webkit",
+    "language": "en",
+    "page": "setup",
+    "viewport": {
+      "width": 390,
+      "height": 420
+    },
+    "textScale": 2,
+    "network": "400ms per API request; no bandwidth emulation",
+    "productionData": false,
+    "status": "PASS"
+  },
+  {
+    "engine": "webkit",
+    "language": "en",
+    "page": "registration",
+    "viewport": {
+      "width": 390,
+      "height": 420
+    },
+    "textScale": 2,
+    "network": "400ms per API request; no bandwidth emulation",
+    "productionData": false,
+    "status": "PASS"
+  },
+  {
+    "engine": "webkit",
+    "language": "en",
+    "page": "store",
+    "viewport": {
+      "width": 390,
+      "height": 420
+    },
+    "textScale": 2,
+    "network": "400ms per API request; no bandwidth emulation",
+    "productionData": false,
+    "status": "PASS"
+  }
+]

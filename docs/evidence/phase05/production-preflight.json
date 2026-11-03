@@ -1,0 +1,18 @@
+{
+  "verifiedAt": "2026-11-02T16:32:11.325Z",
+  "url": "https://watsstore.runasp.net/api/public/stores/a9/orders",
+  "method": "OPTIONS",
+  "requestedMethod": "POST",
+  "requestedHeaders": "content-type",
+  "origin": "https://watsstore.vercel.app",
+  "status": 204,
+  "redirected": false,
+  "headers": {
+    "access-control-allow-origin": "https://watsstore.vercel.app",
+    "access-control-allow-methods": "POST",
+    "access-control-allow-headers": "content-type",
+    "vary": "Origin",
+    "location": null
+  },
+  "orderPosted": false
+}

@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
+import SetupReturn from '@/components/SetupReturn';
 import { useDialog } from '@/hooks/useDialog';
 import { 
   Store as StoreIcon, 
@@ -110,6 +111,7 @@ export default function DashboardLayout({
   }
 
   const navLinks = [
+    { name: dir === 'rtl' ? 'دليل تجهيز المتجر' : 'Store setup guide', href: '/dashboard/setup', icon: Sparkles },
     { name: t('dash.overview', undefined, 'نظرة عامة للمتجر'), href: '/dashboard', icon: LayoutDashboard },
     { name: dir === 'rtl' ? 'سوق القوالب والتجارة (10)' : 'Theme marketplace (10)', href: '/dashboard/themes', icon: Sparkles },
     { name: t('dash.orders', undefined, 'الطلبات والمبيعات'), href: '/dashboard/orders', icon: Receipt },
@@ -163,7 +165,7 @@ export default function DashboardLayout({
                     : `${trialInfo?.planType || user?.planType || 'Free'} 👑`}
                 </span>
               </div>
-              <Link
+              <Link prefetch={false}
                 href={`/s/${user.slug}`}
                 target="_blank"
                 className="text-xs text-emerald-400 hover:text-emerald-300 flex items-center gap-1 font-semibold pt-1 border-t border-slate-700/60"
@@ -180,7 +182,7 @@ export default function DashboardLayout({
               const Icon = link.icon;
               const isActive = pathname === link.href;
               return (
-                <Link
+                <Link prefetch={false}
                   key={link.href}
                   href={link.href}
                   className={`flex items-center gap-3 px-4 py-3 rounded-2xl text-xs font-bold transition-all ${
@@ -294,7 +296,7 @@ export default function DashboardLayout({
                   const Icon = link.icon;
                   const isActive = pathname === link.href;
                   return (
-                    <Link
+                    <Link prefetch={false}
                       key={link.href}
                       href={link.href}
                       onClick={() => setIsMobileMenuOpen(false)}
@@ -314,7 +316,7 @@ export default function DashboardLayout({
             <div className="pt-4 border-t border-slate-800 space-y-2 pb-safe">
               <ThemeLanguageBar variant="dashboard" className="flex-wrap mb-3" />
               {user && (
-                <Link
+                <Link prefetch={false}
                   href={`/s/${user.slug}`}
                   target="_blank"
                   className="w-full py-3 px-3 rounded-xl bg-emerald-950/60 text-emerald-400 font-bold text-xs flex items-center justify-center gap-2 border border-emerald-800/60 min-h-[44px]"
@@ -410,7 +412,7 @@ export default function DashboardLayout({
           </div>
         ) : null}
 
-        {children}
+        <SetupReturn/>{children}
       </main>
     </div>
   );

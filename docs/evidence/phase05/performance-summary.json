@@ -1,0 +1,208 @@
+{
+  "applicationSha": "2426469137ba8fb50e6d97448e26dee390dbef15",
+  "isolated": true,
+  "language": "en",
+  "httpCacheEnabled": false,
+  "independentColdStorage": false,
+  "fieldINP": null,
+  "rows": [
+    {
+      "method": "devtools",
+      "page": "landing",
+      "mode": "navigation",
+      "repeats": 3,
+      "performance": 67,
+      "accessibility": 100,
+      "lcp": 3789.26,
+      "cls": 0.0421349318947152,
+      "tbt": 868.0069999923708
+    },
+    {
+      "method": "devtools",
+      "page": "dashboard",
+      "mode": "navigation",
+      "repeats": 3,
+      "performance": 89,
+      "accessibility": 100,
+      "lcp": 3541.971,
+      "cls": 0,
+      "tbt": 78.89100000000008
+    },
+    {
+      "method": "devtools",
+      "page": "store",
+      "mode": "navigation",
+      "repeats": 3,
+      "performance": 95,
+      "accessibility": 100,
+      "lcp": 2130.44,
+      "cls": 0,
+      "tbt": 83.654
+    },
+    {
+      "method": "devtools",
+      "page": "product",
+      "mode": "navigation",
+      "repeats": 3,
+      "performance": 97,
+      "accessibility": 100,
+      "lcp": 1986.159,
+      "cls": 0,
+      "tbt": 82.39599999999973
+    },
+    {
+      "method": "devtools",
+      "page": "tracking",
+      "mode": "navigation",
+      "repeats": 3,
+      "performance": 97,
+      "accessibility": 100,
+      "lcp": 1976.101,
+      "cls": 0.028443879516091224,
+      "tbt": 81.39800000000014
+    },
+    {
+      "method": "devtools",
+      "page": "cart-opening",
+      "mode": "timespan",
+      "repeats": 3,
+      "performance": null,
+      "accessibility": null,
+      "lcp": null,
+      "cls": 0,
+      "tbt": 0
+    },
+    {
+      "method": "devtools",
+      "page": "cart-accessibility",
+      "mode": "snapshot",
+      "repeats": 3,
+      "performance": null,
+      "accessibility": 100,
+      "lcp": null,
+      "cls": null,
+      "tbt": null
+    },
+    {
+      "method": "devtools",
+      "page": "checkout-opening",
+      "mode": "timespan",
+      "repeats": 3,
+      "performance": null,
+      "accessibility": null,
+      "lcp": null,
+      "cls": 0,
+      "tbt": 13.037999999999997
+    },
+    {
+      "method": "devtools",
+      "page": "checkout-accessibility",
+      "mode": "snapshot",
+      "repeats": 3,
+      "performance": null,
+      "accessibility": 100,
+      "lcp": null,
+      "cls": null,
+      "tbt": null
+    },
+    {
+      "method": "simulate",
+      "page": "landing",
+      "mode": "navigation",
+      "repeats": 3,
+      "performance": 72,
+      "accessibility": 100,
+      "lcp": 3491.987,
+      "cls": 0.4211073729062387,
+      "tbt": 64
+    },
+    {
+      "method": "simulate",
+      "page": "dashboard",
+      "mode": "navigation",
+      "repeats": 3,
+      "performance": 91,
+      "accessibility": 100,
+      "lcp": 3575.3054,
+      "cls": 0,
+      "tbt": 47
+    },
+    {
+      "method": "simulate",
+      "page": "store",
+      "mode": "navigation",
+      "repeats": 3,
+      "performance": 91,
+      "accessibility": 100,
+      "lcp": 3179.6303500000004,
+      "cls": 0.1017697701556425,
+      "tbt": 23.5
+    },
+    {
+      "method": "simulate",
+      "page": "product",
+      "mode": "navigation",
+      "repeats": 3,
+      "performance": 93,
+      "accessibility": 100,
+      "lcp": 2817.6985999999997,
+      "cls": 0.1033123532905676,
+      "tbt": 45
+    },
+    {
+      "method": "simulate",
+      "page": "tracking",
+      "mode": "navigation",
+      "repeats": 3,
+      "performance": 89,
+      "accessibility": 100,
+      "lcp": 2666.3916000000004,
+      "cls": 0.17846611427861184,
+      "tbt": 47
+    },
+    {
+      "method": "simulate",
+      "page": "cart-opening",
+      "mode": "timespan",
+      "repeats": 3,
+      "performance": null,
+      "accessibility": null,
+      "lcp": null,
+      "cls": 0,
+      "tbt": 0
+    },
+    {
+      "method": "simulate",
+      "page": "cart-accessibility",
+      "mode": "snapshot",
+      "repeats": 3,
+      "performance": null,
+      "accessibility": 100,
+      "lcp": null,
+      "cls": null,
+      "tbt": null
+    },
+    {
+      "method": "simulate",
+      "page": "checkout-opening",
+      "mode": "timespan",
+      "repeats": 3,
+      "performance": null,
+      "accessibility": null,
+      "lcp": null,
+      "cls": 0,
+      "tbt": 10.583999999999996
+    },
+    {
+      "method": "simulate",
+      "page": "checkout-accessibility",
+      "mode": "snapshot",
+      "repeats": 3,
+      "performance": null,
+      "accessibility": 100,
+      "lcp": null,
+      "cls": null,
+      "tbt": null
+    }
+  ]
+}

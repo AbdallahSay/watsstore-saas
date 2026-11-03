@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
+import { actionInk } from '@/lib/color-contrast';
 import { ShoppingBag, ArrowUpRight, Search, MessageCircle, Plus, Minus, Sparkles } from 'lucide-react';
 import { Store, Product, CartItem } from '@/types';
 import ProductDetails from './ProductDetails';
@@ -39,12 +40,13 @@ export default function CommerceStorefront({
 
   const theme = getStoreTheme(previewTheme || store.themeId);
   const customization: ThemeCustomization = useMemo(() => {
+    if(preview && previewCustomization !== undefined) return parseThemeCustomization(JSON.stringify(previewCustomization));
     return {
       ...(parseThemeCustomization(store.customizationJson) || {}),
       ...(store.customization || {}),
       ...(previewCustomization || {}),
     };
-  }, [store.customizationJson, store.customization, previewCustomization]);
+  }, [store.customizationJson, store.customization, previewCustomization, preview]);
 
   const [category, setCategory] = useState<number | 'all'>('all');
   const [search, setSearch] = useState('');
@@ -69,6 +71,7 @@ export default function CommerceStorefront({
 
   useEffect(() => {
     setLoaded(false);
+    if(preview){setItems([]);setLoaded(true);return;}
     try {
       const saved = JSON.parse(localStorage.getItem(cartKey) || '[]');
       setItems(
@@ -90,7 +93,7 @@ export default function CommerceStorefront({
       setItems([]);
     }
     setLoaded(true);
-  }, [cartKey, store.products]);
+  }, [cartKey, store.products, preview]);
 
   useEffect(() => {
     if (loaded && !preview) {
@@ -136,7 +139,7 @@ export default function CommerceStorefront({
         ? [...old, { product: p, quantity, selectedVariants: selections }]
         : old.map((x, i) => (i === index ? { ...x, quantity: Math.min(1000, x.quantity + quantity) } : x));
     });
-    if (store.metaPixelId) {
+    if (store.metaPixelId && !preview) {
       pixel.addToCart(store.metaPixelId, {
         content_name: p.name,
         content_ids: [p.id],
@@ -176,6 +179,7 @@ export default function CommerceStorefront({
   }
 
   async function review(e: React.FormEvent<HTMLFormElement>) {
+    if(preview){e.preventDefault();return;}
     e.preventDefault();
     const form = e.currentTarget;
     const data = new FormData(form);
@@ -200,6 +204,7 @@ export default function CommerceStorefront({
   const dynamicStyles: Record<string, string> = {};
   if (customization.primaryColor) {
     dynamicStyles['--ws-accent'] = customization.primaryColor;
+    dynamicStyles['--ws-accent-contrast'] = actionInk(customization.primaryColor,theme.sampleColors.bg);
   }
   if (customization.secondaryColor) {
     dynamicStyles['--ws-border'] = customization.secondaryColor;
@@ -370,13 +375,8 @@ export default function CommerceStorefront({
             {/* Theme-Specific Artisan Story Banner */}
             {theme.id === 'crafted-story' && (
               <aside className="ws-artisan-quote-card">
-                <p>
-                  “{tr(
-                    'كل قطعة في هذا المتجر صُنعت بشغف وصبر لتكون فريدة وتحمل لمسة إنسانية دافئة تدوم.',
-                    'Every piece is handmade with devotion and patience to carry warmth and lasting soul.'
-                  )}”
-                </p>
-                <cite>— {tr('صناع الحرف في', 'The Makers at')} {store.storeName}</cite>
+                <p>{store.seoDescription || store.storeName}</p>
+                <cite>{tr('من كتالوج','From the catalog of')} {store.storeName}</cite>
               </aside>
             )}
 
@@ -478,7 +478,7 @@ export default function CommerceStorefront({
                             className="ws-product-image"
                             onClick={() => {
                               setProduct(p);
-                              if (store.metaPixelId) {
+                              if (store.metaPixelId && !preview) {
                                 pixel.viewContent(store.metaPixelId, {
                                   content_name: p.name,
                                   content_ids: [p.id],
@@ -523,7 +523,7 @@ export default function CommerceStorefront({
                               className="ws-product-page-link"
                               href={preview ? '#product-details' : `/s/${encodeURIComponent(store.slug)}/p/${encodeURIComponent(p.slug)}`}
                               onClick={preview ? (e) => { e.preventDefault(); setProduct(p); } : undefined}
-                              style={{ fontSize: '11px', color: 'var(--ws-accent)', fontWeight: 600, textDecoration: 'none' }}
+                              style={{ fontSize: '11px', fontWeight: 600, textDecoration: 'none' }}
                             >
                               {tr('صفحة المنتج', 'Product page')} ↗
                             </Link>
@@ -539,25 +539,25 @@ export default function CommerceStorefront({
 
                             {/* Theme Badges */}
                             {theme.id === 'tech-grid' && (
-                              <span className="ws-spec-chip">{tr('ضمان معتمد 100%', 'Certified Warranty')}</span>
+                              <span className="ws-spec-chip">{store.categories.find(c=>c.id===p.categoryId)?.name || store.storeName}</span>
                             )}
                             {theme.id === 'golden-atelier' && (
-                              <span className="ws-gold-chip">{tr('عيار أصلي موثق', 'Certified Hallmark')}</span>
+                              <span className="ws-gold-chip">{store.categories.find(c=>c.id===p.categoryId)?.name || store.storeName}</span>
                             )}
                             {theme.id === 'pure-beauty' && (
-                              <span className="ws-beauty-chip">{tr('تركيبة نباتية لطيفة', 'Pure Formula')}</span>
+                              <span className="ws-beauty-chip">{store.categories.find(c=>c.id===p.categoryId)?.name || store.storeName}</span>
                             )}
                             {theme.id === 'living-space' && (
-                              <span className="ws-furniture-chip">{tr('خامات طبيعية متينة', 'Natural Materials')}</span>
+                              <span className="ws-furniture-chip">{store.categories.find(c=>c.id===p.categoryId)?.name || store.storeName}</span>
                             )}
                             {theme.id === 'crafted-story' && (
-                              <span className="ws-artisan-chip">{tr('صُنع يدوياً بحب', 'Handmade')}</span>
+                              <span className="ws-artisan-chip">{store.categories.find(c=>c.id===p.categoryId)?.name || store.storeName}</span>
                             )}
                             {theme.id === 'active-motion' && (
-                              <span className="ws-sport-chip">{tr('أداء رياضي فائق', 'Pro Performance')}</span>
+                              <span className="ws-sport-chip">{store.categories.find(c=>c.id===p.categoryId)?.name || store.storeName}</span>
                             )}
                             {theme.id === 'little-joy' && (
-                              <span className="ws-kid-chip">{tr('آمن للأطفال 100%', 'Child Safe')}</span>
+                              <span className="ws-kid-chip">{store.categories.find(c=>c.id===p.categoryId)?.name || store.storeName}</span>
                             )}
 
                             {/* Fresh Market In-Card Quantity Stepper */}

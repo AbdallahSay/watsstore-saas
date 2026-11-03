@@ -6,6 +6,7 @@ export interface ShippingZone {
   id: string; governorate: string; name: string; fee: number; pickup: boolean; estimate?: string;
 }
 export interface CommerceSettings {
+  themeStateVersion?: number; canEditDesign?: boolean; publishedAt?: string;
   publishedTheme: StoreThemeId; draftTheme: StoreThemeId; previousTheme: StoreThemeId;
   checkoutMode: 'online' | 'whatsapp' | 'both'; cashOnDelivery: boolean;
   instaPay: boolean; mobileWallet: boolean; shippingZones: ShippingZone[]; slug: string; customizationJson?: string;

@@ -1,10 +1,10 @@
 'use client';
 
 import { appSwal } from '@/lib/sweetalert';
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { api } from '@/lib/api';
+import { api, ApiRequestError } from '@/lib/api';
 import { pixel } from '@/lib/pixel';
 import Swal from 'sweetalert2';
 import { 
@@ -76,9 +76,12 @@ export default function RegisterPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const submission = useRef(false);
+  const [uncertain, setUncertain] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (submission.current || uncertain) return;
     setErrorMsg(null);
 
     // Validate Egyptian mobile number format
@@ -89,6 +92,7 @@ export default function RegisterPage() {
       return;
     }
 
+    submission.current = true;
     setIsLoading(true);
 
     try {
@@ -111,23 +115,19 @@ export default function RegisterPage() {
       await appSwal.fire({
         icon: 'success',
         title: t('auth.register_success', undefined, 'مبروك! تم إنشاء متجرك بنجاح 🎉'),
-        html: `
-          <div style="direction: ${isRtl ? 'rtl' : 'ltr'}; text-align: ${isRtl ? 'right' : 'left'};">
-            <p><strong>${t('auth.store_name', undefined, 'اسم المتجر')}:</strong> ${res.storeName}</p>
-            <p><strong>${isRtl ? 'رابط متجرك:' : 'Store URL:'}</strong> /s/${res.slug}</p>
-            <p><strong>${isRtl ? 'رمز QR الدائم:' : 'Permanent QR:'}</strong> /m/${res.publicCode}</p>
-            <p style="color: #059669; margin-top: 10px;">${isRtl ? 'تم إضافة قسم تجريبي "الأكثر مبيعاً" تلقائياً لتبدأ فوراً بإضافة منتجاتك.' : 'A sample category has been created so you can start adding products right away.'}</p>
-          </div>
-        `,
+        text: isRtl ? `متجرك «${res.storeName}» جاهز للإعداد. سنرشدك لإضافة المنتجات والدفع والتصميم.` : `Your store “${res.storeName}” is ready to set up. Continue with products, payments and design.`,
         confirmButtonText: t('auth.goto_dashboard', undefined, 'الانتقال إلى لوحة التحكم 🚀'),
         confirmButtonColor: '#10B981',
       });
 
-      router.push('/dashboard');
+      router.push('/dashboard/setup');
     } catch (err: any) {
-      setErrorMsg(err.message || (isRtl ? 'حدث خطأ أثناء إنشاء الحساب' : 'An error occurred during registration'));
+      const pending = err instanceof ApiRequestError && err.uncertain;
+      setUncertain(pending);
+      setErrorMsg(pending ? (isRtl ? 'لم نتمكن من تأكيد إنشاء الحساب. قد يكون متجرك أُنشئ بالفعل. جرّب تسجيل الدخول بنفس البريد بدل إنشاء حساب جديد.' : 'We could not confirm account creation. Your store may already exist. Try signing in with the same email instead of registering again.') : err.message || (isRtl ? 'حدث خطأ أثناء إنشاء الحساب' : 'An error occurred during registration'));
     } finally {
       setIsLoading(false);
+      submission.current = false;
     }
   };
 
@@ -173,14 +173,14 @@ export default function RegisterPage() {
           {errorMsg && (
             <div className="mb-6 p-3.5 bg-rose-50 dark:bg-rose-950/50 border border-rose-200 dark:border-rose-800 rounded-2xl text-rose-700 dark:text-rose-300 text-xs flex items-center gap-2 font-bold">
               <AlertCircle className="w-4 h-4 shrink-0" />
-              <span>{errorMsg}</span>
+              <span role="alert">{errorMsg}{uncertain && <Link className="block underline min-h-11 py-3" href="/login">{isRtl ? 'الانتقال لتسجيل الدخول' : 'Sign in to recover your account'}</Link>}</span>
             </div>
           )}
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
+                <label htmlFor="register-ownerName" className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
                   {t('auth.owner_name', undefined, 'اسم صاحب المتجر *')}
                 </label>
                 <div className="relative">
@@ -188,7 +188,7 @@ export default function RegisterPage() {
                   <input
                     type="text"
                     required
-                    value={formData.ownerName}
+                    id="register-ownerName" name="ownerName" autoComplete="name" value={formData.ownerName}
                     onChange={(e) => setFormData({ ...formData, ownerName: e.target.value })}
                     placeholder={t('auth.owner_name_placeholder', undefined, 'مثال: أحمد محمود')}
                     className={`w-full ${isRtl ? 'pr-10 pl-3.5' : 'pl-10 pr-3.5'} py-3 rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-colors`}
@@ -197,7 +197,7 @@ export default function RegisterPage() {
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
+                <label htmlFor="register-storeName" className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
                   {t('auth.store_name', undefined, 'اسم المتجر / البراند *')}
                 </label>
                 <div className="relative">
@@ -205,7 +205,7 @@ export default function RegisterPage() {
                   <input
                     type="text"
                     required
-                    value={formData.storeName}
+                    id="register-storeName" name="storeName" autoComplete="organization" value={formData.storeName}
                     onChange={(e) => setFormData({ ...formData, storeName: e.target.value })}
                     placeholder={t('auth.store_name_placeholder', undefined, 'مثال: براند الأناقة')}
                     className={`w-full ${isRtl ? 'pr-10 pl-3.5' : 'pl-10 pr-3.5'} py-3 rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-colors`}
@@ -224,7 +224,7 @@ export default function RegisterPage() {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
+                <label htmlFor="register-email" className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
                   {t('auth.email', undefined, 'البريد الإلكتروني *')}
                 </label>
                 <div className="relative">
@@ -232,7 +232,7 @@ export default function RegisterPage() {
                   <input
                     type="email"
                     required
-                    value={formData.email}
+                    id="register-email" name="email" autoComplete="email" value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                     placeholder="merchant@example.com"
                     className={`w-full ${isRtl ? 'pr-10 pl-3.5' : 'pl-10 pr-3.5'} py-3 rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-colors`}
@@ -241,7 +241,7 @@ export default function RegisterPage() {
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
+                <label htmlFor="register-password" className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
                   {t('auth.password', undefined, 'كلمة المرور *')}
                 </label>
                 <div className="relative">
@@ -250,7 +250,7 @@ export default function RegisterPage() {
                     type={showPassword ? 'text' : 'password'}
                     required
                     minLength={6}
-                    value={formData.password}
+                    id="register-password" name="password" autoComplete="new-password" value={formData.password}
                     onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                     placeholder={t('auth.password_min', undefined, '6 أحرف على الأقل')}
                     className={`w-full ${isRtl ? 'pr-10 pl-10' : 'pl-10 pr-10'} py-3 rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-colors`}
@@ -268,7 +268,7 @@ export default function RegisterPage() {
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
+              <label htmlFor="register-whatsAppNumber" className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
                 {t('auth.whatsapp', undefined, 'رقم الواتساب لاستقبال الطلبات *')}
               </label>
               <div className="relative">
@@ -276,7 +276,7 @@ export default function RegisterPage() {
                 <input
                   type="tel"
                   required
-                  value={formData.whatsAppNumber}
+                  id="register-whatsAppNumber" name="whatsAppNumber" autoComplete="tel" value={formData.whatsAppNumber}
                   onChange={(e) => setFormData({ ...formData, whatsAppNumber: e.target.value })}
                   placeholder={t('auth.whatsapp_placeholder', undefined, 'مثال: 01012345678 أو 201012345678')}
                   className={`w-full ${isRtl ? 'pr-10 pl-3.5' : 'pl-10 pr-3.5'} py-3 rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-colors`}
@@ -286,13 +286,13 @@ export default function RegisterPage() {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
+                <label htmlFor="register-city" className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
                   {t('auth.city', undefined, 'المحافظة / المدينة *')}
                 </label>
                 <div className="relative">
                   <MapPin className={`w-4 h-4 text-slate-400 absolute ${isRtl ? 'right-3.5' : 'left-3.5'} top-1/2 -translate-y-1/2 pointer-events-none`} />
                   <select
-                    value={formData.city}
+                    id="register-city" name="city" autoComplete="address-level2" value={formData.city}
                     onChange={(e) => setFormData({ ...formData, city: e.target.value })}
                     className={`w-full ${isRtl ? 'pr-10 pl-3.5' : 'pl-10 pr-3.5'} py-3 rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-sm font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-colors`}
                   >
@@ -306,13 +306,13 @@ export default function RegisterPage() {
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
+                <label htmlFor="register-businessCategory" className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
                   {t('auth.category', undefined, 'نوع النشاط التجاري *')}
                 </label>
                 <div className="relative">
                   <Tag className={`w-4 h-4 text-slate-400 absolute ${isRtl ? 'right-3.5' : 'left-3.5'} top-1/2 -translate-y-1/2 pointer-events-none`} />
                   <select
-                    value={formData.businessCategory}
+                    id="register-businessCategory" name="businessCategory" autoComplete="off" value={formData.businessCategory}
                     onChange={(e) => setFormData({ ...formData, businessCategory: e.target.value })}
                     className={`w-full ${isRtl ? 'pr-10 pl-3.5' : 'pl-10 pr-3.5'} py-3 rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-sm font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-colors`}
                   >
@@ -329,8 +329,8 @@ export default function RegisterPage() {
             <div className="pt-2">
               <button
                 type="submit"
-                disabled={isLoading}
-                className="w-full py-4 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white font-extrabold text-sm rounded-2xl shadow-lg shadow-emerald-600/25 flex items-center justify-center gap-2 transition-all hover:scale-[1.01] active:scale-[0.99]"
+                disabled={isLoading || uncertain}
+                className="w-full py-4 bg-emerald-700 hover:bg-emerald-800 disabled:opacity-50 text-white font-extrabold text-sm rounded-2xl shadow-lg shadow-emerald-600/25 flex items-center justify-center gap-2 transition-all hover:scale-[1.01] active:scale-[0.99]"
               >
                 <span>{isLoading ? t('auth.registering', undefined, 'جاري إنشاء المتجر...') : t('auth.register_button', undefined, 'بدء التجربة المجانية (14 يوماً) 🚀')}</span>
                 <ArrowIcon className="w-4 h-4" />

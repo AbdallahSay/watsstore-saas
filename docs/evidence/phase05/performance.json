@@ -1,0 +1,1356 @@
+{
+  "isolated": true,
+  "fieldINP": null,
+  "results": [
+    {
+      "page": "landing",
+      "repeat": 1,
+      "method": "devtools",
+      "mode": "navigation",
+      "performance": 67,
+      "accessibility": 100,
+      "lcp": 3789.26,
+      "cls": 0.0421349318947152,
+      "tbt": 885.0549999999996,
+      "viewport": {
+        "width": 390,
+        "height": 844,
+        "dpr": 1
+      },
+      "throttling": {
+        "rttMs": 150,
+        "throughputKbps": 1638.4,
+        "requestLatencyMs": 562.5,
+        "downloadThroughputKbps": 1474.5600000000002,
+        "uploadThroughputKbps": 675,
+        "cpuSlowdownMultiplier": 4
+      },
+      "failedAccessibility": []
+    },
+    {
+      "page": "dashboard",
+      "repeat": 1,
+      "method": "devtools",
+      "mode": "navigation",
+      "performance": 89,
+      "accessibility": 100,
+      "lcp": 3569.426,
+      "cls": 0,
+      "tbt": 80.5920000000001,
+      "viewport": {
+        "width": 390,
+        "height": 844,
+        "dpr": 1
+      },
+      "throttling": {
+        "rttMs": 150,
+        "throughputKbps": 1638.4,
+        "requestLatencyMs": 562.5,
+        "downloadThroughputKbps": 1474.5600000000002,
+        "uploadThroughputKbps": 675,
+        "cpuSlowdownMultiplier": 4
+      },
+      "failedAccessibility": []
+    },
+    {
+      "page": "store",
+      "repeat": 1,
+      "method": "devtools",
+      "mode": "navigation",
+      "performance": 95,
+      "accessibility": 100,
+      "lcp": 2130.44,
+      "cls": 0,
+      "tbt": 88.2489999923705,
+      "viewport": {
+        "width": 390,
+        "height": 844,
+        "dpr": 1
+      },
+      "throttling": {
+        "rttMs": 150,
+        "throughputKbps": 1638.4,
+        "requestLatencyMs": 562.5,
+        "downloadThroughputKbps": 1474.5600000000002,
+        "uploadThroughputKbps": 675,
+        "cpuSlowdownMultiplier": 4
+      },
+      "failedAccessibility": []
+    },
+    {
+      "page": "product",
+      "repeat": 1,
+      "method": "devtools",
+      "mode": "navigation",
+      "performance": 97,
+      "accessibility": 100,
+      "lcp": 2007.392,
+      "cls": 0,
+      "tbt": 98.63400000000001,
+      "viewport": {
+        "width": 390,
+        "height": 844,
+        "dpr": 1
+      },
+      "throttling": {
+        "rttMs": 150,
+        "throughputKbps": 1638.4,
+        "requestLatencyMs": 562.5,
+        "downloadThroughputKbps": 1474.5600000000002,
+        "uploadThroughputKbps": 675,
+        "cpuSlowdownMultiplier": 4
+      },
+      "failedAccessibility": []
+    },
+    {
+      "page": "tracking",
+      "repeat": 1,
+      "method": "devtools",
+      "mode": "navigation",
+      "performance": 98,
+      "accessibility": 100,
+      "lcp": 1643.227,
+      "cls": 0.028322658856537883,
+      "tbt": 94.19199999237071,
+      "viewport": {
+        "width": 390,
+        "height": 844,
+        "dpr": 1
+      },
+      "throttling": {
+        "rttMs": 150,
+        "throughputKbps": 1638.4,
+        "requestLatencyMs": 562.5,
+        "downloadThroughputKbps": 1474.5600000000002,
+        "uploadThroughputKbps": 675,
+        "cpuSlowdownMultiplier": 4
+      },
+      "failedAccessibility": []
+    },
+    {
+      "page": "cart-opening",
+      "repeat": 1,
+      "method": "devtools",
+      "mode": "timespan",
+      "performance": null,
+      "accessibility": null,
+      "lcp": null,
+      "cls": 0,
+      "tbt": 0,
+      "viewport": {
+        "width": 390,
+        "height": 844,
+        "dpr": 1
+      },
+      "throttling": {
+        "rttMs": 150,
+        "throughputKbps": 1638.4,
+        "requestLatencyMs": 562.5,
+        "downloadThroughputKbps": 1474.5600000000002,
+        "uploadThroughputKbps": 675,
+        "cpuSlowdownMultiplier": 4
+      },
+      "failedAccessibility": []
+    },
+    {
+      "page": "cart-accessibility",
+      "repeat": 1,
+      "method": "devtools",
+      "mode": "snapshot",
+      "performance": null,
+      "accessibility": 100,
+      "lcp": null,
+      "cls": null,
+      "tbt": null,
+      "viewport": {
+        "width": 390,
+        "height": 844,
+        "dpr": 1
+      },
+      "throttling": {
+        "rttMs": 150,
+        "throughputKbps": 1638.4,
+        "requestLatencyMs": 562.5,
+        "downloadThroughputKbps": 1474.5600000000002,
+        "uploadThroughputKbps": 675,
+        "cpuSlowdownMultiplier": 4
+      },
+      "failedAccessibility": []
+    },
+    {
+      "page": "checkout-opening",
+      "repeat": 1,
+      "method": "devtools",
+      "mode": "timespan",
+      "performance": null,
+      "accessibility": null,
+      "lcp": null,
+      "cls": 0,
+      "tbt": 13.037999999999997,
+      "viewport": {
+        "width": 390,
+        "height": 844,
+        "dpr": 1
+      },
+      "throttling": {
+        "rttMs": 150,
+        "throughputKbps": 1638.4,
+        "requestLatencyMs": 562.5,
+        "downloadThroughputKbps": 1474.5600000000002,
+        "uploadThroughputKbps": 675,
+        "cpuSlowdownMultiplier": 4
+      },
+      "failedAccessibility": []
+    },
+    {
+      "page": "checkout-accessibility",
+      "repeat": 1,
+      "method": "devtools",
+      "mode": "snapshot",
+      "performance": null,
+      "accessibility": 100,
+      "lcp": null,
+      "cls": null,
+      "tbt": null,
+      "viewport": {
+        "width": 390,
+        "height": 844,
+        "dpr": 1
+      },
+      "throttling": {
+        "rttMs": 150,
+        "throughputKbps": 1638.4,
+        "requestLatencyMs": 562.5,
+        "downloadThroughputKbps": 1474.5600000000002,
+        "uploadThroughputKbps": 675,
+        "cpuSlowdownMultiplier": 4
+      },
+      "failedAccessibility": []
+    },
+    {
+      "page": "landing",
+      "repeat": 2,
+      "method": "devtools",
+      "mode": "navigation",
+      "performance": 67,
+      "accessibility": 100,
+      "lcp": 3788.867,
+      "cls": 0.0421349318947152,
+      "tbt": 868.0069999923708,
+      "viewport": {
+        "width": 390,
+        "height": 844,
+        "dpr": 1
+      },
+      "throttling": {
+        "rttMs": 150,
+        "throughputKbps": 1638.4,
+        "requestLatencyMs": 562.5,
+        "downloadThroughputKbps": 1474.5600000000002,
+        "uploadThroughputKbps": 675,
+        "cpuSlowdownMultiplier": 4
+      },
+      "failedAccessibility": []
+    },
+    {
+      "page": "dashboard",
+      "repeat": 2,
+      "method": "devtools",
+      "mode": "navigation",
+      "performance": 89,
+      "accessibility": 100,
+      "lcp": 3541.971,
+      "cls": 0,
+      "tbt": 76.86499999999978,
+      "viewport": {
+        "width": 390,
+        "height": 844,
+        "dpr": 1
+      },
+      "throttling": {
+        "rttMs": 150,
+        "throughputKbps": 1638.4,
+        "requestLatencyMs": 562.5,
+        "downloadThroughputKbps": 1474.5600000000002,
+        "uploadThroughputKbps": 675,
+        "cpuSlowdownMultiplier": 4
+      },
+      "failedAccessibility": []
+    },
+    {
+      "page": "store",
+      "repeat": 2,
+      "method": "devtools",
+      "mode": "navigation",
+      "performance": 95,
+      "accessibility": 100,
+      "lcp": 2131.105,
+      "cls": 0,
+      "tbt": 83.654,
+      "viewport": {
+        "width": 390,
+        "height": 844,
+        "dpr": 1
+      },
+      "throttling": {
+        "rttMs": 150,
+        "throughputKbps": 1638.4,
+        "requestLatencyMs": 562.5,
+        "downloadThroughputKbps": 1474.5600000000002,
+        "uploadThroughputKbps": 675,
+        "cpuSlowdownMultiplier": 4
+      },
+      "failedAccessibility": []
+    },
+    {
+      "page": "product",
+      "repeat": 2,
+      "method": "devtools",
+      "mode": "navigation",
+      "performance": 97,
+      "accessibility": 100,
+      "lcp": 1977.876,
+      "cls": 0,
+      "tbt": 82.39599999999973,
+      "viewport": {
+        "width": 390,
+        "height": 844,
+        "dpr": 1
+      },
+      "throttling": {
+        "rttMs": 150,
+        "throughputKbps": 1638.4,
+        "requestLatencyMs": 562.5,
+        "downloadThroughputKbps": 1474.5600000000002,
+        "uploadThroughputKbps": 675,
+        "cpuSlowdownMultiplier": 4
+      },
+      "failedAccessibility": []
+    },
+    {
+      "page": "tracking",
+      "repeat": 2,
+      "method": "devtools",
+      "mode": "navigation",
+      "performance": 97,
+      "accessibility": 100,
+      "lcp": 2029.423,
+      "cls": 0.028443879516091224,
+      "tbt": 81.39800000000014,
+      "viewport": {
+        "width": 390,
+        "height": 844,
+        "dpr": 1
+      },
+      "throttling": {
+        "rttMs": 150,
+        "throughputKbps": 1638.4,
+        "requestLatencyMs": 562.5,
+        "downloadThroughputKbps": 1474.5600000000002,
+        "uploadThroughputKbps": 675,
+        "cpuSlowdownMultiplier": 4
+      },
+      "failedAccessibility": []
+    },
+    {
+      "page": "cart-opening",
+      "repeat": 2,
+      "method": "devtools",
+      "mode": "timespan",
+      "performance": null,
+      "accessibility": null,
+      "lcp": null,
+      "cls": 0,
+      "tbt": 0,
+      "viewport": {
+        "width": 390,
+        "height": 844,
+        "dpr": 1
+      },
+      "throttling": {
+        "rttMs": 150,
+        "throughputKbps": 1638.4,
+        "requestLatencyMs": 562.5,
+        "downloadThroughputKbps": 1474.5600000000002,
+        "uploadThroughputKbps": 675,
+        "cpuSlowdownMultiplier": 4
+      },
+      "failedAccessibility": []
+    },
+    {
+      "page": "cart-accessibility",
+      "repeat": 2,
+      "method": "devtools",
+      "mode": "snapshot",
+      "performance": null,
+      "accessibility": 100,
+      "lcp": null,
+      "cls": null,
+      "tbt": null,
+      "viewport": {
+        "width": 390,
+        "height": 844,
+        "dpr": 1
+      },
+      "throttling": {
+        "rttMs": 150,
+        "throughputKbps": 1638.4,
+        "requestLatencyMs": 562.5,
+        "downloadThroughputKbps": 1474.5600000000002,
+        "uploadThroughputKbps": 675,
+        "cpuSlowdownMultiplier": 4
+      },
+      "failedAccessibility": []
+    },
+    {
+      "page": "checkout-opening",
+      "repeat": 2,
+      "method": "devtools",
+      "mode": "timespan",
+      "performance": null,
+      "accessibility": null,
+      "lcp": null,
+      "cls": 0,
+      "tbt": 16.811000000000007,
+      "viewport": {
+        "width": 390,
+        "height": 844,
+        "dpr": 1
+      },
+      "throttling": {
+        "rttMs": 150,
+        "throughputKbps": 1638.4,
+        "requestLatencyMs": 562.5,
+        "downloadThroughputKbps": 1474.5600000000002,
+        "uploadThroughputKbps": 675,
+        "cpuSlowdownMultiplier": 4
+      },
+      "failedAccessibility": []
+    },
+    {
+      "page": "checkout-accessibility",
+      "repeat": 2,
+      "method": "devtools",
+      "mode": "snapshot",
+      "performance": null,
+      "accessibility": 100,
+      "lcp": null,
+      "cls": null,
+      "tbt": null,
+      "viewport": {
+        "width": 390,
+        "height": 844,
+        "dpr": 1
+      },
+      "throttling": {
+        "rttMs": 150,
+        "throughputKbps": 1638.4,
+        "requestLatencyMs": 562.5,
+        "downloadThroughputKbps": 1474.5600000000002,
+        "uploadThroughputKbps": 675,
+        "cpuSlowdownMultiplier": 4
+      },
+      "failedAccessibility": []
+    },
+    {
+      "page": "landing",
+      "repeat": 3,
+      "method": "devtools",
+      "mode": "navigation",
+      "performance": 82,
+      "accessibility": 100,
+      "lcp": 3803.672,
+      "cls": 0.06003225317287607,
+      "tbt": 197.36599999999999,
+      "viewport": {
+        "width": 390,
+        "height": 844,
+        "dpr": 1
+      },
+      "throttling": {
+        "rttMs": 150,
+        "throughputKbps": 1638.4,
+        "requestLatencyMs": 562.5,
+        "downloadThroughputKbps": 1474.5600000000002,
+        "uploadThroughputKbps": 675,
+        "cpuSlowdownMultiplier": 4
+      },
+      "failedAccessibility": []
+    },
+    {
+      "page": "dashboard",
+      "repeat": 3,
+      "method": "devtools",
+      "mode": "navigation",
+      "performance": 89,
+      "accessibility": 100,
+      "lcp": 3538.921,
+      "cls": 0,
+      "tbt": 78.89100000000008,
+      "viewport": {
+        "width": 390,
+        "height": 844,
+        "dpr": 1
+      },
+      "throttling": {
+        "rttMs": 150,
+        "throughputKbps": 1638.4,
+        "requestLatencyMs": 562.5,
+        "downloadThroughputKbps": 1474.5600000000002,
+        "uploadThroughputKbps": 675,
+        "cpuSlowdownMultiplier": 4
+      },
+      "failedAccessibility": []
+    },
+    {
+      "page": "store",
+      "repeat": 3,
+      "method": "devtools",
+      "mode": "navigation",
+      "performance": 96,
+      "accessibility": 100,
+      "lcp": 2127.542,
+      "cls": 0,
+      "tbt": 74.70599999999968,
+      "viewport": {
+        "width": 390,
+        "height": 844,
+        "dpr": 1
+      },
+      "throttling": {
+        "rttMs": 150,
+        "throughputKbps": 1638.4,
+        "requestLatencyMs": 562.5,
+        "downloadThroughputKbps": 1474.5600000000002,
+        "uploadThroughputKbps": 675,
+        "cpuSlowdownMultiplier": 4
+      },
+      "failedAccessibility": []
+    },
+    {
+      "page": "product",
+      "repeat": 3,
+      "method": "devtools",
+      "mode": "navigation",
+      "performance": 97,
+      "accessibility": 100,
+      "lcp": 1986.159,
+      "cls": 0,
+      "tbt": 75.87599999237045,
+      "viewport": {
+        "width": 390,
+        "height": 844,
+        "dpr": 1
+      },
+      "throttling": {
+        "rttMs": 150,
+        "throughputKbps": 1638.4,
+        "requestLatencyMs": 562.5,
+        "downloadThroughputKbps": 1474.5600000000002,
+        "uploadThroughputKbps": 675,
+        "cpuSlowdownMultiplier": 4
+      },
+      "failedAccessibility": []
+    },
+    {
+      "page": "tracking",
+      "repeat": 3,
+      "method": "devtools",
+      "mode": "navigation",
+      "performance": 97,
+      "accessibility": 100,
+      "lcp": 1976.101,
+      "cls": 0.028443879516091224,
+      "tbt": 70.04099999237087,
+      "viewport": {
+        "width": 390,
+        "height": 844,
+        "dpr": 1
+      },
+      "throttling": {
+        "rttMs": 150,
+        "throughputKbps": 1638.4,
+        "requestLatencyMs": 562.5,
+        "downloadThroughputKbps": 1474.5600000000002,
+        "uploadThroughputKbps": 675,
+        "cpuSlowdownMultiplier": 4
+      },
+      "failedAccessibility": []
+    },
+    {
+      "page": "cart-opening",
+      "repeat": 3,
+      "method": "devtools",
+      "mode": "timespan",
+      "performance": null,
+      "accessibility": null,
+      "lcp": null,
+      "cls": 0,
+      "tbt": 0,
+      "viewport": {
+        "width": 390,
+        "height": 844,
+        "dpr": 1
+      },
+      "throttling": {
+        "rttMs": 150,
+        "throughputKbps": 1638.4,
+        "requestLatencyMs": 562.5,
+        "downloadThroughputKbps": 1474.5600000000002,
+        "uploadThroughputKbps": 675,
+        "cpuSlowdownMultiplier": 4
+      },
+      "failedAccessibility": []
+    },
+    {
+      "page": "cart-accessibility",
+      "repeat": 3,
+      "method": "devtools",
+      "mode": "snapshot",
+      "performance": null,
+      "accessibility": 100,
+      "lcp": null,
+      "cls": null,
+      "tbt": null,
+      "viewport": {
+        "width": 390,
+        "height": 844,
+        "dpr": 1
+      },
+      "throttling": {
+        "rttMs": 150,
+        "throughputKbps": 1638.4,
+        "requestLatencyMs": 562.5,
+        "downloadThroughputKbps": 1474.5600000000002,
+        "uploadThroughputKbps": 675,
+        "cpuSlowdownMultiplier": 4
+      },
+      "failedAccessibility": []
+    },
+    {
+      "page": "checkout-opening",
+      "repeat": 3,
+      "method": "devtools",
+      "mode": "timespan",
+      "performance": null,
+      "accessibility": null,
+      "lcp": null,
+      "cls": 0,
+      "tbt": 7.6569999999999965,
+      "viewport": {
+        "width": 390,
+        "height": 844,
+        "dpr": 1
+      },
+      "throttling": {
+        "rttMs": 150,
+        "throughputKbps": 1638.4,
+        "requestLatencyMs": 562.5,
+        "downloadThroughputKbps": 1474.5600000000002,
+        "uploadThroughputKbps": 675,
+        "cpuSlowdownMultiplier": 4
+      },
+      "failedAccessibility": []
+    },
+    {
+      "page": "checkout-accessibility",
+      "repeat": 3,
+      "method": "devtools",
+      "mode": "snapshot",
+      "performance": null,
+      "accessibility": 100,
+      "lcp": null,
+      "cls": null,
+      "tbt": null,
+      "viewport": {
+        "width": 390,
+        "height": 844,
+        "dpr": 1
+      },
+      "throttling": {
+        "rttMs": 150,
+        "throughputKbps": 1638.4,
+        "requestLatencyMs": 562.5,
+        "downloadThroughputKbps": 1474.5600000000002,
+        "uploadThroughputKbps": 675,
+        "cpuSlowdownMultiplier": 4
+      },
+      "failedAccessibility": []
+    },
+    {
+      "page": "landing",
+      "repeat": 1,
+      "method": "simulate",
+      "mode": "navigation",
+      "performance": 72,
+      "accessibility": 100,
+      "lcp": 3491.987,
+      "cls": 0.4211073729062387,
+      "tbt": 56,
+      "viewport": {
+        "width": 390,
+        "height": 844,
+        "dpr": 1
+      },
+      "throttling": {
+        "rttMs": 150,
+        "throughputKbps": 1638.4,
+        "requestLatencyMs": 562.5,
+        "downloadThroughputKbps": 1474.5600000000002,
+        "uploadThroughputKbps": 675,
+        "cpuSlowdownMultiplier": 4
+      },
+      "failedAccessibility": []
+    },
+    {
+      "page": "dashboard",
+      "repeat": 1,
+      "method": "simulate",
+      "mode": "navigation",
+      "performance": 90,
+      "accessibility": 100,
+      "lcp": 3594.69575,
+      "cls": 0,
+      "tbt": 61,
+      "viewport": {
+        "width": 390,
+        "height": 844,
+        "dpr": 1
+      },
+      "throttling": {
+        "rttMs": 150,
+        "throughputKbps": 1638.4,
+        "requestLatencyMs": 562.5,
+        "downloadThroughputKbps": 1474.5600000000002,
+        "uploadThroughputKbps": 675,
+        "cpuSlowdownMultiplier": 4
+      },
+      "failedAccessibility": []
+    },
+    {
+      "page": "store",
+      "repeat": 1,
+      "method": "simulate",
+      "mode": "navigation",
+      "performance": 91,
+      "accessibility": 100,
+      "lcp": 3176.7008,
+      "cls": 0.1017697701556425,
+      "tbt": 22.5,
+      "viewport": {
+        "width": 390,
+        "height": 844,
+        "dpr": 1
+      },
+      "throttling": {
+        "rttMs": 150,
+        "throughputKbps": 1638.4,
+        "requestLatencyMs": 562.5,
+        "downloadThroughputKbps": 1474.5600000000002,
+        "uploadThroughputKbps": 675,
+        "cpuSlowdownMultiplier": 4
+      },
+      "failedAccessibility": []
+    },
+    {
+      "page": "product",
+      "repeat": 1,
+      "method": "simulate",
+      "mode": "navigation",
+      "performance": 93,
+      "accessibility": 100,
+      "lcp": 2817.6985999999997,
+      "cls": 0.1033123532905676,
+      "tbt": 45,
+      "viewport": {
+        "width": 390,
+        "height": 844,
+        "dpr": 1
+      },
+      "throttling": {
+        "rttMs": 150,
+        "throughputKbps": 1638.4,
+        "requestLatencyMs": 562.5,
+        "downloadThroughputKbps": 1474.5600000000002,
+        "uploadThroughputKbps": 675,
+        "cpuSlowdownMultiplier": 4
+      },
+      "failedAccessibility": []
+    },
+    {
+      "page": "tracking",
+      "repeat": 1,
+      "method": "simulate",
+      "mode": "navigation",
+      "performance": 89,
+      "accessibility": 100,
+      "lcp": 2660.996399999999,
+      "cls": 0.17846611427861184,
+      "tbt": 20.5,
+      "viewport": {
+        "width": 390,
+        "height": 844,
+        "dpr": 1
+      },
+      "throttling": {
+        "rttMs": 150,
+        "throughputKbps": 1638.4,
+        "requestLatencyMs": 562.5,
+        "downloadThroughputKbps": 1474.5600000000002,
+        "uploadThroughputKbps": 675,
+        "cpuSlowdownMultiplier": 4
+      },
+      "failedAccessibility": []
+    },
+    {
+      "page": "cart-opening",
+      "repeat": 1,
+      "method": "simulate",
+      "mode": "timespan",
+      "performance": null,
+      "accessibility": null,
+      "lcp": null,
+      "cls": 0,
+      "tbt": 0,
+      "viewport": {
+        "width": 390,
+        "height": 844,
+        "dpr": 1
+      },
+      "throttling": {
+        "rttMs": 150,
+        "throughputKbps": 1638.4,
+        "requestLatencyMs": 562.5,
+        "downloadThroughputKbps": 1474.5600000000002,
+        "uploadThroughputKbps": 675,
+        "cpuSlowdownMultiplier": 4
+      },
+      "failedAccessibility": []
+    },
+    {
+      "page": "cart-accessibility",
+      "repeat": 1,
+      "method": "simulate",
+      "mode": "snapshot",
+      "performance": null,
+      "accessibility": 100,
+      "lcp": null,
+      "cls": null,
+      "tbt": null,
+      "viewport": {
+        "width": 390,
+        "height": 844,
+        "dpr": 1
+      },
+      "throttling": {
+        "rttMs": 150,
+        "throughputKbps": 1638.4,
+        "requestLatencyMs": 562.5,
+        "downloadThroughputKbps": 1474.5600000000002,
+        "uploadThroughputKbps": 675,
+        "cpuSlowdownMultiplier": 4
+      },
+      "failedAccessibility": []
+    },
+    {
+      "page": "checkout-opening",
+      "repeat": 1,
+      "method": "simulate",
+      "mode": "timespan",
+      "performance": null,
+      "accessibility": null,
+      "lcp": null,
+      "cls": 0,
+      "tbt": 10.593999999999994,
+      "viewport": {
+        "width": 390,
+        "height": 844,
+        "dpr": 1
+      },
+      "throttling": {
+        "rttMs": 150,
+        "throughputKbps": 1638.4,
+        "requestLatencyMs": 562.5,
+        "downloadThroughputKbps": 1474.5600000000002,
+        "uploadThroughputKbps": 675,
+        "cpuSlowdownMultiplier": 4
+      },
+      "failedAccessibility": []
+    },
+    {
+      "page": "checkout-accessibility",
+      "repeat": 1,
+      "method": "simulate",
+      "mode": "snapshot",
+      "performance": null,
+      "accessibility": 100,
+      "lcp": null,
+      "cls": null,
+      "tbt": null,
+      "viewport": {
+        "width": 390,
+        "height": 844,
+        "dpr": 1
+      },
+      "throttling": {
+        "rttMs": 150,
+        "throughputKbps": 1638.4,
+        "requestLatencyMs": 562.5,
+        "downloadThroughputKbps": 1474.5600000000002,
+        "uploadThroughputKbps": 675,
+        "cpuSlowdownMultiplier": 4
+      },
+      "failedAccessibility": []
+    },
+    {
+      "page": "landing",
+      "repeat": 2,
+      "method": "simulate",
+      "mode": "navigation",
+      "performance": 74,
+      "accessibility": 100,
+      "lcp": 3466.79125,
+      "cls": 0.3431264534159621,
+      "tbt": 64,
+      "viewport": {
+        "width": 390,
+        "height": 844,
+        "dpr": 1
+      },
+      "throttling": {
+        "rttMs": 150,
+        "throughputKbps": 1638.4,
+        "requestLatencyMs": 562.5,
+        "downloadThroughputKbps": 1474.5600000000002,
+        "uploadThroughputKbps": 675,
+        "cpuSlowdownMultiplier": 4
+      },
+      "failedAccessibility": []
+    },
+    {
+      "page": "dashboard",
+      "repeat": 2,
+      "method": "simulate",
+      "mode": "navigation",
+      "performance": 91,
+      "accessibility": 100,
+      "lcp": 3575.3054,
+      "cls": 0,
+      "tbt": 47,
+      "viewport": {
+        "width": 390,
+        "height": 844,
+        "dpr": 1
+      },
+      "throttling": {
+        "rttMs": 150,
+        "throughputKbps": 1638.4,
+        "requestLatencyMs": 562.5,
+        "downloadThroughputKbps": 1474.5600000000002,
+        "uploadThroughputKbps": 675,
+        "cpuSlowdownMultiplier": 4
+      },
+      "failedAccessibility": []
+    },
+    {
+      "page": "store",
+      "repeat": 2,
+      "method": "simulate",
+      "mode": "navigation",
+      "performance": 91,
+      "accessibility": 100,
+      "lcp": 3179.6303500000004,
+      "cls": 0.1017697701556425,
+      "tbt": 23.5,
+      "viewport": {
+        "width": 390,
+        "height": 844,
+        "dpr": 1
+      },
+      "throttling": {
+        "rttMs": 150,
+        "throughputKbps": 1638.4,
+        "requestLatencyMs": 562.5,
+        "downloadThroughputKbps": 1474.5600000000002,
+        "uploadThroughputKbps": 675,
+        "cpuSlowdownMultiplier": 4
+      },
+      "failedAccessibility": []
+    },
+    {
+      "page": "product",
+      "repeat": 2,
+      "method": "simulate",
+      "mode": "navigation",
+      "performance": 92,
+      "accessibility": 100,
+      "lcp": 2949.0173999999997,
+      "cls": 0.1033123532905676,
+      "tbt": 43,
+      "viewport": {
+        "width": 390,
+        "height": 844,
+        "dpr": 1
+      },
+      "throttling": {
+        "rttMs": 150,
+        "throughputKbps": 1638.4,
+        "requestLatencyMs": 562.5,
+        "downloadThroughputKbps": 1474.5600000000002,
+        "uploadThroughputKbps": 675,
+        "cpuSlowdownMultiplier": 4
+      },
+      "failedAccessibility": []
+    },
+    {
+      "page": "tracking",
+      "repeat": 2,
+      "method": "simulate",
+      "mode": "navigation",
+      "performance": 87,
+      "accessibility": 100,
+      "lcp": 2956.1337000000003,
+      "cls": 0.17846611427861184,
+      "tbt": 49,
+      "viewport": {
+        "width": 390,
+        "height": 844,
+        "dpr": 1
+      },
+      "throttling": {
+        "rttMs": 150,
+        "throughputKbps": 1638.4,
+        "requestLatencyMs": 562.5,
+        "downloadThroughputKbps": 1474.5600000000002,
+        "uploadThroughputKbps": 675,
+        "cpuSlowdownMultiplier": 4
+      },
+      "failedAccessibility": []
+    },
+    {
+      "page": "cart-opening",
+      "repeat": 2,
+      "method": "simulate",
+      "mode": "timespan",
+      "performance": null,
+      "accessibility": null,
+      "lcp": null,
+      "cls": 0,
+      "tbt": 0,
+      "viewport": {
+        "width": 390,
+        "height": 844,
+        "dpr": 1
+      },
+      "throttling": {
+        "rttMs": 150,
+        "throughputKbps": 1638.4,
+        "requestLatencyMs": 562.5,
+        "downloadThroughputKbps": 1474.5600000000002,
+        "uploadThroughputKbps": 675,
+        "cpuSlowdownMultiplier": 4
+      },
+      "failedAccessibility": []
+    },
+    {
+      "page": "cart-accessibility",
+      "repeat": 2,
+      "method": "simulate",
+      "mode": "snapshot",
+      "performance": null,
+      "accessibility": 100,
+      "lcp": null,
+      "cls": null,
+      "tbt": null,
+      "viewport": {
+        "width": 390,
+        "height": 844,
+        "dpr": 1
+      },
+      "throttling": {
+        "rttMs": 150,
+        "throughputKbps": 1638.4,
+        "requestLatencyMs": 562.5,
+        "downloadThroughputKbps": 1474.5600000000002,
+        "uploadThroughputKbps": 675,
+        "cpuSlowdownMultiplier": 4
+      },
+      "failedAccessibility": []
+    },
+    {
+      "page": "checkout-opening",
+      "repeat": 2,
+      "method": "simulate",
+      "mode": "timespan",
+      "performance": null,
+      "accessibility": null,
+      "lcp": null,
+      "cls": 0,
+      "tbt": 3.5670000000000073,
+      "viewport": {
+        "width": 390,
+        "height": 844,
+        "dpr": 1
+      },
+      "throttling": {
+        "rttMs": 150,
+        "throughputKbps": 1638.4,
+        "requestLatencyMs": 562.5,
+        "downloadThroughputKbps": 1474.5600000000002,
+        "uploadThroughputKbps": 675,
+        "cpuSlowdownMultiplier": 4
+      },
+      "failedAccessibility": []
+    },
+    {
+      "page": "checkout-accessibility",
+      "repeat": 2,
+      "method": "simulate",
+      "mode": "snapshot",
+      "performance": null,
+      "accessibility": 100,
+      "lcp": null,
+      "cls": null,
+      "tbt": null,
+      "viewport": {
+        "width": 390,
+        "height": 844,
+        "dpr": 1
+      },
+      "throttling": {
+        "rttMs": 150,
+        "throughputKbps": 1638.4,
+        "requestLatencyMs": 562.5,
+        "downloadThroughputKbps": 1474.5600000000002,
+        "uploadThroughputKbps": 675,
+        "cpuSlowdownMultiplier": 4
+      },
+      "failedAccessibility": []
+    },
+    {
+      "page": "landing",
+      "repeat": 3,
+      "method": "simulate",
+      "mode": "navigation",
+      "performance": 70,
+      "accessibility": 100,
+      "lcp": 3515.7494999999994,
+      "cls": 0.4211073729062387,
+      "tbt": 141,
+      "viewport": {
+        "width": 390,
+        "height": 844,
+        "dpr": 1
+      },
+      "throttling": {
+        "rttMs": 150,
+        "throughputKbps": 1638.4,
+        "requestLatencyMs": 562.5,
+        "downloadThroughputKbps": 1474.5600000000002,
+        "uploadThroughputKbps": 675,
+        "cpuSlowdownMultiplier": 4
+      },
+      "failedAccessibility": []
+    },
+    {
+      "page": "dashboard",
+      "repeat": 3,
+      "method": "simulate",
+      "mode": "navigation",
+      "performance": 91,
+      "accessibility": 100,
+      "lcp": 3568.66605,
+      "cls": 0,
+      "tbt": 43,
+      "viewport": {
+        "width": 390,
+        "height": 844,
+        "dpr": 1
+      },
+      "throttling": {
+        "rttMs": 150,
+        "throughputKbps": 1638.4,
+        "requestLatencyMs": 562.5,
+        "downloadThroughputKbps": 1474.5600000000002,
+        "uploadThroughputKbps": 675,
+        "cpuSlowdownMultiplier": 4
+      },
+      "failedAccessibility": []
+    },
+    {
+      "page": "store",
+      "repeat": 3,
+      "method": "simulate",
+      "mode": "navigation",
+      "performance": 91,
+      "accessibility": 100,
+      "lcp": 3188.76485,
+      "cls": 0.1017697701556425,
+      "tbt": 28.5,
+      "viewport": {
+        "width": 390,
+        "height": 844,
+        "dpr": 1
+      },
+      "throttling": {
+        "rttMs": 150,
+        "throughputKbps": 1638.4,
+        "requestLatencyMs": 562.5,
+        "downloadThroughputKbps": 1474.5600000000002,
+        "uploadThroughputKbps": 675,
+        "cpuSlowdownMultiplier": 4
+      },
+      "failedAccessibility": []
+    },
+    {
+      "page": "product",
+      "repeat": 3,
+      "method": "simulate",
+      "mode": "navigation",
+      "performance": 96,
+      "accessibility": 100,
+      "lcp": 2258.8846,
+      "cls": 0.1033123532905676,
+      "tbt": 46,
+      "viewport": {
+        "width": 390,
+        "height": 844,
+        "dpr": 1
+      },
+      "throttling": {
+        "rttMs": 150,
+        "throughputKbps": 1638.4,
+        "requestLatencyMs": 562.5,
+        "downloadThroughputKbps": 1474.5600000000002,
+        "uploadThroughputKbps": 675,
+        "cpuSlowdownMultiplier": 4
+      },
+      "failedAccessibility": []
+    },
+    {
+      "page": "tracking",
+      "repeat": 3,
+      "method": "simulate",
+      "mode": "navigation",
+      "performance": 89,
+      "accessibility": 100,
+      "lcp": 2666.3916000000004,
+      "cls": 0.17846611427861184,
+      "tbt": 47,
+      "viewport": {
+        "width": 390,
+        "height": 844,
+        "dpr": 1
+      },
+      "throttling": {
+        "rttMs": 150,
+        "throughputKbps": 1638.4,
+        "requestLatencyMs": 562.5,
+        "downloadThroughputKbps": 1474.5600000000002,
+        "uploadThroughputKbps": 675,
+        "cpuSlowdownMultiplier": 4
+      },
+      "failedAccessibility": []
+    },
+    {
+      "page": "cart-opening",
+      "repeat": 3,
+      "method": "simulate",
+      "mode": "timespan",
+      "performance": null,
+      "accessibility": null,
+      "lcp": null,
+      "cls": 0,
+      "tbt": 0,
+      "viewport": {
+        "width": 390,
+        "height": 844,
+        "dpr": 1
+      },
+      "throttling": {
+        "rttMs": 150,
+        "throughputKbps": 1638.4,
+        "requestLatencyMs": 562.5,
+        "downloadThroughputKbps": 1474.5600000000002,
+        "uploadThroughputKbps": 675,
+        "cpuSlowdownMultiplier": 4
+      },
+      "failedAccessibility": []
+    },
+    {
+      "page": "cart-accessibility",
+      "repeat": 3,
+      "method": "simulate",
+      "mode": "snapshot",
+      "performance": null,
+      "accessibility": 100,
+      "lcp": null,
+      "cls": null,
+      "tbt": null,
+      "viewport": {
+        "width": 390,
+        "height": 844,
+        "dpr": 1
+      },
+      "throttling": {
+        "rttMs": 150,
+        "throughputKbps": 1638.4,
+        "requestLatencyMs": 562.5,
+        "downloadThroughputKbps": 1474.5600000000002,
+        "uploadThroughputKbps": 675,
+        "cpuSlowdownMultiplier": 4
+      },
+      "failedAccessibility": []
+    },
+    {
+      "page": "checkout-opening",
+      "repeat": 3,
+      "method": "simulate",
+      "mode": "timespan",
+      "performance": null,
+      "accessibility": null,
+      "lcp": null,
+      "cls": 0,
+      "tbt": 10.583999999999996,
+      "viewport": {
+        "width": 390,
+        "height": 844,
+        "dpr": 1
+      },
+      "throttling": {
+        "rttMs": 150,
+        "throughputKbps": 1638.4,
+        "requestLatencyMs": 562.5,
+        "downloadThroughputKbps": 1474.5600000000002,
+        "uploadThroughputKbps": 675,
+        "cpuSlowdownMultiplier": 4
+      },
+      "failedAccessibility": []
+    },
+    {
+      "page": "checkout-accessibility",
+      "repeat": 3,
+      "method": "simulate",
+      "mode": "snapshot",
+      "performance": null,
+      "accessibility": 100,
+      "lcp": null,
+      "cls": null,
+      "tbt": null,
+      "viewport": {
+        "width": 390,
+        "height": 844,
+        "dpr": 1
+      },
+      "throttling": {
+        "rttMs": 150,
+        "throughputKbps": 1638.4,
+        "requestLatencyMs": 562.5,
+        "downloadThroughputKbps": 1474.5600000000002,
+        "uploadThroughputKbps": 675,
+        "cpuSlowdownMultiplier": 4
+      },
+      "failedAccessibility": []
+    }
+  ]
+}

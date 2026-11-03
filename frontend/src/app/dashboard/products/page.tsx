@@ -34,6 +34,13 @@ export default function DashboardProductsPage() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const setupOpened = useRef(false);
+  useEffect(() => {
+    if (!isLoading && !setupOpened.current && new URLSearchParams(location.search).get('new') === '1') {
+      setupOpened.current = true;
+      openCreateModal();
+    }
+  }, [isLoading]);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [planType, setPlanType] = useState('Free');
   const [storeName, setStoreName] = useState('');
@@ -674,7 +681,7 @@ export default function DashboardProductsPage() {
 
           <button
             onClick={openCreateModal}
-            className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-bold rounded-2xl shadow-lg shadow-emerald-600/20 flex items-center gap-2 transition-all hover:scale-105"
+            className="px-5 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white text-xs sm:text-sm font-bold rounded-2xl shadow-lg shadow-emerald-600/20 flex items-center gap-2 transition-all hover:scale-105"
           >
             <Plus className="w-4 h-4 stroke-[2.5]" />
             <span>{t('products.add_new', undefined, 'إضافة منتج جديد')}</span>
@@ -734,7 +741,7 @@ export default function DashboardProductsPage() {
           </p>
           <button
             onClick={openCreateModal}
-            className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl"
+            className="px-5 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-bold rounded-xl"
           >
             إضافة منتج الآن
           </button>
@@ -813,7 +820,7 @@ export default function DashboardProductsPage() {
                             <span>{variantCount} مجموعة خيارات</span>
                           </span>
                         ) : (
-                          <span className="text-slate-400">سعر موحد (بدون مقاسات)</span>
+                          <span className="text-slate-600 dark:text-slate-400">سعر موحد (بدون مقاسات)</span>
                         )}
                       </td>
 

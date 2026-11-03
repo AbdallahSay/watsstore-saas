@@ -1,0 +1,18 @@
+{
+  "version": 1,
+  "parameters": "--vulnerable --include-transitive",
+  "sources": [
+    "https://api.nuget.org/v3/index.json"
+  ],
+  "projects": [
+    {
+      "path": "E:/WatsStore/work/phase05-experience/backend/WatsStore.Api.csproj"
+    },
+    {
+      "path": "E:/WatsStore/work/phase05-experience/backend.Tests/WatsStore.Tests.csproj"
+    },
+    {
+      "path": "E:/WatsStore/work/phase05-experience/backend.E2E/WatsStore.E2E.csproj"
+    }
+  ]
+}

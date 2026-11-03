@@ -73,7 +73,7 @@ async function inspect(page, theme, width, engine) {
   await expect(dialog).toBeVisible();
   await dialog.getByRole('button', { name: /موبايل/ }).click();
   const canvas = page.getByTestId('merchant-preview-canvas');
-  await expect(canvas.locator('.ws-storefront')).toHaveAttribute('data-theme', theme);
+  await expect(canvas.frameLocator('iframe').locator('.ws-storefront')).toHaveAttribute('data-theme', theme);
   const bounds = await canvas.boundingBox();
   assert.ok(bounds, 'Preview frame exists');
   assert.ok(bounds.x >= -1 && bounds.x + bounds.width <= width + 1,
@@ -81,18 +81,19 @@ async function inspect(page, theme, width, engine) {
 
   const metrics = await page.evaluate(() => {
     const canvas = document.querySelector('[data-testid="merchant-preview-canvas"]');
-    const grid = canvas.querySelector('.ws-product-grid');
-    const cr = canvas.getBoundingClientRect();
+    const documentPreview = canvas.querySelector('iframe').contentDocument;
+    const grid = documentPreview.querySelector('.ws-product-grid');
+    const cr = {left:0,right:documentPreview.defaultView.innerWidth};
     const overflowing = [];
-    for (const el of canvas.querySelectorAll('.ws-catalog-product, .ws-primary-action, .ws-secondary-action, .ws-product-info h3')) {
+    for (const el of documentPreview.querySelectorAll('.ws-catalog-product, .ws-primary-action, .ws-secondary-action, .ws-product-info h3')) {
       const r = el.getBoundingClientRect();
       if (r.width && r.height && (r.left < cr.left - 2 || r.right > cr.right + 2)) {
         overflowing.push((el.className || el.tagName).toString().slice(0, 80));
       }
     }
     return {
-      pageOverflow: document.documentElement.scrollWidth > innerWidth + 2,
-      columns: grid ? getComputedStyle(grid).gridTemplateColumns.split(' ').filter(Boolean).length : 0,
+      pageOverflow: document.documentElement.scrollWidth > innerWidth + 2 || documentPreview.documentElement.scrollWidth > documentPreview.defaultView.innerWidth + 2,
+      columns: grid ? documentPreview.defaultView.getComputedStyle(grid).gridTemplateColumns.split(' ').filter(Boolean).length : 0,
       overflowing: overflowing.slice(0, 8),
       modalToolbarOverflow: Array.from(document.querySelectorAll('[data-testid="merchant-theme-preview"] > div:first-child button')).filter(el => {
         const r = el.getBoundingClientRect();
@@ -106,7 +107,12 @@ async function inspect(page, theme, width, engine) {
   assert.ok(metrics.columns >= 1 && metrics.columns <= 2, 'Mobile preview should show 1-2 product columns: ' + theme + ' ' + engine);
   assert.deepEqual(metrics.overflowing, [], 'Preview card/button overflow: ' + theme + ' ' + engine);
   assert.deepEqual(metrics.modalToolbarOverflow, [], 'Preview controls must remain within viewport');
-  report.push({ engine, width, theme, status: 'PASS', columns: metrics.columns });
+  // Desktop preview on a narrow phone must have a real 1280px viewport.
+  await dialog.getByRole('button',{name:'عرض شاشة الكمبيوتر'}).click();
+  const actualWidth=await canvas.frameLocator('iframe').locator('body').evaluate(()=>innerWidth);
+  assert.equal(actualWidth,1280,'Desktop media queries must run at 1280px, even on a phone');
+  await dialog.getByRole('button',{name:/موبايل/}).click();
+  report.push({ engine, width, theme, status:'PASS', columns:metrics.columns,desktopViewport:actualWidth });
   if (width === 390) {
     await canvas.screenshot({path: path.join(output, engine + '-' + theme + '-mobile.png')});
   }

@@ -101,7 +101,7 @@ namespace WatsStore.Api.Controllers
             var response = new PublicStoreResponse
             {
                 ThemeId = commerce?.PublishedTheme ?? "editorial-luxe",
-                CustomizationJson = commerce?.CustomizationJson ?? "{}",
+                CustomizationJson = ThemeDesignState.Read(commerce?.CustomizationJson).Published.GetRawText(),
                 CheckoutMode = commerce?.CheckoutMode ?? "whatsapp",
                 CashOnDelivery = commerce?.CashOnDelivery ?? true,
                 InstaPay = commerce?.InstaPay ?? !string.IsNullOrWhiteSpace(store.InstaPayAddress),
