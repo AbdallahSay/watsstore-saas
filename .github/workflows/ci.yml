@@ -74,6 +74,8 @@ jobs:
 
       - name: Type check
         run: npx tsc --noEmit
+      - name: ESLint release gate
+        run: npm run lint
       - name: Audit npm dependencies
         run: npm audit --audit-level=moderate
 
