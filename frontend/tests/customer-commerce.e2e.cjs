@@ -21,7 +21,7 @@ async function viewport(page,width){await page.setViewport({width,height:1000,is
   await request(`/merchant/commerce/orders/${order.orderId}/status`,fixture.token,'PATCH',{status:'Confirmed'});
   await page.waitForFunction(()=>document.querySelector('[aria-label="تحديث غير مقروء"]'));
   await page.waitForFunction(()=>window.__notices.length===1);await click(page,'تحديث الآن');await sleep(600);assert.equal(await page.evaluate(()=>window.__notices.length),1);
-  await page.reload({waitUntil:'domcontentloaded'});assert.equal(await page.evaluate(()=>window.__notices.length),0);assert.ok(await page.$('[aria-label="تحديث غير مقروء"]'));
+  await page.reload({waitUntil:'domcontentloaded'});await page.waitForSelector('.cc-order-row');assert.equal(await page.evaluate(()=>window.__notices.length),0);assert.ok(await page.$('[aria-label="تحديث غير مقروء"]'));
   // A hidden page makes no automatic API calls. Resume refreshes immediately.
   let tracks=0;page.on('request',r=>{if(r.url().includes('/orders/track/'))tracks++;});
   await page.evaluate(()=>{Object.defineProperty(document,'visibilityState',{value:'hidden',configurable:true});document.dispatchEvent(new Event('visibilitychange'));});await sleep(500);const hidden=tracks;await sleep(1000);assert.equal(tracks,hidden);

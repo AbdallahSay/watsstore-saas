@@ -48,7 +48,7 @@ export default function DashboardProductsPage() {
   const [formImageUrl, setFormImageUrl] = useState('');
   const [formDescription, setFormDescription] = useState('');
   const [formIsAvailable, setFormIsAvailable] = useState(true);
-  
+
   // File & Multi-Image upload state
   const [formImages, setFormImages] = useState<string[]>([]);
   const [isDragging, setIsDragging] = useState(false);
@@ -71,27 +71,27 @@ export default function DashboardProductsPage() {
     const token = (localStorage.getItem('watsstore_merchant_token') || localStorage.getItem('watsstore_token'));
     if (!token) return;
 
-    try {
-      const [prods, cats, summary] = await Promise.all([
+
+      return Promise.all([
         api.getProducts(token),
         api.getCategories(token),
         api.getDashboardSummary(token)
-      ]);
+      ]).then(async ([prods, cats, summary]) => {
       setProducts(prods);
       setCategories(cats);
       setPlanType(summary.storeInfo?.planType || 'Free');
       setStoreName(summary.storeInfo?.storeName || '');
       setAiGenerationsUsed(summary.aiGenerationsUsed ?? summary.storeInfo?.aiGenerationsUsed ?? 0);
       setAiGenerationsLimit(summary.aiGenerationsLimit ?? summary.storeInfo?.aiGenerationsLimit ?? (summary.storeInfo?.planType === 'Pro' ? 15 : summary.storeInfo?.planType === 'VIP' ? 150 : 0));
-    } catch (err: any) {
+    }).catch((err: any) => {
       appSwal.fire({
         icon: 'error',
         title: 'خطأ',
         text: err.message || 'فشل في تحميل المنتجات',
       });
-    } finally {
+    }).finally(() => {
       setIsLoading(false);
-    }
+    });
   };
 
   useEffect(() => {

@@ -36,18 +36,18 @@ export default function MerchantOrdersPage() {
     const token = (localStorage.getItem('watsstore_merchant_token') || localStorage.getItem('watsstore_token'));
     if (!token) return;
 
-    try {
-      const data = await api.getOrders(token, page, 100);
+
+      return api.getOrders(token, page, 100).then(async (data) => {
       setOrders(data.orders || []);setTotal(data.total);
-    } catch (err: any) {
+    }).catch((err: any) => {
       appSwal.fire({
         icon: 'error',
         title: 'خطأ',
         text: err.message || 'فشل في تحميل سجل الطلبات',
       });
-    } finally {
+    }).finally(() => {
       setIsLoading(false);
-    }
+    });
   };
 
   useEffect(() => {

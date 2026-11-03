@@ -2,6 +2,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
+import { useBrowserStorage, useBrowserReady } from '@/hooks/useBrowserStorage';
 import { readDeviceOrders, removeDeviceOrder, updateDeviceOrder, SavedOrder } from '@/lib/customer-orders';
 import { commerceApi, TrackingOrder } from '@/lib/commerce-api';
 import { orderLabel, terminalOrder } from '@/lib/order-status';
@@ -13,16 +14,20 @@ import { useVisiblePoll } from './useVisiblePoll';
 export default function CustomerOrders() {
   const {storeSlug:slug}=useParams<{storeSlug:string}>(); const {language}=useLanguage(); const en=language!=='ar';
   const tr=(ar:string,english:string)=>en?english:ar;
-  const [orders,setOrders]=useState<SavedOrder[]>([]); const [loaded,setLoaded]=useState(false);
+  const [orders,setOrders]=useState<SavedOrder[]>([]); const loaded=useBrowserReady();
   const [checking,setChecking]=useState(false);const checkingRef=useRef(false);
   const [errors,setErrors]=useState<Record<string,string>>({});const [notice,setNotice]=useState('');
   const [notifications,setNotifications]=useState(false);
   useEffect(()=>{
-    const sync=()=>{setOrders(readDeviceOrders(slug));setLoaded(true);};sync();
-    try{setNotifications(localStorage.getItem(`ws_foreground_${slug}`)==='enabled'&&'Notification'in window&&Notification.permission==='granted');}catch{}
+    const sync=()=>{setOrders(readDeviceOrders(slug));};
     window.addEventListener('storage',sync);window.addEventListener('ws-orders-changed',sync);
     return()=>{window.removeEventListener('storage',sync);window.removeEventListener('ws-orders-changed',sync);};
   },[slug]);
+  const savedNotifications = useBrowserStorage('ws_foreground_' + slug);
+  const savedOrders = useBrowserStorage('ws_customer_orders_' + slug);
+  const [previousStorage, setPreviousStorage] = useState<string | undefined>();
+  const storageSnapshot = JSON.stringify([slug, savedNotifications, savedOrders, loaded]);
+  if (previousStorage !== storageSnapshot) { setPreviousStorage(storageSnapshot); setOrders(readDeviceOrders(slug)); setNotifications(loaded && savedNotifications === 'enabled' && 'Notification' in window && Notification.permission === 'granted'); }
   async function refresh(manual=false) {
     if(document.visibilityState!=='visible'||checkingRef.current)return;
     const saved=readDeviceOrders(slug).filter(x=>manual||!terminalOrder(x.status));if(!saved.length)return;

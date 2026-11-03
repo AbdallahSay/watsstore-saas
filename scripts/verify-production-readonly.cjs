@@ -1,10 +1,23 @@
 // Public release smoke test. Every browser write request is aborted, including orders.
 const fs=require('node:fs'),path=require('node:path'),assert=require('node:assert/strict');
 const {chromium,firefox,webkit,expect}=require('../frontend/node_modules/@playwright/test');
-const site=process.env.E2E_SITE_URL||'https://frontend-bay-ten-58.vercel.app',api=process.env.E2E_API_URL||'https://watsstore.runasp.net/api',slug=process.env.E2E_STORE_SLUG||'a9';
-assert.ok(['localhost','frontend-bay-ten-58.vercel.app'].includes(new URL(site).hostname));assert.ok(['localhost','watsstore.runasp.net'].includes(new URL(api).hostname));
+const site=process.env.E2E_SITE_URL||'https://watsstore.vercel.app',api=process.env.E2E_API_URL||'https://watsstore.runasp.net/api',slug=process.env.E2E_STORE_SLUG||'a9';
+assert.ok(['localhost','watsstore.vercel.app','frontend-bay-ten-58.vercel.app'].includes(new URL(site).hostname));assert.ok(['localhost','watsstore.runasp.net'].includes(new URL(api).hostname));
 const out=path.resolve(__dirname,'../work/transformation/production-readonly');fs.mkdirSync(out,{recursive:true});
 async function bounds(page){assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),true,'No document overflow');}
+async function checkoutFields(page){
+ const issues=await page.locator('.ws-checkout-fields').evaluateAll(fields=>fields.flatMap(field=>{
+  let bottom=-Infinity;const issues=[];
+  for(const label of field.querySelectorAll(':scope > label')){
+   const control=label.querySelector('input,select,textarea');if(!control)continue;
+   const r=label.getBoundingClientRect(),c=control.getBoundingClientRect();
+   const node=[...label.childNodes].find(n=>n.nodeType===Node.TEXT_NODE&&n.textContent.trim());
+   if(node){const range=document.createRange();range.selectNode(node);if(range.getBoundingClientRect().bottom>c.top+1)issues.push('Label overlaps its control');}
+   if(r.top<bottom-1)issues.push('Adjacent fields overlap');bottom=r.bottom;
+   if(c.left< -1||c.right>innerWidth+1)issues.push('Field overflows');
+  }return issues;
+ }));assert.deepEqual(issues,[],'Live checkout field geometry');
+}
 (async()=>{const response=await fetch(`${api}/public/stores/${encodeURIComponent(slug)}`);assert.equal(response.status,200);const store=await response.json(),product=store.products.find(p=>p.isAvailable);assert.ok(product,'A publicly available product is required for the checkout UI smoke test.');
 const results=[];for(const engine of (process.env.AUDIT_ENGINES||'chrome,firefox,webkit').split(',')){
  const browser=engine==='chrome'?await chromium.launch({channel:'chrome'}):await {firefox,webkit}[engine].launch();
@@ -21,8 +34,8 @@ const results=[];for(const engine of (process.env.AUDIT_ENGINES||'chrome,firefox
   await page.goto(`${site}/s/${encodeURIComponent(slug)}/p/${encodeURIComponent(product.slug)}`,{waitUntil:'networkidle'});await expect(page.locator('#product-title')).toHaveText(product.name);await bounds(page);await page.screenshot({path:path.join(out,`${engine}-${language}-product.png`)});
   await page.getByRole('button',{name:language==='ar'?'اشترِ الآن':'Buy now',exact:true}).click();await expect(page.locator('.ws-checkout-form')).toBeVisible();
   await page.locator('input[name=name]').fill('اختبار واجهة فقط — لا يُرسل');await page.locator('input[name=phone]').fill('01000000000');await page.locator('textarea[name=address]').fill('عنوان اختبار واجهة فقط. لا يتم إنشاء طلب ولا يتم الشحن.');
-  for(const width of [320,360,375,390,414,430,768,1024,1280,1440,1920]){await page.setViewportSize({width,height:390});await bounds(page);const rectangle=await page.locator('.ws-cart').evaluate(element=>{const r=element.getBoundingClientRect();return {left:r.left,right:r.right,top:r.top,bottom:r.bottom,width:innerWidth,height:innerHeight};});assert.ok(rectangle.left>=-1&&rectangle.right<=rectangle.width+1&&rectangle.top>=-1&&rectangle.bottom<=rectangle.height+1);}
-  await page.setViewportSize({width:390,height:844});await page.locator('.ws-checkout-review').scrollIntoViewIfNeeded();await page.screenshot({path:path.join(out,`${engine}-${language}-checkout-not-submitted.png`)});
+  for(const width of [320,360,375,390,414,430,768,1024,1280,1440,1920]){await page.setViewportSize({width,height:390});await bounds(page);await checkoutFields(page);const rectangle=await page.locator('.ws-cart').evaluate(element=>{const r=element.getBoundingClientRect();return {left:r.left,right:r.right,top:r.top,bottom:r.bottom,width:innerWidth,height:innerHeight};});assert.ok(rectangle.left>=-1&&rectangle.right<=rectangle.width+1&&rectangle.top>=-1&&rectangle.bottom<=rectangle.height+1);}
+  await page.setViewportSize({width:390,height:844});await page.locator('#checkout-customer').scrollIntoViewIfNeeded();await page.screenshot({path:path.join(out,`${engine}-${language}-checkout-fields.png`)});await page.locator('#checkout-payment').scrollIntoViewIfNeeded();await page.screenshot({path:path.join(out,`${engine}-${language}-checkout-payment.png`)});await page.locator('.ws-checkout-review').scrollIntoViewIfNeeded();await page.screenshot({path:path.join(out,`${engine}-${language}-checkout-not-submitted.png`)});
   await page.getByRole('button',{name:language==='ar'?'إغلاق':'Close',exact:true}).click();await page.getByRole('button',{name:language==='ar'?/حقيبة التسوق/:/Shopping bag/}).click();await page.getByRole('button',{name:language==='ar'?'المتابعة لإتمام الطلب':'Continue to checkout',exact:true}).click();await expect(page.locator('input[name=name]')).toHaveValue('اختبار واجهة فقط — لا يُرسل');
   await page.getByRole('button',{name:language==='ar'?'إغلاق':'Close',exact:true}).click();await page.goto(`${site}/s/${encodeURIComponent(slug)}/my-orders`,{waitUntil:'networkidle'});await bounds(page);await expect(page.locator('body')).toContainText(language==='ar'?'طلباتي':'My orders');
   assert.deepEqual(errors,[]);assert.deepEqual(writes.filter(r=>r.path.endsWith('/orders')),[],'No order submission may even be attempted');

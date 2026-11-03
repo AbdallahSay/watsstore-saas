@@ -1,0 +1,846 @@
+{
+  "isolated": true,
+  "orderSubmissions": 0,
+  "results": [
+    {
+      "theme": "editorial-luxe",
+      "language": "ar",
+      "width": 320,
+      "passed": true
+    },
+    {
+      "theme": "editorial-luxe",
+      "language": "ar",
+      "width": 360,
+      "passed": true
+    },
+    {
+      "theme": "editorial-luxe",
+      "language": "ar",
+      "width": 390,
+      "passed": true
+    },
+    {
+      "theme": "editorial-luxe",
+      "language": "ar",
+      "width": 430,
+      "passed": true
+    },
+    {
+      "theme": "editorial-luxe",
+      "language": "ar",
+      "width": 768,
+      "passed": true
+    },
+    {
+      "theme": "editorial-luxe",
+      "language": "ar",
+      "width": 1024,
+      "passed": true
+    },
+    {
+      "theme": "editorial-luxe",
+      "language": "ar",
+      "width": 1440,
+      "passed": true
+    },
+    {
+      "theme": "street-pulse",
+      "language": "ar",
+      "width": 320,
+      "passed": true
+    },
+    {
+      "theme": "street-pulse",
+      "language": "ar",
+      "width": 360,
+      "passed": true
+    },
+    {
+      "theme": "street-pulse",
+      "language": "ar",
+      "width": 390,
+      "passed": true
+    },
+    {
+      "theme": "street-pulse",
+      "language": "ar",
+      "width": 430,
+      "passed": true
+    },
+    {
+      "theme": "street-pulse",
+      "language": "ar",
+      "width": 768,
+      "passed": true
+    },
+    {
+      "theme": "street-pulse",
+      "language": "ar",
+      "width": 1024,
+      "passed": true
+    },
+    {
+      "theme": "street-pulse",
+      "language": "ar",
+      "width": 1440,
+      "passed": true
+    },
+    {
+      "theme": "pure-beauty",
+      "language": "ar",
+      "width": 320,
+      "passed": true
+    },
+    {
+      "theme": "pure-beauty",
+      "language": "ar",
+      "width": 360,
+      "passed": true
+    },
+    {
+      "theme": "pure-beauty",
+      "language": "ar",
+      "width": 390,
+      "passed": true
+    },
+    {
+      "theme": "pure-beauty",
+      "language": "ar",
+      "width": 430,
+      "passed": true
+    },
+    {
+      "theme": "pure-beauty",
+      "language": "ar",
+      "width": 768,
+      "passed": true
+    },
+    {
+      "theme": "pure-beauty",
+      "language": "ar",
+      "width": 1024,
+      "passed": true
+    },
+    {
+      "theme": "pure-beauty",
+      "language": "ar",
+      "width": 1440,
+      "passed": true
+    },
+    {
+      "theme": "tech-grid",
+      "language": "ar",
+      "width": 320,
+      "passed": true
+    },
+    {
+      "theme": "tech-grid",
+      "language": "ar",
+      "width": 360,
+      "passed": true
+    },
+    {
+      "theme": "tech-grid",
+      "language": "ar",
+      "width": 390,
+      "passed": true
+    },
+    {
+      "theme": "tech-grid",
+      "language": "ar",
+      "width": 430,
+      "passed": true
+    },
+    {
+      "theme": "tech-grid",
+      "language": "ar",
+      "width": 768,
+      "passed": true
+    },
+    {
+      "theme": "tech-grid",
+      "language": "ar",
+      "width": 1024,
+      "passed": true
+    },
+    {
+      "theme": "tech-grid",
+      "language": "ar",
+      "width": 1440,
+      "passed": true
+    },
+    {
+      "theme": "fresh-market",
+      "language": "ar",
+      "width": 320,
+      "passed": true
+    },
+    {
+      "theme": "fresh-market",
+      "language": "ar",
+      "width": 360,
+      "passed": true
+    },
+    {
+      "theme": "fresh-market",
+      "language": "ar",
+      "width": 390,
+      "passed": true
+    },
+    {
+      "theme": "fresh-market",
+      "language": "ar",
+      "width": 430,
+      "passed": true
+    },
+    {
+      "theme": "fresh-market",
+      "language": "ar",
+      "width": 768,
+      "passed": true
+    },
+    {
+      "theme": "fresh-market",
+      "language": "ar",
+      "width": 1024,
+      "passed": true
+    },
+    {
+      "theme": "fresh-market",
+      "language": "ar",
+      "width": 1440,
+      "passed": true
+    },
+    {
+      "theme": "living-space",
+      "language": "ar",
+      "width": 320,
+      "passed": true
+    },
+    {
+      "theme": "living-space",
+      "language": "ar",
+      "width": 360,
+      "passed": true
+    },
+    {
+      "theme": "living-space",
+      "language": "ar",
+      "width": 390,
+      "passed": true
+    },
+    {
+      "theme": "living-space",
+      "language": "ar",
+      "width": 430,
+      "passed": true
+    },
+    {
+      "theme": "living-space",
+      "language": "ar",
+      "width": 768,
+      "passed": true
+    },
+    {
+      "theme": "living-space",
+      "language": "ar",
+      "width": 1024,
+      "passed": true
+    },
+    {
+      "theme": "living-space",
+      "language": "ar",
+      "width": 1440,
+      "passed": true
+    },
+    {
+      "theme": "golden-atelier",
+      "language": "ar",
+      "width": 320,
+      "passed": true
+    },
+    {
+      "theme": "golden-atelier",
+      "language": "ar",
+      "width": 360,
+      "passed": true
+    },
+    {
+      "theme": "golden-atelier",
+      "language": "ar",
+      "width": 390,
+      "passed": true
+    },
+    {
+      "theme": "golden-atelier",
+      "language": "ar",
+      "width": 430,
+      "passed": true
+    },
+    {
+      "theme": "golden-atelier",
+      "language": "ar",
+      "width": 768,
+      "passed": true
+    },
+    {
+      "theme": "golden-atelier",
+      "language": "ar",
+      "width": 1024,
+      "passed": true
+    },
+    {
+      "theme": "golden-atelier",
+      "language": "ar",
+      "width": 1440,
+      "passed": true
+    },
+    {
+      "theme": "active-motion",
+      "language": "ar",
+      "width": 320,
+      "passed": true
+    },
+    {
+      "theme": "active-motion",
+      "language": "ar",
+      "width": 360,
+      "passed": true
+    },
+    {
+      "theme": "active-motion",
+      "language": "ar",
+      "width": 390,
+      "passed": true
+    },
+    {
+      "theme": "active-motion",
+      "language": "ar",
+      "width": 430,
+      "passed": true
+    },
+    {
+      "theme": "active-motion",
+      "language": "ar",
+      "width": 768,
+      "passed": true
+    },
+    {
+      "theme": "active-motion",
+      "language": "ar",
+      "width": 1024,
+      "passed": true
+    },
+    {
+      "theme": "active-motion",
+      "language": "ar",
+      "width": 1440,
+      "passed": true
+    },
+    {
+      "theme": "little-joy",
+      "language": "ar",
+      "width": 320,
+      "passed": true
+    },
+    {
+      "theme": "little-joy",
+      "language": "ar",
+      "width": 360,
+      "passed": true
+    },
+    {
+      "theme": "little-joy",
+      "language": "ar",
+      "width": 390,
+      "passed": true
+    },
+    {
+      "theme": "little-joy",
+      "language": "ar",
+      "width": 430,
+      "passed": true
+    },
+    {
+      "theme": "little-joy",
+      "language": "ar",
+      "width": 768,
+      "passed": true
+    },
+    {
+      "theme": "little-joy",
+      "language": "ar",
+      "width": 1024,
+      "passed": true
+    },
+    {
+      "theme": "little-joy",
+      "language": "ar",
+      "width": 1440,
+      "passed": true
+    },
+    {
+      "theme": "crafted-story",
+      "language": "ar",
+      "width": 320,
+      "passed": true
+    },
+    {
+      "theme": "crafted-story",
+      "language": "ar",
+      "width": 360,
+      "passed": true
+    },
+    {
+      "theme": "crafted-story",
+      "language": "ar",
+      "width": 390,
+      "passed": true
+    },
+    {
+      "theme": "crafted-story",
+      "language": "ar",
+      "width": 430,
+      "passed": true
+    },
+    {
+      "theme": "crafted-story",
+      "language": "ar",
+      "width": 768,
+      "passed": true
+    },
+    {
+      "theme": "crafted-story",
+      "language": "ar",
+      "width": 1024,
+      "passed": true
+    },
+    {
+      "theme": "crafted-story",
+      "language": "ar",
+      "width": 1440,
+      "passed": true
+    },
+    {
+      "theme": "editorial-luxe",
+      "language": "en",
+      "width": 320,
+      "passed": true
+    },
+    {
+      "theme": "editorial-luxe",
+      "language": "en",
+      "width": 360,
+      "passed": true
+    },
+    {
+      "theme": "editorial-luxe",
+      "language": "en",
+      "width": 390,
+      "passed": true
+    },
+    {
+      "theme": "editorial-luxe",
+      "language": "en",
+      "width": 430,
+      "passed": true
+    },
+    {
+      "theme": "editorial-luxe",
+      "language": "en",
+      "width": 768,
+      "passed": true
+    },
+    {
+      "theme": "editorial-luxe",
+      "language": "en",
+      "width": 1024,
+      "passed": true
+    },
+    {
+      "theme": "editorial-luxe",
+      "language": "en",
+      "width": 1440,
+      "passed": true
+    },
+    {
+      "theme": "street-pulse",
+      "language": "en",
+      "width": 320,
+      "passed": true
+    },
+    {
+      "theme": "street-pulse",
+      "language": "en",
+      "width": 360,
+      "passed": true
+    },
+    {
+      "theme": "street-pulse",
+      "language": "en",
+      "width": 390,
+      "passed": true
+    },
+    {
+      "theme": "street-pulse",
+      "language": "en",
+      "width": 430,
+      "passed": true
+    },
+    {
+      "theme": "street-pulse",
+      "language": "en",
+      "width": 768,
+      "passed": true
+    },
+    {
+      "theme": "street-pulse",
+      "language": "en",
+      "width": 1024,
+      "passed": true
+    },
+    {
+      "theme": "street-pulse",
+      "language": "en",
+      "width": 1440,
+      "passed": true
+    },
+    {
+      "theme": "pure-beauty",
+      "language": "en",
+      "width": 320,
+      "passed": true
+    },
+    {
+      "theme": "pure-beauty",
+      "language": "en",
+      "width": 360,
+      "passed": true
+    },
+    {
+      "theme": "pure-beauty",
+      "language": "en",
+      "width": 390,
+      "passed": true
+    },
+    {
+      "theme": "pure-beauty",
+      "language": "en",
+      "width": 430,
+      "passed": true
+    },
+    {
+      "theme": "pure-beauty",
+      "language": "en",
+      "width": 768,
+      "passed": true
+    },
+    {
+      "theme": "pure-beauty",
+      "language": "en",
+      "width": 1024,
+      "passed": true
+    },
+    {
+      "theme": "pure-beauty",
+      "language": "en",
+      "width": 1440,
+      "passed": true
+    },
+    {
+      "theme": "tech-grid",
+      "language": "en",
+      "width": 320,
+      "passed": true
+    },
+    {
+      "theme": "tech-grid",
+      "language": "en",
+      "width": 360,
+      "passed": true
+    },
+    {
+      "theme": "tech-grid",
+      "language": "en",
+      "width": 390,
+      "passed": true
+    },
+    {
+      "theme": "tech-grid",
+      "language": "en",
+      "width": 430,
+      "passed": true
+    },
+    {
+      "theme": "tech-grid",
+      "language": "en",
+      "width": 768,
+      "passed": true
+    },
+    {
+      "theme": "tech-grid",
+      "language": "en",
+      "width": 1024,
+      "passed": true
+    },
+    {
+      "theme": "tech-grid",
+      "language": "en",
+      "width": 1440,
+      "passed": true
+    },
+    {
+      "theme": "fresh-market",
+      "language": "en",
+      "width": 320,
+      "passed": true
+    },
+    {
+      "theme": "fresh-market",
+      "language": "en",
+      "width": 360,
+      "passed": true
+    },
+    {
+      "theme": "fresh-market",
+      "language": "en",
+      "width": 390,
+      "passed": true
+    },
+    {
+      "theme": "fresh-market",
+      "language": "en",
+      "width": 430,
+      "passed": true
+    },
+    {
+      "theme": "fresh-market",
+      "language": "en",
+      "width": 768,
+      "passed": true
+    },
+    {
+      "theme": "fresh-market",
+      "language": "en",
+      "width": 1024,
+      "passed": true
+    },
+    {
+      "theme": "fresh-market",
+      "language": "en",
+      "width": 1440,
+      "passed": true
+    },
+    {
+      "theme": "living-space",
+      "language": "en",
+      "width": 320,
+      "passed": true
+    },
+    {
+      "theme": "living-space",
+      "language": "en",
+      "width": 360,
+      "passed": true
+    },
+    {
+      "theme": "living-space",
+      "language": "en",
+      "width": 390,
+      "passed": true
+    },
+    {
+      "theme": "living-space",
+      "language": "en",
+      "width": 430,
+      "passed": true
+    },
+    {
+      "theme": "living-space",
+      "language": "en",
+      "width": 768,
+      "passed": true
+    },
+    {
+      "theme": "living-space",
+      "language": "en",
+      "width": 1024,
+      "passed": true
+    },
+    {
+      "theme": "living-space",
+      "language": "en",
+      "width": 1440,
+      "passed": true
+    },
+    {
+      "theme": "golden-atelier",
+      "language": "en",
+      "width": 320,
+      "passed": true
+    },
+    {
+      "theme": "golden-atelier",
+      "language": "en",
+      "width": 360,
+      "passed": true
+    },
+    {
+      "theme": "golden-atelier",
+      "language": "en",
+      "width": 390,
+      "passed": true
+    },
+    {
+      "theme": "golden-atelier",
+      "language": "en",
+      "width": 430,
+      "passed": true
+    },
+    {
+      "theme": "golden-atelier",
+      "language": "en",
+      "width": 768,
+      "passed": true
+    },
+    {
+      "theme": "golden-atelier",
+      "language": "en",
+      "width": 1024,
+      "passed": true
+    },
+    {
+      "theme": "golden-atelier",
+      "language": "en",
+      "width": 1440,
+      "passed": true
+    },
+    {
+      "theme": "active-motion",
+      "language": "en",
+      "width": 320,
+      "passed": true
+    },
+    {
+      "theme": "active-motion",
+      "language": "en",
+      "width": 360,
+      "passed": true
+    },
+    {
+      "theme": "active-motion",
+      "language": "en",
+      "width": 390,
+      "passed": true
+    },
+    {
+      "theme": "active-motion",
+      "language": "en",
+      "width": 430,
+      "passed": true
+    },
+    {
+      "theme": "active-motion",
+      "language": "en",
+      "width": 768,
+      "passed": true
+    },
+    {
+      "theme": "active-motion",
+      "language": "en",
+      "width": 1024,
+      "passed": true
+    },
+    {
+      "theme": "active-motion",
+      "language": "en",
+      "width": 1440,
+      "passed": true
+    },
+    {
+      "theme": "little-joy",
+      "language": "en",
+      "width": 320,
+      "passed": true
+    },
+    {
+      "theme": "little-joy",
+      "language": "en",
+      "width": 360,
+      "passed": true
+    },
+    {
+      "theme": "little-joy",
+      "language": "en",
+      "width": 390,
+      "passed": true
+    },
+    {
+      "theme": "little-joy",
+      "language": "en",
+      "width": 430,
+      "passed": true
+    },
+    {
+      "theme": "little-joy",
+      "language": "en",
+      "width": 768,
+      "passed": true
+    },
+    {
+      "theme": "little-joy",
+      "language": "en",
+      "width": 1024,
+      "passed": true
+    },
+    {
+      "theme": "little-joy",
+      "language": "en",
+      "width": 1440,
+      "passed": true
+    },
+    {
+      "theme": "crafted-story",
+      "language": "en",
+      "width": 320,
+      "passed": true
+    },
+    {
+      "theme": "crafted-story",
+      "language": "en",
+      "width": 360,
+      "passed": true
+    },
+    {
+      "theme": "crafted-story",
+      "language": "en",
+      "width": 390,
+      "passed": true
+    },
+    {
+      "theme": "crafted-story",
+      "language": "en",
+      "width": 430,
+      "passed": true
+    },
+    {
+      "theme": "crafted-story",
+      "language": "en",
+      "width": 768,
+      "passed": true
+    },
+    {
+      "theme": "crafted-story",
+      "language": "en",
+      "width": 1024,
+      "passed": true
+    },
+    {
+      "theme": "crafted-story",
+      "language": "en",
+      "width": 1440,
+      "passed": true
+    }
+  ]
+}

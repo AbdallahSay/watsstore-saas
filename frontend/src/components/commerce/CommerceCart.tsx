@@ -4,6 +4,7 @@ import OrderConfirmation from './OrderConfirmation';
 import { CartItem, Store, CreateOrderResponse } from '@/types';
 import { createOrder, paymentOptions, CommerceApiError } from '@/lib/commerce-api';
 import { CheckoutAttempt, checkoutKey, prepareCheckoutAttempt, readCheckoutAttempt } from '@/lib/checkout-attempt';
+import { useBrowserReady } from '@/hooks/useBrowserStorage';
 import { api } from '@/lib/api';
 import { useDialog } from './useDialog';
 import { rememberDeviceOrder } from '@/lib/customer-orders';
@@ -18,7 +19,7 @@ export default function CommerceCart({directCheckout = false, store, items, open
   const submitting = useRef(false);
   const requestClose = () => { if (!submitting.current) close(); };
   const ref = useDialog(open, requestClose);
-  const [step, setStep] = useState<'cart' | 'checkout'>('cart');
+  const [step, setStep] = useState<'cart' | 'checkout'>(directCheckout ? 'checkout' : 'cart');
   const [coupon, setCoupon] = useState('');
   const [discount, setDiscount] = useState(0);
   const [error, setError] = useState('');
@@ -28,39 +29,42 @@ export default function CommerceCart({directCheckout = false, store, items, open
   const [couponBusy, setCouponBusy] = useState(false);
   const couponRequest = useRef(0);
   const [result, setResult] = useState<CreateOrderResponse | null>(null);
-  useEffect(() => {
-    if (result && items.length) {
-      setResult(null);
-      setStep(directCheckout ? 'checkout' : 'cart');
-    }
-  }, [items, result, directCheckout]);
+  if (result && items.length) { setResult(null); setStep(directCheckout ? 'checkout' : 'cart'); }
   const [zoneId, setZoneId] = useState('');
   const methods = paymentOptions(store);
   const [payment, setPayment] = useState(methods[0]?.id || 'cod');
   const [channel, setChannel] = useState<'online' | 'whatsapp'>(store.checkoutMode === 'whatsapp' || !store.checkoutMode ? 'whatsapp' : 'online');
   const attempt = useRef<CheckoutAttempt | null>(null);
   const storageKey = `watsstore_attempt_${store.slug}`;
-  useEffect(() => {
-    let saved: CheckoutAttempt | null = null;
-    try { saved = readCheckoutAttempt(sessionStorage.getItem(storageKey)); } catch { /* checked before submission */ }
-    if (!saved) return;
-    attempt.current = saved;
-    const p = saved.payload;
-    setDetails({name:p.customerName, phone:p.customerPhone, address:p.customerAddress, notes:p.customerNotes || '', reference:p.transferReference || ''});
-    setPayment(p.paymentMethod || 'cod'); setZoneId(p.shippingZoneId || ''); setChannel(p.channel || 'whatsapp'); setCoupon(p.couponCode || '');
-    if (saved.pending) {
-      setUncertain(true); setStep('checkout');
-      setError('هناك محاولة طلب لم يتم تأكيد نتيجتها. أعد التحقق من نفس الطلب؛ لا تُنشئ طلباً جديداً.');
+  const browserReady = useBrowserReady();
+  const [restoredKey, setRestoredKey] = useState<string | null>(null);
+  if (browserReady && restoredKey !== storageKey) {
+    setRestoredKey(storageKey);
+    let restoredAttempt: CheckoutAttempt | null = null;
+    try { restoredAttempt = readCheckoutAttempt(sessionStorage.getItem(storageKey)); } catch { /* Optional browser persistence. */ }
+    if (restoredAttempt) {
+      const p = restoredAttempt.payload;
+      setDetails({name:p.customerName, phone:p.customerPhone, address:p.customerAddress, notes:p.customerNotes || '', reference:p.transferReference || ''});
+      setPayment(p.paymentMethod || 'cod'); setZoneId(p.shippingZoneId || ''); setChannel(p.channel || 'whatsapp'); setCoupon(p.couponCode || '');
+      if (restoredAttempt.pending) { setUncertain(true); setStep('checkout'); setError('هناك محاولة طلب لم يتم تأكيد نتيجتها. أعد التحقق من نفس الطلب؛ لا تُنشئ طلباً جديداً.'); }
     }
+  }
+  useEffect(() => {
+    try { attempt.current = readCheckoutAttempt(sessionStorage.getItem(storageKey)); } catch { attempt.current = null; }
   }, [storageKey]);
-  useEffect(() => { if (open && !attempt.current?.pending) setStep(directCheckout ? 'checkout' : 'cart'); }, [open, directCheckout]);
+  const openMode = `${open}:${directCheckout}`;
+  const [previousOpen, setPreviousOpen] = useState(openMode);
+  if (openMode !== previousOpen) { setPreviousOpen(openMode); if (open && !uncertain) setStep(directCheckout ? 'checkout' : 'cart'); }
   const subtotal = items.reduce((n, x) => n + x.product.price * x.quantity, 0);
   const zone = store.shippingZones?.find(z => z.id === zoneId);
   const shipping = zone?.fee ?? store.deliveryFee;
   const shippingKnown = !store.shippingZones?.length || !!zone;
   const totalItems = items.reduce((count, item) => count + item.quantity, 0);
   const money = (n: number) => `${n.toFixed(2)} ${store.currency}`;
-  useEffect(() => { setDiscount(0); couponRequest.current++; setCouponBusy(false); }, [subtotal, coupon]);
+  const discountKey = JSON.stringify([subtotal, coupon]);
+  const [previousDiscountKey, setPreviousDiscountKey] = useState(discountKey);
+  if (previousDiscountKey !== discountKey) { setPreviousDiscountKey(discountKey); setDiscount(0); setCouponBusy(false); }
+  useEffect(() => { couponRequest.current++; }, [subtotal, coupon]);
   useEffect(() => {
     if (!open || step !== 'checkout' || result || uncertain) return;
     ref.current?.querySelector<HTMLElement>('.ws-cart-body')?.scrollTo({top:0});
