@@ -11,7 +11,6 @@ import {
   Mail, 
   Lock, 
   AlertCircle, 
-  Sparkles,
   LogIn,
   Home,
   Eye,
@@ -58,22 +57,6 @@ export default function LoginPage() {
     }
   };
 
-  const handleFillDemo = () => {
-    setEmail('demo@watsstore.com');
-    setPassword('123456');
-    setErrorMsg(null);
-  };
-
-  const handleForgotPassword = () => {
-    appSwal.fire({
-      icon: 'info',
-      title: t('auth.forgot_password_title', undefined, 'استعادة كلمة المرور'),
-      text: t('auth.forgot_password_desc', undefined, 'لاستعادة كلمة المرور أو إعادة تعيين حساب متجرك، تواصل فوراً مع فريق الدعم الفني عبر الواتساب: 01011653619'),
-      confirmButtonText: t('swal.ok', undefined, 'حسناً'),
-      confirmButtonColor: '#10B981',
-    });
-  };
-
   const isRtl = dir === 'rtl';
 
   return (
@@ -112,16 +95,6 @@ export default function LoginPage() {
 
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md px-4 sm:px-0">
         <div className="bg-white dark:bg-slate-900 py-8 px-6 sm:px-10 rounded-3xl shadow-xl shadow-slate-200/50 dark:shadow-slate-950/60 border border-slate-200/80 dark:border-slate-800 space-y-6 transition-colors">
-          {/* Quick Demo Login Pill */}
-          <button
-            type="button"
-            onClick={handleFillDemo}
-            className="w-full py-2.5 px-4 bg-emerald-50 dark:bg-emerald-950/40 hover:bg-emerald-100 dark:hover:bg-emerald-900/50 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/60 rounded-2xl text-xs font-bold flex items-center justify-center gap-2 transition-colors"
-          >
-            <Sparkles className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-            <span>{t('auth.demo_fill', undefined, 'تجربة سريعة: ملء بيانات متجر العرض (Demo Store)')}</span>
-          </button>
-
           {errorMsg && (
             <div className="p-3.5 bg-rose-50 dark:bg-rose-950/50 border border-rose-200 dark:border-rose-800 rounded-2xl text-rose-700 dark:text-rose-300 text-xs flex items-center gap-2 font-bold">
               <AlertCircle className="w-4 h-4 shrink-0" />
@@ -152,13 +125,12 @@ export default function LoginPage() {
                 <label className="block text-xs font-bold text-slate-700 dark:text-slate-300">
                   {t('auth.password', undefined, 'كلمة المرور')}
                 </label>
-                <button
-                  type="button"
-                  onClick={handleForgotPassword}
+                <Link
+                  href="/forgot-password"
                   className="text-[11px] font-bold text-emerald-600 dark:text-emerald-400 hover:underline"
                 >
                   {t('auth.forgot_password', undefined, 'هل نسيت كلمة المرور؟')}
-                </button>
+                </Link>
               </div>
               <div className="relative">
                 <Lock className={`w-4 h-4 text-slate-400 absolute ${isRtl ? 'right-3.5' : 'left-3.5'} top-1/2 -translate-y-1/2`} />

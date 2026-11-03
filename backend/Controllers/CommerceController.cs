@@ -53,6 +53,10 @@ public class CommerceController(AppDbContext db) : ControllerBase
     public async Task<IActionResult> Publish(string op)
     {
         if (op is not ("publish" or "restore")) return NotFound();
+        var store = await db.Stores.SingleOrDefaultAsync(s => s.Id == Tenant);
+        if (store == null) return NotFound();
+        if (op == "publish" && !store.EmailVerified)
+            return StatusCode(403, new { message = "يلزم تأكيد ملكية البريد الإلكتروني قبل نشر المتجر للعامة.", requiresEmailVerification = true });
         var settings = await db.CommerceSettings.SingleOrDefaultAsync(x => x.StoreId == Tenant);
         if (settings == null) return BadRequest(new { message = "احفظ المسودة أولاً" });
         var previous = settings.PublishedTheme;

@@ -28,6 +28,13 @@ namespace WatsStore.Api.Domain.Entities
         public string? InstaPayAddress { get; set; }
         public string PlanType { get; set; } = "Free"; // Free, Pro, VIP
         public bool IsActive { get; set; } = true;
+        public bool EmailVerified { get; set; } = false;
+        public DateTime? EmailVerifiedAt { get; set; }
+        public string EmailVerificationStatus { get; set; } = "Pending"; // Pending, Verified, Grandfathered
+        public bool PhoneVerified { get; set; } = false;
+        public DateTime? PhoneVerifiedAt { get; set; }
+        public DateTime? PasswordChangedAt { get; set; }
+        public string SecurityStamp { get; set; } = Guid.NewGuid().ToString("N");
         public int ViewCount { get; set; } = 0;
         public int AiGenerationsCount { get; set; } = 0;
         public DateTime? AiQuotaResetDate { get; set; }
@@ -40,6 +47,7 @@ namespace WatsStore.Api.Domain.Entities
         public ICollection<WhatsAppOrder> Orders { get; set; } = new List<WhatsAppOrder>();
         public ICollection<StoreReview> Reviews { get; set; } = new List<StoreReview>();
         public ICollection<StoreCoupon> Coupons { get; set; } = new List<StoreCoupon>();
+        public ICollection<MerchantOtpChallenge> OtpChallenges { get; set; } = new List<MerchantOtpChallenge>();
 
         public int GetAiGenerationsLimit()
         {

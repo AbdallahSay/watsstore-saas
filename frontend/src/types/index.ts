@@ -46,6 +46,9 @@ export interface Store {
   publicCode: string;
   whatsAppNumber: string;
   businessCategory: string;
+  emailVerified?: boolean;
+  emailVerificationStatus?: string;
+  phoneVerified?: boolean;
   city: string;
   addressDetails?: string | null;
   logoUrl?: string | null;
@@ -166,6 +169,40 @@ export interface ApplyCouponResponse {
   message: string;
 }
 
+export interface SecurityStatusResponse {
+  email: string;
+  emailVerified: boolean;
+  emailVerificationStatus: string;
+  phone: string;
+  phoneVerified: boolean;
+  phoneVerificationStatus: string;
+  canPublishTheme: boolean;
+}
+
+export interface ForgotPasswordResponse {
+  success: boolean;
+  message: string;
+  retryAfterSeconds?: number;
+}
+
+export interface VerifyRecoveryResponse {
+  success: boolean;
+  message: string;
+  recoveryToken?: string;
+  expiresInSeconds?: number;
+}
+
+export interface GenericSecurityResponse {
+  success: boolean;
+  message: string;
+}
+
+export interface RevokeSessionsResponse {
+  success: boolean;
+  message: string;
+  token: string;
+}
+
 export interface AuthResponse {
   token: string;
   storeId: string;
@@ -180,6 +217,9 @@ export interface AuthResponse {
   currency: string;
   city: string;
   businessCategory: string;
+  emailVerified?: boolean;
+  emailVerificationStatus?: string;
+  phoneVerified?: boolean;
 }
 
 export interface DashboardSummary {
@@ -201,6 +241,9 @@ export interface DashboardSummary {
     publicCode: string;
     whatsAppNumber: string;
     businessCategory: string;
+  emailVerified?: boolean;
+  emailVerificationStatus?: string;
+  phoneVerified?: boolean;
     city: string;
     addressDetails?: string | null;
     logoUrl?: string | null;
@@ -242,6 +285,9 @@ export interface StoreDirectoryCard {
   slug: string;
   publicCode: string;
   businessCategory: string;
+  emailVerified?: boolean;
+  emailVerificationStatus?: string;
+  phoneVerified?: boolean;
   city: string;
   logoUrl?: string | null;
   themeColor: string;
@@ -306,6 +352,9 @@ export interface AdminStoreSummary {
   publicCode: string;
   subdomain: string;
   businessCategory: string;
+  emailVerified?: boolean;
+  emailVerificationStatus?: string;
+  phoneVerified?: boolean;
   city: string;
   planType: string;
   isActive: boolean;

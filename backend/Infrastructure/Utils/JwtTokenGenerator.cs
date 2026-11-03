@@ -44,6 +44,8 @@ namespace WatsStore.Api.Infrastructure.Utils
                 new Claim("ownerName", store.OwnerName),
                 new Claim(ClaimTypes.Role, "Merchant"),
                 new Claim("role", "Merchant"),
+                new Claim("securityStamp", store.SecurityStamp ?? string.Empty),
+                new Claim("emailVerified", store.EmailVerified ? "true" : "false"),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
             };
 
@@ -75,6 +77,8 @@ namespace WatsStore.Api.Infrastructure.Utils
                 new Claim(ClaimTypes.Role, "Admin"),
                 new Claim("role", "Admin"),
                 new Claim("isAdmin", "true"),
+                new Claim("securityStamp", "admin-security-stamp"),
+                new Claim("emailVerified", "true"),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
             };
 

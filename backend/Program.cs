@@ -55,7 +55,18 @@ builder.Services.AddHttpClient("brevo", client =>
     client.BaseAddress = new Uri("https://api.brevo.com/v3/");
     client.DefaultRequestHeaders.Add("Accept", "application/json");
 });
-builder.Services.AddSingleton<IEmailSender, BrevoEmailSender>();
+builder.Services.AddSingleton<IEmailSender>(sp =>
+{
+    var options = sp.GetRequiredService<Microsoft.Extensions.Options.IOptions<BrevoOptions>>().Value;
+    if (string.IsNullOrWhiteSpace(options.ApiKey))
+    {
+        return new DevEmailSink(sp.GetService<ILogger<DevEmailSink>>());
+    }
+    return new BrevoEmailSender(
+        sp.GetRequiredService<IHttpClientFactory>(),
+        sp.GetRequiredService<Microsoft.Extensions.Options.IOptions<BrevoOptions>>(),
+        sp.GetRequiredService<ILogger<BrevoEmailSender>>());
+});
 
 // 3. JWT Authentication
 var secretKey = builder.Configuration["Jwt:SecretKey"] ?? throw new InvalidOperationException("Jwt:SecretKey must be supplied through secure configuration.");
@@ -732,7 +743,7 @@ using (var scope = app.Services.CreateScope())
             logger.LogWarning(gwEx, "Payment gateways seeding skipped or failed.");
         }
 
-        if (!await db.Stores.AnyAsync(s => s.Slug == "al-amal-fashion"))
+        if ((app.Environment.IsDevelopment() || app.Environment.IsEnvironment("Testing") || builder.Configuration.GetValue<bool>("SeedDemoStore", false)) && !await db.Stores.AnyAsync(s => s.Slug == "al-amal-fashion"))
         {
             logger.LogInformation("Seeding default demo store 'al-amal-fashion'...");
 

@@ -22,7 +22,12 @@ import {
   AllPlansResponse,
   SubscriptionRequestItem,
   MerchantBillingStatus,
-  PaymentGatewayItem
+  PaymentGatewayItem,
+  SecurityStatusResponse,
+  ForgotPasswordResponse,
+  VerifyRecoveryResponse,
+  GenericSecurityResponse,
+  RevokeSessionsResponse
 } from '../types';
 
 import { API_BASE_URL } from './api-base';
@@ -188,6 +193,65 @@ export const api = {
       })) throw new ApiRequestError('وصل رد تسجيل غير مكتمل. تحقّق من حسابك بتسجيل الدخول قبل المحاولة مجددًا.', 200, true);
       return result;
     } finally { clearTimeout(timeout); }
+  },
+
+  // Auth & Account Security
+  async forgotPassword(email: string): Promise<ForgotPasswordResponse> {
+    return fetchJson<ForgotPasswordResponse>(`${API_BASE_URL}/auth/forgot-password`, {
+      method: 'POST',
+      body: JSON.stringify({ email }),
+    });
+  },
+
+  async verifyRecoveryCode(email: string, code: string): Promise<VerifyRecoveryResponse> {
+    return fetchJson<VerifyRecoveryResponse>(`${API_BASE_URL}/auth/verify-recovery-code`, {
+      method: 'POST',
+      body: JSON.stringify({ email, code }),
+    });
+  },
+
+  async resetPassword(recoveryToken: string, newPassword: string): Promise<GenericSecurityResponse> {
+    return fetchJson<GenericSecurityResponse>(`${API_BASE_URL}/auth/reset-password`, {
+      method: 'POST',
+      body: JSON.stringify({ recoveryToken, newPassword }),
+    });
+  },
+
+  async verifyEmail(token: string, code: string): Promise<GenericSecurityResponse> {
+    return fetchJson<GenericSecurityResponse>(`${API_BASE_URL}/auth/verify-email`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+      body: JSON.stringify({ code }),
+    });
+  },
+
+  async resendEmailOtp(token: string): Promise<GenericSecurityResponse> {
+    return fetchJson<GenericSecurityResponse>(`${API_BASE_URL}/auth/resend-email-otp`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+    });
+  },
+
+  // Merchant Security Dashboard
+  async getMerchantSecurityStatus(token: string): Promise<SecurityStatusResponse> {
+    return fetchJson<SecurityStatusResponse>(`${API_BASE_URL}/merchant/security/status`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+  },
+
+  async changeMerchantPassword(token: string, currentPassword: string, newPassword: string): Promise<GenericSecurityResponse> {
+    return fetchJson<GenericSecurityResponse>(`${API_BASE_URL}/merchant/security/change-password`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+      body: JSON.stringify({ currentPassword, newPassword }),
+    });
+  },
+
+  async revokeOtherSessions(token: string): Promise<RevokeSessionsResponse> {
+    return fetchJson<RevokeSessionsResponse>(`${API_BASE_URL}/merchant/security/revoke-other-sessions`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+    });
   },
 
   async login(data: any): Promise<AuthResponse> {

@@ -62,5 +62,8 @@ namespace WatsStore.Api.DTOs
         public string Currency { get; set; } = "ج.م";
         public string City { get; set; } = string.Empty;
         public string BusinessCategory { get; set; } = string.Empty;
+        public bool EmailVerified { get; set; }
+        public string EmailVerificationStatus { get; set; } = "Pending";
+        public bool PhoneVerified { get; set; }
     }
 }

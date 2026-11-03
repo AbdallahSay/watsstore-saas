@@ -61,6 +61,15 @@ export default function DashboardLayout({
         // Fetch fresh summary to get exact trial status from backend
         api.getDashboardSummary(token)
           .then((res) => {
+            if (res.storeInfo && typeof res.storeInfo.emailVerified === 'boolean') {
+              parsed.emailVerified = res.storeInfo.emailVerified;
+              parsed.emailVerificationStatus = res.storeInfo.emailVerificationStatus;
+              localStorage.setItem('watsstore_user', JSON.stringify(parsed));
+              setUser({ ...parsed });
+            }
+            return res;
+          })
+          .then((res) => {
             setTrialInfo({
               isTrialExpired: !!res.isTrialExpired,
               remainingDays: res.remainingTrialDays ?? 14,
@@ -347,6 +356,38 @@ export default function DashboardLayout({
           </div>
           <ThemeLanguageBar variant="dashboard" />
         </div>
+
+        {/* Email Verification Banner */}
+        {user && user.emailVerified === false && (
+          <div className="mb-6 p-4 rounded-2xl bg-amber-500/10 dark:bg-amber-950/40 border border-amber-500/30 text-amber-900 dark:text-amber-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-sm">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-2xl bg-amber-500 text-white flex items-center justify-center shrink-0 shadow-md shadow-amber-500/20">
+                <AlertTriangle className="w-5 h-5" />
+              </div>
+              <div>
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="font-extrabold text-xs sm:text-sm text-slate-900 dark:text-white">
+                    {dir === 'rtl' ? 'بريدك الإلكتروني غير مفعّل بعد ⚠️' : 'Email Address Not Verified ⚠️'}
+                  </span>
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-200 dark:bg-amber-900 text-amber-800 dark:text-amber-200">
+                    {dir === 'rtl' ? 'مطلوب لنشر القوالب' : 'Required to Publish Themes'}
+                  </span>
+                </div>
+                <p className="text-[11px] text-slate-600 dark:text-slate-400 mt-0.5">
+                  {dir === 'rtl'
+                    ? 'لتأمين متجرك وتفعيل نشر قوالب المتجر الحية، يرجى إدخال رمز التحقق المرسل إلى بريدك.'
+                    : 'To secure your store and publish live themes, please enter the verification code sent to your email.'}
+                </p>
+              </div>
+            </div>
+            <Link
+              href="/verify-email"
+              className="px-4 py-2.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs shrink-0 shadow-md shadow-amber-600/25 transition-all hover:scale-105 flex items-center gap-1.5"
+            >
+              <span>{dir === 'rtl' ? 'تأكيد البريد الآن' : 'Verify Email Now'}</span>
+            </Link>
+          </div>
+        )}
 
         {/* Trial Countdown or Expiration Sticky Banner */}
         {trialInfo && trialInfo.isTrialExpired ? (

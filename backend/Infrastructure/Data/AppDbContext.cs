@@ -19,6 +19,7 @@ namespace WatsStore.Api.Infrastructure.Data
         public DbSet<WhatsAppOrder> WhatsAppOrders => Set<WhatsAppOrder>();
         public DbSet<StoreReview> StoreReviews => Set<StoreReview>();
         public DbSet<StoreCoupon> StoreCoupons => Set<StoreCoupon>();
+        public DbSet<MerchantOtpChallenge> MerchantOtpChallenges => Set<MerchantOtpChallenge>();
         public DbSet<SuperAdmin> SuperAdmins => Set<SuperAdmin>();
         public DbSet<PlatformSetting> PlatformSettings => Set<PlatformSetting>();
         public DbSet<SubscriptionRequest> SubscriptionRequests => Set<SubscriptionRequest>();
@@ -27,6 +28,25 @@ namespace WatsStore.Api.Infrastructure.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+            // MerchantOtpChallenge Configuration
+            modelBuilder.Entity<MerchantOtpChallenge>(entity =>
+            {
+                entity.HasKey(c => c.Id);
+                entity.Property(c => c.Email).HasMaxLength(200).IsRequired();
+                entity.Property(c => c.PhoneNumber).HasMaxLength(30);
+                entity.Property(c => c.Purpose).HasMaxLength(50).IsRequired();
+                entity.Property(c => c.CodeHash).HasMaxLength(128).IsRequired();
+                entity.Property(c => c.Salt).HasMaxLength(64).IsRequired();
+                entity.Property(c => c.RecoveryToken).HasMaxLength(100);
+                entity.Property(c => c.IpAddress).HasMaxLength(45);
+                entity.Property(c => c.Attempts).HasDefaultValue(0);
+                entity.Property(c => c.MaxAttempts).HasDefaultValue(5);
+                entity.Property(c => c.IsUsed).HasDefaultValue(false);
+
+                entity.HasIndex(c => new { c.Email, c.Purpose, c.IsUsed });
+                entity.HasIndex(c => new { c.StoreId, c.Purpose, c.IsUsed });
+                entity.HasIndex(c => c.RecoveryToken);
+            });
             modelBuilder.Entity<CommerceSettings>(e =>
             {
                 e.HasKey(x => x.StoreId);
@@ -67,6 +87,10 @@ namespace WatsStore.Api.Infrastructure.Data
                 entity.Property(s => s.ThemeColor).HasMaxLength(20).HasDefaultValue("#10B981");
                 entity.Property(s => s.Currency).HasMaxLength(20).HasDefaultValue("ج.م");
                 entity.Property(s => s.PlanType).HasMaxLength(20).HasDefaultValue("Free");
+                entity.Property(s => s.EmailVerificationStatus).HasMaxLength(30).HasDefaultValue("Pending");
+                entity.Property(s => s.SecurityStamp).HasMaxLength(100);
+                entity.Property(s => s.EmailVerified).HasDefaultValue(false);
+                entity.Property(s => s.PhoneVerified).HasDefaultValue(false);
                 entity.Property(s => s.VodafoneCashNumber).HasMaxLength(20);
                 entity.Property(s => s.InstaPayAddress).HasMaxLength(100);
 
@@ -93,6 +117,11 @@ namespace WatsStore.Api.Infrastructure.Data
                       .OnDelete(DeleteBehavior.Cascade);
 
                 entity.HasMany(s => s.Coupons)
+                      .WithOne(c => c.Store)
+                      .HasForeignKey(c => c.StoreId)
+                      .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasMany(s => s.OtpChallenges)
                       .WithOne(c => c.Store)
                       .HasForeignKey(c => c.StoreId)
                       .OnDelete(DeleteBehavior.Cascade);

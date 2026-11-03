@@ -23,6 +23,13 @@ public class CommerceFactory : WebApplicationFactory<Program>
     public CommerceFactory(bool uiAudit = false) { this.uiAudit = uiAudit; }
     private readonly string path = Path.Combine(Path.GetTempPath(), $"watsstore-test-{Guid.NewGuid()}.db");
     public const string TestKey = "isolated-test-signing-key-with-at-least-32-bytes-only";
+    public new HttpClient CreateClient()
+    {
+        using var scope = Services.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        db.Database.EnsureCreated();
+        return base.CreateClient();
+    }
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
         var dir = AppContext.BaseDirectory;
@@ -57,12 +64,13 @@ public class CommerceFactory : WebApplicationFactory<Program>
             services.AddControllers().AddApplicationPart(typeof(TestAssetsController).Assembly);
         });
     }
+    public async Task EnsureDb() { using var scope = Services.CreateScope(); var db = scope.ServiceProvider.GetRequiredService<AppDbContext>(); await db.Database.EnsureCreatedAsync(); }
     public async Task<(Store Store, Product Product)> Seed()
     {
         using var scope = Services.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
         await db.Database.EnsureCreatedAsync();
-        var store = new Store { Email = $"{Guid.NewGuid()}@test.invalid", Slug = Guid.NewGuid().ToString("N"), PublicCode = Guid.NewGuid().ToString("N")[..16], StoreName = "اختبار", OwnerName = "Test", WhatsAppNumber = "201012345678", BusinessCategory = "Test", City = "Cairo", PlanType = "Pro", DeliveryFee = 30 };
+        var store = new Store { Email = $"{Guid.NewGuid()}@test.invalid", PasswordHash = BCrypt.Net.BCrypt.HashPassword("DefaultPassword123!"), Slug = Guid.NewGuid().ToString("N"), PublicCode = Guid.NewGuid().ToString("N")[..16], StoreName = "اختبار", OwnerName = "Test", WhatsAppNumber = "201012345678", BusinessCategory = "Test", City = "Cairo", PlanType = "Pro", DeliveryFee = 30, EmailVerified = true, EmailVerificationStatus = "Grandfathered" };
         var product = new Product { StoreId = store.Id, Name = "منتج", Slug = "product", Price = 100 };
         db.AddRange(store, product, new CommerceSettings { StoreId = store.Id, CheckoutMode = "both" });
         await db.SaveChangesAsync();
