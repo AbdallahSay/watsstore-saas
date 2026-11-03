@@ -585,6 +585,7 @@ export default function CommerceStorefront({
                               <button
                                 type="button"
                                 className="ws-card-quick-add"
+                                data-quick-add-kind={hasVariants ? 'options' : 'direct'}
                                 onClick={() => quickAddNoVariants(p, 1)}
                                 aria-label={hasVariants
                                   ? tr(`اختيار تفاصيل ${p.name}`, `Choose options for ${p.name}`)
