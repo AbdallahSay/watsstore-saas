@@ -52,7 +52,19 @@ async function bounds(page){const result=await page.evaluate(()=>{const modal=do
   const payload=JSON.parse(heldOrder.postData());assert.equal(payload.items.length,2);assert.equal(payload.items.find(x=>x.productId===fixture.productId).quantity,2);assert.equal(payload.items.find(x=>x.productId===fixture.productId).selectedVariants['المقاس'],'L');
   await heldOrder.continue();const response=await orderResponse;assert.equal(response.status(),200);const created=await response.json();assert.equal(created.subtotal,305);assert.equal(created.discountAmount,30.5);assert.equal(created.deliveryFee,45);assert.equal(created.totalAmount,319.5);await page.waitForSelector('.ws-confirmation');await page.waitForFunction(()=>document.querySelectorAll('.ws-confirmation li').length===2);assert.equal((await json('/merchant/orders',fixture.token)).total,before.total+1);assert.equal((await json('/merchant/commerce/inventory',fixture.token)).find(x=>x.productId===fixture.productId).quantity,stockBefore-2);
   assert.ok((await page.$eval('.ws-confirmed-status',x=>x.innerText)).includes('تم استلام طلبك'));await page.screenshot({path:path.join(output,`${fixture.theme}-mobile-success.png`)});await click(page,'.ws-confirmation button','متابعة التسوق');
-  await page.evaluate(()=>{localStorage.setItem('watsstore_lang','en');});await page.reload({waitUntil:'networkidle0'});await page.waitForFunction(()=>document.documentElement.dir==='ltr');await click(page,'.ws-product-info h3 button','منتج الاختبار 1');await click(page,'[role=dialog] button','Add to bag');await click(page,'.ws-cart button','Continue to checkout');await bounds(page);assert.ok((await page.$eval('.ws-checkout-review',x=>x.innerText)).includes('Order review'));await page.screenshot({path:path.join(output,`${fixture.theme}-english-checkout.png`)});
+  await page.evaluate(()=>{localStorage.setItem('watsstore_lang','en');});
+  // Continue shopping closes the confirmation on the current product route. Return to the
+  // catalog explicitly, then exercise the same real product-page path in English.
+  await page.goto(`${site}/s/${fixture.slug}`,{waitUntil:'networkidle0'});
+  await page.waitForFunction(()=>document.documentElement.dir==='ltr');
+  await click(page,'.ws-product-info h3 a','منتج الاختبار 1');
+  await page.waitForFunction(()=>document.querySelector('#product-title')?.textContent==='منتج الاختبار 1');
+  assert.ok(new URL(page.url()).pathname.includes('/p/'),'English product selection opens a dedicated route');
+  assert.equal(await page.$('[role=dialog]'),null,'Product selection must not open the retired product modal');
+  await click(page,'.ws-product-actions button[type=submit]','Add to bag');
+  await click(page,'.ws-cart button','Continue to checkout');await bounds(page);
+  assert.ok((await page.$eval('.ws-checkout-review',x=>x.innerText)).includes('Order review'));
+  await page.screenshot({path:path.join(output,`${fixture.theme}-english-checkout.png`)});
   assert.deepEqual(errors,[]);results.push({theme:fixture.theme,result:'PASS',widths:[320,375,390,768,1024,1440,1920],checks:['two products','variant L','quantity 2','coupon stale-response protection','server total 319.50','inventory deducted twice','long SKU','16px inputs','44px controls','short viewport','keyboard trap','busy Escape guard','Arabic RTL','English LTR']});await context.close();
  }
  fs.writeFileSync(path.join(output,'summary.json'),JSON.stringify(results,null,2));console.log(results);
