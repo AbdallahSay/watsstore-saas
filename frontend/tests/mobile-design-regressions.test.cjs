@@ -53,3 +53,31 @@ test('shipping has all 27 governorates, city suggestions and custom area fallbac
   assert.match(view, /onChange=\{\(e\) => updateShippingZone\(index, \{ name: e.target.value \}\)\}/);
   assert.match(view, /fee: Number\(e.target.value\)/);
 });
+
+
+test('hero image contains no random first-product name/price overlay', () => {
+  const storefront = read('src/components/commerce/CommerceStorefront.tsx');
+  assert.doesNotMatch(storefront, /className="ws-photo-caption"/);
+  assert.match(storefront, /className="ws-hero-art"/);
+});
+
+test('collection title and count remain separate correctly centered flex children', () => {
+  const storefront = read('src/components/commerce/CommerceStorefront.tsx');
+  const css = read('src/styles/store-themes.css');
+  assert.match(storefront, /className="ws-collection-title-text"/);
+  assert.match(storefront, /className="ws-product-count"/);
+  assert.match(css, /\.ws-storefront \.ws-section-heading h2 \.ws-product-count\s*\{[^}]*place-items: center;/);
+  assert.match(css, /\.ws-storefront \.ws-section-heading h2 \.ws-product-count\s*\{[^}]*min-width: 32px;/);
+});
+
+test('all non-grocery cards expose an in-card plus button without product quick-view modal', () => {
+  const storefront = read('src/components/commerce/CommerceStorefront.tsx');
+  const css = read('src/styles/store-themes.css');
+  assert.match(storefront, /theme\.id !== 'fresh-market' && p\.isAvailable/);
+  assert.match(storefront, /className="ws-card-quick-add"/);
+  assert.match(storefront, /data-quick-add-kind=\{hasVariants \? 'options' : 'direct'\}/);
+  assert.match(storefront, /onClick=\{\(\) => quickAddNoVariants\(p, 1\)\}/);
+  assert.match(storefront, /add\(p, 1, \{\}, false, false\)/);
+  assert.doesNotMatch(storefront, /ProductModal/);
+  assert.match(css, /\.ws-storefront \.ws-card-quick-add\s*\{[^}]*min-height: 44px;/);
+});
