@@ -1,5 +1,5 @@
 'use client';
-import { useBrowserStorage, useBrowserReady } from '@/hooks/useBrowserStorage';
+import { useBrowserReady } from '@/hooks/useBrowserStorage';
 
 import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
@@ -69,12 +69,11 @@ export default function CommerceStorefront({
 
 
 
-  const cartSnapshot = useBrowserStorage(cartKey);
-  const [previousCart, setPreviousCart] = useState<{ raw: string | null; products: Store['products'] } | null>(null);
-  if (!previousCart || previousCart.raw !== cartSnapshot || previousCart.products !== store.products) {
-    setPreviousCart({ raw: cartSnapshot, products: store.products });
+  const [previousCart, setPreviousCart] = useState<{ key: string; products: Store['products'] } | null>(null);
+  if (loaded && (!previousCart || previousCart.key !== cartKey || previousCart.products !== store.products)) {
+    setPreviousCart({ key: cartKey, products: store.products });
     try {
-      const saved = JSON.parse(cartSnapshot || '[]');
+      const saved = JSON.parse(localStorage.getItem(cartKey) || '[]');
       setItems(
         Array.isArray(saved)
           ? saved.flatMap((x: CartItem) => {

@@ -1,0 +1,89 @@
+[
+  {
+    "theme": "editorial",
+    "result": "PASS",
+    "widths": [
+      320,
+      375,
+      390,
+      768,
+      1024,
+      1440,
+      1920
+    ],
+    "checks": [
+      "two products",
+      "variant L",
+      "quantity 2",
+      "coupon stale-response protection",
+      "server total 319.50",
+      "inventory deducted twice",
+      "long SKU",
+      "16px inputs",
+      "44px controls",
+      "short viewport",
+      "keyboard trap",
+      "busy Escape guard",
+      "Arabic RTL",
+      "English LTR"
+    ]
+  },
+  {
+    "theme": "streetwear",
+    "result": "PASS",
+    "widths": [
+      320,
+      375,
+      390,
+      768,
+      1024,
+      1440,
+      1920
+    ],
+    "checks": [
+      "two products",
+      "variant L",
+      "quantity 2",
+      "coupon stale-response protection",
+      "server total 319.50",
+      "inventory deducted twice",
+      "long SKU",
+      "16px inputs",
+      "44px controls",
+      "short viewport",
+      "keyboard trap",
+      "busy Escape guard",
+      "Arabic RTL",
+      "English LTR"
+    ]
+  },
+  {
+    "theme": "lifestyle",
+    "result": "PASS",
+    "widths": [
+      320,
+      375,
+      390,
+      768,
+      1024,
+      1440,
+      1920
+    ],
+    "checks": [
+      "two products",
+      "variant L",
+      "quantity 2",
+      "coupon stale-response protection",
+      "server total 319.50",
+      "inventory deducted twice",
+      "long SKU",
+      "16px inputs",
+      "44px controls",
+      "short viewport",
+      "keyboard trap",
+      "busy Escape guard",
+      "Arabic RTL",
+      "English LTR"
+    ]
+  }
+]
