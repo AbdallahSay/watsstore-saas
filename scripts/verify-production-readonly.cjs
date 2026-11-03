@@ -1,8 +1,8 @@
 // Public release smoke test. Every browser write request is aborted, including orders.
 const fs=require('node:fs'),path=require('node:path'),assert=require('node:assert/strict');
 const {chromium,firefox,webkit,expect}=require('../frontend/node_modules/@playwright/test');
-const site=process.env.E2E_SITE_URL||'https://frontend-bay-ten-58.vercel.app',api=process.env.E2E_API_URL||'https://watsstore.runasp.net/api',slug=process.env.E2E_STORE_SLUG||'a9';
-assert.ok(['localhost','frontend-bay-ten-58.vercel.app'].includes(new URL(site).hostname));assert.ok(['localhost','watsstore.runasp.net'].includes(new URL(api).hostname));
+const site=process.env.E2E_SITE_URL||'https://watsstore.vercel.app',api=process.env.E2E_API_URL||'https://watsstore.runasp.net/api',slug=process.env.E2E_STORE_SLUG||'a9';
+assert.ok(['localhost','watsstore.vercel.app','frontend-bay-ten-58.vercel.app'].includes(new URL(site).hostname));assert.ok(['localhost','watsstore.runasp.net'].includes(new URL(api).hostname));
 const out=path.resolve(__dirname,'../work/transformation/production-readonly');fs.mkdirSync(out,{recursive:true});
 async function bounds(page){assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),true,'No document overflow');}
 (async()=>{const response=await fetch(`${api}/public/stores/${encodeURIComponent(slug)}`);assert.equal(response.status,200);const store=await response.json(),product=store.products.find(p=>p.isAvailable);assert.ok(product,'A publicly available product is required for the checkout UI smoke test.');
