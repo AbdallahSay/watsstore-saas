@@ -39,6 +39,7 @@ namespace WatsStore.Api.Controllers
 
             var normalizedSlug = slug.Trim().ToLowerInvariant();
 
+            // ⚡ Bolt: Use AsSplitQuery to prevent Cartesian explosion when loading multiple collections
             var store = await _db.Stores
                 .AsNoTracking()
                 .AsSplitQuery()
