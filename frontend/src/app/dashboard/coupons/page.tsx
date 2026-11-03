@@ -49,18 +49,18 @@ export default function DashboardCouponsPage() {
     const token = (localStorage.getItem('watsstore_merchant_token') || localStorage.getItem('watsstore_token'));
     if (!token) return;
 
-    try {
-      const data = await api.getMerchantCoupons(token);
+
+      return api.getMerchantCoupons(token).then(async (data) => {
       setCoupons(data);
-    } catch (err: any) {
+    }).catch((err: any) => {
       appSwal.fire({
         icon: 'error',
         title: 'خطأ',
         text: err.message || 'فشل في تحميل كوبونات الخصم',
       });
-    } finally {
+    }).finally(() => {
       setIsLoading(false);
-    }
+    });
   };
 
   useEffect(() => {

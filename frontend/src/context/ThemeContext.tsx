@@ -1,6 +1,7 @@
 'use client';
 
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useEffect } from 'react';
+import { useBrowserStorage, useBrowserReady, writeBrowserStorage } from '@/hooks/useBrowserStorage';
 
 export type Theme = 'light' | 'dark';
 
@@ -16,29 +17,9 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 const THEME_STORAGE_KEY = 'watsstore_theme';
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setThemeState] = useState<Theme>('light');
-  const [isMounted, setIsMounted] = useState(false);
-
-  useEffect(() => {
-    setIsMounted(true);
-    try {
-      const savedTheme = localStorage.getItem(THEME_STORAGE_KEY) as Theme | null;
-      if (savedTheme === 'dark' || savedTheme === 'light') {
-        setThemeState(savedTheme);
-        applyThemeClass(savedTheme);
-      } else {
-        // Detect system preference
-        const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-        const initialTheme: Theme = prefersDark ? 'dark' : 'light';
-        setThemeState(initialTheme);
-        applyThemeClass(initialTheme);
-      }
-    } catch {
-      // Fallback
-      applyThemeClass('light');
-    }
-  }, []);
-
+  const savedTheme = useBrowserStorage(THEME_STORAGE_KEY);
+  const isMounted = useBrowserReady();
+  const theme: Theme = savedTheme === 'dark' || savedTheme === 'light' ? savedTheme : isMounted && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
   const applyThemeClass = (newTheme: Theme) => {
     if (typeof document !== 'undefined') {
       const root = document.documentElement;
@@ -50,8 +31,10 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  useEffect(() => { applyThemeClass(theme); }, [theme]);
+
   const setTheme = (newTheme: Theme) => {
-    setThemeState(newTheme);
+    writeBrowserStorage(THEME_STORAGE_KEY, newTheme);
     applyThemeClass(newTheme);
     try {
       localStorage.setItem(THEME_STORAGE_KEY, newTheme);

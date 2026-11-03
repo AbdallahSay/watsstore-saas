@@ -1,5 +1,6 @@
 'use client';
 
+import { useBrowserStorage, useBrowserReady, writeBrowserStorage } from '@/hooks/useBrowserStorage';
 import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
 
 export type CurrencyCode = 'EGP' | 'USD' | 'EUR' | 'SAR' | 'AED' | 'GBP' | 'TRY';
@@ -39,7 +40,8 @@ interface CurrencyContextType {
 const CurrencyContext = createContext<CurrencyContextType | undefined>(undefined);
 
 export function CurrencyProvider({ children }: { children: React.ReactNode }) {
-  const [currency, setCurrencyState] = useState<CurrencyCode>('EGP');
+  const savedPreference = useBrowserStorage(CURRENCY_STORAGE_KEY) as CurrencyCode | null;
+  const currency: CurrencyCode = savedPreference && CURRENCIES[savedPreference] ? savedPreference : 'EGP';
   const [rates, setRates] = useState<Record<CurrencyCode, number>>(() => {
     const r = {} as Record<CurrencyCode, number>;
     (Object.keys(CURRENCIES) as CurrencyCode[]).forEach((c) => {
@@ -47,18 +49,7 @@ export function CurrencyProvider({ children }: { children: React.ReactNode }) {
     });
     return r;
   });
-  const [isMounted, setIsMounted] = useState(false);
-
-  // Restore persisted currency on mount
-  useEffect(() => {
-    setIsMounted(true);
-    try {
-      const saved = localStorage.getItem(CURRENCY_STORAGE_KEY) as CurrencyCode | null;
-      if (saved && CURRENCIES[saved]) {
-        setCurrencyState(saved);
-      }
-    } catch {}
-  }, []);
+  const isMounted = useBrowserReady();
 
   // Fetch live rates from exchangerate-api (free, no key needed for basic endpoint)
   useEffect(() => {
@@ -87,7 +78,7 @@ export function CurrencyProvider({ children }: { children: React.ReactNode }) {
   }, [currency]);
 
   const setCurrency = useCallback((c: CurrencyCode) => {
-    setCurrencyState(c);
+    writeBrowserStorage(CURRENCY_STORAGE_KEY, c);
     try { localStorage.setItem(CURRENCY_STORAGE_KEY, c); } catch {}
   }, []);
 

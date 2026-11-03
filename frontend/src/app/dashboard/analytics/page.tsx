@@ -38,18 +38,18 @@ export default function DashboardAnalyticsPage() {
     const token = localStorage.getItem('watsstore_token');
     if (!token) return;
 
-    try {
-      const data = await api.getMerchantAnalytics(token);
+
+      return api.getMerchantAnalytics(token).then(async (data) => {
       setAnalytics(data);
-    } catch (err: any) {
+    }).catch((err: any) => {
       appSwal.fire({
         icon: 'error',
         title: 'خطأ',
         text: err.message || 'فشل في تحميل بيانات الإحصائيات',
       });
-    } finally {
+    }).finally(() => {
       setIsLoading(false);
-    }
+    });
   };
 
   useEffect(() => {

@@ -31,18 +31,18 @@ export default function DashboardCategoriesPage() {
     const token = (localStorage.getItem('watsstore_merchant_token') || localStorage.getItem('watsstore_token'));
     if (!token) return;
 
-    try {
-      const data = await api.getCategories(token);
+
+      return api.getCategories(token).then(async (data) => {
       setCategories(data);
-    } catch (err: any) {
+    }).catch((err: any) => {
       appSwal.fire({
         icon: 'error',
         title: 'خطأ',
         text: err.message || 'فشل في تحميل الأقسام',
       });
-    } finally {
+    }).finally(() => {
       setIsLoading(false);
-    }
+    });
   };
 
   useEffect(() => {

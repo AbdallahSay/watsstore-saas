@@ -17,11 +17,13 @@ function StoreThemePreviewContent() {
   const [themeId, setThemeId] = useState<StoreThemeId>(initialTheme);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [previousSlug, setPreviousSlug] = useState(slug);
+  if (previousSlug !== slug) { setPreviousSlug(slug); setLoading(true); setStore(null); setError(''); }
 
   useEffect(() => {
     if (!slug) return;
     let live = true;
-    setLoading(true);
+
     api.getPublicStore(slug)
       .then((data) => {
         if (live) {

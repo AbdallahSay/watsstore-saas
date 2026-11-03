@@ -1,4 +1,5 @@
 'use client';
+import { useBrowserStorage, useBrowserReady } from '@/hooks/useBrowserStorage';
 
 import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
@@ -54,7 +55,7 @@ export default function CommerceStorefront({
   const [available, setAvailable] = useState(false);
   const [page, setPage] = useState(1);
   const [items, setItems] = useState<CartItem[]>([]);
-  const [loaded, setLoaded] = useState(false);
+  const loaded = useBrowserReady();
   const [cartOpen, setCartOpen] = useState(false);
   const [cartLoaded, setCartLoaded] = useState(false);
   const [directCheckout, setDirectCheckout] = useState(false);
@@ -66,14 +67,14 @@ export default function CommerceStorefront({
   const cartKey = `watsstore_cart_${store.slug}`;
   const productHref = (item: Product) => `/s/${encodeURIComponent(store.slug)}/p/${encodeURIComponent(item.slug)}${previewTheme && !preview ? `?theme=${encodeURIComponent(previewTheme)}` : ''}`;
 
-  useEffect(() => {
-    if (cartOpen) setCartLoaded(true);
-  }, [cartOpen]);
 
-  useEffect(() => {
-    setLoaded(false);
+
+  const cartSnapshot = useBrowserStorage(cartKey);
+  const [previousCart, setPreviousCart] = useState<{ raw: string | null; products: Store['products'] } | null>(null);
+  if (!previousCart || previousCart.raw !== cartSnapshot || previousCart.products !== store.products) {
+    setPreviousCart({ raw: cartSnapshot, products: store.products });
     try {
-      const saved = JSON.parse(localStorage.getItem(cartKey) || '[]');
+      const saved = JSON.parse(cartSnapshot || '[]');
       setItems(
         Array.isArray(saved)
           ? saved.flatMap((x: CartItem) => {
@@ -92,8 +93,7 @@ export default function CommerceStorefront({
     } catch {
       setItems([]);
     }
-    setLoaded(true);
-  }, [cartKey, store.products]);
+  }
 
   useEffect(() => {
     if (loaded && !preview) {
@@ -105,9 +105,9 @@ export default function CommerceStorefront({
     }
   }, [items, loaded, cartKey, preview]);
 
-  useEffect(() => {
-    setPage(1);
-  }, [category, search, sort, maximumPrice, available]);
+  const filterKey = JSON.stringify([category, search, sort, maximumPrice, available]);
+  const [previousFilterKey, setPreviousFilterKey] = useState(filterKey);
+  if (filterKey !== previousFilterKey) { setPreviousFilterKey(filterKey); setPage(1); }
 
   const products = useMemo(() => {
     const list = store.products.filter(
@@ -150,7 +150,7 @@ export default function CommerceStorefront({
     }
     if (openCart) {
       setDirectCheckout(buyNow);
-      setCartOpen(true);
+      setCartLoaded(true); setCartOpen(true);
     }
   }
 
@@ -299,7 +299,7 @@ export default function CommerceStorefront({
             aria-label={tr(`حقيبة التسوق، ${totalItems} منتجات`, `Shopping bag, ${totalItems} items`)}
             onClick={() => {
               setDirectCheckout(false);
-              setCartOpen(true);
+              setCartLoaded(true); setCartOpen(true);
             }}
           >
             <ShoppingBag size={18} />
