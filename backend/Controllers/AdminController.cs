@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
@@ -7,9 +7,11 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using WatsStore.Api.Domain.Entities;
 using WatsStore.Api.DTOs;
 using WatsStore.Api.Infrastructure.Data;
+using WatsStore.Api.Infrastructure.Email;
 using WatsStore.Api.Infrastructure.Utils;
 
 namespace WatsStore.Api.Controllers
@@ -1044,6 +1046,50 @@ namespace WatsStore.Api.Controllers
                 CreatedAt = r.CreatedAt,
                 ReviewedAt = r.ReviewedAt
             };
+        }
+
+        // ── Brevo Email ─────────────────────────────────────────────────────────────
+        /// <summary>
+        /// Admin-only: sends a single test email to the pre-approved address configured
+        /// in Brevo:TestEmailApprovedAddress. Rate-limited to prevent abuse.
+        /// </summary>
+        [HttpPost("email/test")]
+        [EnableRateLimiting("auth-policy")]
+        public async Task<IActionResult> SendTestEmail(
+            [FromBody] SendTestEmailRequest request,
+            [FromServices] IEmailSender emailSender,
+            [FromServices] ILogger<AdminController> logger,
+            CancellationToken ct)
+        {
+            var access = EnsureAdminAccess();
+            if (access != null) return access;
+
+            // Only deliver to the explicitly approved address to prevent abuse
+            var approvedAddress = _config["Brevo:TestEmailApprovedAddress"];
+            if (string.IsNullOrWhiteSpace(approvedAddress) ||
+                !string.Equals(request.ToEmail.Trim(), approvedAddress, StringComparison.OrdinalIgnoreCase))
+            {
+                return BadRequest(new { message = "عنوان البريد غير مدرج في قائمة العناوين المعتمدة للاختبار." });
+            }
+
+            try
+            {
+                await emailSender.SendAsync(
+                    request.ToEmail,
+                    request.ToName,
+                    request.Subject,
+                    "<h1 dir=\"rtl\">اختبار WatsStore</h1>" +
+                    "<p dir=\"rtl\">إذا وصلتك هذه الرسالة، فإن إعداد بريد Brevo يعمل بنجاح.</p>",
+                    "WatsStore Email Test — If you received this, Brevo is configured correctly.",
+                    ct);
+
+                return Ok(new { message = "تم إرسال رسالة الاختبار بنجاح." });
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Admin test email send failed");
+                return StatusCode(500, new { message = "فشل إرسال رسالة الاختبار. راجع سجلات الخادم للتفاصيل." });
+            }
         }
 
         private static (bool IsTrialExpired, int RemainingTrialDays, DateTime? TrialEndsAt) CalculateTrial(string planType, DateTime createdAt, DateTime? subscriptionEndsAt)

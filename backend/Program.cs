@@ -8,6 +8,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using WatsStore.Api.Domain.Entities;
 using WatsStore.Api.Infrastructure.Data;
+using WatsStore.Api.Infrastructure.Email;
 using WatsStore.Api.Infrastructure.Utils;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -46,6 +47,15 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 // 2. Dependency Injection
 builder.Services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
+
+// 2b. Email Service (Brevo Transactional Email)
+builder.Services.Configure<BrevoOptions>(builder.Configuration.GetSection("Brevo"));
+builder.Services.AddHttpClient("brevo", client =>
+{
+    client.BaseAddress = new Uri("https://api.brevo.com/v3/");
+    client.DefaultRequestHeaders.Add("Accept", "application/json");
+});
+builder.Services.AddSingleton<IEmailSender, BrevoEmailSender>();
 
 // 3. JWT Authentication
 var secretKey = builder.Configuration["Jwt:SecretKey"] ?? throw new InvalidOperationException("Jwt:SecretKey must be supplied through secure configuration.");
