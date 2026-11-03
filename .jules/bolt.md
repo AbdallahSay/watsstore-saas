@@ -1,0 +1,3 @@
+## 2024-11-03 - Prevent Cartesian Explosion on Store Deletion
+**Learning:** Found an Entity Framework core `Include()` cartesian explosion in `AdminController.cs`'s `DeleteStore` method where 5 large collections (`Products`, `Categories`, `Orders`, `Reviews`, `Coupons`) were included on a single entity retrieval. EF Core defaults to fetching this as a single monolithic query with numerous JOINs which can cause a significant performance bottleneck.
+**Action:** Applied `.AsSplitQuery()` before `.Include()` calls when retrieving object graphs with multiple one-to-many relationships in EF Core to break the query into smaller, separated queries to improve performance.

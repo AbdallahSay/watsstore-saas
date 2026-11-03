@@ -468,6 +468,7 @@ namespace WatsStore.Api.Controllers
             if (authError != null) return authError;
 
             var store = await _db.Stores
+                .AsSplitQuery() // ⚡ Bolt: Prevent Cartesian explosion on large object graphs with multiple collection includes
                 .Include(s => s.Products)
                 .Include(s => s.Categories)
                 .Include(s => s.Orders)
