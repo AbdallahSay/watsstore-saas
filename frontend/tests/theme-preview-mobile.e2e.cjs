@@ -11,7 +11,9 @@ assert.equal(new URL(api).hostname, 'localhost', 'Only isolated fixture backend 
 
 const fixture = JSON.parse(fs.readFileSync(path.join(root, 'work/e2e-fixtures.json'), 'utf8'))[0];
 const themes = ['editorial-luxe','street-pulse','pure-beauty','tech-grid','fresh-market',
-  'living-space','golden-atelier','active-motion','little-joy','crafted-story'];
+  'living-space','golden-atelier','active-motion','little-joy','crafted-story',
+  'cafe-ritual','pet-haven','bloom-studio','auto-circuit','game-arena',
+  'book-gallery','optical-studio','outdoor-trail','travel-atelier','office-pro'];
 const output = path.join(root, 'work/transformation/theme-preview');
 fs.mkdirSync(output, { recursive: true });
 const report = [];

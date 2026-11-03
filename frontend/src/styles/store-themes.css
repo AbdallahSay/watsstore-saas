@@ -1876,3 +1876,607 @@
   .ws-section-heading h2 { max-width: 100%; }
   .ws-product-info .ws-card-quick-add { min-height: 44px; }
 }
+
+
+/* ==========================================================================
+   THEME 11: CAFÉ RITUAL (Coffee, Cafés & Bakeries)
+   Class: .ws-theme--cafe-ritual
+   ========================================================================== */
+.ws-theme--cafe-ritual {
+  --ws-bg: #faf6f0;
+  --ws-fg: #2b1e16;
+  --ws-card: #f2eae0;
+  --ws-accent: #8c4a27;
+  --ws-accent-contrast: #fffcf7;
+  --ws-border: #d8c8b8;
+  --ws-muted: #6e5b4f;
+  --ws-card-ratio: 1/1;
+  --ws-radius-control: 8px;
+  --ws-radius-card: 12px;
+  --store-whatsapp-bg: #8c4a27;
+  --store-whatsapp-text: #fffcf7;
+  --store-whatsapp-border: #8c4a27;
+  --store-whatsapp-hover: #6f381c;
+  --store-whatsapp-focus: #8c4a27;
+  --store-whatsapp-radius: 8px;
+}
+.ws-theme--cafe-ritual .ws-header {
+  border-bottom: 2px solid #8c4a27;
+}
+.ws-theme--cafe-ritual .ws-brand {
+  font-family: var(--font-amiri, serif);
+  font-weight: 700;
+  letter-spacing: .02em;
+}
+.ws-theme--cafe-ritual .ws-hero h1 span {
+  color: #8c4a27;
+  font-style: italic;
+}
+.ws-theme--cafe-ritual .ws-catalog-product {
+  border: 1px solid #d8c8b8;
+  background: #ffffff;
+  border-radius: 12px;
+  overflow: hidden;
+  transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+}
+.ws-theme--cafe-ritual .ws-catalog-product:hover {
+  transform: translateY(-3px);
+  border-color: #8c4a27;
+  box-shadow: 0 12px 28px rgba(140, 74, 39, 0.12);
+}
+.ws-theme--cafe-ritual .ws-product-badge {
+  background: #8c4a27;
+  color: #fffcf7;
+  font-size: 11px;
+  font-weight: 700;
+  border-radius: 4px;
+}
+.ws-theme--cafe-ritual .ws-primary-action {
+  background: #8c4a27;
+  color: #fffcf7;
+  border-radius: 8px;
+  font-weight: 600;
+}
+.ws-theme--cafe-ritual .ws-primary-action:hover {
+  background: #6f381c;
+}
+
+/* ==========================================================================
+   THEME 12: PET HAVEN (Pet Products & Accessories)
+   Class: .ws-theme--pet-haven
+   ========================================================================== */
+.ws-theme--pet-haven {
+  --ws-bg: #f6faf9;
+  --ws-fg: #1b332f;
+  --ws-card: #eaf3f1;
+  --ws-accent: #1f7a70;
+  --ws-accent-contrast: #ffffff;
+  --ws-border: #c7e0dc;
+  --ws-muted: #537770;
+  --ws-card-ratio: 4/5;
+  --ws-radius-control: 16px;
+  --ws-radius-card: 20px;
+  --store-whatsapp-bg: #1f7a70;
+  --store-whatsapp-text: #ffffff;
+  --store-whatsapp-border: #1f7a70;
+  --store-whatsapp-hover: #165b53;
+  --store-whatsapp-focus: #1f7a70;
+  --store-whatsapp-radius: 16px;
+}
+.ws-theme--pet-haven .ws-brand {
+  font-weight: 800;
+  color: #1f7a70;
+}
+.ws-theme--pet-haven .ws-hero h1 span {
+  color: #1f7a70;
+  position: relative;
+}
+.ws-theme--pet-haven .ws-catalog-product {
+  border: 2px solid #e0eeea;
+  background: #ffffff;
+  border-radius: 20px;
+  box-shadow: 0 4px 14px rgba(31, 122, 112, 0.06);
+  transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+}
+.ws-theme--pet-haven .ws-catalog-product:hover {
+  transform: translateY(-4px) scale(1.01);
+  border-color: #1f7a70;
+  box-shadow: 0 14px 28px rgba(31, 122, 112, 0.14);
+}
+.ws-theme--pet-haven .ws-product-badge {
+  background: #f97316;
+  color: #ffffff;
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-weight: 800;
+}
+.ws-theme--pet-haven .ws-primary-action {
+  background: #1f7a70;
+  color: #ffffff;
+  border-radius: 16px;
+  font-weight: 700;
+}
+.ws-theme--pet-haven .ws-primary-action:hover {
+  background: #165b53;
+}
+
+/* ==========================================================================
+   THEME 13: BLOOM STUDIO (Flowers & Gifts)
+   Class: .ws-theme--bloom-studio
+   ========================================================================== */
+.ws-theme--bloom-studio {
+  --ws-bg: #fdfbf8;
+  --ws-fg: #2b2623;
+  --ws-card: #f7f0ed;
+  --ws-accent: #b45367;
+  --ws-accent-contrast: #ffffff;
+  --ws-border: #e6d6d0;
+  --ws-muted: #786560;
+  --ws-card-ratio: 3/4;
+  --ws-radius-control: 12px;
+  --ws-radius-card: 16px;
+  --store-whatsapp-bg: #b45367;
+  --store-whatsapp-text: #ffffff;
+  --store-whatsapp-border: #b45367;
+  --store-whatsapp-hover: #943e50;
+  --store-whatsapp-focus: #b45367;
+  --store-whatsapp-radius: 12px;
+}
+.ws-theme--bloom-studio .ws-brand {
+  font-family: var(--font-amiri, serif);
+  font-weight: 600;
+  letter-spacing: .03em;
+}
+.ws-theme--bloom-studio .ws-hero h1 span {
+  color: #b45367;
+}
+.ws-theme--bloom-studio .ws-catalog-product {
+  border: 1px solid #ebd9d2;
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(180, 83, 103, 0.05);
+  transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease;
+}
+.ws-theme--bloom-studio .ws-catalog-product:hover {
+  transform: translateY(-3px);
+  border-color: #b45367;
+  box-shadow: 0 14px 32px rgba(180, 83, 103, 0.12);
+}
+.ws-theme--bloom-studio .ws-product-badge {
+  background: #b45367;
+  color: #ffffff;
+  border-radius: 999px;
+  padding: 3px 10px;
+  font-size: 11px;
+}
+.ws-theme--bloom-studio .ws-primary-action {
+  background: #b45367;
+  color: #ffffff;
+  border-radius: 12px;
+}
+.ws-theme--bloom-studio .ws-primary-action:hover {
+  background: #943e50;
+}
+
+/* ==========================================================================
+   THEME 14: AUTO CIRCUIT (Automotive Accessories)
+   Class: .ws-theme--auto-circuit
+   ========================================================================== */
+.ws-theme--auto-circuit {
+  color-scheme: dark;
+  --ws-bg: #121316;
+  --ws-fg: #f0f2f5;
+  --ws-card: #1c1e24;
+  --ws-accent: #dc2626;
+  --ws-accent-contrast: #ffffff;
+  --ws-border: #333742;
+  --ws-muted: #9ba3b4;
+  --ws-card-ratio: 4/5;
+  --ws-radius-control: 4px;
+  --ws-radius-card: 6px;
+  --store-whatsapp-bg: #dc2626;
+  --store-whatsapp-text: #ffffff;
+  --store-whatsapp-border: #dc2626;
+  --store-whatsapp-hover: #b91c1c;
+  --store-whatsapp-focus: #dc2626;
+  --store-whatsapp-radius: 4px;
+}
+.ws-theme--auto-circuit .ws-header {
+  border-bottom: 2px solid #dc2626;
+}
+.ws-theme--auto-circuit .ws-brand {
+  font-family: var(--font-tajawal, sans-serif);
+  font-weight: 900;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+}
+.ws-theme--auto-circuit .ws-hero h1 span {
+  color: #dc2626;
+}
+.ws-theme--auto-circuit .ws-catalog-product {
+  border: 1px solid #2d313b;
+  background: #18191f;
+  border-radius: 6px;
+  transition: transform .2s ease, border-color .2s ease, box-shadow .2s ease;
+}
+.ws-theme--auto-circuit .ws-catalog-product:hover {
+  transform: translateY(-2px);
+  border-color: #dc2626;
+  box-shadow: 0 8px 24px rgba(220, 38, 38, 0.25);
+}
+.ws-theme--auto-circuit .ws-product-badge {
+  background: #dc2626;
+  color: #ffffff;
+  font-weight: 800;
+  border-radius: 2px;
+  text-transform: uppercase;
+}
+.ws-theme--auto-circuit .ws-primary-action {
+  background: #dc2626;
+  color: #ffffff;
+  border-radius: 4px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+.ws-theme--auto-circuit .ws-primary-action:hover {
+  background: #b91c1c;
+}
+
+/* ==========================================================================
+   THEME 15: GAME ARENA (Gaming & Electronics Accessories)
+   Class: .ws-theme--game-arena
+   ========================================================================== */
+.ws-theme--game-arena {
+  color-scheme: dark;
+  --ws-bg: #0d0f17;
+  --ws-fg: #e6e9f5;
+  --ws-card: #161926;
+  --ws-accent: #7c3aed;
+  --ws-accent-contrast: #ffffff;
+  --ws-border: #2b3047;
+  --ws-muted: #8b95b5;
+  --ws-card-ratio: 4/5;
+  --ws-radius-control: 6px;
+  --ws-radius-card: 8px;
+  --store-whatsapp-bg: #7c3aed;
+  --store-whatsapp-text: #ffffff;
+  --store-whatsapp-border: #7c3aed;
+  --store-whatsapp-hover: #6d28d9;
+  --store-whatsapp-focus: #7c3aed;
+  --store-whatsapp-radius: 6px;
+}
+.ws-theme--game-arena .ws-header {
+  border-bottom: 1px solid #7c3aed;
+  box-shadow: 0 4px 20px rgba(124, 58, 237, 0.15);
+}
+.ws-theme--game-arena .ws-brand {
+  font-family: var(--font-tajawal, monospace);
+  font-weight: 900;
+  letter-spacing: .08em;
+  color: #a78bfa;
+}
+.ws-theme--game-arena .ws-hero h1 span {
+  color: #06b6d4;
+  text-shadow: 0 0 16px rgba(6, 182, 212, 0.5);
+}
+.ws-theme--game-arena .ws-catalog-product {
+  border: 1px solid #23283d;
+  background: #141724;
+  border-radius: 8px;
+  transition: transform .2s ease, border-color .2s ease, box-shadow .2s ease;
+}
+.ws-theme--game-arena .ws-catalog-product:hover {
+  transform: translateY(-3px);
+  border-color: #7c3aed;
+  box-shadow: 0 0 20px rgba(124, 58, 237, 0.35);
+}
+.ws-theme--game-arena .ws-product-badge {
+  background: #06b6d4;
+  color: #090b10;
+  font-weight: 900;
+  border-radius: 4px;
+}
+.ws-theme--game-arena .ws-primary-action {
+  background: #7c3aed;
+  color: #ffffff;
+  border-radius: 6px;
+  font-weight: 700;
+  box-shadow: 0 4px 14px rgba(124, 58, 237, 0.4);
+}
+.ws-theme--game-arena .ws-primary-action:hover {
+  background: #6d28d9;
+  box-shadow: 0 6px 20px rgba(124, 58, 237, 0.6);
+}
+
+/* ==========================================================================
+   THEME 16: BOOK GALLERY (Books & Stationery)
+   Class: .ws-theme--book-gallery
+   ========================================================================== */
+.ws-theme--book-gallery {
+  --ws-bg: #faf7f0;
+  --ws-fg: #201b17;
+  --ws-card: #f0ebd9;
+  --ws-accent: #78350f;
+  --ws-accent-contrast: #fffdfa;
+  --ws-border: #d9ceb6;
+  --ws-muted: #6b5c4f;
+  --ws-card-ratio: 3/4;
+  --ws-radius-control: 4px;
+  --ws-radius-card: 6px;
+  --store-whatsapp-bg: #78350f;
+  --store-whatsapp-text: #fffdfa;
+  --store-whatsapp-border: #78350f;
+  --store-whatsapp-hover: #5f2a0b;
+  --store-whatsapp-focus: #78350f;
+  --store-whatsapp-radius: 4px;
+}
+.ws-theme--book-gallery .ws-brand {
+  font-family: var(--font-amiri, serif);
+  font-weight: 700;
+  letter-spacing: .02em;
+}
+.ws-theme--book-gallery .ws-hero h1 span {
+  color: #78350f;
+  font-family: var(--font-amiri, serif);
+}
+.ws-theme--book-gallery .ws-catalog-product {
+  border: 1px solid #dcd1be;
+  background: #fbf9f4;
+  border-radius: 6px;
+  box-shadow: 0 2px 8px rgba(32, 27, 23, 0.04);
+  transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+}
+.ws-theme--book-gallery .ws-catalog-product:hover {
+  transform: translateY(-3px);
+  border-color: #78350f;
+  box-shadow: 0 10px 24px rgba(120, 53, 15, 0.12);
+}
+.ws-theme--book-gallery .ws-product-badge {
+  background: #78350f;
+  color: #fffdfa;
+  font-size: 11px;
+  border-radius: 2px;
+}
+.ws-theme--book-gallery .ws-primary-action {
+  background: #78350f;
+  color: #fffdfa;
+  border-radius: 4px;
+}
+.ws-theme--book-gallery .ws-primary-action:hover {
+  background: #5f2a0b;
+}
+
+/* ==========================================================================
+   THEME 17: OPTICAL STUDIO (Eyewear & Fashion Accessories)
+   Class: .ws-theme--optical-studio
+   ========================================================================== */
+.ws-theme--optical-studio {
+  --ws-bg: #faf9f7;
+  --ws-fg: #1a1a1a;
+  --ws-card: #f1ede7;
+  --ws-accent: #18181b;
+  --ws-accent-contrast: #ffffff;
+  --ws-border: #dad5cc;
+  --ws-muted: #6b6761;
+  --ws-card-ratio: 16/9;
+  --ws-radius-control: 0px;
+  --ws-radius-card: 0px;
+  --store-whatsapp-bg: #18181b;
+  --store-whatsapp-text: #ffffff;
+  --store-whatsapp-border: #18181b;
+  --store-whatsapp-hover: #27272a;
+  --store-whatsapp-focus: #18181b;
+  --store-whatsapp-radius: 0px;
+}
+.ws-theme--optical-studio .ws-brand {
+  font-weight: 300;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+.ws-theme--optical-studio .ws-hero h1 span {
+  font-weight: 300;
+  font-style: italic;
+}
+.ws-theme--optical-studio .ws-catalog-product {
+  border: 1px solid #e0dbd2;
+  background: #ffffff;
+  border-radius: 0;
+  transition: border-color .2s ease, box-shadow .2s ease;
+}
+.ws-theme--optical-studio .ws-catalog-product:hover {
+  border-color: #18181b;
+  box-shadow: 0 8px 24px rgba(24, 24, 27, 0.08);
+}
+.ws-theme--optical-studio .ws-product-badge {
+  background: #18181b;
+  color: #ffffff;
+  font-size: 10px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  border-radius: 0;
+}
+.ws-theme--optical-studio .ws-primary-action {
+  background: #18181b;
+  color: #ffffff;
+  border-radius: 0;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  font-size: 12px;
+}
+.ws-theme--optical-studio .ws-primary-action:hover {
+  background: #27272a;
+}
+
+/* ==========================================================================
+   THEME 18: OUTDOOR TRAIL (Outdoor & Adventure Equipment)
+   Class: .ws-theme--outdoor-trail
+   ========================================================================== */
+.ws-theme--outdoor-trail {
+  --ws-bg: #f5f6f3;
+  --ws-fg: #1e261f;
+  --ws-card: #e6eae2;
+  --ws-accent: #2f5233;
+  --ws-accent-contrast: #ffffff;
+  --ws-border: #c4cdbf;
+  --ws-muted: #566455;
+  --ws-card-ratio: 4/5;
+  --ws-radius-control: 6px;
+  --ws-radius-card: 8px;
+  --store-whatsapp-bg: #2f5233;
+  --store-whatsapp-text: #ffffff;
+  --store-whatsapp-border: #2f5233;
+  --store-whatsapp-hover: #233e26;
+  --store-whatsapp-focus: #2f5233;
+  --store-whatsapp-radius: 6px;
+}
+.ws-theme--outdoor-trail .ws-brand {
+  font-family: var(--font-tajawal, sans-serif);
+  font-weight: 800;
+  color: #2f5233;
+  letter-spacing: .03em;
+}
+.ws-theme--outdoor-trail .ws-hero h1 span {
+  color: #2f5233;
+}
+.ws-theme--outdoor-trail .ws-catalog-product {
+  border: 1.5px solid #c8d2c3;
+  background: #ffffff;
+  border-radius: 8px;
+  transition: transform .2s ease, border-color .2s ease, box-shadow .2s ease;
+}
+.ws-theme--outdoor-trail .ws-catalog-product:hover {
+  transform: translateY(-3px);
+  border-color: #2f5233;
+  box-shadow: 0 10px 24px rgba(47, 82, 51, 0.15);
+}
+.ws-theme--outdoor-trail .ws-product-badge {
+  background: #ea580c;
+  color: #ffffff;
+  font-weight: 700;
+  border-radius: 4px;
+}
+.ws-theme--outdoor-trail .ws-primary-action {
+  background: #2f5233;
+  color: #ffffff;
+  border-radius: 6px;
+  font-weight: 700;
+}
+.ws-theme--outdoor-trail .ws-primary-action:hover {
+  background: #233e26;
+}
+
+/* ==========================================================================
+   THEME 19: TRAVEL ATELIER (Travel Bags & Luggage)
+   Class: .ws-theme--travel-atelier
+   ========================================================================== */
+.ws-theme--travel-atelier {
+  --ws-bg: #f7f7f8;
+  --ws-fg: #131b2e;
+  --ws-card: #eceff3;
+  --ws-accent: #1d3557;
+  --ws-accent-contrast: #ffffff;
+  --ws-border: #cdd5df;
+  --ws-muted: #5c687a;
+  --ws-card-ratio: 4/5;
+  --ws-radius-control: 6px;
+  --ws-radius-card: 10px;
+  --store-whatsapp-bg: #1d3557;
+  --store-whatsapp-text: #ffffff;
+  --store-whatsapp-border: #1d3557;
+  --store-whatsapp-hover: #14253e;
+  --store-whatsapp-focus: #1d3557;
+  --store-whatsapp-radius: 6px;
+}
+.ws-theme--travel-atelier .ws-brand {
+  font-weight: 700;
+  letter-spacing: .06em;
+}
+.ws-theme--travel-atelier .ws-hero h1 span {
+  color: #1d3557;
+}
+.ws-theme--travel-atelier .ws-catalog-product {
+  border: 1px solid #d2d8e2;
+  background: #ffffff;
+  border-radius: 10px;
+  box-shadow: 0 4px 16px rgba(29, 53, 87, 0.05);
+  transition: transform .2s ease, border-color .2s ease, box-shadow .2s ease;
+}
+.ws-theme--travel-atelier .ws-catalog-product:hover {
+  transform: translateY(-3px);
+  border-color: #1d3557;
+  box-shadow: 0 12px 28px rgba(29, 53, 87, 0.12);
+}
+.ws-theme--travel-atelier .ws-product-badge {
+  background: #1d3557;
+  color: #ffffff;
+  font-weight: 700;
+  border-radius: 4px;
+}
+.ws-theme--travel-atelier .ws-primary-action {
+  background: #1d3557;
+  color: #ffffff;
+  border-radius: 6px;
+  font-weight: 700;
+}
+.ws-theme--travel-atelier .ws-primary-action:hover {
+  background: #14253e;
+}
+
+/* ==========================================================================
+   THEME 20: OFFICE PRO (Office Supplies & Business Equipment)
+   Class: .ws-theme--office-pro
+   ========================================================================== */
+.ws-theme--office-pro {
+  --ws-bg: #f8fafc;
+  --ws-fg: #0f172a;
+  --ws-card: #f1f5f9;
+  --ws-accent: #2563eb;
+  --ws-accent-contrast: #ffffff;
+  --ws-border: #cbd5e1;
+  --ws-muted: #64748b;
+  --ws-card-ratio: 1/1;
+  --ws-radius-control: 6px;
+  --ws-radius-card: 8px;
+  --store-whatsapp-bg: #2563eb;
+  --store-whatsapp-text: #ffffff;
+  --store-whatsapp-border: #2563eb;
+  --store-whatsapp-hover: #1d4ed8;
+  --store-whatsapp-focus: #2563eb;
+  --store-whatsapp-radius: 6px;
+}
+.ws-theme--office-pro .ws-brand {
+  font-family: var(--font-tajawal, sans-serif);
+  font-weight: 800;
+  letter-spacing: .04em;
+  color: #0f172a;
+}
+.ws-theme--office-pro .ws-hero h1 span {
+  color: #2563eb;
+}
+.ws-theme--office-pro .ws-catalog-product {
+  border: 1px solid #e2e8f0;
+  background: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+  transition: transform .2s ease, border-color .2s ease, box-shadow .2s ease;
+}
+.ws-theme--office-pro .ws-catalog-product:hover {
+  transform: translateY(-2px);
+  border-color: #2563eb;
+  box-shadow: 0 8px 20px rgba(37, 99, 235, 0.12);
+}
+.ws-theme--office-pro .ws-product-badge {
+  background: #2563eb;
+  color: #ffffff;
+  font-weight: 700;
+  border-radius: 4px;
+}
+.ws-theme--office-pro .ws-primary-action {
+  background: #2563eb;
+  color: #ffffff;
+  border-radius: 6px;
+  font-weight: 700;
+}
+.ws-theme--office-pro .ws-primary-action:hover {
+  background: #1d4ed8;
+}

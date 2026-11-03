@@ -27,8 +27,8 @@ test('Theme WhatsApp Number Sanitizer handles Egyptian and International numbers
   assert.equal(sanitizeWhatsAppNumber(null), '');
 });
 
-test('All 10 themes in registry have art-directed WhatsApp token defaults', () => {
-  assert.equal(STORE_THEME_IDS.length, 10);
+test('All 20 themes in registry have art-directed WhatsApp token defaults', () => {
+  assert.equal(STORE_THEME_IDS.length, 20);
   
   for (const id of STORE_THEME_IDS) {
     const theme = STORE_THEMES[id];
@@ -47,7 +47,7 @@ test('All 10 themes in registry have art-directed WhatsApp token defaults', () =
   }
 });
 
-test('store-themes.css defines semantic WhatsApp tokens for all 10 theme selectors', () => {
+test('store-themes.css defines semantic WhatsApp tokens for all 20 theme selectors', () => {
   const themeClasses = [
     'editorial-luxe',
     'street-pulse',
@@ -59,6 +59,16 @@ test('store-themes.css defines semantic WhatsApp tokens for all 10 theme selecto
     'active-motion',
     'little-joy',
     'crafted-story',
+    'cafe-ritual',
+    'pet-haven',
+    'bloom-studio',
+    'auto-circuit',
+    'game-arena',
+    'book-gallery',
+    'optical-studio',
+    'outdoor-trail',
+    'travel-atelier',
+    'office-pro',
   ];
 
   for (const theme of themeClasses) {

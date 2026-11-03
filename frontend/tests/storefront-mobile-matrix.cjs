@@ -23,7 +23,17 @@ const THEMES = [
   'golden-atelier',
   'active-motion',
   'little-joy',
-  'crafted-story'
+  'crafted-story',
+  'cafe-ritual',
+  'pet-haven',
+  'bloom-studio',
+  'auto-circuit',
+  'game-arena',
+  'book-gallery',
+  'optical-studio',
+  'outdoor-trail',
+  'travel-atelier',
+  'office-pro'
 ];
 
 async function apiJson(route, method = 'GET', body, token) {

@@ -5,10 +5,12 @@ const path = require('node:path');
 const root = path.resolve(__dirname, '..');
 const read = name => fs.readFileSync(path.join(root, name), 'utf8');
 
-test('all ten production theme IDs and the Pure Beauty design are registered', () => {
+test('all 20 production theme IDs and the Pure Beauty design are registered', () => {
   const themes = read('src/lib/store-themes.ts');
   const expected = ['editorial-luxe','street-pulse','pure-beauty','tech-grid','fresh-market',
-    'living-space','golden-atelier','active-motion','little-joy','crafted-story'];
+    'living-space','golden-atelier','active-motion','little-joy','crafted-story',
+    'cafe-ritual','pet-haven','bloom-studio','auto-circuit','game-arena',
+    'book-gallery','optical-studio','outdoor-trail','travel-atelier','office-pro'];
   const ids = themes.match(/export const STORE_THEME_IDS = \[([\s\S]*?)\] as const;/);
   assert.ok(ids, 'Theme registry should define an explicit allowlist');
   for (const id of expected) {
