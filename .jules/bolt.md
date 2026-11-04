@@ -1,0 +1,3 @@
+## 2024-06-13 - AsSplitQuery on DeleteStore
+**Learning:** Found a Cartesian explosion bottleneck in `AdminController.DeleteStore` where fetching a store along with 5 collection navigation properties (`Products`, `Categories`, `Orders`, `Reviews`, `Coupons`) generated a massive JOIN query, causing performance issues.
+**Action:** Applied `.AsSplitQuery()` to break the massive query into multiple smaller, efficient queries. When fetching entities with multiple large related collections in Entity Framework, always look for `.AsSplitQuery()` opportunities to optimize data transfer and processing speed.
