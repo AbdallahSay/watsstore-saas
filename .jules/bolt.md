@@ -1,0 +1,6 @@
+## 2024-05-24 - Efficient Bulk Deletes with EF Core
+**Learning:** When deleting a parent entity and its cascading children in EF Core 7+, fetching the parent with `.Include()` for all children (Products, Categories, Orders, etc.) and loading them into memory only to call `RemoveRange()` and `Remove()` causes massive data transfer and a Cartesian explosion on the database query.
+**Action:** Use `.ExecuteDeleteAsync()` to delete child entities directly on the database without fetching them into memory, improving performance and avoiding N+1 / Cartesian explosion issues.
+## 2024-05-24 - Bulk Deletion Requires Explicit Transactions
+**Learning:** When refactoring from `.Remove()`/`.SaveChangesAsync()` to EF Core 7+ bulk deletes (`.ExecuteDeleteAsync()`), the implicit transaction protection is lost. Multiple `.ExecuteDeleteAsync()` calls run independently against the database, meaning a failure midway through leaves the database in a partially deleted, corrupted state. Also, without `SaveChanges`, EF Core no longer automatically orders `DELETE` statements based on foreign keys.
+**Action:** When executing multiple bulk delete or update operations that should be atomic, always wrap them in a `using var transaction = await _db.Database.BeginTransactionAsync();` block and manually ensure dependents are deleted before principals.
