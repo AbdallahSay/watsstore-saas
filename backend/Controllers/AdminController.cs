@@ -470,11 +470,7 @@ namespace WatsStore.Api.Controllers
             if (authError != null) return authError;
 
             var store = await _db.Stores
-                .Include(s => s.Products)
-                .Include(s => s.Categories)
-                .Include(s => s.Orders)
-                .Include(s => s.Reviews)
-                .Include(s => s.Coupons)
+                .Select(s => new { s.Id, s.StoreName })
                 .FirstOrDefaultAsync(s => s.Id == id);
 
             if (store == null)
@@ -484,15 +480,9 @@ namespace WatsStore.Api.Controllers
 
             var storeName = store.StoreName;
 
-            // Remove associated children entities to ensure clean deletion
-            if (store.Products.Any()) _db.Products.RemoveRange(store.Products);
-            if (store.Categories.Any()) _db.Categories.RemoveRange(store.Categories);
-            if (store.Orders.Any()) _db.WhatsAppOrders.RemoveRange(store.Orders);
-            if (store.Reviews.Any()) _db.StoreReviews.RemoveRange(store.Reviews);
-            if (store.Coupons.Any()) _db.StoreCoupons.RemoveRange(store.Coupons);
-
-            _db.Stores.Remove(store);
-            await _db.SaveChangesAsync();
+            // Use ExecuteDeleteAsync to perform a bulk delete on the database without loading entities into memory.
+            // Database ON DELETE CASCADE will handle removing associated child entities efficiently.
+            await _db.Stores.Where(s => s.Id == id).ExecuteDeleteAsync();
 
             return Ok(new
             {
