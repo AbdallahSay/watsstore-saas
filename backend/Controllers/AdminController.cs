@@ -469,35 +469,43 @@ namespace WatsStore.Api.Controllers
             var authError = EnsureAdminAccess();
             if (authError != null) return authError;
 
-            var store = await _db.Stores
-                .Include(s => s.Products)
-                .Include(s => s.Categories)
-                .Include(s => s.Orders)
-                .Include(s => s.Reviews)
-                .Include(s => s.Coupons)
-                .FirstOrDefaultAsync(s => s.Id == id);
+            var storeInfo = await _db.Stores
+                .AsNoTracking()
+                .Where(s => s.Id == id)
+                .Select(s => new { s.Id, s.StoreName })
+                .FirstOrDefaultAsync();
 
-            if (store == null)
+            if (storeInfo == null)
             {
                 return NotFound(new { message = "المتجر المطلوب غير موجود في المنصة" });
             }
 
-            var storeName = store.StoreName;
+            // ⚡ Bolt Performance Optimization:
+            // - Replaced heavy Entity tracking + Include chains with direct bulk execute deletions.
+            // - Wrapped multiple consecutive bulk executions in a transaction to maintain integrity.
+            // - Reduces memory footprint drastically and avoids Cartesian explosion for large stores.
+            using var transaction = await _db.Database.BeginTransactionAsync();
+            try
+            {
+                await _db.Products.Where(p => p.StoreId == id).ExecuteDeleteAsync();
+                await _db.Categories.Where(c => c.StoreId == id).ExecuteDeleteAsync();
+                await _db.WhatsAppOrders.Where(o => o.StoreId == id).ExecuteDeleteAsync();
+                await _db.StoreReviews.Where(r => r.StoreId == id).ExecuteDeleteAsync();
+                await _db.StoreCoupons.Where(c => c.StoreId == id).ExecuteDeleteAsync();
+                await _db.Stores.Where(s => s.Id == id).ExecuteDeleteAsync();
 
-            // Remove associated children entities to ensure clean deletion
-            if (store.Products.Any()) _db.Products.RemoveRange(store.Products);
-            if (store.Categories.Any()) _db.Categories.RemoveRange(store.Categories);
-            if (store.Orders.Any()) _db.WhatsAppOrders.RemoveRange(store.Orders);
-            if (store.Reviews.Any()) _db.StoreReviews.RemoveRange(store.Reviews);
-            if (store.Coupons.Any()) _db.StoreCoupons.RemoveRange(store.Coupons);
-
-            _db.Stores.Remove(store);
-            await _db.SaveChangesAsync();
+                await transaction.CommitAsync();
+            }
+            catch
+            {
+                await transaction.RollbackAsync();
+                throw;
+            }
 
             return Ok(new
             {
                 id,
-                message = $"تم حذف متجر '{storeName}' وجميع بياناته المرتبطة بنجاح من المنصة."
+                message = $"تم حذف متجر '{storeInfo.StoreName}' وجميع بياناته المرتبطة بنجاح من المنصة."
             });
         }
 
