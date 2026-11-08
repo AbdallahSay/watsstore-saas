@@ -1,0 +1,3 @@
+## 2024-05-18 - [EF Core Cascade Delete Performance]
+**Learning:** In EF Core 7+, calling `.ExecuteDeleteAsync()` is vastly superior to `.RemoveRange()` for bulk and cascade deletions as it avoids loading entities into memory (which can cause a Cartesian explosion when multiple collections are `.Include()`d). However, because `.ExecuteDeleteAsync()` executes immediately outside the Change Tracker, multiple consecutive calls must be explicitly wrapped in an explicit transaction (`await _db.Database.BeginTransactionAsync()`) to guarantee atomicity and database integrity.
+**Action:** When refactoring deletions to use `.ExecuteDeleteAsync()` across multiple tables, always wrap the calls in a transaction to prevent partial deletes if an error occurs mid-operation.
