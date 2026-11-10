@@ -1,0 +1,3 @@
+## 2024-05-15 - ExecuteDeleteAsync Requires Manual Topological Sorting
+**Learning:** EF Core 7+ `ExecuteDeleteAsync()` bulk operations execute immediately and bypass the Change Tracker. Unlike `SaveChangesAsync()`, which automatically sorts delete statements topologically to respect foreign key constraints, manual bulk deletes will throw a SQL constraint violation if entities are deleted out of order (e.g. deleting a `Category` before a `Product` when the `Product` relies on the `Category`).
+**Action:** When manually writing multiple `ExecuteDeleteAsync()` calls, always inspect the FK configurations (`DeleteBehavior`) in `AppDbContext` and ensure you are deleting from leaf nodes (children) up to the root (parents) to avoid transaction crashes.
