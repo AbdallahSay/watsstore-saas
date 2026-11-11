@@ -1,0 +1,4 @@
+
+## 2024-03-24 - Bulk Delete Execution Order and Transactions in EF Core 7+
+**Learning:** Replacing memory-heavy `RemoveRange` with `ExecuteDeleteAsync` provides massive performance gains by avoiding tracking overhead and Cartesian explosion. However, because `ExecuteDeleteAsync` bypasses EF Core's automatic topological sorting and executes immediately, multiple deletes must be explicitly wrapped in a database transaction to maintain atomicity. Furthermore, strict leaf-to-root deletion order must be enforced to avoid SQL Foreign Key constraint violations (e.g., `Products` must be deleted before `Categories` because `Category.Products` uses `DeleteBehavior.ClientSetNull`).
+**Action:** When optimizing deletes with `ExecuteDeleteAsync` on a bounded context, always explicitly define a database transaction and manually order the execution from leaf entities up to the aggregate root.
