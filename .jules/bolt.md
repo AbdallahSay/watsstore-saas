@@ -1,0 +1,3 @@
+## 2024-11-10 - Executing bulk deletes with ExecuteDeleteAsync order in EF Core
+**Learning:** `ExecuteDeleteAsync` issues direct SQL `DELETE` queries that bypass EF Core's automatic topological sorting. When deleting entities with `ClientSetNull` constraints (like `Category` -> `Product`), you must manually order the deletions (leaf-to-root) to prevent SQL Foreign Key constraint violations. The previous code deleted products and categories before other dependent entities, which can cause SQL FK violations if `WhatsAppOrders` have constraints.
+**Action:** When migrating from `RemoveRange` to `ExecuteDeleteAsync`, carefully trace all dependent entities and ensure strict leaf-to-root deletion order, matching exactly what the database engine expects.
