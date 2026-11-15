@@ -470,11 +470,7 @@ namespace WatsStore.Api.Controllers
             if (authError != null) return authError;
 
             var store = await _db.Stores
-                .Include(s => s.Products)
-                .Include(s => s.Categories)
-                .Include(s => s.Orders)
-                .Include(s => s.Reviews)
-                .Include(s => s.Coupons)
+                .Select(s => new { s.Id, s.StoreName })
                 .FirstOrDefaultAsync(s => s.Id == id);
 
             if (store == null)
@@ -484,15 +480,27 @@ namespace WatsStore.Api.Controllers
 
             var storeName = store.StoreName;
 
-            // Remove associated children entities to ensure clean deletion
-            if (store.Products.Any()) _db.Products.RemoveRange(store.Products);
-            if (store.Categories.Any()) _db.Categories.RemoveRange(store.Categories);
-            if (store.Orders.Any()) _db.WhatsAppOrders.RemoveRange(store.Orders);
-            if (store.Reviews.Any()) _db.StoreReviews.RemoveRange(store.Reviews);
-            if (store.Coupons.Any()) _db.StoreCoupons.RemoveRange(store.Coupons);
+            // ⚡ Bolt: Replaced in-memory entity fetching and RemoveRange with ExecuteDeleteAsync
+            // Why: Avoids Cartesian explosion when including 5 collections and eliminates O(N) memory allocation for deleted entities.
+            // Impact: O(1) memory usage during deletion and reduces database roundtrips by bypassing the EF Change Tracker.
+            // Note: Explicit transaction is required because ExecuteDeleteAsync executes immediately and independently per call.
+            using var transaction = await _db.Database.BeginTransactionAsync();
+            try
+            {
+                await _db.Products.Where(p => p.StoreId == id).ExecuteDeleteAsync();
+                await _db.Categories.Where(c => c.StoreId == id).ExecuteDeleteAsync();
+                await _db.WhatsAppOrders.Where(o => o.StoreId == id).ExecuteDeleteAsync();
+                await _db.StoreReviews.Where(r => r.StoreId == id).ExecuteDeleteAsync();
+                await _db.StoreCoupons.Where(c => c.StoreId == id).ExecuteDeleteAsync();
+                await _db.Stores.Where(s => s.Id == id).ExecuteDeleteAsync();
 
-            _db.Stores.Remove(store);
-            await _db.SaveChangesAsync();
+                await transaction.CommitAsync();
+            }
+            catch
+            {
+                await transaction.RollbackAsync();
+                throw;
+            }
 
             return Ok(new
             {
