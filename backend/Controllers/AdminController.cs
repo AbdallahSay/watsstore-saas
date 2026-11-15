@@ -469,30 +469,42 @@ namespace WatsStore.Api.Controllers
             var authError = EnsureAdminAccess();
             if (authError != null) return authError;
 
-            var store = await _db.Stores
-                .Include(s => s.Products)
-                .Include(s => s.Categories)
-                .Include(s => s.Orders)
-                .Include(s => s.Reviews)
-                .Include(s => s.Coupons)
-                .FirstOrDefaultAsync(s => s.Id == id);
+            // ⚡ Bolt Optimization: Use projection to only fetch the store name, preventing Cartesian explosion
+            // when loading all children. Then use ExecuteDeleteAsync to perform database-level batch deletes
+            // instead of fetching entities into memory to call RemoveRange.
+            var storeName = await _db.Stores
+                .Where(s => s.Id == id)
+                .Select(s => s.StoreName)
+                .FirstOrDefaultAsync();
 
-            if (store == null)
+            if (storeName == null)
             {
                 return NotFound(new { message = "المتجر المطلوب غير موجود في المنصة" });
             }
 
-            var storeName = store.StoreName;
+            // Using transaction since we have multiple ExecuteDeleteAsync calls which execute immediately
+            using var transaction = await _db.Database.BeginTransactionAsync();
 
-            // Remove associated children entities to ensure clean deletion
-            if (store.Products.Any()) _db.Products.RemoveRange(store.Products);
-            if (store.Categories.Any()) _db.Categories.RemoveRange(store.Categories);
-            if (store.Orders.Any()) _db.WhatsAppOrders.RemoveRange(store.Orders);
-            if (store.Reviews.Any()) _db.StoreReviews.RemoveRange(store.Reviews);
-            if (store.Coupons.Any()) _db.StoreCoupons.RemoveRange(store.Coupons);
+            try
+            {
+                // Note: EF Core usually handles cascade deletes for us via DeleteBehavior.Cascade,
+                // but since the original code explicitly deleted children, we do it via ExecuteDeleteAsync
+                // for safety and exact behavioral parity.
+                await _db.Products.Where(p => p.StoreId == id).ExecuteDeleteAsync();
+                await _db.Categories.Where(c => c.StoreId == id).ExecuteDeleteAsync();
+                await _db.WhatsAppOrders.Where(o => o.StoreId == id).ExecuteDeleteAsync();
+                await _db.StoreReviews.Where(r => r.StoreId == id).ExecuteDeleteAsync();
+                await _db.StoreCoupons.Where(c => c.StoreId == id).ExecuteDeleteAsync();
 
-            _db.Stores.Remove(store);
-            await _db.SaveChangesAsync();
+                await _db.Stores.Where(s => s.Id == id).ExecuteDeleteAsync();
+
+                await transaction.CommitAsync();
+            }
+            catch
+            {
+                await transaction.RollbackAsync();
+                throw;
+            }
 
             return Ok(new
             {
