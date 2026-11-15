@@ -1,0 +1,3 @@
+## 2024-11-09 - Massive Memory Leak in EF Core Entity Deletion
+**Learning:** Found a severe performance bottleneck in `AdminController.DeleteStore` where deleting a single `Store` entity inadvertently loaded thousands of associated records (Products, Categories, Orders, Reviews, Coupons) into application memory because of multiple chained `.Include()` calls combined with `RemoveRange()`.
+**Action:** Always replace `.Include().RemoveRange()` chains with EF Core 7's `.ExecuteDeleteAsync()` for bulk entity removal, wrapping the operations in an explicit `_db.Database.BeginTransactionAsync()` block to preserve rollback integrity that `SaveChangesAsync()` would normally provide.
