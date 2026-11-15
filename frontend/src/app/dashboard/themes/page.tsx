@@ -67,8 +67,8 @@ export default function ThemesMarketplacePage() {
   const [dirty, setDirty] = useState(false);
 
   async function load() {
-    try {
-      const result = await commerceApi<CommerceSettings>('/merchant/commerce/settings', merchantToken());
+
+      return commerceApi<CommerceSettings>('/merchant/commerce/settings', merchantToken()).then(async (result) => {
       // Handle legacy theme alias if present in draft or published
       result.draftTheme = parseStoreTheme(result.draftTheme);
       result.publishedTheme = parseStoreTheme(result.publishedTheme);
@@ -84,9 +84,9 @@ export default function ThemesMarketplacePage() {
       const storeData = await api.getPublicStore(result.slug);
       setStore(storeData);
       setDirty(false);
-    } catch (e) {
+    }).catch((e: any) => {
       setMessage({ text: (e as Error).message, type: 'error' });
-    }
+    });
   }
 
   useEffect(() => {

@@ -40,18 +40,18 @@ export default function DashboardReviewsPage() {
     const token = (localStorage.getItem('watsstore_merchant_token') || localStorage.getItem('watsstore_token'));
     if (!token) return;
 
-    try {
-      const data = await api.getMerchantReviews(token);
+
+      return api.getMerchantReviews(token).then(async (data) => {
       setReviewsData(data);
-    } catch (err: any) {
+    }).catch((err: any) => {
       appSwal.fire({
         icon: 'error',
         title: 'خطأ',
         text: err.message || 'فشل في تحميل التقييمات',
       });
-    } finally {
+    }).finally(() => {
       setIsLoading(false);
-    }
+    });
   };
 
   useEffect(() => {
@@ -67,7 +67,7 @@ export default function DashboardReviewsPage() {
 
     try {
       await api.toggleReviewApproval(token, review.id, newStatus);
-      
+
       // Optimistic state update
       setReviewsData(prev => {
         const updatedReviews = prev.reviews.map(r => 
@@ -442,7 +442,7 @@ export default function DashboardReviewsPage() {
 
                 {/* Review Comment Box */}
                 <div className="mt-3.5 p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-700 text-slate-700 dark:text-slate-200 text-xs sm:text-sm leading-relaxed">
-                  "{review.comment}"
+                  &quot;{review.comment}&quot;
                 </div>
               </div>
             );

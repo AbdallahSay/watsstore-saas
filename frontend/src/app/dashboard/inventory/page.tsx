@@ -47,13 +47,13 @@ export default function InventoryManagementPage() {
 
   async function load() {
     const token = merchantToken();
-    const [p, s] = await Promise.all([
+    return Promise.all([
       api.getProducts(token),
       commerceApi<Stock[]>('/merchant/commerce/inventory', token),
-    ]);
+    ]).then(async ([p, s]) => {
     setProducts(p);
     setStocks(s);
-  }
+  });}
 
   useEffect(() => {
     load().catch((e) => setMessage({ text: (e as Error).message, type: 'error' }));

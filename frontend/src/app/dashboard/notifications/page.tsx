@@ -38,15 +38,15 @@ export default function NotificationsAuditPage() {
   const [busy, setBusy] = useState(false);
 
   async function load() {
-    try {
-      const res = await commerceApi<Summary>('/merchant/notifications', merchantToken());
+
+      return commerceApi<Summary>('/merchant/notifications', merchantToken()).then(async (res) => {
       setData(res);
-    } catch {
+    }).catch((_error: any) => {
       setMessage({
         text: 'إدارة إشعارات الخلفية غير متاحة حالياً. يلزم نشر إعدادات الخادم والموزّع الآمن أولاً.',
         type: 'error',
       });
-    }
+    });
   }
 
   useEffect(() => {

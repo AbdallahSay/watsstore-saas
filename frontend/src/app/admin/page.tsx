@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useCallback, Component, ErrorInfo, ReactNode } from 'react';
 import Link from 'next/link';
+import { useBrowserStorage, useBrowserReady } from '@/hooks/useBrowserStorage';
 import { appSwal } from '@/lib/sweetalert';
 import { useLanguage } from '@/context/LanguageContext';
 import { useDialog } from '@/hooks/useDialog';
@@ -118,9 +119,14 @@ class AdminTabErrorBoundary extends Component<AdminTabErrorBoundaryProps, AdminT
 
 export default function SuperAdminPage() {
   const { t, language, dir } = useLanguage();
-  const [token, setToken] = useState<string | null>(null);
-  const [adminUser, setAdminUser] = useState<any>(null);
-  const [isInitializing, setIsInitializing] = useState(true);
+  const storedToken = useBrowserStorage('watsstore_admin_token');
+  const [tokenOverride, setToken] = useState<string | null | undefined>();
+  const token = tokenOverride === undefined ? storedToken : tokenOverride;
+  const storedAdminUser = useBrowserStorage('watsstore_admin_user');
+  const [adminUserOverride, setAdminUser] = useState<any>(null);
+  let adminUser = adminUserOverride;
+  if (!adminUser && storedAdminUser) { try { adminUser = JSON.parse(storedAdminUser); } catch { /* Invalid cached profile does not authenticate a session. */ } }
+  const isInitializing = !useBrowserReady();
 
   // Active View Tab in Dashboard
   const [activeTab, setActiveTab] = useState<'stores' | 'subscriptions' | 'pricing' | 'gateways' | 'settings'>('stores');
@@ -204,26 +210,9 @@ export default function SuperAdminPage() {
     if (!isUpdatingPlanModal) setStoreForPlanModal(null);
   });
 
-  // Initialize Auth
-  useEffect(() => {
-    const savedToken = localStorage.getItem('watsstore_admin_token');
-    const savedUser = localStorage.getItem('watsstore_admin_user');
-    if (savedToken) {
-      setToken(savedToken);
-      if (savedUser) {
-        try {
-          setAdminUser(JSON.parse(savedUser));
-        } catch {}
-      }
-    }
-    setIsInitializing(false);
-  }, []);
-
   // Fetch Dashboard Data
   const loadDashboardData = useCallback(async (activeToken: string) => {
-    setIsLoadingData(true);
-    try {
-      const [statsRes, storesRes, pricingRes, pendingSubsRes, gatewaysRes] = await Promise.all([
+    return Promise.all([
         api.getAdminPlatformStats(activeToken),
         api.getAdminStores(activeToken),
         api.getAdminPricing(activeToken).catch((err) => {
@@ -238,7 +227,7 @@ export default function SuperAdminPage() {
           console.warn('Could not load admin payment gateways:', err);
           return [];
         })
-      ]);
+      ]).then(async ([statsRes, storesRes, pricingRes, pendingSubsRes, gatewaysRes]) => {
       setStats(statsRes);
       setStores(storesRes);
       if (pricingRes) {
@@ -246,7 +235,7 @@ export default function SuperAdminPage() {
       }
       setPendingSubscriptions(Array.isArray(pendingSubsRes) ? pendingSubsRes : []);
       setPaymentGateways(Array.isArray(gatewaysRes) ? gatewaysRes : []);
-    } catch (err: any) {
+    }).catch((err: any) => {
       console.error('Failed to load admin data:', err);
       if (err.message && err.message.includes('401')) {
         handleLogout();
@@ -268,9 +257,9 @@ export default function SuperAdminPage() {
           color: '#f8fafc',
         });
       }
-    } finally {
+    }).finally(() => {
       setIsLoadingData(false);
-    }
+    });
   }, []);
 
   // When token is set, load data
@@ -319,7 +308,7 @@ export default function SuperAdminPage() {
   };
 
   // Handle Logout
-  const handleLogout = () => {
+  function handleLogout() {
     localStorage.removeItem('watsstore_admin_token');
     localStorage.removeItem('watsstore_admin_user');
     setToken(null);
@@ -693,7 +682,7 @@ export default function SuperAdminPage() {
     setActionLoadingId(storeId);
     try {
       const res = await api.toggleStoreStatus(token, storeId);
-      
+
       // Update local state
       setStores(prev => prev.map(s => {
         if (s.id === storeId) {
@@ -763,7 +752,7 @@ export default function SuperAdminPage() {
     setActionLoadingId(storeId);
     try {
       const res = await api.deleteStore(token, storeId);
-      
+
       // Remove from local stores
       setStores(prev => prev.filter(s => s.id !== storeId));
 

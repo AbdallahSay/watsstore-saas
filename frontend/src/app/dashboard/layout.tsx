@@ -1,8 +1,9 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
+import { useBrowserStorage } from '@/hooks/useBrowserStorage';
 import { useDialog } from '@/hooks/useDialog';
 import { 
   Store as StoreIcon, 
@@ -38,7 +39,8 @@ export default function DashboardLayout({
   const router = useRouter();
   const pathname = usePathname();
   const { t, dir } = useLanguage();
-  const [user, setUser] = useState<any>(null);
+  const storedUser = useBrowserStorage('watsstore_user');
+  const user = useMemo(() => { try { return storedUser ? JSON.parse(storedUser) : null; } catch { return null; } }, [storedUser]);
   const [trialInfo, setTrialInfo] = useState<{
     isTrialExpired: boolean;
     remainingDays: number;
@@ -46,7 +48,7 @@ export default function DashboardLayout({
     trialEndsAt?: string | null;
   } | null>(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
+  const isLoading = !user;
 
   useEffect(() => {
     const token = localStorage.getItem('watsstore_merchant_token') || localStorage.getItem('watsstore_token');
@@ -57,7 +59,6 @@ export default function DashboardLayout({
     } else {
       try {
         const parsed = JSON.parse(storedUser);
-        setUser(parsed);
         // Fetch fresh summary to get exact trial status from backend
         api.getDashboardSummary(token)
           .then((res) => {
@@ -78,15 +79,13 @@ export default function DashboardLayout({
       } catch {
         router.push('/login');
       }
-      setIsLoading(false);
     }
   }, [router]);
   const drawerRef = useDialog(isMobileMenuOpen, () => setIsMobileMenuOpen(false), '(min-width: 768px)');
 
   // Close drawer on route change
-  useEffect(() => {
-    setIsMobileMenuOpen(false);
-  }, [pathname]);
+  const [drawerPath, setDrawerPath] = useState(pathname);
+  if (drawerPath !== pathname) { setDrawerPath(pathname); setIsMobileMenuOpen(false); }
 
 
   const handleLogout = () => {

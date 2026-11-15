@@ -85,13 +85,13 @@ export default function OrderDetailsPage() {
 
   async function load() {
     const token = merchantToken();
-    const [o, h] = await Promise.all([
+    return Promise.all([
       commerceApi<Order>(`/merchant/orders/${params.id}`, token),
       commerceApi<History[]>(`/merchant/commerce/orders/${params.id}/history`, token),
-    ]);
+    ]).then(async ([o, h]) => {
     setOrder(o);
     setHistory(h);
-  }
+  });}
 
   useEffect(() => {
     load().catch((e) => setMessage({ text: (e as Error).message, type: 'error' }));

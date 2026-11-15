@@ -529,7 +529,7 @@ export default function HomePage() {
                     </div>
 
                     <p className="text-sm sm:text-base text-slate-700 dark:text-slate-300 leading-relaxed italic mb-6">
-                      "{tItem.quote}"
+                      &quot;{tItem.quote}&quot;
                     </p>
                   </div>
 

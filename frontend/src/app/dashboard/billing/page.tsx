@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
+import { useBrowserStorage } from '@/hooks/useBrowserStorage';
 import { appSwal } from '@/lib/sweetalert';
 import { useLanguage } from '@/context/LanguageContext';
 import { 
@@ -42,7 +43,9 @@ import {
 
 export default function MerchantBillingPage() {
   const { t, language, dir } = useLanguage();
-  const [token, setToken] = useState<string | null>(null);
+  const primaryToken = useBrowserStorage('watsstore_merchant_token');
+  const legacyToken = useBrowserStorage('watsstore_token');
+  const token = primaryToken || legacyToken;
   const [status, setStatus] = useState<MerchantBillingStatus | null>(null);
   const [pricing, setPricing] = useState<PlatformPricingSettings | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -53,9 +56,9 @@ export default function MerchantBillingPage() {
   // Upgrade Plan selection states
   const [billingCycle, setBillingCycle] = useState<'Monthly' | 'Annual'>('Annual');
   const [selectedPlan, setSelectedPlan] = useState<'Pro' | 'VIP'>('Pro');
-  const [paymentMethod, setPaymentMethod] = useState<string>('VodafoneCash');
-  const [destinationAccount, setDestinationAccount] = useState<string>('');
-  const [destinationAccountName, setDestinationAccountName] = useState<string>('');
+  const [chosenPaymentMethod, setPaymentMethod] = useState<string>('VodafoneCash');
+  const [chosenDestinationAccount, setDestinationAccount] = useState<string>('');
+  const [chosenDestinationAccountName, setDestinationAccountName] = useState<string>('');
   const [senderIdentifier, setSenderIdentifier] = useState('');
   const [transactionId, setTransactionId] = useState('');
   const [notes, setNotes] = useState('');
@@ -64,17 +67,15 @@ export default function MerchantBillingPage() {
   const [isCopied, setIsCopied] = useState<string | null>(null);
 
   const loadBillingData = useCallback(async (authToken: string) => {
-    setIsLoading(true);
-    try {
-      const [billingRes, pricingRes] = await Promise.all([
+    return Promise.all([
         api.getMerchantBillingStatus(authToken),
         api.getPublicPricing().catch(() => null)
-      ]);
+      ]).then(async ([billingRes, pricingRes]) => {
       setStatus(billingRes);
       if (pricingRes) {
         setPricing(pricingRes);
       }
-    } catch (err: any) {
+    }).catch((err: any) => {
       console.error('Failed to load billing status:', err);
       appSwal.fire({
         icon: 'error',
@@ -84,20 +85,12 @@ export default function MerchantBillingPage() {
         background: '#0f172a',
         color: '#f8fafc',
       });
-    } finally {
+    }).finally(() => {
       setIsLoading(false);
-    }
+    });
   }, []);
 
-  useEffect(() => {
-    const savedToken = (localStorage.getItem('watsstore_merchant_token') || localStorage.getItem('watsstore_token'));
-    if (savedToken) {
-      setToken(savedToken);
-      loadBillingData(savedToken);
-    } else {
-      setIsLoading(false);
-    }
-  }, [loadBillingData]);
+  useEffect(() => { if (token) void loadBillingData(token); }, [token, loadBillingData]);
 
   // Synchronize dynamic payment gateways
   const dynamicGateways: PaymentGatewayItem[] = (status?.activePaymentGateways && status.activePaymentGateways.length > 0)
@@ -135,33 +128,11 @@ export default function MerchantBillingPage() {
         }
       ];
 
-  // Auto-select valid payment method if current is not in active gateways
-  useEffect(() => {
-    if (dynamicGateways.length > 0) {
-      const isCurrentValid = dynamicGateways.some(g => g.gatewayKey === paymentMethod);
-      if (!isCurrentValid) {
-        setPaymentMethod(dynamicGateways[0].gatewayKey);
-      }
-    }
-  }, [dynamicGateways, paymentMethod]);
-
-  // Auto-select destination account for selected gateway
-  useEffect(() => {
-    const currentGw = dynamicGateways.find(g => g.gatewayKey === paymentMethod) || dynamicGateways[0];
-    if (currentGw) {
-      const activeAccs = (currentGw.accounts || []).filter(a => a.isActive !== false);
-      if (activeAccs.length > 0) {
-        const isCurrentAccValid = activeAccs.some(a => a.accountNumber === destinationAccount);
-        if (!isCurrentAccValid) {
-          setDestinationAccount(activeAccs[0].accountNumber);
-          setDestinationAccountName(activeAccs[0].accountName || '');
-        }
-      } else {
-        setDestinationAccount('');
-        setDestinationAccountName('');
-      }
-    }
-  }, [dynamicGateways, paymentMethod, destinationAccount]);
+  const paymentMethod = dynamicGateways.some(g => g.gatewayKey === chosenPaymentMethod) ? chosenPaymentMethod : dynamicGateways[0]?.gatewayKey || '';
+  const activeAccounts = (dynamicGateways.find(g => g.gatewayKey === paymentMethod)?.accounts || []).filter(a => a.isActive !== false);
+  const selectedAccount = activeAccounts.find(a => a.accountNumber === chosenDestinationAccount) || activeAccounts[0];
+  const destinationAccount = selectedAccount?.accountNumber || '';
+  const destinationAccountName = selectedAccount?.accountName || (destinationAccount === chosenDestinationAccount ? chosenDestinationAccountName : '');
 
   const copyToClipboard = (text: string, label: string) => {
     if (typeof navigator !== 'undefined' && navigator.clipboard) {

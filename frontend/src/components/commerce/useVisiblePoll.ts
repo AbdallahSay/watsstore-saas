@@ -1,7 +1,8 @@
 'use client';
 import { useEffect, useRef } from 'react';
 export function useVisiblePoll(callback: () => void | Promise<void>, enabled: boolean, interval = 30000) {
-  const latest = useRef(callback); latest.current = callback;
+  const latest = useRef(callback);
+  useEffect(() => { latest.current = callback; }, [callback]);
   useEffect(() => {
     if (!enabled) return;
     let timer: ReturnType<typeof setInterval> | undefined;

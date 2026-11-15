@@ -74,6 +74,8 @@ jobs:
 
       - name: Type check
         run: npx tsc --noEmit
+      - name: ESLint release gate
+        run: npm run lint
       - name: Audit npm dependencies
         run: npm audit --audit-level=moderate
 
@@ -144,6 +146,9 @@ jobs:
         working-directory: frontend
       - name: Verify mobile native shopping, variants, coupons and accessible checkout
         run: npm run test:mobile-commerce
+        working-directory: frontend
+      - name: Verify checkout labels and controls across all themes and release widths
+        run: node tests/checkout-layout.e2e.cjs
         working-directory: frontend
       - name: Verify dedicated product and complete order journey across engines
         run: npm run test:native-journey

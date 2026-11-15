@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
+import { useBrowserStorage } from '@/hooks/useBrowserStorage';
 import { api } from '@/lib/api';
 import { readPreviewCart, clearPreviewCart, type PreviewCartLine } from '@/lib/preview-cart';
 import type { Store, Product, CreateOrderResponse } from '@/types';
@@ -14,7 +15,9 @@ export default function PreviewCheckoutPage() {
   const productId = search.get('product');
   const cartMode = search.get('cart') === '1';
   const [cartLines, setCartLines] = useState<PreviewCartLine[]>([]);
-  useEffect(() => { if (slug && cartMode) setCartLines(readPreviewCart(slug)); }, [slug, cartMode]);
+  const savedCart = useBrowserStorage('ws_preview_cart_' + slug);
+  const [previousCart, setPreviousCart] = useState<string | null | undefined>();
+  if (previousCart !== savedCart) { setPreviousCart(savedCart); if (slug && cartMode) setCartLines(readPreviewCart(slug)); }
   const [store, setStore] = useState<Store | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');

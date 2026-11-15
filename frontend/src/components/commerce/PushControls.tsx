@@ -1,4 +1,5 @@
 'use client';
+import { useBrowserStorage } from '@/hooks/useBrowserStorage';
 import { useEffect, useState } from 'react';
 import { commerceApi } from '@/lib/commerce-api';
 type DeviceSubscription={id:string;revokeKey:string};
@@ -8,7 +9,10 @@ export default function PushControls({slug,token,english=false}:{slug:string;tok
   const key=`${slug}:${token}`;const tr=(ar:string,en:string)=>english?en:ar;
   const [config,setConfig]=useState<{enabled:boolean;publicKey?:string}|null>(null);
   const [sub,setSub]=useState<DeviceSubscription|null>(null);const [message,setMessage]=useState('');const [busy,setBusy]=useState(false);
-  useEffect(()=>{let live=true;setSub(records()[key]||null);commerceApi<{enabled:boolean;publicKey?:string}>(`/public/stores/${encodeURIComponent(slug)}/notifications/config`).then(c=>{if(live)setConfig(c);}).catch(()=>{if(live)setConfig({enabled:false});});return()=>{live=false;};},[slug,key]);
+  useEffect(()=>{let live=true;commerceApi<{enabled:boolean;publicKey?:string}>(`/public/stores/${encodeURIComponent(slug)}/notifications/config`).then(c=>{if(live)setConfig(c);}).catch(()=>{if(live)setConfig({enabled:false});});return()=>{live=false;};},[slug,key]);
+  const stored = useBrowserStorage(storage);
+  const [previousStored, setPreviousStored] = useState<string | null | undefined>();
+  if (previousStored !== stored) { setPreviousStored(stored); setSub(records()[key] || null); }
   async function enable() {
     if(!config?.enabled||!config.publicKey)return;
     if(!window.isSecureContext||!('serviceWorker'in navigator)||!('PushManager'in window)||!('Notification'in window)){setMessage(tr('المتصفح مش بيدعم إشعارات الخلفية هنا. على iPhone قد تحتاج تضيف الموقع للشاشة الرئيسية وتفتحه منها.','Background push is unsupported here. On iPhone, you may need to add this site to the Home Screen and open it there.'));return;}

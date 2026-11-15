@@ -1,5 +1,6 @@
 'use client';
 
+import { useBrowserStorage, useBrowserReady, writeBrowserStorage } from '@/hooks/useBrowserStorage';
 import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import {
   LanguageCode,
@@ -34,8 +35,9 @@ const LanguageContext = createContext<LanguageContextType | undefined>(undefined
 const LANGUAGE_STORAGE_KEY = 'watsstore_lang';
 
 export function LanguageProvider({ children }: { children: React.ReactNode }) {
-  const [language, setLanguageState] = useState<LanguageCode>(DEFAULT_LANGUAGE);
-  const [isMounted, setIsMounted] = useState(false);
+  const savedLanguage = useBrowserStorage(LANGUAGE_STORAGE_KEY) as LanguageCode | null;
+  const language = savedLanguage && LANGUAGES[savedLanguage] ? savedLanguage : DEFAULT_LANGUAGE;
+  const isMounted = useBrowserReady();
   const [dictionaries, setDictionaries] = useState<Partial<Record<LanguageCode, TranslationDictionary>>>({ar:arabic});
   useEffect(() => {
     if (language === 'ar' || dictionaries[language]) return;
@@ -54,24 +56,11 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
-  useEffect(() => {
-    setIsMounted(true);
-    try {
-      const savedLang = localStorage.getItem(LANGUAGE_STORAGE_KEY) as LanguageCode | null;
-      if (savedLang && LANGUAGES[savedLang]) {
-        setLanguageState(savedLang);
-        applyLanguageToHtml(savedLang);
-      } else {
-        applyLanguageToHtml(DEFAULT_LANGUAGE);
-      }
-    } catch {
-      applyLanguageToHtml(DEFAULT_LANGUAGE);
-    }
-  }, [applyLanguageToHtml]);
+  useEffect(() => { applyLanguageToHtml(language); }, [language, applyLanguageToHtml]);
 
   const setLanguage = useCallback((code: LanguageCode) => {
     if (!LANGUAGES[code]) return;
-    setLanguageState(code);
+    writeBrowserStorage(LANGUAGE_STORAGE_KEY, code);
     applyLanguageToHtml(code);
     try {
       localStorage.setItem(LANGUAGE_STORAGE_KEY, code);
