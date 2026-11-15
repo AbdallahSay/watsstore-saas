@@ -469,30 +469,37 @@ namespace WatsStore.Api.Controllers
             var authError = EnsureAdminAccess();
             if (authError != null) return authError;
 
-            var store = await _db.Stores
-                .Include(s => s.Products)
-                .Include(s => s.Categories)
-                .Include(s => s.Orders)
-                .Include(s => s.Reviews)
-                .Include(s => s.Coupons)
-                .FirstOrDefaultAsync(s => s.Id == id);
+            // BOLT OPTIMIZATION: Prevent Cartesian explosion and memory bloat.
+            // Fetch only the StoreName, instead of including all related collections.
+            var storeName = await _db.Stores
+                .Where(s => s.Id == id)
+                .Select(s => s.StoreName)
+                .FirstOrDefaultAsync();
 
-            if (store == null)
+            if (storeName == null)
             {
                 return NotFound(new { message = "المتجر المطلوب غير موجود في المنصة" });
             }
 
-            var storeName = store.StoreName;
+            // BOLT OPTIMIZATION: Use EF Core 7+ ExecuteDeleteAsync for bulk deletion without fetching into memory.
+            // Wrap in a transaction to maintain integrity previously provided by SaveChangesAsync.
+            await using var transaction = await _db.Database.BeginTransactionAsync();
+            try
+            {
+                await _db.Products.Where(p => p.StoreId == id).ExecuteDeleteAsync();
+                await _db.Categories.Where(c => c.StoreId == id).ExecuteDeleteAsync();
+                await _db.WhatsAppOrders.Where(o => o.StoreId == id).ExecuteDeleteAsync();
+                await _db.StoreReviews.Where(r => r.StoreId == id).ExecuteDeleteAsync();
+                await _db.StoreCoupons.Where(c => c.StoreId == id).ExecuteDeleteAsync();
+                await _db.Stores.Where(s => s.Id == id).ExecuteDeleteAsync();
 
-            // Remove associated children entities to ensure clean deletion
-            if (store.Products.Any()) _db.Products.RemoveRange(store.Products);
-            if (store.Categories.Any()) _db.Categories.RemoveRange(store.Categories);
-            if (store.Orders.Any()) _db.WhatsAppOrders.RemoveRange(store.Orders);
-            if (store.Reviews.Any()) _db.StoreReviews.RemoveRange(store.Reviews);
-            if (store.Coupons.Any()) _db.StoreCoupons.RemoveRange(store.Coupons);
-
-            _db.Stores.Remove(store);
-            await _db.SaveChangesAsync();
+                await transaction.CommitAsync();
+            }
+            catch (Exception)
+            {
+                await transaction.RollbackAsync();
+                throw;
+            }
 
             return Ok(new
             {
