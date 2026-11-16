@@ -1,0 +1,3 @@
+## 2024-10-23 - EF Core Cartesian Explosion Optimization
+**Learning:** EF Core 8 performs a single mega-join by default when including multiple collection navigation properties (e.g., `Products`, `Categories`, `Orders` on a `Store` entity). This leads to a massive Cartesian product payload from the database to the application, consuming huge memory and CPU.
+**Action:** Use `.AsSplitQuery()` on EF Core `IQueryable`s when fetching an entity with more than one collection navigation property. This issues separate, efficient SQL queries instead of one massive join, drastically improving backend load times and preventing memory issues.
