@@ -470,6 +470,8 @@ namespace WatsStore.Api.Controllers
             if (authError != null) return authError;
 
             var store = await _db.Stores
+                // Performance optimization: Use AsSplitQuery to prevent Cartesian explosion when including multiple collections
+                .AsSplitQuery()
                 .Include(s => s.Products)
                 .Include(s => s.Categories)
                 .Include(s => s.Orders)
