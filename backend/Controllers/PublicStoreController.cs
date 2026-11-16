@@ -44,6 +44,7 @@ namespace WatsStore.Api.Controllers
                 .AsSplitQuery()
                 .Include(s => s.Categories.Where(c => c.IsActive).OrderBy(c => c.SortOrder))
                 .Include(s => s.Products.Where(p => p.IsAvailable).OrderBy(p => p.SortOrder).ThenByDescending(p => p.CreatedAt))
+                .AsSplitQuery() // ⚡ Bolt: Prevent Cartesian explosion when eager loading multiple collections
                 .FirstOrDefaultAsync(s => s.Slug == normalizedSlug && s.IsActive);
 
             if (store == null)
