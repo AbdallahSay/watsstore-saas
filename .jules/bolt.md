@@ -1,0 +1,3 @@
+## 2026-10-21 - Prevent Cartesian Explosion with AsSplitQuery
+**Learning:** Entity Framework Core defaults to fetching all related collection entities in a single massive query. In this codebase's architecture, a single `Store` entity contains multiple large collections (`Products`, `Categories`, `Orders`, etc.). Fetching these together causes a Cartesian explosion, drastically hurting database performance.
+**Action:** Always use `.AsSplitQuery()` when fetching an entity alongside multiple collection navigation properties using `.Include()` in Entity Framework Core to break it down into smaller, parallel SQL queries.
