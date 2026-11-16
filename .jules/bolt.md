@@ -1,0 +1,3 @@
+## 2024-05-19 - Entity Framework EF Core Bulk Delete Transaction Surprise
+**Learning:** When replacing `RemoveRange()` and `SaveChangesAsync()` with bulk `ExecuteDeleteAsync()` methods for performance, EF Core executes these deletes instantly and independently. To prevent data corruption on partial failures when deleting multiple tables in sequence, these calls MUST be manually wrapped in a database transaction (`await _db.Database.BeginTransactionAsync()`).
+**Action:** When implementing EF 7+ bulk `.ExecuteUpdateAsync()` or `.ExecuteDeleteAsync()` across multiple statements, always enclose them in an explicit transaction block and commit.
