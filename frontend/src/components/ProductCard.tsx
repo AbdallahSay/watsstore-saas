@@ -1,5 +1,6 @@
 'use client';
 
+import { memo } from 'react';
 import { Product, ProductVariantGroup } from '../types';
 import { Plus, SlidersHorizontal, Image as ImageIcon, Images } from 'lucide-react';
 
@@ -11,7 +12,11 @@ interface ProductCardProps {
   onQuickAdd?: (product: Product) => void;
 }
 
-export default function ProductCard({
+// ⚡ Bolt: Wrapped ProductCard in React.memo to prevent unnecessary re-renders
+// 💡 What: Added memoization to the ProductCard component
+// 🎯 Why: This component is rendered in a list inside StoreCatalogClient. Any state change in the parent (like searchQuery or cart updates) would cause all ProductCards to re-render unnecessarily.
+// 📊 Impact: Reduces re-renders of the product catalog significantly, especially in stores with many products, saving CPU cycles and improving perceived performance.
+const ProductCard = memo(function ProductCard({
   product,
   currency,
   themeColor = '#10B981',
@@ -160,4 +165,6 @@ export default function ProductCard({
       </div>
     </div>
   );
-}
+});
+
+export default ProductCard;
