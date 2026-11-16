@@ -1,0 +1,3 @@
+## 2023-10-24 - [Backend Optimization] Prevent Cartesian Explosion with .AsSplitQuery()
+**Learning:** When using Entity Framework Core to fetch an entity alongside multiple collection navigation properties (using multiple `.Include()` calls), it can result in a massive Cartesian product during SQL generation, causing severe performance bottlenecks and high memory usage.
+**Action:** Always use `.AsSplitQuery()` on queries that eager-load multiple collections to ensure EF Core splits the query into multiple smaller, more efficient SQL queries, significantly improving both database and application performance.
