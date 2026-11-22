@@ -310,51 +310,6 @@ namespace WatsStore.Api.Controllers
             });
         }
 
-        [HttpPost("webhook/simulate")]
-        public async Task<IActionResult> SimulateWebhook([FromBody] SimulateWebhookRequest req)
-        {
-            if (req.RequestId == Guid.Empty)
-                return BadRequest(new { message = "معرف الطلب غير صالح" });
-
-            var subRequest = await _db.SubscriptionRequests
-                .Include(r => r.Store)
-                .FirstOrDefaultAsync(r => r.Id == req.RequestId);
-
-            if (subRequest == null)
-                return NotFound(new { message = "طلب الاشتراك غير موجود" });
-
-            if (subRequest.Status == "Approved")
-                return Ok(new { message = "الطلب مفعل بالفعل", status = "Approved" });
-
-            subRequest.Status = "Approved";
-            subRequest.ReviewedAt = DateTime.UtcNow;
-            subRequest.AdminNotes = "تم الاعتماد التلقائي عبر الويب هوك السحابي (Simulated Webhook Hook)";
-
-            if (subRequest.Store != null)
-            {
-                subRequest.Store.PlanType = subRequest.PlanType;
-                subRequest.Store.AiGenerationsCount = 0;
-                subRequest.Store.AiQuotaResetDate = DateTime.UtcNow;
-
-                int daysToAdd = subRequest.BillingCycle == "Annual" ? 365 : 30;
-                var baseDate = (subRequest.Store.SubscriptionEndsAt.HasValue && subRequest.Store.SubscriptionEndsAt.Value > DateTime.UtcNow)
-                    ? subRequest.Store.SubscriptionEndsAt.Value
-                    : DateTime.UtcNow;
-
-                subRequest.Store.SubscriptionEndsAt = baseDate.AddDays(daysToAdd);
-            }
-
-            await _db.SaveChangesAsync();
-
-            return Ok(new
-            {
-                message = "تم تفعيل الاشتراك والترقية بنجاح عبر الويب هوك",
-                status = "Approved",
-                storeName = subRequest.Store?.StoreName,
-                plan = subRequest.PlanType
-            });
-        }
-
         [HttpGet("requests/{id}")]
         public async Task<IActionResult> GetBillingRequestById(Guid id)
         {
@@ -399,8 +354,4 @@ namespace WatsStore.Api.Controllers
         }
     }
 
-    public class SimulateWebhookRequest
-    {
-        public Guid RequestId { get; set; }
-    }
 }

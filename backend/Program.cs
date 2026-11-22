@@ -618,16 +618,25 @@ using (var scope = app.Services.CreateScope())
                     db.SuperAdmins.Remove(legacyAdmin);
                 }
 
-                var configPassword = builder.Configuration["AdminSettings:Password"]; if (string.IsNullOrWhiteSpace(configPassword)) configPassword = "body@2003"; var defaultHash = BCrypt.Net.BCrypt.HashPassword(configPassword.Trim());
-                db.SuperAdmins.Add(new SuperAdmin
+                var configPassword = builder.Configuration["AdminSettings:Password"];
+                if (string.IsNullOrWhiteSpace(configPassword))
                 {
-                    Id = Guid.NewGuid(),
-                    Email = adminEmail,
-                    PasswordHash = defaultHash,
-                    UpdatedAt = DateTime.UtcNow
-                });
-                await db.SaveChangesAsync();
-                logger.LogInformation("Super Admin account seeded successfully for {Email}", adminEmail);
+                    // No hardcoded fallback: never seed an admin with a default password.
+                    logger.LogWarning("Super Admin seeding skipped: AdminSettings:Password is not configured. Set it to seed the initial admin account.");
+                }
+                else
+                {
+                    var defaultHash = BCrypt.Net.BCrypt.HashPassword(configPassword.Trim());
+                    db.SuperAdmins.Add(new SuperAdmin
+                    {
+                        Id = Guid.NewGuid(),
+                        Email = adminEmail,
+                        PasswordHash = defaultHash,
+                        UpdatedAt = DateTime.UtcNow
+                    });
+                    await db.SaveChangesAsync();
+                    logger.LogInformation("Super Admin account seeded successfully for {Email}", adminEmail);
+                }
             }
         }
         catch (Exception adminEx)
