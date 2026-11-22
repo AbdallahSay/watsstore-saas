@@ -1613,7 +1613,7 @@ export default function SuperAdminPage() {
                   </div>
                 ) : (
                   <div className="overflow-x-auto">
-                    <table className="w-full text-right text-xs">
+                    <table className="w-full min-w-[760px] text-right text-xs">
                       <thead className="bg-slate-950/80 text-slate-400 border-b border-slate-800">
                         <tr>
                           <th className="py-3.5 px-4 font-bold">المتجر والتاجر</th>
@@ -2677,7 +2677,7 @@ export default function SuperAdminPage() {
                   </div>
                 ) : (
                   <div className="overflow-x-auto">
-                    <table className="w-full text-right text-xs">
+                    <table className="w-full min-w-[760px] text-right text-xs">
                       <thead className="bg-slate-950/80 text-slate-400 font-bold border-b border-slate-800 uppercase tracking-wider">
                         <tr>
                           <th className="py-3.5 px-4">المتجر والرابط</th>

@@ -348,7 +348,7 @@ export default function MerchantBillingPage() {
                     طلب ترقية معلق قيد المراجعة
                   </span>
                   <span className="text-xs text-amber-800 font-mono">
-                    {new Date(status.activePendingRequest.createdAt).toLocaleDateString('ar-EG', { dateStyle: 'medium', timeStyle: 'short' })}
+                    {new Date(status.activePendingRequest.createdAt).toLocaleString('ar-EG', { dateStyle: 'medium', timeStyle: 'short' })}
                   </span>
                 </div>
                 <h3 className="text-lg sm:text-xl font-black mt-1 text-slate-900">
@@ -1162,7 +1162,7 @@ export default function MerchantBillingPage() {
 
         {status?.invoiceHistory && status.invoiceHistory.length > 0 ? (
           <div className="overflow-x-auto">
-            <table className="w-full text-right text-xs">
+            <table className="w-full min-w-[640px] text-right text-xs">
               <thead className="bg-slate-50 text-slate-500 border-b border-slate-100">
                 <tr>
                   <th className="py-3 px-4 font-bold">تاريخ الطلب</th>
