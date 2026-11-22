@@ -604,7 +604,7 @@ export default function DashboardOverviewPage() {
             </div>
             <div className="space-y-1">
               <span className="font-extrabold text-slate-900 dark:text-white text-xs block">{summary.storeInfo.storeName}</span>
-              <span className="text-[10px] text-slate-400 dark:text-slate-500 font-mono block">
+              <span className="text-[10px] text-slate-400 dark:text-slate-500 block">
                 {t('dash.permanent_code', { code: summary.storeInfo.publicCode }, `كود دائم: ${summary.storeInfo.publicCode}`)}
               </span>
             </div>
@@ -628,7 +628,7 @@ export default function DashboardOverviewPage() {
                   type="text"
                   readOnly
                   value={subdomainUrl}
-                  className="w-full text-xs font-mono font-bold text-emerald-900 dark:text-emerald-300 bg-white dark:bg-slate-900 px-3.5 py-2.5 rounded-xl border border-emerald-300 dark:border-emerald-700 min-h-[44px]"
+                  className="w-full text-xs font-bold text-emerald-900 dark:text-emerald-300 bg-white dark:bg-slate-900 px-3.5 py-2.5 rounded-xl border border-emerald-300 dark:border-emerald-700 min-h-[44px]"
                 />
                 <button
                   onClick={() => copyToClipboard(subdomainUrl, 'subdomain')}
@@ -658,7 +658,7 @@ export default function DashboardOverviewPage() {
                   type="text"
                   readOnly
                   value={storeUrl}
-                  className="w-full text-xs font-mono text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-900 px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 min-h-[44px]"
+                  className="w-full text-xs text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-900 px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 min-h-[44px]"
                 />
                 <button
                   onClick={() => copyToClipboard(storeUrl, 'link')}
@@ -679,7 +679,7 @@ export default function DashboardOverviewPage() {
                   type="text"
                   readOnly
                   value={qrUrl}
-                  className="w-full text-xs font-mono text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-900 px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 min-h-[44px]"
+                  className="w-full text-xs text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-900 px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 min-h-[44px]"
                 />
                 <button
                   onClick={() => copyToClipboard(qrUrl, 'qr')}
@@ -943,7 +943,7 @@ export default function DashboardOverviewPage() {
                     <span className="text-[10px] text-slate-400 block">
                       {t('dash.unified_wallet_label', undefined, 'رقم فودافون كاش وإنستاباي الموحد:')}
                     </span>
-                    <span className="font-mono font-black text-base tracking-wider text-amber-300">
+                    <span className="font-black text-base tracking-wider text-amber-300">
                       {platformConfig.subscriptionWalletNumber}
                     </span>
                   </div>

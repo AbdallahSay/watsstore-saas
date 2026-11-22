@@ -25,14 +25,18 @@ export default function GlobalError({ error, reset }: GlobalErrorProps) {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          minHeight: '100vh',
           boxSizing: 'border-box',
         }}
       >
+        {/* 100vh fallback first, then 100dvh: keeps this screen inside the mobile
+            visual viewport (100vh includes the dynamic URL-bar area). Self-contained
+            because this component renders its own <html>/<body>. */}
+        <style>{`body { min-height: 100vh; min-height: 100dvh; }`}</style>
         <div
           style={{
             maxWidth: '480px',
             width: '90%',
+            boxSizing: 'border-box',
             backgroundColor: '#111827',
             border: '1px solid #1f2937',
             borderRadius: '24px',

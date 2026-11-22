@@ -1045,7 +1045,7 @@ export default function SuperAdminPage() {
                     value={secretKey}
                     onChange={(e) => setSecretKey(e.target.value)}
                     placeholder="أدخل المفتاح السري لمنصة WatsStore"
-                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-100 placeholder:text-slate-600 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all text-left font-mono"
+                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-100 placeholder:text-slate-600 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all text-left"
                     required
                   />
                   <Key className="w-4 h-4 text-slate-500 absolute left-3 top-3.5" />
@@ -1182,7 +1182,7 @@ export default function SuperAdminPage() {
                       type="email"
                       value={forgotEmail}
                       onChange={(e) => setForgotEmail(e.target.value)}
-                      className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-slate-100 focus:outline-none focus:border-emerald-500 font-mono"
+                      className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-slate-100 focus:outline-none focus:border-emerald-500"
                       required
                     />
                   </div>
@@ -1204,7 +1204,7 @@ export default function SuperAdminPage() {
                       value={forgotResetToken}
                       onChange={(e) => setForgotResetToken(e.target.value)}
                       placeholder="WATS-XXXXXX"
-                      className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-emerald-400 font-mono font-bold tracking-widest focus:outline-none focus:border-emerald-500 text-center uppercase"
+                      className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-emerald-400 font-bold tracking-widest focus:outline-none focus:border-emerald-500 text-center uppercase"
                       required
                     />
                   </div>
@@ -1353,7 +1353,7 @@ export default function SuperAdminPage() {
           {/* Live Status indicator */}
           <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-slate-950/80 border border-slate-800 rounded-full text-xs">
             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-            <span className="text-slate-300 font-mono text-[11px]">MonsterASP API Live</span>
+            <span className="text-slate-300 text-[11px]">MonsterASP API Live</span>
           </div>
 
           {/* Refresh Button */}
@@ -1468,7 +1468,7 @@ export default function SuperAdminPage() {
                 <div className="space-y-1">
                   <span className="text-slate-400 block text-[11px]">البريد الإلكتروني المعتمد للمسؤول العام:</span>
                   <div className="flex items-center gap-2">
-                    <span className="font-mono font-bold text-white text-sm">{adminUser?.email || "مدير المنصة"}</span>
+                    <span className="font-bold text-white text-sm">{adminUser?.email || "مدير المنصة"}</span>
                     <span className="px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 text-[10px] font-bold">
                       مالك المنصة
                     </span>
@@ -1476,7 +1476,7 @@ export default function SuperAdminPage() {
                 </div>
                 <div className="sm:text-left text-slate-400 text-[11px] space-y-0.5">
                   <span className="block">حالة الحساب: <span className="text-emerald-400 font-bold">نشط ومؤمن 🛡️</span></span>
-                  <span className="block">التشفير: <span className="text-slate-300 font-mono">BCrypt Salted</span></span>
+                  <span className="block">التشفير: <span className="text-slate-300">BCrypt Salted</span></span>
                 </div>
               </div>
 
@@ -1504,7 +1504,7 @@ export default function SuperAdminPage() {
                       value={currentPassword}
                       onChange={(e) => setCurrentPassword(e.target.value)}
                       placeholder="أدخل كلمة المرور الحالية"
-                      className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-100 focus:outline-none focus:border-emerald-500 text-left font-mono"
+                      className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-100 focus:outline-none focus:border-emerald-500 text-left"
                       required
                     />
                     <Lock className="w-4 h-4 text-slate-500 absolute left-3 top-3.5" />
@@ -1520,7 +1520,7 @@ export default function SuperAdminPage() {
                         value={newPassword}
                         onChange={(e) => setNewPassword(e.target.value)}
                         placeholder="6 أحرف على الأقل"
-                        className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-100 focus:outline-none focus:border-emerald-500 text-left font-mono"
+                        className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-100 focus:outline-none focus:border-emerald-500 text-left"
                         required
                       />
                       <Key className="w-4 h-4 text-slate-500 absolute left-3 top-3.5" />
@@ -1535,7 +1535,7 @@ export default function SuperAdminPage() {
                         value={confirmPassword}
                         onChange={(e) => setConfirmPassword(e.target.value)}
                         placeholder="أعد كتابة كلمة المرور الجديدة"
-                        className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-100 focus:outline-none focus:border-emerald-500 text-left font-mono"
+                        className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-100 focus:outline-none focus:border-emerald-500 text-left"
                         required
                       />
                       <Key className="w-4 h-4 text-slate-500 absolute left-3 top-3.5" />
@@ -1613,7 +1613,7 @@ export default function SuperAdminPage() {
                   </div>
                 ) : (
                   <div className="overflow-x-auto">
-                    <table className="w-full text-right text-xs">
+                    <table className="w-full min-w-[760px] text-right text-xs">
                       <thead className="bg-slate-950/80 text-slate-400 border-b border-slate-800">
                         <tr>
                           <th className="py-3.5 px-4 font-bold">المتجر والتاجر</th>
@@ -1633,7 +1633,7 @@ export default function SuperAdminPage() {
                             try {
                               const d = new Date(sub.createdAt);
                               if (!isNaN(d.getTime())) {
-                                formattedDate = d.toLocaleDateString('ar-EG', { dateStyle: 'short', timeStyle: 'short' });
+                                formattedDate = d.toLocaleString('ar-EG', { dateStyle: 'short', timeStyle: 'short' });
                               }
                             } catch {
                               formattedDate = 'غير محدد';
@@ -1642,22 +1642,22 @@ export default function SuperAdminPage() {
 
                           return (
                             <tr key={sub.id} className="hover:bg-slate-800/40 transition-colors">
-                              <td className="py-3.5 px-4">
+                              <td className="py-3.5 px-4 min-w-[160px]">
                                 <div className="space-y-0.5">
                                   <span className="font-bold text-white block text-sm">{sub?.storeName || 'متجر غير معروف'}</span>
-                                  <span className="text-[11px] text-slate-400 block font-mono">{sub?.merchantEmail || 'بدون بريد'}</span>
+                                  <span className="text-[11px] text-slate-400 block">{sub?.merchantEmail || 'بدون بريد'}</span>
                                   {sub?.merchantPhone ? (
                                     <a
                                       href={`https://wa.me/${cleanPhone}`}
                                       target="_blank"
                                       rel="noopener noreferrer"
-                                      className="text-[11px] text-emerald-400 hover:underline inline-flex items-center gap-1 font-mono"
+                                      className="text-[11px] text-emerald-400 hover:underline inline-flex items-center gap-1"
                                     >
                                       <span>واتساب: {sub.merchantPhone}</span>
                                       <ExternalLink className="w-3 h-3" />
                                     </a>
                                   ) : (
-                                    <span className="text-[11px] text-slate-500 font-mono">لا يوجد هاتف</span>
+                                    <span className="text-[11px] text-slate-500">لا يوجد هاتف</span>
                                   )}
                                 </div>
                               </td>
@@ -1678,7 +1678,7 @@ export default function SuperAdminPage() {
                               </td>
 
                               <td className="py-3.5 px-4">
-                                <span className="text-sm font-black text-white font-mono">{sub?.amount ?? 0} ج.م</span>
+                                <span className="text-sm font-black text-white">{sub?.amount ?? 0} ج.م</span>
                               </td>
 
                               <td className="py-3.5 px-4">
@@ -1687,12 +1687,12 @@ export default function SuperAdminPage() {
                                     {sub?.paymentMethod === 'VodafoneCash' ? 'فودافون كاش' : sub?.paymentMethod === 'InstaPay' ? 'إنستاباي' : (sub?.paymentMethod || 'أخرى')}
                                   </span>
                                   {sub?.destinationAccount && (
-                                    <span className="text-[10px] text-emerald-400 block font-mono" title="الحساب المحول إليه">
+                                    <span className="text-[10px] text-emerald-400 block" title="الحساب المحول إليه">
                                       إلى: <strong className="text-emerald-300">{sub.destinationAccount}</strong>
                                     </span>
                                   )}
                                   {sub?.senderIdentifier && (
-                                    <span className="text-[10px] text-slate-400 block font-mono" title="المحول منه">
+                                    <span className="text-[10px] text-slate-400 block" title="المحول منه">
                                       من: <strong className="text-slate-200">{sub.senderIdentifier}</strong>
                                     </span>
                                   )}
@@ -1702,7 +1702,7 @@ export default function SuperAdminPage() {
                               <td className="py-3.5 px-4">
                                 <div className="space-y-1">
                                   <div className="flex items-center justify-between gap-1 bg-slate-950 px-2 py-1 rounded border border-slate-800 max-w-[170px]">
-                                    <code className="text-amber-400 font-mono font-bold text-[11px] truncate" title={sub?.transactionId || ''}>
+                                    <code className="text-amber-400 font-bold text-[11px] truncate" title={sub?.transactionId || ''}>
                                       {sub?.transactionId || 'غير متوفر'}
                                     </code>
                                     <button
@@ -1738,7 +1738,7 @@ export default function SuperAdminPage() {
                                 </div>
                               </td>
 
-                              <td className="py-3.5 px-4 font-mono text-slate-400">
+                              <td className="py-3.5 px-4 text-slate-400">
                                 {formattedDate}
                               </td>
 
@@ -1874,7 +1874,7 @@ export default function SuperAdminPage() {
                           vodafoneCashWallet: e.target.value
                         })}
                         placeholder="01027150123"
-                        className="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 text-xs text-slate-100 font-mono focus:outline-none focus:border-emerald-500"
+                        className="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 text-xs text-slate-100 focus:outline-none focus:border-emerald-500"
                       />
                     </div>
                     <div>
@@ -1887,7 +1887,7 @@ export default function SuperAdminPage() {
                           instaPayHandle: e.target.value
                         })}
                         placeholder="watsstore@instapay"
-                        className="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 text-xs text-slate-100 font-mono focus:outline-none focus:border-emerald-500"
+                        className="w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 text-xs text-slate-100 focus:outline-none focus:border-emerald-500"
                       />
                     </div>
                   </div>
@@ -1961,7 +1961,7 @@ export default function SuperAdminPage() {
                                 ...pricingSettings,
                                 proMonthlyPrice: Number(e.target.value)
                               })}
-                              className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white font-mono font-bold focus:outline-none focus:border-emerald-500"
+                              className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white font-bold focus:outline-none focus:border-emerald-500"
                               required
                             />
                           </div>
@@ -1975,7 +1975,7 @@ export default function SuperAdminPage() {
                                 ...pricingSettings,
                                 proAnnualPrice: Number(e.target.value)
                               })}
-                              className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white font-mono font-bold focus:outline-none focus:border-emerald-500"
+                              className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white font-bold focus:outline-none focus:border-emerald-500"
                               required
                             />
                           </div>
@@ -1992,7 +1992,7 @@ export default function SuperAdminPage() {
                                 ...pricingSettings,
                                 proProductLimit: Number(e.target.value)
                               })}
-                              className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-1.5 text-xs text-white font-mono focus:outline-none focus:border-emerald-500"
+                              className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-1.5 text-xs text-white focus:outline-none focus:border-emerald-500"
                               required
                             />
                           </div>
@@ -2006,7 +2006,7 @@ export default function SuperAdminPage() {
                                 ...pricingSettings,
                                 proCouponLimit: Number(e.target.value)
                               })}
-                              className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-1.5 text-xs text-white font-mono focus:outline-none focus:border-emerald-500"
+                              className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-1.5 text-xs text-white focus:outline-none focus:border-emerald-500"
                               required
                             />
                           </div>
@@ -2020,7 +2020,7 @@ export default function SuperAdminPage() {
                                 ...pricingSettings,
                                 proAiLimit: Number(e.target.value)
                               })}
-                              className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-1.5 text-xs text-white font-mono focus:outline-none focus:border-emerald-500"
+                              className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-1.5 text-xs text-white focus:outline-none focus:border-emerald-500"
                               required
                             />
                           </div>
@@ -2054,7 +2054,7 @@ export default function SuperAdminPage() {
                                 ...pricingSettings,
                                 vipMonthlyPrice: Number(e.target.value)
                               })}
-                              className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white font-mono font-bold focus:outline-none focus:border-emerald-500"
+                              className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white font-bold focus:outline-none focus:border-emerald-500"
                               required
                             />
                           </div>
@@ -2068,7 +2068,7 @@ export default function SuperAdminPage() {
                                 ...pricingSettings,
                                 vipAnnualPrice: Number(e.target.value)
                               })}
-                              className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white font-mono font-bold focus:outline-none focus:border-emerald-500"
+                              className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white font-bold focus:outline-none focus:border-emerald-500"
                               required
                             />
                           </div>
@@ -2085,7 +2085,7 @@ export default function SuperAdminPage() {
                                 ...pricingSettings,
                                 vipProductLimit: Number(e.target.value)
                               })}
-                              className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-1.5 text-xs text-white font-mono focus:outline-none focus:border-emerald-500"
+                              className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-1.5 text-xs text-white focus:outline-none focus:border-emerald-500"
                               required
                             />
                           </div>
@@ -2099,7 +2099,7 @@ export default function SuperAdminPage() {
                                 ...pricingSettings,
                                 vipCouponLimit: Number(e.target.value)
                               })}
-                              className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-1.5 text-xs text-white font-mono focus:outline-none focus:border-emerald-500"
+                              className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-1.5 text-xs text-white focus:outline-none focus:border-emerald-500"
                               required
                             />
                           </div>
@@ -2113,7 +2113,7 @@ export default function SuperAdminPage() {
                                 ...pricingSettings,
                                 vipAiLimit: Number(e.target.value)
                               })}
-                              className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-1.5 text-xs text-white font-mono focus:outline-none focus:border-emerald-500"
+                              className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-1.5 text-xs text-white focus:outline-none focus:border-emerald-500"
                               required
                             />
                           </div>
@@ -2243,7 +2243,7 @@ export default function SuperAdminPage() {
                                 <div>
                                   <div className="flex items-center gap-2">
                                     <h3 className="text-base font-black text-white">{gw.displayName}</h3>
-                                    <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-md bg-slate-800 text-slate-400">
+                                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-slate-800 text-slate-400">
                                       {gw.gatewayKey}
                                     </span>
                                   </div>
@@ -2306,7 +2306,7 @@ export default function SuperAdminPage() {
                                   <span className="text-xs font-bold text-slate-300">
                                     الأرقام والحسابات المعتمدة للاستقبال
                                   </span>
-                                  <span className="px-2 py-0.5 rounded-full bg-slate-800 text-emerald-400 text-[10px] font-mono font-bold">
+                                  <span className="px-2 py-0.5 rounded-full bg-slate-800 text-emerald-400 text-[10px] font-bold">
                                     {accounts.length} حساب
                                   </span>
                                 </div>
@@ -2332,7 +2332,7 @@ export default function SuperAdminPage() {
                                       key={idx}
                                       className="bg-slate-900/80 border border-slate-800/90 rounded-xl p-3 flex flex-col sm:flex-row sm:items-center gap-3 text-xs"
                                     >
-                                      <span className="w-6 h-6 rounded-lg bg-slate-800 text-slate-400 flex items-center justify-center font-mono font-bold text-[11px] shrink-0">
+                                      <span className="w-6 h-6 rounded-lg bg-slate-800 text-slate-400 flex items-center justify-center font-bold text-[11px] shrink-0">
                                         {idx + 1}
                                       </span>
 
@@ -2343,7 +2343,7 @@ export default function SuperAdminPage() {
                                             placeholder={isVodafone ? "رقم المحفظة (مثال: 01027150123)" : isInstapay ? "عنوان الدفع اللحظي (مثال: watsstore@instapay)" : "رقم الحساب / المعرف"}
                                             value={acc.accountNumber || ''}
                                             onChange={(e) => handleAccountChange(gw.gatewayKey, idx, 'accountNumber', e.target.value)}
-                                            className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-1.5 text-xs text-slate-100 font-mono focus:outline-none focus:border-emerald-500"
+                                            className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-1.5 text-xs text-slate-100 focus:outline-none focus:border-emerald-500"
                                             required
                                           />
                                         </div>
@@ -2394,7 +2394,7 @@ export default function SuperAdminPage() {
                   {/* Save Button */}
                   <div className="pt-4 border-t border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4">
                     <p className="text-xs text-slate-400">
-                      ملاحظة: تنعكس التغييرات فوراً في صفحة ترقية باقات التجار (<span className="text-emerald-400 font-mono">/dashboard/billing</span>) وسيظهر للتجار الأرقام المفعلة فقط للاختيار والنسخ بنقرة واحدة.
+                      ملاحظة: تنعكس التغييرات فوراً في صفحة ترقية باقات التجار (<span className="text-emerald-400">/dashboard/billing</span>) وسيظهر للتجار الأرقام المفعلة فقط للاختيار والنسخ بنقرة واحدة.
                     </p>
 
                     <button
@@ -2677,7 +2677,7 @@ export default function SuperAdminPage() {
                   </div>
                 ) : (
                   <div className="overflow-x-auto">
-                    <table className="w-full text-right text-xs">
+                    <table className="w-full min-w-[760px] text-right text-xs">
                       <thead className="bg-slate-950/80 text-slate-400 font-bold border-b border-slate-800 uppercase tracking-wider">
                         <tr>
                           <th className="py-3.5 px-4">المتجر والرابط</th>
@@ -2709,15 +2709,15 @@ export default function SuperAdminPage() {
                           return (
                             <tr key={storeId} className="hover:bg-slate-800/30 transition-colors">
                               {/* Store Name & Slug */}
-                              <td className="py-3.5 px-4">
+                              <td className="py-3.5 px-4 min-w-[170px]">
                                 <div className="space-y-0.5">
                                   <span className="font-bold text-white text-sm block">
                                     {storeName}
                                   </span>
-                                  <div className="flex items-center gap-1.5 text-[11px] text-slate-400 font-mono">
+                                  <div className="flex items-center gap-1.5 text-[11px] text-slate-400">
                                     <span className="text-emerald-400">/{slug}</span>
                                     <span>•</span>
-                                    <span className="text-slate-500 font-sans">{store.publicCode}</span>
+                                    <span className="text-slate-500">{store.publicCode}</span>
                                   </div>
                                   <span className="text-[10px] text-slate-500 block">
                                     تم التسجيل: {new Date(store.createdAt).toLocaleDateString('ar-EG')}
@@ -2731,7 +2731,7 @@ export default function SuperAdminPage() {
                                   <span className="font-bold text-slate-200 block">
                                     {ownerName}
                                   </span>
-                                  <div className="flex items-center gap-1 text-[11px] text-slate-400 font-mono">
+                                  <div className="flex items-center gap-1 text-[11px] text-slate-400">
                                     <a 
                                       href={`https://wa.me/${phone}`} 
                                       target="_blank" 
@@ -2816,12 +2816,12 @@ export default function SuperAdminPage() {
                               {/* Status Badge */}
                               <td className="py-3.5 px-4">
                                 {isActive ? (
-                                  <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
+                                  <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 whitespace-nowrap">
                                     <CheckCircle2 className="w-3 h-3 text-emerald-400" />
                                     <span>نشط ومتاح</span>
                                   </span>
                                 ) : (
-                                  <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-rose-500/10 text-rose-400 border border-rose-500/30">
+                                  <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-rose-500/10 text-rose-400 border border-rose-500/30 whitespace-nowrap">
                                     <XCircle className="w-3 h-3 text-rose-400" />
                                     <span>موقوف مؤقتاً</span>
                                   </span>

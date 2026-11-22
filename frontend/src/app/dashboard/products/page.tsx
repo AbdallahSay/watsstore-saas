@@ -631,7 +631,7 @@ export default function DashboardProductsPage() {
           <div className="flex items-center gap-2.5">
             <h1 className="text-2xl font-black text-slate-900 dark:text-white">{t('products.title', undefined, 'إدارة المنتجات والكتالوج')}</h1>
             {planType === 'Free' ? (
-              <span className="text-[11px] font-bold px-2.5 py-1 rounded-full bg-slate-100 text-slate-700 border border-slate-200">
+              <span className="text-[11px] font-bold px-2.5 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
                 منتجاتك: {products.length} / 10 (تجربة مجانية 14 يوماً)
               </span>
             ) : planType === 'Pro' ? (
@@ -776,7 +776,7 @@ export default function DashboardProductsPage() {
                               className="w-12 h-12 rounded-xl object-cover border border-slate-200 shrink-0"
                             />
                           ) : (
-                            <div className="w-12 h-12 rounded-xl bg-slate-100 text-slate-400 flex items-center justify-center shrink-0">
+                            <div className="w-12 h-12 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-500 flex items-center justify-center shrink-0">
                               <ImageIcon className="w-5 h-5" />
                             </div>
                           )}
@@ -928,7 +928,7 @@ export default function DashboardProductsPage() {
                     <Images className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                     <span>معرض صور المنتج (حتى 8 صور)</span>
                   </label>
-                  <span className="text-[11px] font-bold font-mono px-2 py-0.5 rounded-full bg-slate-200/80 dark:bg-slate-700 text-slate-700 dark:text-slate-300">
+                  <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-slate-200/80 dark:bg-slate-700 text-slate-700 dark:text-slate-300">
                     {formImages.length} / 8 صور
                   </span>
                 </div>
