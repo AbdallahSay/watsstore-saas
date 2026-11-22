@@ -86,7 +86,7 @@ export default function DashboardAnalyticsPage() {
     return (
       <div className="py-24 text-center space-y-3 bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800">
         <RefreshCw className="w-10 h-10 text-emerald-600 animate-spin mx-auto" />
-        <h3 className="text-base font-bold text-slate-700">جاري تجميع وتحليل بيانات المبيعات...</h3>
+        <h3 className="text-base font-bold text-slate-700 dark:text-slate-200">جاري تجميع وتحليل بيانات المبيعات...</h3>
         <p className="text-xs text-slate-400">نستخرج مؤشرات الإيرادات والمنتجات الأكثر طلباً في الوقت الفعلي</p>
       </div>
     );
@@ -178,7 +178,7 @@ export default function DashboardAnalyticsPage() {
               <span className="text-xs font-bold text-slate-500 dark:text-slate-400">{analytics.currency}</span>
             </div>
             <div className="flex items-center gap-1.5 pt-1">
-              <span className="text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full inline-flex items-center gap-0.5">
+              <span className="text-[11px] font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10 px-2 py-0.5 rounded-full inline-flex items-center gap-0.5">
                 <TrendingUp className="w-3 h-3" />
                 <span>{analytics.growthPercentage >= 0 ? `+${analytics.growthPercentage}%` : `${analytics.growthPercentage}%`} نمو</span>
               </span>
@@ -202,7 +202,7 @@ export default function DashboardAnalyticsPage() {
               <span className="text-xs font-bold text-slate-500 dark:text-slate-400">طلب ناجح</span>
             </div>
             <div className="flex items-center gap-1.5 pt-1">
-              <span className="text-[11px] font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded-full">
+              <span className="text-[11px] font-bold text-blue-700 dark:text-blue-400 bg-blue-50 dark:bg-blue-500/10 px-2 py-0.5 rounded-full">
                 {analytics.thisMonthOrdersCount} طلب هذا الشهر
               </span>
               <span className="text-[11px] text-slate-400">عبر الواتساب</span>
@@ -341,10 +341,10 @@ export default function DashboardAnalyticsPage() {
                         chartMode === 'revenue'
                           ? isHovered
                             ? 'bg-emerald-500 shadow-lg shadow-emerald-500/40'
-                            : value > 0 ? 'bg-emerald-600' : 'bg-slate-200'
+                            : value > 0 ? 'bg-emerald-600' : 'bg-slate-200 dark:bg-slate-700'
                           : isHovered
                             ? 'bg-blue-500 shadow-lg shadow-blue-500/40'
-                            : value > 0 ? 'bg-blue-600' : 'bg-slate-200'
+                            : value > 0 ? 'bg-blue-600' : 'bg-slate-200 dark:bg-slate-700'
                       }`}
                       style={{ height: `${percentage}%` }}
                     />
@@ -392,7 +392,7 @@ export default function DashboardAnalyticsPage() {
             </div>
             <Link
               href="/dashboard/products"
-              className="text-xs font-bold text-emerald-600 hover:text-emerald-700 flex items-center gap-1"
+              className="text-xs font-bold text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 flex items-center gap-1"
             >
               <span>إدارة المنتجات</span>
               <ArrowUpRight className="w-3.5 h-3.5" />
@@ -426,7 +426,7 @@ export default function DashboardAnalyticsPage() {
                   </div>
 
                   <div className="text-left flex-shrink-0">
-                    <div className="text-xs font-black text-emerald-700">
+                    <div className="text-xs font-black text-emerald-700 dark:text-emerald-400">
                       {prod.totalRevenue.toLocaleString()} {analytics.currency}
                     </div>
                     <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400 block">
@@ -469,7 +469,7 @@ export default function DashboardAnalyticsPage() {
                       </div>
 
                       {/* Percentage Bar */}
-                      <div className="w-full bg-slate-200 rounded-full h-1.5 overflow-hidden">
+                      <div className="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-1.5 overflow-hidden">
                         <div
                           className={`h-full ${
                             isVodafone ? 'bg-emerald-500' : isInstaPay ? 'bg-purple-500' : 'bg-blue-500'
@@ -480,7 +480,7 @@ export default function DashboardAnalyticsPage() {
 
                       <div className="flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400 font-medium pt-0.5">
                         <span>{pm.count} طلبات</span>
-                        <span className="font-bold text-slate-700">{pm.totalAmount.toLocaleString()} {analytics.currency}</span>
+                        <span className="font-bold text-slate-700 dark:text-slate-200">{pm.totalAmount.toLocaleString()} {analytics.currency}</span>
                       </div>
                     </div>
                   );
@@ -490,12 +490,12 @@ export default function DashboardAnalyticsPage() {
           </div>
 
           {/* Quick Tip Box */}
-          <div className="mt-4 p-3.5 rounded-2xl bg-emerald-50 border border-emerald-200/80 space-y-1 text-xs">
-            <div className="flex items-center gap-1.5 font-bold text-emerald-900">
+          <div className="mt-4 p-3.5 rounded-2xl bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200/80 dark:border-emerald-500/30 space-y-1 text-xs">
+            <div className="flex items-center gap-1.5 font-bold text-emerald-900 dark:text-emerald-300">
               <CheckCircle2 className="w-4 h-4 text-emerald-600" />
               <span>نصيحة لمضاعفة التحويل</span>
             </div>
-            <p className="text-[11px] text-emerald-800 leading-relaxed">
+            <p className="text-[11px] text-emerald-800 dark:text-emerald-200/90 leading-relaxed">
               تفعيل المحافظ الإلكترونية وإنستاباي في إعدادات المتجر يقلل من نسبة إلغاء الطلبات ويزيد من سرعة تحصيل المبيعات.
             </p>
           </div>
