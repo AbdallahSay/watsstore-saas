@@ -612,22 +612,33 @@ using (var scope = app.Services.CreateScope())
             var existingAdmin = await db.SuperAdmins.FirstOrDefaultAsync(a => a.Email == adminEmail);
             if (existingAdmin == null)
             {
-                var legacyAdmin = await db.SuperAdmins.FirstOrDefaultAsync(a => a.Email == "admin@watsstore.com");
-                if (legacyAdmin != null)
+                var configPassword = builder.Configuration["AdminSettings:Password"];
+                if (string.IsNullOrWhiteSpace(configPassword))
                 {
-                    db.SuperAdmins.Remove(legacyAdmin);
+                    // No hardcoded fallback: never seed an admin with a default password.
+                    // The legacy admin row is left untouched until a replacement can be created.
+                    logger.LogWarning("Super Admin seeding skipped: AdminSettings:Password is not configured. Set it to seed the initial admin account.");
                 }
-
-                var configPassword = builder.Configuration["AdminSettings:Password"]; if (string.IsNullOrWhiteSpace(configPassword)) configPassword = "body@2003"; var defaultHash = BCrypt.Net.BCrypt.HashPassword(configPassword.Trim());
-                db.SuperAdmins.Add(new SuperAdmin
+                else
                 {
-                    Id = Guid.NewGuid(),
-                    Email = adminEmail,
-                    PasswordHash = defaultHash,
-                    UpdatedAt = DateTime.UtcNow
-                });
-                await db.SaveChangesAsync();
-                logger.LogInformation("Super Admin account seeded successfully for {Email}", adminEmail);
+                    // Remove the legacy admin only together with its replacement, in the same SaveChanges.
+                    var legacyAdmin = await db.SuperAdmins.FirstOrDefaultAsync(a => a.Email == "admin@watsstore.com");
+                    if (legacyAdmin != null)
+                    {
+                        db.SuperAdmins.Remove(legacyAdmin);
+                    }
+
+                    var defaultHash = BCrypt.Net.BCrypt.HashPassword(configPassword.Trim());
+                    db.SuperAdmins.Add(new SuperAdmin
+                    {
+                        Id = Guid.NewGuid(),
+                        Email = adminEmail,
+                        PasswordHash = defaultHash,
+                        UpdatedAt = DateTime.UtcNow
+                    });
+                    await db.SaveChangesAsync();
+                    logger.LogInformation("Super Admin account seeded successfully for {Email}", adminEmail);
+                }
             }
         }
         catch (Exception adminEx)

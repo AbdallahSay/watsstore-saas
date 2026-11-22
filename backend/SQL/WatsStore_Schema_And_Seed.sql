@@ -116,9 +116,12 @@ END
 GO
 
 -- ===================================================================================
--- Seed Demo Store: 'al-amal-fashion' (بوتيك الأمل للأزياء الفاخرة)
--- Password is '123456' hashed with BCrypt
+-- DEMO STORE SEED (LOCAL DEVELOPMENT ONLY - DISABLED BY DEFAULT)
+-- This block creates demo@watsstore.com with the well-known password 123456.
+-- NEVER run it against a production/shared database: anyone can log in to that account.
+-- Uncomment only for local development and testing.
 -- ===================================================================================
+/*
 DECLARE @DemoStoreId UNIQUEIDENTIFIER = 'E6B5D7A1-4F29-4B52-9A8C-2D3B89C0F101';
 
 IF NOT EXISTS (SELECT 1 FROM [dbo].[Stores] WHERE [Slug] = N'al-amal-fashion')
@@ -213,4 +216,5 @@ BEGIN
         1, 4, SYSUTCDATETIME()
     );
 END
+*/
 GO
