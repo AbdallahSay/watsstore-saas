@@ -346,15 +346,38 @@ async function runE2ESuite() {
   const dupBlocked = dupRes.statusCode === 400 || dupRes.statusCode === 409;
   recordResult('BILLING_GATEWAYS', 'Anti-Fraud: Duplicate Transaction ID Rejection', dupBlocked ? 'PASS' : 'FAIL', `HTTP Status: ${dupRes.statusCode}`, dupRes.latencyMs);
 
-  // 3.4 Webhook Simulation & Plan Activation
+  // 3.4 Security: the legacy webhook/simulate self-approval route is gone.
+  // A merchant must NOT be able to approve their own subscription request;
+  // plan activation happens only through admin review. Every state check is
+  // strict: any malformed/missing response fails the test (never passes it).
   if (requestId) {
+    const statusHeaders = { 'Authorization': `Bearer ${merchantBToken}` };
+    const findRequest = (json) => {
+      const history = Array.isArray(json?.invoiceHistory) ? json.invoiceHistory : [];
+      const inHistory = history.find(r => r && r.id === requestId);
+      const pending = json?.activePendingRequest;
+      return inHistory || (pending && pending.id === requestId ? pending : null);
+    };
+
+    const beforeRes = await fetchApi(`${BACKEND_BASE}/api/merchant/billing/status`, { headers: statusHeaders });
     const hookRes = await fetchApi(`${BACKEND_BASE}/api/merchant/billing/webhook/simulate`, {
       method: 'POST',
       headers: { 'Authorization': `Bearer ${merchantBToken}` },
       body: { requestId }
     });
-    const hookOk = hookRes.statusCode === 200 && hookRes.json?.status === 'Approved';
-    recordResult('BILLING_GATEWAYS', 'Automated Webhook Idempotency & Plan Activation', hookOk ? 'PASS' : 'FAIL', `Plan: ${hookRes.json?.plan}, Status: ${hookRes.json?.status}`, hookRes.latencyMs);
+    const afterRes = await fetchApi(`${BACKEND_BASE}/api/merchant/billing/status`, { headers: statusHeaders });
+
+    const routeGone = hookRes.statusCode === 404 || hookRes.statusCode === 405;
+    const baselineOk = beforeRes.statusCode === 200 && !!findRequest(beforeRes.json);
+    const afterOk = afterRes.statusCode === 200;
+    const beforeReq = baselineOk ? findRequest(beforeRes.json) : null;
+    const afterReq = afterOk ? findRequest(afterRes.json) : null;
+    const stillPending = !!afterReq && afterReq.status === 'Pending';
+    const planUnchanged = baselineOk && afterOk && afterRes.json?.planType === beforeRes.json?.planType;
+    const expiryUnchanged = baselineOk && afterOk && (afterRes.json?.subscriptionEndsAt ?? null) === (beforeRes.json?.subscriptionEndsAt ?? null);
+    const requestNotMutated = stillPending && (afterReq?.reviewedAt ?? null) === (beforeReq?.reviewedAt ?? null);
+    const hookOk = routeGone && baselineOk && afterOk && stillPending && planUnchanged && expiryUnchanged && requestNotMutated;
+    recordResult('BILLING_GATEWAYS', 'Security: Merchant Cannot Self-Approve Subscription (webhook/simulate removed)', hookOk ? 'PASS' : 'FAIL', `HTTP ${hookRes.statusCode}, baselineOk: ${baselineOk}, afterOk: ${afterOk}, stillPending: ${stillPending}, planUnchanged: ${planUnchanged}, expiryUnchanged: ${expiryUnchanged}`, hookRes.latencyMs);
   }
 
   // ============================================================================
