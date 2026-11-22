@@ -259,7 +259,7 @@ export default function MerchantOrdersPage() {
                       </td>
                       <td role="cell" data-label={language === 'ar' ? "العميل" : "Customer"} className="py-4 px-4">
                         <div className="font-bold text-slate-900 dark:text-white">{order.customerName}</div>
-                        <div className="text-slate-400 dark:text-slate-500 font-mono text-[11px] dir-ltr text-right">{order.customerPhone}</div>
+                        <div className="text-slate-400 dark:text-slate-500 text-[11px] dir-ltr text-right">{order.customerPhone}</div>
                       </td>
                       <td role="cell" data-label={language === 'ar' ? "الدفع" : "Payment"} className="py-4 px-4">
                         <span className="inline-block px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 font-bold text-[11px] text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700">

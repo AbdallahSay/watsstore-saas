@@ -465,7 +465,7 @@ export default function DashboardAnalyticsPage() {
                           {isVodafone ? <Wallet className="w-3.5 h-3.5 text-emerald-600" /> : isInstaPay ? <Building2 className="w-3.5 h-3.5 text-purple-600" /> : <CreditCard className="w-3.5 h-3.5 text-blue-600" />}
                           <span>{pm.method}</span>
                         </span>
-                        <span className="font-mono font-bold text-slate-900 dark:text-slate-100">{pm.percentage}%</span>
+                        <span className="font-bold text-slate-900 dark:text-slate-100">{pm.percentage}%</span>
                       </div>
 
                       {/* Percentage Bar */}

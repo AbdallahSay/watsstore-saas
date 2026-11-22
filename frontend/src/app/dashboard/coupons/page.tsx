@@ -385,7 +385,7 @@ export default function DashboardCouponsPage() {
                       {/* Code */}
                       <td role="cell" data-label={language === 'ar' ? "الكود" : "Code"} className="p-4">
                         <div className="flex items-center gap-2">
-                          <span className="font-mono font-black text-sm text-slate-900 dark:text-white bg-slate-100 dark:bg-slate-800 px-2.5 py-1 rounded-lg border border-slate-200 dark:border-slate-700 tracking-wider">
+                          <span className="font-black text-sm text-slate-900 dark:text-white bg-slate-100 dark:bg-slate-800 px-2.5 py-1 rounded-lg border border-slate-200 dark:border-slate-700 tracking-wider">
                             {coupon.code}
                           </span>
                           <button
@@ -565,7 +565,7 @@ export default function DashboardCouponsPage() {
                   value={formCode}
                   onChange={(e) => setFormCode(e.target.value.toUpperCase())}
                   placeholder="مثال: MASAR10 أو EID2026 أو SAVE50"
-                  className="w-full text-sm font-mono font-bold px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 uppercase tracking-wider"
+                  className="w-full text-sm font-bold px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 uppercase tracking-wider"
                   required
                 />
                 <span className="text-[11px] text-slate-400 mt-1 block">

@@ -928,7 +928,7 @@ export default function DashboardProductsPage() {
                     <Images className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                     <span>معرض صور المنتج (حتى 8 صور)</span>
                   </label>
-                  <span className="text-[11px] font-bold font-mono px-2 py-0.5 rounded-full bg-slate-200/80 dark:bg-slate-700 text-slate-700 dark:text-slate-300">
+                  <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-slate-200/80 dark:bg-slate-700 text-slate-700 dark:text-slate-300">
                     {formImages.length} / 8 صور
                   </span>
                 </div>

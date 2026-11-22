@@ -377,7 +377,7 @@ export default function ThemesMarketplacePage() {
                             >
                               {theme.categoryLabelAr}
                             </span>
-                            <span className="text-xs opacity-60 font-mono">
+                            <span className="text-xs opacity-60">
                               {theme.colorScheme === 'dark' ? 'داكن 🌙' : 'فاتح ☀️'}
                             </span>
                           </div>
@@ -390,7 +390,7 @@ export default function ThemesMarketplacePage() {
                                   : theme.fontMood === 'bold'
                                   ? 'font-black uppercase'
                                   : theme.fontMood === 'tech'
-                                  ? 'font-mono'
+                                  ? ''
                                   : ''
                               }`}
                             >
@@ -531,7 +531,7 @@ export default function ThemesMarketplacePage() {
                         value={customization.primaryColor || ''}
                         placeholder="#059669"
                         onChange={(e) => updateCustomization({ primaryColor: e.target.value })}
-                        className="flex-1 min-h-[44px] px-3 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white text-xs font-mono"
+                        className="flex-1 min-h-[44px] px-3 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white text-xs"
                       />
                     </div>
                     {/* Preset Swatches */}

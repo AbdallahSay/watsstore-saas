@@ -370,7 +370,7 @@ export default function DashboardSettingsPage() {
                   type="text"
                   value={formData.themeColor}
                   onChange={(e) => setFormData({ ...formData, themeColor: e.target.value })}
-                  className="flex-1 px-3 py-2 rounded-xl border border-slate-200 font-mono text-xs text-slate-700"
+                  className="flex-1 px-3 py-2 rounded-xl border border-slate-200 text-xs text-slate-700"
                 />
               </div>
             </div>
@@ -607,7 +607,7 @@ export default function DashboardSettingsPage() {
                   value={formData.metaPixelId}
                   onChange={(e) => setFormData({ ...formData, metaPixelId: e.target.value })}
                   placeholder="مثال: 987654321012345"
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 font-mono text-sm focus:outline-none focus:border-emerald-500"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:border-emerald-500"
                 />
               </div>
             )}

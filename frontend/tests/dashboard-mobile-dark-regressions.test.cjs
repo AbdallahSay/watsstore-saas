@@ -14,6 +14,20 @@ test('billing pending-upgrade card never mixes toLocaleDateString with timeStyle
   assert.match(s, /activePendingRequest\.createdAt\)\.toLocaleString\('ar-EG', \{ dateStyle: 'medium', timeStyle: 'short' \}\)/);
 });
 
+test('admin subscriptions table never mixes toLocaleDateString with timeStyle', () => {
+  const s = read('src/app/admin/page.tsx');
+  assert.ok(!/toLocaleDateString\([^)]*timeStyle/.test(s),
+    'same invalid-options crash class as billing - dates silently fell back to placeholder text');
+  assert.match(s, /toLocaleString\('ar-EG', \{ dateStyle: 'short', timeStyle: 'short' \}\)/);
+});
+
+test('dashboard and admin pages render in the Cairo theme font, not a stray mono or system stack', () => {
+  for (const f of ['src/app/dashboard/page.tsx', 'src/app/admin/page.tsx', 'src/app/dashboard/billing/page.tsx', 'src/app/dashboard/analytics/page.tsx', 'src/app/dashboard/orders/page.tsx', 'src/app/dashboard/products/page.tsx', 'src/app/dashboard/settings/page.tsx', 'src/app/dashboard/coupons/page.tsx', 'src/app/dashboard/themes/page.tsx']) {
+    const s = read(f);
+    assert.ok(!/font-mono|font-sans/.test(s), f + ' must inherit the Cairo theme font');
+  }
+});
+
 test('wide dashboard tables scroll horizontally instead of squeezing on phones', () => {
   const billing = read('src/app/dashboard/billing/page.tsx');
   const admin = read('src/app/admin/page.tsx');
