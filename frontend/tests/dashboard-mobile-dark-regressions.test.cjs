@@ -33,7 +33,7 @@ test('wide dashboard tables scroll horizontally instead of squeezing on phones',
   const admin = read('src/app/admin/page.tsx');
   // Without a min-width inside overflow-x-auto, w-full tables compress into
   // unreadable one-word-per-line vertical strips at 390px.
-  assert.match(billing, /<table className="w-full min-w-\[640px\] text-right text-xs">/);
+  assert.match(billing, /<table className="w-full min-w-\[900px\] text-right text-xs">/);
   assert.equal((admin.match(/<table className="w-full min-w-\[760px\] text-right text-xs">/g) || []).length, 2);
 });
 
@@ -51,4 +51,30 @@ test('analytics page is fully themed in dark mode', () => {
     const bare = new RegExp(token.replace(/-/g, '\\-') + '(?![\\w/-])(?! dark:)');
     assert.ok(!bare.test(s), `${token} without a dark: counterpart in analytics page`);
   }
+});
+
+test('billing invoice table protects every column from mid-word wrapping', () => {
+  const s = read('src/app/dashboard/billing/page.tsx');
+  // Auto table layout squeezed flexible columns to min-content at 390px, splitting
+  // Arabic words mid-token ("المبل" / "غ"). Headers and single-token cells must not wrap.
+  const tableRegion = s.slice(s.indexOf('min-w-[900px]'));
+  assert.ok((tableRegion.match(/<th className="py-3 px-4 font-bold whitespace-nowrap">/g) || []).length === 8,
+    'all 8 invoice-table headers need whitespace-nowrap');
+  assert.ok((tableRegion.match(/whitespace-nowrap/g) || []).length >= 17,
+    'invoice date/plan/cycle/amount/method/sender cells and status pills need whitespace-nowrap');
+  assert.match(tableRegion, /max-w-\[150px\] truncate/, 'transaction id cell keeps truncate protection');
+});
+
+test('billing headings and wizard surfaces stay readable in dark mode', () => {
+  const s = read('src/app/dashboard/billing/page.tsx');
+  // Plan name + wizard title previously rendered text-slate-900 on dark:bg-slate-900.
+  assert.match(s, /text-xl sm:text-2xl font-black text-slate-900 dark:text-slate-100/g);
+  assert.equal((s.match(/text-xl sm:text-2xl font-black text-slate-900 dark:text-slate-100/g) || []).length, 2,
+    'current-plan name and wizard title both need a dark foreground');
+  for (const token of ['bg-slate-100 text-slate-600 hover:bg-slate-200', 'bg-slate-50 border border-slate-200 rounded-2xl p-4 space-y-2']) {
+    assert.ok(!s.includes(token), `unguarded light surface in billing: ${token}`);
+  }
+  // quota cards, stepper buttons and cycle switcher carry dark: variants
+  assert.match(s, /bg-slate-50 dark:bg-slate-800\/60 border border-slate-200 dark:border-slate-700/);
+  assert.match(s, /bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700/);
 });

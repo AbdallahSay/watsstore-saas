@@ -308,7 +308,7 @@ export default function MerchantBillingPage() {
       {/* Top Header / Breadcrumb */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 dark:border-slate-800 pb-5">
         <div>
-          <div className="flex items-center gap-2 text-xs text-slate-500 mb-1">
+          <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400 mb-1">
             <Link href="/dashboard" className="hover:text-emerald-600 font-bold flex items-center gap-1">
               <span>لوحة التحكم</span>
               <ArrowRight className="w-3.5 h-3.5" />
@@ -320,7 +320,7 @@ export default function MerchantBillingPage() {
             <CreditCard className="w-6 h-6 text-emerald-600" />
             <span>إدارة الاشتراك والفوترة وبوابات الدفع</span>
           </h1>
-          <p className="text-xs sm:text-sm text-slate-500 mt-1">
+          <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">
             تابع حالة باقتك الحالية، استهلك كوتة الذكاء الاصطناعي، وقم بالترقية المباشرة عبر فودافون كاش أو إنستاباي.
           </p>
         </div>
@@ -407,30 +407,30 @@ export default function MerchantBillingPage() {
           {/* Detailed Metadata Pill Bar */}
           <div className="bg-white/80 dark:bg-slate-800/80 border border-amber-200 dark:border-amber-700 rounded-2xl p-4 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 text-xs">
             <div>
-              <span className="text-[11px] text-slate-500 block">طريقة الدفع المحول بها</span>
+              <span className="text-[11px] text-slate-500 dark:text-slate-400 block">طريقة الدفع المحول بها</span>
               <span className="font-bold text-slate-900 dark:text-slate-100">
                 {status.activePendingRequest.paymentMethod === 'VodafoneCash' ? 'فودافون كاش' : status.activePendingRequest.paymentMethod === 'InstaPay' ? 'إنستاباي (InstaPay)' : status.activePendingRequest.paymentMethod}
               </span>
             </div>
             <div>
-              <span className="text-[11px] text-slate-500 block">المبلغ الإجمالي المحول</span>
+              <span className="text-[11px] text-slate-500 dark:text-slate-400 block">المبلغ الإجمالي المحول</span>
               <span className="font-black text-emerald-700 dark:text-emerald-400 text-sm">{status.activePendingRequest.amount} ج.م</span>
             </div>
             <div>
-              <span className="text-[11px] text-slate-500 block">رقم العملية التأكيدي</span>
+              <span className="text-[11px] text-slate-500 dark:text-slate-400 block">رقم العملية التأكيدي</span>
               <span className="font-bold text-amber-900 dark:text-amber-200 bg-amber-100 dark:bg-amber-500/15 px-2 py-0.5 rounded border border-amber-200 dark:border-amber-500/30 inline-block">
                 {status.activePendingRequest.transactionId}
               </span>
             </div>
             <div>
-              <span className="text-[11px] text-slate-500 block">المحول منه (المحفظة / الحساب)</span>
+              <span className="text-[11px] text-slate-500 dark:text-slate-400 block">المحول منه (المحفظة / الحساب)</span>
               <span className="font-bold text-slate-800 dark:text-slate-200">
                 {status.activePendingRequest.senderIdentifier || 'غير مسجل'}
               </span>
             </div>
             {status.activePendingRequest.destinationAccount && (
               <div>
-                <span className="text-[11px] text-slate-500 block">الحساب المحول إليه</span>
+                <span className="text-[11px] text-slate-500 dark:text-slate-400 block">الحساب المحول إليه</span>
                 <span className="font-bold text-emerald-800 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-200 dark:border-emerald-500/30 inline-block">
                   {status.activePendingRequest.destinationAccount}
                 </span>
@@ -443,7 +443,7 @@ export default function MerchantBillingPage() {
       {/* 2. Current Plan Overview Card */}
       {status && (
         <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 sm:p-8 shadow-sm space-y-6 transition-colors">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-5">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 dark:border-slate-800 pb-5">
             <div className="flex items-center gap-3">
               <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 text-emerald-600 flex items-center justify-center font-bold">
                 <Crown className="w-6 h-6" />
@@ -451,12 +451,12 @@ export default function MerchantBillingPage() {
               <div>
                 <span className="text-xs font-bold text-slate-400 block">الباقة الحالية لمتجرك</span>
                 <div className="flex items-center gap-2">
-                  <h2 className="text-xl sm:text-2xl font-black text-slate-900">
+                  <h2 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-slate-100">
                     {status.planType === 'VIP' ? 'باقة كبار التجار (VIP 👑)' : status.planType === 'Pro' ? 'باقة المحترفين (Pro ⭐)' : 'تجربة مجانية (14 يوماً)'}
                   </h2>
                   <span className={`text-[11px] font-black px-2.5 py-0.5 rounded-full ${
                     status.isTrialExpired
-                      ? 'bg-rose-100 text-rose-700'
+                      ? 'bg-rose-100 dark:bg-rose-500/10 text-rose-700 dark:text-rose-300'
                       : status.planType === 'Free'
                       ? 'bg-amber-100 text-amber-800'
                       : 'bg-emerald-100 text-emerald-800'
@@ -470,7 +470,7 @@ export default function MerchantBillingPage() {
             <div className="flex items-center gap-3">
               <div className="text-left sm:text-right">
                 <span className="text-[11px] text-slate-400 block font-bold">تاريخ انتهاء الصلاحية</span>
-                <span className="text-xs sm:text-sm font-black text-slate-700">
+                <span className="text-xs sm:text-sm font-black text-slate-700 dark:text-slate-200">
                   {status.planType === 'Free'
                     ? (status.trialEndsAt ? new Date(status.trialEndsAt).toLocaleDateString('ar-EG', { dateStyle: 'medium' }) : `${status.remainingTrialDays} أيام متبقية`)
                     : (status.subscriptionEndsAt ? new Date(status.subscriptionEndsAt).toLocaleDateString('ar-EG', { dateStyle: 'medium' }) : 'اشتراك مفتوح')}
@@ -482,17 +482,17 @@ export default function MerchantBillingPage() {
           {/* AI Quota & Plan Limits Row */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {/* AI Generations Progress */}
-            <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 space-y-2">
+            <div className="bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 rounded-2xl p-4 space-y-2">
               <div className="flex items-center justify-between text-xs">
-                <span className="font-bold text-slate-600 flex items-center gap-1.5">
+                <span className="font-bold text-slate-600 dark:text-slate-300 flex items-center gap-1.5">
                   <Sparkles className="w-4 h-4 text-emerald-600" />
                   <span>توليد وصف المنتجات بالذكاء الاصطناعي</span>
                 </span>
-                <span className="font-black text-slate-900">
+                <span className="font-black text-slate-900 dark:text-slate-100">
                   {status.aiGenerationsUsed} / {status.aiGenerationsLimit}
                 </span>
               </div>
-              <div className="w-full bg-slate-200 h-2 rounded-full overflow-hidden">
+              <div className="w-full bg-slate-200 dark:bg-slate-700 h-2 rounded-full overflow-hidden">
                 <div 
                   className={`h-full rounded-full transition-all ${
                     status.aiGenerationsLimit === 0 ? 'bg-slate-400 w-0' : 'bg-emerald-500'
@@ -504,7 +504,7 @@ export default function MerchantBillingPage() {
                   }}
                 />
               </div>
-              <div className="flex justify-between items-center text-[11px] text-slate-500">
+              <div className="flex justify-between items-center text-[11px] text-slate-500 dark:text-slate-400">
                 {status.planType === 'Free' ? (
                   <span className="text-rose-600 font-bold">🔒 مقفل في الباقة المجانية (متاح في Pro و VIP)</span>
                 ) : (
@@ -514,13 +514,13 @@ export default function MerchantBillingPage() {
             </div>
 
             {/* Product Limit */}
-            <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 space-y-1">
+            <div className="bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 rounded-2xl p-4 space-y-1">
               <span className="text-[11px] font-bold text-slate-400 block">سعة المنتجات بالمتجر</span>
               <div className="flex items-baseline gap-1.5">
-                <span className="text-xl font-black text-slate-900">
+                <span className="text-xl font-black text-slate-900 dark:text-slate-100">
                   {status.planType === 'VIP' ? 'غير محدود' : status.planType === 'Pro' ? '100' : '10'}
                 </span>
-                <span className="text-xs text-slate-500">منتج</span>
+                <span className="text-xs text-slate-500 dark:text-slate-400">منتج</span>
               </div>
               <span className="text-[11px] text-slate-400 block">
                 {status.planType === 'Free' ? 'قم بالترقية لإضافة حتى 100 منتج أو غير محدود' : 'سعة ممتازة لعرض تشكيلة كتالوج واسعة'}
@@ -528,13 +528,13 @@ export default function MerchantBillingPage() {
             </div>
 
             {/* Coupons & Features */}
-            <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 space-y-1">
+            <div className="bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 rounded-2xl p-4 space-y-1">
               <span className="text-[11px] font-bold text-slate-400 block">كوبونات الخصم والتصدير</span>
               <div className="flex items-baseline gap-1.5">
-                <span className="text-xl font-black text-slate-900">
+                <span className="text-xl font-black text-slate-900 dark:text-slate-100">
                   {status.planType === 'VIP' ? 'غير محدود' : status.planType === 'Pro' ? '15' : '1'}
                 </span>
-                <span className="text-xs text-slate-500">كوبون نشط</span>
+                <span className="text-xs text-slate-500 dark:text-slate-400">كوبون نشط</span>
               </div>
               <span className="text-[11px] text-slate-400 block">
                 تصدير إكسل: {status.planType === 'Free' ? '🔒 مغلق' : '✅ مفعل ومتاح'}
@@ -548,13 +548,13 @@ export default function MerchantBillingPage() {
       <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 sm:p-8 shadow-sm space-y-8 transition-colors">
         {/* Wizard Header & Stepper Tabs */}
         <div className="space-y-4">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-5">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 dark:border-slate-800 pb-5">
             <div>
               <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-bold mb-2">
                 <Zap className="w-3.5 h-3.5 text-emerald-600" />
                 <span>معالج الترقية السريع (Stripe/Shopify Grade)</span>
               </div>
-              <h2 className="text-xl sm:text-2xl font-black text-slate-900">
+              <h2 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-slate-100">
                 ترقية وتجديد باقة المتجر في 3 خطوات بسيطة
               </h2>
             </div>
@@ -574,7 +574,7 @@ export default function MerchantBillingPage() {
               className={`p-3 rounded-2xl font-black transition-all flex items-center justify-center gap-2 ${
                 wizardStep === 1
                   ? 'bg-emerald-600 text-white shadow-md shadow-emerald-600/20'
-                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                  : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
               }`}
             >
               <span className="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center text-[11px]">1</span>
@@ -587,7 +587,7 @@ export default function MerchantBillingPage() {
               className={`p-3 rounded-2xl font-black transition-all flex items-center justify-center gap-2 ${
                 wizardStep === 2
                   ? 'bg-emerald-600 text-white shadow-md shadow-emerald-600/20'
-                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                  : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
               }`}
             >
               <span className="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center text-[11px]">2</span>
@@ -600,7 +600,7 @@ export default function MerchantBillingPage() {
               className={`p-3 rounded-2xl font-black transition-all flex items-center justify-center gap-2 ${
                 wizardStep === 3
                   ? 'bg-emerald-600 text-white shadow-md shadow-emerald-600/20'
-                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                  : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
               }`}
             >
               <span className="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center text-[11px]">3</span>
@@ -614,15 +614,15 @@ export default function MerchantBillingPage() {
           <div className="space-y-6 animate-fade-in">
             {/* Billing Cycle Switcher */}
             <div className="text-center space-y-3">
-              <p className="text-xs text-slate-500">اختر دورة الفوترة المفضلة لك:</p>
-              <div className="inline-flex items-center p-1 bg-slate-100 border border-slate-200 rounded-2xl gap-1">
+              <p className="text-xs text-slate-500 dark:text-slate-400">اختر دورة الفوترة المفضلة لك:</p>
+              <div className="inline-flex items-center p-1 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl gap-1">
                 <button
                   type="button"
                   onClick={() => setBillingCycle('Monthly')}
                   className={`px-4 py-2 rounded-xl text-xs font-black transition-all ${
                     billingCycle === 'Monthly'
                       ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-sm'
-                      : 'text-slate-600 hover:text-slate-900'
+                      : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
                   }`}
                 >
                   دفع شهري
@@ -633,7 +633,7 @@ export default function MerchantBillingPage() {
                   className={`px-4 py-2 rounded-xl text-xs font-black transition-all flex items-center gap-1.5 ${
                     billingCycle === 'Annual'
                       ? 'bg-emerald-600 text-white shadow-sm'
-                      : 'text-slate-600 hover:text-slate-900'
+                      : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
                   }`}
                 >
                   <span>دفع سنوي</span>
@@ -671,20 +671,20 @@ export default function MerchantBillingPage() {
 
                   <div>
                     <h3 className="text-xl font-black text-slate-900 dark:text-slate-100">باقة المحترفين</h3>
-                    <p className="text-xs text-slate-500 mt-1">المثالية للمتاجر المتنامية وحملات إعلانات السوشيال ميديا</p>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">المثالية للمتاجر المتنامية وحملات إعلانات السوشيال ميديا</p>
                   </div>
 
                   <div className="flex items-baseline gap-2">
                     <span className="text-3xl sm:text-4xl font-black text-slate-900 dark:text-slate-100">
                       {billingCycle === 'Annual' ? proAnnual : proMonthly}
                     </span>
-                    <span className="text-xs text-slate-500 font-bold">
+                    <span className="text-xs text-slate-500 dark:text-slate-400 font-bold">
                       ج.م / {billingCycle === 'Annual' ? 'سنوياً' : 'شهرياً'}
                     </span>
                   </div>
 
                   {billingCycle === 'Annual' && (
-                    <div className="p-2.5 bg-emerald-50 border border-emerald-200 rounded-xl text-xs text-emerald-800 font-bold">
+                    <div className="p-2.5 bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/30 rounded-xl text-xs text-emerald-800 dark:text-emerald-300 font-bold">
                       وفرت 1,089 ج.م مقارنة بالدفع الشهري!
                     </div>
                   )}
@@ -745,14 +745,14 @@ export default function MerchantBillingPage() {
 
                   <div>
                     <h3 className="text-xl font-black text-slate-900 dark:text-slate-100">باقة كبار التجار</h3>
-                    <p className="text-xs text-slate-500 mt-1">سعة مطلقة بدون قيود للشركات والعلامات التجارية الكبرى</p>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">سعة مطلقة بدون قيود للشركات والعلامات التجارية الكبرى</p>
                   </div>
 
                   <div className="flex items-baseline gap-2">
                     <span className="text-3xl sm:text-4xl font-black text-slate-900 dark:text-slate-100">
                       {billingCycle === 'Annual' ? vipAnnual : vipMonthly}
                     </span>
-                    <span className="text-xs text-slate-500 font-bold">
+                    <span className="text-xs text-slate-500 dark:text-slate-400 font-bold">
                       ج.م / {billingCycle === 'Annual' ? 'سنوياً' : 'شهرياً'}
                     </span>
                   </div>
@@ -1073,7 +1073,7 @@ export default function MerchantBillingPage() {
                       className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-xs sm:text-sm text-slate-100 focus:outline-none focus:border-emerald-500"
                       required
                     />
-                    <span className="text-[10px] text-slate-500 mt-1 block">
+                    <span className="text-[10px] text-slate-500 dark:text-slate-400 mt-1 block">
                       من 6 إلى 30 حرف ورقم كما يظهر في رسالة تأكيد التحويل
                     </span>
                   </div>
@@ -1089,7 +1089,7 @@ export default function MerchantBillingPage() {
                       placeholder="مثال: 010xxxxxxxx أو name@instapay"
                       className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-xs sm:text-sm text-slate-100 focus:outline-none focus:border-emerald-500"
                     />
-                    <span className="text-[10px] text-slate-500 mt-1 block">
+                    <span className="text-[10px] text-slate-500 dark:text-slate-400 mt-1 block">
                       لتسريع مطابقة الحوالة وتفعيل متجرك فورياً
                     </span>
                   </div>
@@ -1162,38 +1162,38 @@ export default function MerchantBillingPage() {
 
         {status?.invoiceHistory && status.invoiceHistory.length > 0 ? (
           <div className="overflow-x-auto">
-            <table className="w-full min-w-[640px] text-right text-xs">
+            <table className="w-full min-w-[900px] text-right text-xs">
               <thead className="bg-slate-50 dark:bg-slate-800/60 text-slate-500 dark:text-slate-400 border-b border-slate-100 dark:border-slate-800">
                 <tr>
-                  <th className="py-3 px-4 font-bold">تاريخ الطلب</th>
-                  <th className="py-3 px-4 font-bold">الباقة</th>
-                  <th className="py-3 px-4 font-bold">دورة الفوترة</th>
-                  <th className="py-3 px-4 font-bold">المبلغ</th>
-                  <th className="py-3 px-4 font-bold">طريقة الدفع</th>
-                  <th className="py-3 px-4 font-bold">المحول منه</th>
-                  <th className="py-3 px-4 font-bold">رقم العملية</th>
-                  <th className="py-3 px-4 font-bold">حالة الطلب</th>
+                  <th className="py-3 px-4 font-bold whitespace-nowrap">تاريخ الطلب</th>
+                  <th className="py-3 px-4 font-bold whitespace-nowrap">الباقة</th>
+                  <th className="py-3 px-4 font-bold whitespace-nowrap">دورة الفوترة</th>
+                  <th className="py-3 px-4 font-bold whitespace-nowrap">المبلغ</th>
+                  <th className="py-3 px-4 font-bold whitespace-nowrap">طريقة الدفع</th>
+                  <th className="py-3 px-4 font-bold whitespace-nowrap">المحول منه</th>
+                  <th className="py-3 px-4 font-bold whitespace-nowrap">رقم العملية</th>
+                  <th className="py-3 px-4 font-bold whitespace-nowrap">حالة الطلب</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                 {status.invoiceHistory.map((item) => (
                   <tr key={item.id} className="hover:bg-slate-50/80 dark:hover:bg-slate-800/50 transition-colors">
-                    <td className="py-3 px-4 text-slate-600 dark:text-slate-300">
+                    <td className="py-3 px-4 text-slate-600 dark:text-slate-300 whitespace-nowrap">
                       {new Date(item.createdAt).toLocaleDateString('ar-EG', { dateStyle: 'medium' })}
                     </td>
-                    <td className="py-3 px-4 font-bold text-slate-900 dark:text-slate-100">
+                    <td className="py-3 px-4 font-bold text-slate-900 dark:text-slate-100 whitespace-nowrap">
                       {item.planType === 'VIP' ? 'كبار التجار (VIP 👑)' : 'المحترفين (Pro ⭐)'}
                     </td>
-                    <td className="py-3 px-4 font-medium text-slate-600 dark:text-slate-300">
+                    <td className="py-3 px-4 font-medium text-slate-600 dark:text-slate-300 whitespace-nowrap">
                       {item.billingCycle === 'Annual' ? 'سنوي' : 'شهري'}
                     </td>
-                    <td className="py-3 px-4 font-bold text-slate-900 dark:text-slate-100">
+                    <td className="py-3 px-4 font-bold text-slate-900 dark:text-slate-100 whitespace-nowrap">
                       {item.amount} ج.م
                     </td>
-                    <td className="py-3 px-4 text-slate-600 dark:text-slate-300">
+                    <td className="py-3 px-4 text-slate-600 dark:text-slate-300 whitespace-nowrap">
                       {item.paymentMethod === 'VodafoneCash' ? 'فودافون كاش' : item.paymentMethod === 'InstaPay' ? 'إنستاباي' : item.paymentMethod}
                     </td>
-                    <td className="py-3 px-4 text-slate-600 dark:text-slate-300">
+                    <td className="py-3 px-4 text-slate-600 dark:text-slate-300 whitespace-nowrap">
                       {item.senderIdentifier || '-'}
                     </td>
                     <td className="py-3 px-4 text-slate-700 dark:text-slate-300 max-w-[150px] truncate" title={item.transactionId}>
@@ -1201,22 +1201,22 @@ export default function MerchantBillingPage() {
                     </td>
                     <td className="py-3 px-4">
                       {item.status === 'Approved' ? (
-                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-500/10 text-emerald-800 dark:text-emerald-300 font-bold text-[11px]">
+                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full whitespace-nowrap bg-emerald-100 dark:bg-emerald-500/10 text-emerald-800 dark:text-emerald-300 font-bold text-[11px]">
                           <CheckCircle2 className="w-3.5 h-3.5" />
                           <span>تم التفعيل بنجاح</span>
                         </span>
                       ) : item.status === 'Rejected' ? (
-                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-rose-100 dark:bg-rose-500/10 text-rose-800 dark:text-rose-300 font-bold text-[11px]" title={item.adminNotes || 'مرفوض'}>
+                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full whitespace-nowrap bg-rose-100 dark:bg-rose-500/10 text-rose-800 dark:text-rose-300 font-bold text-[11px]" title={item.adminNotes || 'مرفوض'}>
                           <XCircle className="w-3.5 h-3.5" />
                           <span>مرفوض ({item.adminNotes || 'تحقق من الحوالة'})</span>
                         </span>
                       ) : item.status === 'Cancelled' ? (
-                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold text-[11px]">
+                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full whitespace-nowrap bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold text-[11px]">
                           <Ban className="w-3.5 h-3.5" />
                           <span>تم الإلغاء</span>
                         </span>
                       ) : (
-                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-amber-100 dark:bg-amber-500/15 text-amber-800 dark:text-amber-300 font-bold text-[11px]">
+                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full whitespace-nowrap bg-amber-100 dark:bg-amber-500/15 text-amber-800 dark:text-amber-300 font-bold text-[11px]">
                           <Clock className="w-3.5 h-3.5 animate-spin" />
                           <span>قيد المراجعة</span>
                         </span>
