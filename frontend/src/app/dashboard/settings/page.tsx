@@ -370,7 +370,7 @@ export default function DashboardSettingsPage() {
                   type="text"
                   value={formData.themeColor}
                   onChange={(e) => setFormData({ ...formData, themeColor: e.target.value })}
-                  className="flex-1 px-3 py-2 rounded-xl border border-slate-200 text-xs text-slate-700"
+                  className="flex-1 min-w-0 px-3 py-2 rounded-xl border border-slate-200 text-xs text-slate-700"
                 />
               </div>
             </div>
@@ -384,7 +384,7 @@ export default function DashboardSettingsPage() {
                   value={formData.logoUrl}
                   onChange={(e) => setFormData({ ...formData, logoUrl: e.target.value })}
                   placeholder="رابط الشعار أو ارفعه مباشرة..."
-                  className="flex-1 px-3.5 py-2.5 rounded-xl border border-slate-200 font-medium text-sm focus:outline-none focus:border-emerald-500"
+                  className="flex-1 min-w-0 px-3.5 py-2.5 rounded-xl border border-slate-200 font-medium text-sm focus:outline-none focus:border-emerald-500"
                 />
                 <input
                   type="file"
@@ -432,7 +432,7 @@ export default function DashboardSettingsPage() {
                   value={formData.coverUrl}
                   onChange={(e) => setFormData({ ...formData, coverUrl: e.target.value })}
                   placeholder="رابط الغلاف أو ارفعه مباشرة..."
-                  className="flex-1 px-3.5 py-2.5 rounded-xl border border-slate-200 font-medium text-sm focus:outline-none focus:border-emerald-500"
+                  className="flex-1 min-w-0 px-3.5 py-2.5 rounded-xl border border-slate-200 font-medium text-sm focus:outline-none focus:border-emerald-500"
                 />
                 <input
                   type="file"
